@@ -9,6 +9,9 @@ import {
     createStreamableValue
 } from 'ai/rsc'
 import { openai } from '@ai-sdk/openai'
+import { z } from 'zod'
+import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
+import { Stocks } from '@/components/stocks/stocks'
 import {
     formatNumber,
     runAsyncFnWithoutBlocking,
@@ -38,10 +41,131 @@ export type UIState = {
 
 async function submitUserMessage(content: string) {
     'use server'
-    console.log("submitting user message", content)
+
+    const aiState = getMutableAIState<typeof AI>()
+
+    aiState.update({
+        ...aiState.get(),
+        messages: [
+            ...aiState.get().messages,
+            {
+                id: nanoid(),
+                role: 'user',
+                content
+            }
+        ]
+    })
+
+    let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
+    let textNode: undefined | React.ReactNode
+
+    const result = await streamUI({
+        // model: anthropic('claude-3-5-sonnet-20240620'),
+        model: openai('gpt-4o'),
+        initial: <SpinnerMessage />,
+        system: `\
+    You are an AI coding agent on OpenAgents.com. You help users interact with their repositories.
+    You can view file contents, navigate the repository structure, and provide information about the codebase.
+        `,
+        messages: [
+            ...aiState.get().messages.map((message: any) => ({
+                role: message.role,
+                content: message.content,
+                name: message.name
+            }))
+        ],
+        text: ({ content, done, delta }) => {
+            if (!textStream) {
+                textStream = createStreamableValue('')
+                textNode = <BotMessage content={textStream.value} />
+            }
+
+            if (done) {
+                textStream.done()
+                aiState.done({
+                    ...aiState.get(),
+                    messages: [
+                        ...aiState.get().messages,
+                        {
+                            id: nanoid(),
+                            role: 'assistant',
+                            content
+                        }
+                    ]
+                })
+            } else {
+                textStream.update(delta)
+            }
+
+            return textNode
+        },
+        tools: {
+            listStocks: {
+                description: 'List three imaginary stocks that are trending.',
+                parameters: z.object({
+                    stocks: z.array(
+                        z.object({
+                            symbol: z.string().describe('The symbol of the stock'),
+                            price: z.number().describe('The price of the stock'),
+                            delta: z.number().describe('The change in price of the stock')
+                        })
+                    )
+                }),
+                generate: async function*({ stocks }) {
+                    yield (
+                        <BotCard>
+                            <StocksSkeleton />
+                        </BotCard>
+                    )
+
+                    await sleep(1000)
+
+                    const toolCallId = nanoid()
+
+                    aiState.done({
+                        ...aiState.get(),
+                        messages: [
+                            ...aiState.get().messages,
+                            {
+                                id: nanoid(),
+                                role: 'assistant',
+                                content: [
+                                    {
+                                        type: 'tool-call',
+                                        toolName: 'listStocks',
+                                        toolCallId,
+                                        args: { stocks }
+                                    }
+                                ]
+                            },
+                            {
+                                id: nanoid(),
+                                role: 'tool',
+                                content: [
+                                    {
+                                        type: 'tool-result',
+                                        toolName: 'listStocks',
+                                        toolCallId,
+                                        result: stocks
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+
+                    return (
+                        <BotCard>
+                            <Stocks props={stocks} />
+                        </BotCard>
+                    )
+                }
+            },
+        }
+    })
+
     return {
         id: nanoid(),
-        display: "Here's a test."
+        display: result.value
     }
 }
 
