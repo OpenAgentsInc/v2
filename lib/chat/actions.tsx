@@ -11,6 +11,7 @@ import {
     createStreamableValue
 } from 'ai/rsc'
 import { openai } from '@ai-sdk/openai'
+import { anthropic } from '@ai-sdk/anthropic'
 import { getTools } from '@/tools'
 import { z } from 'zod'
 import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
@@ -42,7 +43,7 @@ export type UIState = {
     display: React.ReactNode
 }[]
 
-async function submitUserMessage(content: string, repo: any) {
+async function submitUserMessage(content: string, repo: any, model: any) {
     'use server'
 
     const aiState = getMutableAIState<typeof AI>()
@@ -63,7 +64,7 @@ async function submitUserMessage(content: string, repo: any) {
     let textNode: undefined | React.ReactNode
 
     const result = await streamUI({
-        model: openai('gpt-4o'),
+        model: model.provider === 'openai' ? openai(model.id) : anthropic(model.id),
         initial: <SpinnerMessage />,
         system: `\
     You are an AI coding agent on OpenAgents.com. You help users interact with their repositories.
