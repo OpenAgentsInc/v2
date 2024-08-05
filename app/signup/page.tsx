@@ -1,18 +1,16 @@
-import { auth } from '@/auth'
-import SignupForm from '@/components/signup-form'
-import { Session } from '@/lib/types'
+import { auth, SignUp } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 
 export default async function SignupPage() {
-  const session = (await auth()) as Session
+  const { userId } = auth()
 
-  if (session) {
+  if (userId) {
     redirect('/')
   }
 
   return (
     <main className="flex flex-col p-4">
-      <SignupForm />
+      <SignUp />
     </main>
   )
 }
