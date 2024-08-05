@@ -2,11 +2,16 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
+import { useModelStore } from '@/store/models'
 import * as Popover from '@radix-ui/react-popover'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { models } from '@/lib/models'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
     const setRepo = useRepoStore((state) => state.setRepo)
+    const model = useModelStore((state) => state.model)
+    const setModel = useModelStore((state) => state.setModel)
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -36,12 +41,29 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         >
             <div className="flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center space-x-2">
-                    <button className="bg-black text-white hover:bg-white/10 rounded px-2 py-1 flex items-center space-x-1">
-                        <span className="opacity-75 text-xs">Claude 3.5 Sonnet</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 256 256">
-                            <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
-                        </svg>
-                    </button>
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                            <button className="bg-black text-white hover:bg-white/10 rounded px-2 py-1 flex items-center space-x-1">
+                                <span className="opacity-75 text-xs">{model.name}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 256 256">
+                                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+                                </svg>
+                            </button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                            <DropdownMenu.Content className="bg-black border border-white rounded-lg shadow-lg p-1 z-50">
+                                {models.map((m) => (
+                                    <DropdownMenu.Item
+                                        key={m.id}
+                                        className="px-2 py-1 text-white hover:bg-white/10 cursor-pointer"
+                                        onClick={() => setModel(m)}
+                                    >
+                                        {m.name}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                    </DropdownMenu.Root>
                     <span className="bg-black text-white rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
                         <Wrench className="mr-1" size={14} />
                         4
