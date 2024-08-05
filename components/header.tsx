@@ -7,14 +7,15 @@ import { IconNextChat } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignInButton, SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs'
 
 function UserOrLogin() {
+    const { user } = useUser()
     return (
         <>
             <SignedIn>
                 <SidebarMobile>
-                    <ChatHistory userId={""} /> {/* You'll need to pass the user ID from Clerk */}
+                    <ChatHistory userId={user?.id || ""} />
                 </SidebarMobile>
                 <SidebarToggle />
             </SignedIn>
