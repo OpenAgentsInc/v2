@@ -34,7 +34,8 @@ export function ChatPanel({
     const { submitUserMessage } = useActions()
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
 
-    const exampleMessages = [
+    const exampleMessages = []
+    const exampleMessagesOld = [
         {
             heading: 'How do I',
             subheading: 'connect a GitHub repo?',
