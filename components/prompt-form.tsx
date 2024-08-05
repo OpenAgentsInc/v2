@@ -37,37 +37,39 @@ export function PromptForm({
     }
   }, [])
 
+  const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Blur focus on mobile
+    if (window.innerWidth < 600) {
+      inputRef.current?.blur()
+    }
+
+    const value = input.trim()
+    setInput('')
+    if (!value) return
+
+    // Ensure messages is an array before updating
+    const currentMessages = Array.isArray(messages) ? messages : []
+
+    // Optimistically add user message UI
+    setMessages(prevMessages => [
+      ...(Array.isArray(prevMessages) ? prevMessages : []),
+      {
+        id: nanoid(),
+        display: <UserMessage>{value}</UserMessage>
+      }
+    ])
+
+    // Submit and get response message
+    const responseMessage = await submitUserMessage(value)
+    setMessages(prevMessages => [...(Array.isArray(prevMessages) ? prevMessages : []), responseMessage])
+  }, [input, setInput, messages, setMessages, submitUserMessage])
+
   return (
     <form
       ref={formRef}
-      onSubmit={async (e: any) => {
-        e.preventDefault()
-
-        // Blur focus on mobile
-        if (window.innerWidth < 600) {
-          e.target['message']?.blur()
-        }
-
-        const value = input.trim()
-        setInput('')
-        if (!value) return
-
-        // Ensure messages is an array before updating
-        const currentMessages = Array.isArray(messages) ? messages : []
-
-        // Optimistically add user message UI
-        setMessages([
-          ...currentMessages,
-          {
-            id: nanoid(),
-            display: <UserMessage>{value}</UserMessage>
-          }
-        ])
-
-        // Submit and get response message
-        const responseMessage = await submitUserMessage(value)
-        setMessages(prevMessages => [...(Array.isArray(prevMessages) ? prevMessages : []), responseMessage])
-      }}
+      onSubmit={handleSubmit}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
         <Tooltip>
