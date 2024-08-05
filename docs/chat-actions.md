@@ -134,16 +134,17 @@ lib/
       pullRequests.ts
       issues.ts
       repositories.ts
-    components/
-      FileViewer.tsx
-      HierarchyViewer.tsx
-      PullRequestCreator.tsx
-      PullRequestMerger.tsx
-      IssueCreator.tsx
     types.ts
     utils.ts
   chat/
     actions.tsx (refactored)
+components/
+  github/
+    FileViewer.tsx
+    HierarchyViewer.tsx
+    PullRequestCreator.tsx
+    PullRequestMerger.tsx
+    IssueCreator.tsx
 ```
 
 #### Detailed Specifications
