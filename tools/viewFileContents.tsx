@@ -3,28 +3,37 @@ import { nanoid } from '@/lib/utils'
 import { BotCard } from '@/components/stocks'
 import { viewFileContents as fetchFileContents } from '@/lib/github/actions/viewFile'
 import dynamic from 'next/dynamic'
+import { Repo } from '@/lib/types'
 
 const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer').then(mod => mod.FileViewer), {
     ssr: false,
     loading: () => <div>Loading file viewer...</div>
 });
 
-export const viewFileContents = (aiState: any) => ({
+export const viewFileContents = (aiState: any, repo: Repo | null) => ({
     description: 'View the contents of a file in the GitHub repository',
     parameters: z.object({
-        repo: z.string().describe('The repository name (e.g., "owner/repo")'),
         path: z.string().describe('The file path within the repository'),
         ref: z.string().optional().describe('The branch or commit reference (optional)')
     }),
-    generate: async function*({ repo, path, ref }) {
+    generate: async function*({ path, ref }) {
         yield (
             <BotCard>
                 <div>Loading file contents...</div>
             </BotCard>
         )
 
+        if (!repo) {
+            return (
+                <BotCard>
+                    <div>Error: Repository information is not available.</div>
+                </BotCard>
+            )
+        }
+
         try {
-            const content = await fetchFileContents(repo, path, ref)
+            const repoString = `${repo.owner}/${repo.name}`
+            const content = await fetchFileContents(repoString, path, ref || repo.branch)
             const toolCallId = nanoid()
 
             aiState.done({
@@ -39,7 +48,7 @@ export const viewFileContents = (aiState: any) => ({
                                 type: 'tool-call',
                                 toolName: 'viewFileContents',
                                 toolCallId,
-                                args: { repo, path, ref }
+                                args: { repo: repoString, path, ref: ref || repo.branch }
                             }
                         ]
                     },
