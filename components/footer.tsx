@@ -6,6 +6,7 @@ import * as Popover from '@radix-ui/react-popover'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
+    console.log(repo)
     const setRepo = useRepoStore((state) => state.setRepo)
 
     const [repoInput, setRepoInput] = React.useState({
@@ -91,7 +92,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                             autoFocus={false}
                                         />
                                         <button 
-                                            type="submit" 
+                                            type="submit"
                                             className="w-full p-2 bg-black text-white border border-white rounded hover:bg-white hover:bg-opacity-5 focus:outline-none text-sm transition-colors duration-200"
                                         >
                                             {repo ? 'Update Repo' : 'Set Repo'}
