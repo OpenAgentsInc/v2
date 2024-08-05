@@ -2,9 +2,26 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
+import * as Popover from '@radix-ui/react-popover'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
+    const setRepo = useRepoStore((state) => state.setRepo)
+
+    const [repoInput, setRepoInput] = React.useState({
+        owner: repo?.owner || '',
+        name: repo?.name || '',
+        branch: repo?.branch || ''
+    })
+
+    const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
+    }
+
+    const handleRepoSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        setRepo(repoInput)
+    }
 
     return (
         <div
@@ -27,16 +44,62 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                         4
                     </span>
                     {repo && (
-                        <>
-                            <span className="bg-black text-white rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
-                                <Github className="mr-1" size={14} />
-                                {repo.owner}/{repo.name}
-                            </span>
-                            <span className="bg-black text-white rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
-                                <GitBranch className="mr-1" size={14} />
-                                {repo.branch}
-                            </span>
-                        </>
+                        <Popover.Root>
+                            <Popover.Trigger asChild>
+                                <button className="bg-black text-white rounded px-2 py-0.5 text-xs flex items-center opacity-75 space-x-1">
+                                    <Github size={14} />
+                                    <span>{repo.owner}/{repo.name}</span>
+                                    <GitBranch size={14} />
+                                    <span>{repo.branch}</span>
+                                </button>
+                            </Popover.Trigger>
+                            <Popover.Portal>
+                                <Popover.Content 
+                                    className="bg-black border border-white rounded-lg shadow-lg p-4 z-50" 
+                                    style={{ width: '200px' }}
+                                    onOpenAutoFocus={(e) => e.preventDefault()}
+                                >
+                                    <form onSubmit={handleRepoSubmit} className="space-y-2">
+                                        <input
+                                            type="text"
+                                            name="owner"
+                                            value={repoInput.owner}
+                                            onChange={handleRepoInputChange}
+                                            placeholder="Owner"
+                                            className="w-full p-2 bg-black text-white border border-white rounded focus:outline-none focus:border-gray-300 text-sm"
+                                            autoComplete="off"
+                                            autoFocus={false}
+                                        />
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={repoInput.name}
+                                            onChange={handleRepoInputChange}
+                                            placeholder="Repo name"
+                                            className="w-full p-2 bg-black text-white border border-white rounded focus:outline-none focus:border-gray-300 text-sm"
+                                            autoComplete="off"
+                                            autoFocus={false}
+                                        />
+                                        <input
+                                            type="text"
+                                            name="branch"
+                                            value={repoInput.branch}
+                                            onChange={handleRepoInputChange}
+                                            placeholder="Branch"
+                                            className="w-full p-2 bg-black text-white border border-white rounded focus:outline-none focus:border-gray-300 text-sm"
+                                            autoComplete="off"
+                                            autoFocus={false}
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="w-full p-2 bg-black text-white border border-white rounded hover:bg-white hover:bg-opacity-5 focus:outline-none text-sm transition-colors duration-200"
+                                        >
+                                            {repo ? 'Update Repo' : 'Set Repo'}
+                                        </button>
+                                    </form>
+                                </Popover.Content>
+                            </Popover.Portal>
+                        </Popover.Root>
                     )}
                 </div>
             </div>
