@@ -191,6 +191,7 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             } else if (message.role === 'tool') {
                 message.content.forEach((tool: any) => {
                     if (tool.toolName === 'viewFileContents') {
+                        console.log("????")
                         displays.push(
                             <BotCard key={tool.toolCallId}>
                                 <DynamicFileViewer
