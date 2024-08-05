@@ -30,6 +30,7 @@ import {
 } from '@/components/stocks'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { FileViewer } from '@/components/github/file-viewer'
+import { useRepoStore } from '@/store/repo'
 
 export type AIState = {
     chatId: string
@@ -45,6 +46,7 @@ async function submitUserMessage(content: string) {
     'use server'
 
     const aiState = getMutableAIState<typeof AI>()
+    const repo = useRepoStore.getState().repo
 
     aiState.update({
         ...aiState.get(),
@@ -62,12 +64,12 @@ async function submitUserMessage(content: string) {
     let textNode: undefined | React.ReactNode
 
     const result = await streamUI({
-        // model: anthropic('claude-3-5-sonnet-20240620'),
         model: openai('gpt-4o'),
         initial: <SpinnerMessage />,
         system: `\
     You are an AI coding agent on OpenAgents.com. You help users interact with their repositories.
     You can view file contents, navigate the repository structure, and provide information about the codebase.
+    The current repository is ${repo?.owner}/${repo?.name} on branch ${repo?.branch}.
         `,
         messages: [
             ...aiState.get().messages.map((message: any) => ({
@@ -101,7 +103,7 @@ async function submitUserMessage(content: string) {
 
             return textNode
         },
-        tools: getTools(aiState)
+        tools: getTools(aiState, repo)
     })
 
     return {
@@ -162,11 +164,6 @@ export const AI = createAI<AIState, UIState>({
         }
     }
 })
-
-
-
-// import { BotCard, BotMessage, UserMessage } from '@/components/stocks';
-// import dynamic from 'next/dynamic';
 
 const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer').then(mod => mod.FileViewer), {
     ssr: false,
