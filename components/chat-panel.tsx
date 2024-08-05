@@ -34,7 +34,7 @@ export function ChatPanel({
     const { submitUserMessage } = useActions()
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
 
-    const exampleMessages = []
+    const exampleMessages: any[] = []
     const exampleMessagesOld = [
         {
             heading: 'How do I',
