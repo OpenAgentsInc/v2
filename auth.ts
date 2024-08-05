@@ -1,3 +1,4 @@
-import { auth } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 
-export default auth;
+export { auth }
+

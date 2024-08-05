@@ -1,11 +1,11 @@
-"use client"
+"use server"
 
 import { Sidebar } from '@/components/sidebar'
-import { useAuth } from '@clerk/nextjs'
 import { ChatHistory } from '@/components/chat-history'
+import { auth } from '@clerk/nextjs/server'
 
-export function SidebarDesktop() {
-    const { userId } = useAuth()
+export async function SidebarDesktop() {
+    const userId = auth().userId
 
     if (!userId) {
         return null
