@@ -39,7 +39,7 @@ import { auth } from '@/auth'
 
 // Import the new GitHub-related functions and components
 import { viewFileContents } from '@/lib/github/actions/viewFile'
-import { FileViewer } from '@/lib/github/components/FileViewer'
+import { FileViewer } from '@/components/github/FileViewer'
 
 // ... (keep the confirmPurchase function as is)
 
@@ -192,7 +192,13 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             display:
                 message.role === 'tool' ? (
                     message.content.map((tool: any) => {
+                        console.log("Tool: ", tool)
                         if (tool.toolName === 'viewFileContents') {
+                            // If no path arg, return null after console logging
+                            if (!tool.args) {
+                                console.log('No args')
+                                return null
+                            }
                             return (
                                 <BotCard key={tool.toolCallId}>
                                     <FileViewer content={tool.result} filename={tool.args.path} />
