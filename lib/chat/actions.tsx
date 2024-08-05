@@ -42,11 +42,10 @@ export type UIState = {
     display: React.ReactNode
 }[]
 
-async function submitUserMessage(content: string) {
+async function submitUserMessage(content: string, repo: any) {
     'use server'
 
     const aiState = getMutableAIState<typeof AI>()
-    const repo = useRepoStore.getState().repo
 
     aiState.update({
         ...aiState.get(),
