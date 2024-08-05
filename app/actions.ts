@@ -8,6 +8,7 @@ import { auth } from '@clerk/nextjs/server'
 import { type Chat } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
+    console.log('getChats', userId)
     const { userId: authUserId } = auth()
 
     if (!userId) {
