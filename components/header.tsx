@@ -1,47 +1,46 @@
+"use client"
+
 import * as React from 'react'
 import Link from 'next/link'
-
 import { cn } from '@/lib/utils'
-import { auth } from '@/auth'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
     IconGitHub,
     IconNextChat,
     IconSeparator,
-    IconVercel
 } from '@/components/ui/icons'
-import { UserMenu } from '@/components/user-menu'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
-import { Session } from '@/lib/types'
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
-async function UserOrLogin() {
-    const session = (await auth()) as Session
+function UserOrLogin() {
     return (
         <>
-            {session?.user ? (
-                <>
-                    <SidebarMobile>
-                        <ChatHistory userId={session.user.id} />
-                    </SidebarMobile>
-                    <SidebarToggle />
-                </>
-            ) : (
+            <SignedIn>
+                <SidebarMobile>
+                    <ChatHistory userId={""} /> {/* You'll need to pass the user ID from Clerk */}
+                </SidebarMobile>
+                <SidebarToggle />
+            </SignedIn>
+            <SignedOut>
                 <Link href="/new" rel="nofollow">
                     <IconNextChat className="size-6 mr-2 dark:hidden" inverted />
                     <IconNextChat className="hidden size-6 mr-2 dark:block" />
                 </Link>
-            )}
+            </SignedOut>
             <div className="flex items-center">
                 <IconSeparator className="size-6 text-muted-foreground/50" />
-                {session?.user ? (
-                    <UserMenu user={session.user} />
-                ) : (
-                    <Button variant="link" asChild className="-ml-2">
-                        <Link href="/login">Login</Link>
-                    </Button>
-                )}
+                <SignedIn>
+                    <UserButton afterSignOutUrl="/" />
+                </SignedIn>
+                <SignedOut>
+                    <SignInButton mode="modal">
+                        <Button variant="link" className="-ml-2">
+                            Login
+                        </Button>
+                    </SignInButton>
+                </SignedOut>
             </div>
         </>
     )
