@@ -14,7 +14,7 @@ export function FileViewer({ content, filename }: FileViewerProps) {
   return (
     <div className="border rounded p-4">
       <h3 className="text-lg font-semibold mb-2">{filename}</h3>
-      <pre className="bg-gray-100 p-2 rounded mb-4">
+      <pre className="bg-gray-100 p-2 rounded mb-4 overflow-x-auto">
         <code>{previewLines}</code>
       </pre>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -23,7 +23,7 @@ export function FileViewer({ content, filename }: FileViewerProps) {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[80vw] max-h-[80vh] overflow-auto">
           <h2 className="text-xl font-bold mb-4">{filename}</h2>
-          <pre className="bg-gray-100 p-4 rounded">
+          <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
             <code>{content}</code>
           </pre>
         </DialogContent>
