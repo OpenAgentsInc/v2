@@ -37,6 +37,10 @@ import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
 import { Chat, Message } from '@/lib/types'
 import { auth } from '@/auth'
 
+// Import the new GitHub-related functions and components
+import { viewFileContents } from '@/lib/github/actions/viewFile'
+import { FileViewer } from '@/lib/github/components/FileViewer'
+
 async function confirmPurchase(symbol: string, price: number, amount: number) {
     'use server'
 
@@ -131,20 +135,14 @@ async function submitUserMessage(content: string) {
         model: openai('gpt-4o'),
         initial: <SpinnerMessage />,
         system: `\
-    You are a stock trading conversation bot and you can help users buy stocks, step by step.
-    You and the user can discuss stock prices and the user can adjust the amount of stocks they want to buy, or place an order, in the UI.
+    You are a GitHub repository assistant that can help users interact with their repositories.
+    You can view file contents, navigate the repository structure, and provide information about the codebase.
     
-    Messages inside [] means that it's a UI element or a user event. For example:
-    - "[Price of AAPL = 100]" means that an interface of the stock price of AAPL is shown to the user.
-    - "[User has changed the amount of AAPL to 10]" means that the user has changed the amount of AAPL to 10 in the UI.
+    If the user requests to view a file, call \`view_file_contents\` to show the file contents.
+    If the user wants information about the repository structure, you can describe it based on the information you have.
+    If the user asks about specific code or functionality, you can provide explanations based on the file contents you've viewed.
     
-    If the user requests purchasing a stock, call \`show_stock_purchase_ui\` to show the purchase UI.
-    If the user just wants the price, call \`show_stock_price\` to show the price.
-    If you want to show trending stocks, call \`list_stocks\`.
-    If you want to show events, call \`get_events\`.
-    If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
-    
-    Besides that, you can also chat with users and do some calculations if needed.`,
+    Besides that, you can also chat with users and answer general questions about GitHub and version control.`,
         messages: [
             ...aiState.get().messages.map((message: any) => ({
                 role: message.role,
@@ -178,148 +176,24 @@ async function submitUserMessage(content: string) {
             return textNode
         },
         tools: {
-            listStocks: {
-                description: 'List three imaginary stocks that are trending.',
+            viewFileContents: {
+                description: 'View the contents of a file in the GitHub repository',
                 parameters: z.object({
-                    stocks: z.array(
-                        z.object({
-                            symbol: z.string().describe('The symbol of the stock'),
-                            price: z.number().describe('The price of the stock'),
-                            delta: z.number().describe('The change in price of the stock')
-                        })
-                    )
+                    repo: z.string().describe('The repository name (e.g., "owner/repo")'),
+                    path: z.string().describe('The file path within the repository'),
+                    ref: z.string().optional().describe('The branch or commit reference (optional)')
                 }),
-                generate: async function*({ stocks }) {
+                generate: async function*({ repo, path, ref }) {
                     yield (
                         <BotCard>
-                            <StocksSkeleton />
+                            <div>Loading file contents...</div>
                         </BotCard>
                     )
 
-                    await sleep(1000)
+                    try {
+                        const content = await viewFileContents(repo, path, ref)
+                        const toolCallId = nanoid()
 
-                    const toolCallId = nanoid()
-
-                    aiState.done({
-                        ...aiState.get(),
-                        messages: [
-                            ...aiState.get().messages,
-                            {
-                                id: nanoid(),
-                                role: 'assistant',
-                                content: [
-                                    {
-                                        type: 'tool-call',
-                                        toolName: 'listStocks',
-                                        toolCallId,
-                                        args: { stocks }
-                                    }
-                                ]
-                            },
-                            {
-                                id: nanoid(),
-                                role: 'tool',
-                                content: [
-                                    {
-                                        type: 'tool-result',
-                                        toolName: 'listStocks',
-                                        toolCallId,
-                                        result: stocks
-                                    }
-                                ]
-                            }
-                        ]
-                    })
-
-                    return (
-                        <BotCard>
-                            <Stocks props={stocks} />
-                        </BotCard>
-                    )
-                }
-            },
-            showStockPrice: {
-                description:
-                    'Get the current stock price of a given stock or currency. Use this to show the price to the user.',
-                parameters: z.object({
-                    symbol: z
-                        .string()
-                        .describe(
-                            'The name or symbol of the stock or currency. e.g. DOGE/AAPL/USD.'
-                        ),
-                    price: z.number().describe('The price of the stock.'),
-                    delta: z.number().describe('The change in price of the stock')
-                }),
-                generate: async function*({ symbol, price, delta }) {
-                    yield (
-                        <BotCard>
-                            <StockSkeleton />
-                        </BotCard>
-                    )
-
-                    await sleep(1000)
-
-                    const toolCallId = nanoid()
-
-                    aiState.done({
-                        ...aiState.get(),
-                        messages: [
-                            ...aiState.get().messages,
-                            {
-                                id: nanoid(),
-                                role: 'assistant',
-                                content: [
-                                    {
-                                        type: 'tool-call',
-                                        toolName: 'showStockPrice',
-                                        toolCallId,
-                                        args: { symbol, price, delta }
-                                    }
-                                ]
-                            },
-                            {
-                                id: nanoid(),
-                                role: 'tool',
-                                content: [
-                                    {
-                                        type: 'tool-result',
-                                        toolName: 'showStockPrice',
-                                        toolCallId,
-                                        result: { symbol, price, delta }
-                                    }
-                                ]
-                            }
-                        ]
-                    })
-
-                    return (
-                        <BotCard>
-                            <Stock props={{ symbol, price, delta }} />
-                        </BotCard>
-                    )
-                }
-            },
-            showStockPurchase: {
-                description:
-                    'Show price and the UI to purchase a stock or currency. Use this if the user wants to purchase a stock or currency.',
-                parameters: z.object({
-                    symbol: z
-                        .string()
-                        .describe(
-                            'The name or symbol of the stock or currency. e.g. DOGE/AAPL/USD.'
-                        ),
-                    price: z.number().describe('The price of the stock.'),
-                    numberOfShares: z
-                        .number()
-                        .optional()
-                        .describe(
-                            'The **number of shares** for a stock or currency to purchase. Can be optional if the user did not specify it.'
-                        )
-                }),
-                generate: async function*({ symbol, price, numberOfShares = 100 }) {
-                    const toolCallId = nanoid()
-
-                    if (numberOfShares <= 0 || numberOfShares > 1000) {
                         aiState.done({
                             ...aiState.get(),
                             messages: [
@@ -330,9 +204,9 @@ async function submitUserMessage(content: string) {
                                     content: [
                                         {
                                             type: 'tool-call',
-                                            toolName: 'showStockPurchase',
+                                            toolName: 'viewFileContents',
                                             toolCallId,
-                                            args: { symbol, price, numberOfShares }
+                                            args: { repo, path, ref }
                                         }
                                     ]
                                 },
@@ -342,56 +216,9 @@ async function submitUserMessage(content: string) {
                                     content: [
                                         {
                                             type: 'tool-result',
-                                            toolName: 'showStockPurchase',
+                                            toolName: 'viewFileContents',
                                             toolCallId,
-                                            result: {
-                                                symbol,
-                                                price,
-                                                numberOfShares,
-                                                status: 'expired'
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: nanoid(),
-                                    role: 'system',
-                                    content: `[User has selected an invalid amount]`
-                                }
-                            ]
-                        })
-
-                        return <BotMessage content={'Invalid amount'} />
-                    } else {
-                        aiState.done({
-                            ...aiState.get(),
-                            messages: [
-                                ...aiState.get().messages,
-                                {
-                                    id: nanoid(),
-                                    role: 'assistant',
-                                    content: [
-                                        {
-                                            type: 'tool-call',
-                                            toolName: 'showStockPurchase',
-                                            toolCallId,
-                                            args: { symbol, price, numberOfShares }
-                                        }
-                                    ]
-                                },
-                                {
-                                    id: nanoid(),
-                                    role: 'tool',
-                                    content: [
-                                        {
-                                            type: 'tool-result',
-                                            toolName: 'showStockPurchase',
-                                            toolCallId,
-                                            result: {
-                                                symbol,
-                                                price,
-                                                numberOfShares
-                                            }
+                                            result: content
                                         }
                                     ]
                                 }
@@ -400,82 +227,20 @@ async function submitUserMessage(content: string) {
 
                         return (
                             <BotCard>
-                                <Purchase
-                                    props={{
-                                        numberOfShares,
-                                        symbol,
-                                        price: +price,
-                                        status: 'requires_action'
-                                    }}
-                                />
+                                <FileViewer content={content} filename={path} />
+                            </BotCard>
+                        )
+                    } catch (error) {
+                        console.error('Error fetching file contents:', error)
+                        return (
+                            <BotCard>
+                                <div>Error: Unable to fetch file contents. Please check the file path and try again.</div>
                             </BotCard>
                         )
                     }
                 }
             },
-            getEvents: {
-                description:
-                    'List funny imaginary events between user highlighted dates that describe stock activity.',
-                parameters: z.object({
-                    events: z.array(
-                        z.object({
-                            date: z
-                                .string()
-                                .describe('The date of the event, in ISO-8601 format'),
-                            headline: z.string().describe('The headline of the event'),
-                            description: z.string().describe('The description of the event')
-                        })
-                    )
-                }),
-                generate: async function*({ events }) {
-                    yield (
-                        <BotCard>
-                            <EventsSkeleton />
-                        </BotCard>
-                    )
-
-                    await sleep(1000)
-
-                    const toolCallId = nanoid()
-
-                    aiState.done({
-                        ...aiState.get(),
-                        messages: [
-                            ...aiState.get().messages,
-                            {
-                                id: nanoid(),
-                                role: 'assistant',
-                                content: [
-                                    {
-                                        type: 'tool-call',
-                                        toolName: 'getEvents',
-                                        toolCallId,
-                                        args: { events }
-                                    }
-                                ]
-                            },
-                            {
-                                id: nanoid(),
-                                role: 'tool',
-                                content: [
-                                    {
-                                        type: 'tool-result',
-                                        toolName: 'getEvents',
-                                        toolCallId,
-                                        result: events
-                                    }
-                                ]
-                            }
-                        ]
-                    })
-
-                    return (
-                        <BotCard>
-                            <Events props={events} />
-                        </BotCard>
-                    )
-                }
-            }
+            // ... (keep other existing tools)
         }
     })
 
@@ -557,28 +322,15 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             display:
                 message.role === 'tool' ? (
                     message.content.map(tool => {
-                        return tool.toolName === 'listStocks' ? (
-                            <BotCard>
-                                {/* TODO: Infer types based on the tool result*/}
-                                {/* @ts-expect-error */}
-                                <Stocks props={tool.result} />
-                            </BotCard>
-                        ) : tool.toolName === 'showStockPrice' ? (
-                            <BotCard>
-                                {/* @ts-expect-error */}
-                                <Stock props={tool.result} />
-                            </BotCard>
-                        ) : tool.toolName === 'showStockPurchase' ? (
-                            <BotCard>
-                                {/* @ts-expect-error */}
-                                <Purchase props={tool.result} />
-                            </BotCard>
-                        ) : tool.toolName === 'getEvents' ? (
-                            <BotCard>
-                                {/* @ts-expect-error */}
-                                <Events props={tool.result} />
-                            </BotCard>
-                        ) : null
+                        if (tool.toolName === 'viewFileContents') {
+                            return (
+                                <BotCard>
+                                    <FileViewer content={tool.result} filename={tool.args.path} />
+                                </BotCard>
+                            )
+                        }
+                        // ... (keep other tool renderings)
+                        return null
                     })
                 ) : message.role === 'user' ? (
                     <UserMessage>{message.content as string}</UserMessage>
