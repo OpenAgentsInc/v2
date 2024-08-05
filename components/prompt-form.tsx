@@ -17,6 +17,7 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import { useRepoStore } from '@/store/repo'
 
 export function PromptForm({
   input,
@@ -30,6 +31,7 @@ export function PromptForm({
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
   const [messages, setMessages] = useUIState<typeof AI>()
+  const repo = useRepoStore((state) => state.repo)
 
   React.useEffect(() => {
     if (inputRef.current) {
@@ -62,9 +64,9 @@ export function PromptForm({
     ])
 
     // Submit and get response message
-    const responseMessage = await submitUserMessage(value)
+    const responseMessage = await submitUserMessage(value, repo)
     setMessages(prevMessages => [...(Array.isArray(prevMessages) ? prevMessages : []), responseMessage])
-  }, [input, setInput, messages, setMessages, submitUserMessage])
+  }, [input, setInput, messages, setMessages, submitUserMessage, repo])
 
   return (
     <form
