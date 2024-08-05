@@ -29,7 +29,7 @@ export function PromptForm({
   const { formRef, onKeyDown } = useEnterSubmit()
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
-  const [_, setMessages] = useUIState<typeof AI>()
+  const [messages, setMessages] = useUIState<typeof AI>()
 
   React.useEffect(() => {
     if (inputRef.current) {
@@ -52,8 +52,11 @@ export function PromptForm({
         setInput('')
         if (!value) return
 
+        // Ensure messages is an array before updating
+        const currentMessages = Array.isArray(messages) ? messages : []
+
         // Optimistically add user message UI
-        setMessages(currentMessages => [
+        setMessages([
           ...currentMessages,
           {
             id: nanoid(),
@@ -63,7 +66,7 @@ export function PromptForm({
 
         // Submit and get response message
         const responseMessage = await submitUserMessage(value)
-        setMessages(currentMessages => [...currentMessages, responseMessage])
+        setMessages(prevMessages => [...(Array.isArray(prevMessages) ? prevMessages : []), responseMessage])
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
