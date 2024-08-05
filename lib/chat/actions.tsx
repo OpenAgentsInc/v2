@@ -127,8 +127,8 @@ async function submitUserMessage(content: string) {
     let textNode: undefined | React.ReactNode
 
     const result = await streamUI({
-        model: anthropic('claude-3-5-sonnet-20240620'),
-        // model: openai('gpt-3.5-turbo'),
+        // model: anthropic('claude-3-5-sonnet-20240620'),
+        model: openai('gpt-4o'),
         initial: <SpinnerMessage />,
         system: `\
     You are a stock trading conversation bot and you can help users buy stocks, step by step.
