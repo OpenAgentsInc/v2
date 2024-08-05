@@ -10,6 +10,9 @@ export const AI = createAI({
         chatId: '',
         messages: []
     },
+    initialUIState: {
+        messages: []
+    },
     getUIStateFromAIState
 })
 
