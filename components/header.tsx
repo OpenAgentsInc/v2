@@ -2,13 +2,8 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
-import { Button, buttonVariants } from '@/components/ui/button'
-import {
-    IconGitHub,
-    IconNextChat,
-    IconSeparator,
-} from '@/components/ui/icons'
+import { Button } from '@/components/ui/button'
+import { IconNextChat } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
@@ -29,19 +24,6 @@ function UserOrLogin() {
                     <IconNextChat className="hidden size-6 mr-2 dark:block" />
                 </Link>
             </SignedOut>
-            <div className="flex items-center">
-                <IconSeparator className="size-6 text-muted-foreground/50" />
-                <SignedIn>
-                    <UserButton afterSignOutUrl="/" />
-                </SignedIn>
-                <SignedOut>
-                    <SignInButton mode="modal">
-                        <Button variant="link" className="-ml-2">
-                            Login
-                        </Button>
-                    </SignInButton>
-                </SignedOut>
-            </div>
         </>
     )
 }
@@ -54,16 +36,17 @@ export function Header() {
                     <UserOrLogin />
                 </React.Suspense>
             </div>
-            <div className="flex items-center justify-end space-x-2">
-                <a
-                    target="_blank"
-                    href="https://github.com/openagentsinc/v2"
-                    rel="noopener noreferrer"
-                    className={cn(buttonVariants({ variant: 'outline' }))}
-                >
-                    <IconGitHub />
-                    <span className="hidden ml-2 md:flex">GitHub</span>
-                </a>
+            <div className="flex items-center justify-end">
+                <SignedIn>
+                    <UserButton afterSignOutUrl="/" />
+                </SignedIn>
+                <SignedOut>
+                    <SignInButton mode="modal">
+                        <Button variant="outline">
+                            Log in
+                        </Button>
+                    </SignInButton>
+                </SignedOut>
             </div>
         </header>
     )
