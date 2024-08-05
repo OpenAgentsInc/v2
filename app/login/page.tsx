@@ -1,18 +1,17 @@
-import { auth } from '@/auth'
-import LoginForm from '@/components/login-form'
-import { Session } from '@/lib/types'
+import { auth } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 
 export default async function LoginPage() {
-  const session = (await auth()) as Session
+  const { userId } = auth()
 
-  if (session) {
+  if (userId) {
     redirect('/')
   }
 
   return (
     <main className="flex flex-col p-4">
-      <LoginForm />
+      {/* Replace LoginForm with Clerk's SignIn component */}
+      <SignIn />
     </main>
   )
 }
