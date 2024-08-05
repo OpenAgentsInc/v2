@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs'
+import { auth, SignIn } from '@clerk/nextjs'
 import { redirect } from 'next/navigation'
 
 export default async function LoginPage() {
@@ -10,7 +10,6 @@ export default async function LoginPage() {
 
   return (
     <main className="flex flex-col p-4">
-      {/* Replace LoginForm with Clerk's SignIn component */}
       <SignIn />
     </main>
   )
