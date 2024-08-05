@@ -15,6 +15,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.35",
     "@ai-sdk/openai": "^0.0.34",
+    "@octokit/rest": "^21.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
