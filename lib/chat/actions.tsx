@@ -1,5 +1,5 @@
 import 'server-only'
-
+import { viewFile } from '@/lib/github/actions/viewFile'
 import {
     createAI,
     createStreamableUI,
@@ -21,6 +21,7 @@ import {
 } from '@/components/stocks'
 
 import { z } from 'zod'
+import { FileViewer } from '@/components/github/file-viewer'
 import { EventsSkeleton } from '@/components/stocks/events-skeleton'
 import { Events } from '@/components/stocks/events'
 import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
@@ -144,6 +145,9 @@ async function submitUserMessage(content: string) {
     If you want to show events, call \`get_events\`.
     If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
     
+    You are learning to interact also with GitHub repos.
+    If you want to list a file, call \`view_file\`.
+    
     Besides that, you can also chat with users and do some calculations if needed.`,
         messages: [
             ...aiState.get().messages.map((message: any) => ({
@@ -178,21 +182,17 @@ async function submitUserMessage(content: string) {
             return textNode
         },
         tools: {
-            listStocks: {
-                description: 'List three imaginary stocks that are trending.',
+            viewFile: {
+                description: 'View the contents of a file in a GitHub repository.',
                 parameters: z.object({
-                    stocks: z.array(
-                        z.object({
-                            symbol: z.string().describe('The symbol of the stock'),
-                            price: z.number().describe('The price of the stock'),
-                            delta: z.number().describe('The change in price of the stock')
-                        })
-                    )
+                    repo: z.string().describe('The GitHub repository in the format owner/repo'),
+                    path: z.string().describe('The path to the file in the repository'),
+                    ref: z.string().optional().describe('The branch or commit ref (optional)')
                 }),
-                generate: async function*({ stocks }) {
+                generate: async function*({ repo, path, ref }) {
                     yield (
                         <BotCard>
-                            <StocksSkeleton />
+                            <FileViewer content="" filename="" />
                         </BotCard>
                     )
 
@@ -210,9 +210,9 @@ async function submitUserMessage(content: string) {
                                 content: [
                                     {
                                         type: 'tool-call',
-                                        toolName: 'listStocks',
+                                        toolName: 'viewFile',
                                         toolCallId,
-                                        args: { stocks }
+                                        args: { repo, path, ref }
                                     }
                                 ]
                             },
@@ -222,9 +222,9 @@ async function submitUserMessage(content: string) {
                                 content: [
                                     {
                                         type: 'tool-result',
-                                        toolName: 'listStocks',
+                                        toolName: 'viewFile',
                                         toolCallId,
-                                        result: stocks
+                                        result: { repo, path, ref }
                                     }
                                 ]
                             }
@@ -233,9 +233,76 @@ async function submitUserMessage(content: string) {
 
                     return (
                         <BotCard>
-                            <Stocks props={stocks} />
+                            <FileViewer props={{ content: '', filename: '' }} />
                         </BotCard>
                     )
+                }
+            },
+            listStocks: {
+                description: 'List three imaginary stocks that are trending.',
+                parameters: z.object({
+                    stocks: z.array(
+                        z.object({
+                            symbol: z.string().describe('The symbol of the stock'),
+                            price: z.number().describe('The price of the stock'),
+                            delta: z.number().describe('The change in price of the stock')
+                        })
+                    )
+                }),
+                generate: async function*({ stocks }) {
+                    yield (
+                        <BotCard>
+                            <FileViewer content="" filename={path.split('/').pop() || ''} />
+                        </BotCard>
+                    )
+try {
+                        const fileContents = await viewFile(repo, path, ref)
+                        const toolCallId = nanoid()
+
+                        aiState.done({
+                            ...aiState.get(),
+                            messages: [
+                                ...aiState.get().messages,
+                                {
+                                    id: nanoid(),
+                                    role: 'assistant',
+                                    content: [
+                                        {
+                                            type: 'tool-call',
+                                            toolName: 'viewFile',
+                                            toolCallId,
+                                            args: { repo, path, ref }
+                                        }
+                                    ]
+                                },
+                                {
+                                    id: nanoid(),
+                                    role: 'tool',
+                                    content: [
+                                        {
+                                            type: 'tool-result',
+                                            toolName: 'viewFile',
+                                            toolCallId,
+                                            result: { repo, path, ref, content: fileContents }
+                                        }
+                                    ]
+                                }
+                            ]
+                        })
+
+                        return (
+                            <BotCard>
+                                <FileViewer content={fileContents} filename={path.split('/').pop() || ''} />
+                            </BotCard>
+                        )
+                    } catch (error) {
+                        console.error('Error viewing file:', error)
+                        return (
+                            <BotCard>
+                                <div>Error: Unable to view file contents.</div>
+                            </BotCard>
+                        )
+                    }
                 }
             },
             showStockPrice: {
@@ -557,7 +624,17 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             display:
                 message.role === 'tool' ? (
                     message.content.map(tool => {
-                        return tool.toolName === 'listStocks' ? (
+                        console.log("tool: ", tool) 
+                        return tool.toolName === 'viewFile' ? (
+                            <BotCard>
+                                {/* TODO: Infer types based on the tool result*/}
+                                {/* @ts-expect-error */}
+                                <FileViewer 
+                                    content={tool.result.content} 
+                                    filename={tool.result.path.split('/').pop() || ''}
+                                />
+                            </BotCard>
+                        ) : tool.toolName === 'listStocks' ? (
                             <BotCard>
                                 {/* TODO: Infer types based on the tool result*/}
                                 {/* @ts-expect-error */}
