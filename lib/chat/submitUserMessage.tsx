@@ -11,7 +11,20 @@ import {
     openai
 } from './imports'
 
+import { sleep } from '@/lib/utils'
 
+import {
+    spinner,
+    SystemMessage,
+    Stock,
+    Purchase
+} from '@/components/stocks'
+
+import { EventsSkeleton } from '@/components/stocks/events-skeleton'
+import { Events } from '@/components/stocks/events'
+import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
+import { Stocks } from '@/components/stocks/stocks'
+import { StockSkeleton } from '@/components/stocks/stock-skeleton'
 
 export async function submitUserMessage(content: string) {
     'use server'
