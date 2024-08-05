@@ -58,7 +58,7 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
 
     return (
         <div
-            className="bg-black group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]"
+            className="bg-white dark:bg-black group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]"
             ref={scrollRef}
         >
             <div
