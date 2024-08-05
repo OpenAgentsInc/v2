@@ -53,7 +53,8 @@
     "remark-math": "^5.1.1",
     "sonner": "^1.5.0",
     "usehooks-ts": "^3.1.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
