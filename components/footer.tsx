@@ -1,13 +1,10 @@
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
+import { useRepoStore } from '@/store/repo'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'div'>) {
-    const repo = {
-        owner: 'openagentsinc',
-        name: 'v2',
-        branch: 'main'
-    }
+    const repo = useRepoStore((state) => state.repo)
 
     return (
         <div
