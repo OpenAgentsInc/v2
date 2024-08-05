@@ -2,7 +2,12 @@ import { z } from 'zod'
 import { nanoid } from '@/lib/utils'
 import { BotCard } from '@/components/stocks'
 import { viewFileContents as fetchFileContents } from '@/lib/github/actions/viewFile'
-import { FileViewer } from '@/components/github/file-viewer'
+import dynamic from 'next/dynamic'
+
+const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer').then(mod => mod.FileViewer), {
+    ssr: false,
+    loading: () => <div>Loading file viewer...</div>
+});
 
 export const viewFileContents = (aiState: any) => ({
     description: 'View the contents of a file in the GitHub repository',
@@ -46,7 +51,7 @@ export const viewFileContents = (aiState: any) => ({
                                 type: 'tool-result',
                                 toolName: 'viewFileContents',
                                 toolCallId,
-                                result: content
+                                result: { content, path }
                             }
                         ]
                     }
@@ -55,7 +60,7 @@ export const viewFileContents = (aiState: any) => ({
 
             return (
                 <BotCard>
-                    <FileViewer content={content} filename={path} />
+                    <DynamicFileViewer content={content} filename={path} />
                 </BotCard>
             )
         } catch (error) {

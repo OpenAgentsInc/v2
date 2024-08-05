@@ -1,4 +1,6 @@
 import { Chat, Message } from '@/lib/types'
+import dynamic from 'next/dynamic';
+import { BotCard, BotMessage } from '@/components/stocks';
 import { auth } from '@/auth'
 import {
     createAI,
@@ -22,13 +24,12 @@ import {
 import { saveChat } from '@/app/actions'
 import {
     spinner,
-    BotCard,
-    BotMessage,
     SystemMessage,
     Stock,
     Purchase
 } from '@/components/stocks'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
+import { FileViewer } from '@/components/github/file-viewer'
 
 export type AIState = {
     chatId: string
@@ -162,22 +163,53 @@ export const AI = createAI<AIState, UIState>({
     }
 })
 
+
+
+// import { BotCard, BotMessage, UserMessage } from '@/components/stocks';
+// import dynamic from 'next/dynamic';
+
+const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer').then(mod => mod.FileViewer), {
+    ssr: false,
+    loading: () => <div>Loading file viewer...</div>
+});
+
 export const getUIStateFromAIState = (aiState: Chat) => {
     return aiState.messages
         .filter(message => message.role !== 'system')
-        .map((message, index) => ({
-            id: `${aiState.chatId}-${index}`,
-            display:
-                message.role === 'tool' ? (
-                    message.content.map(tool => {
-                        console.log("tool nothing yet", tool)
-                        return <></>
-                    })
-                ) : message.role === 'user' ? (
-                    <UserMessage>{message.content as string}</UserMessage>
-                ) : message.role === 'assistant' &&
-                    typeof message.content === 'string' ? (
-                    <BotMessage content={message.content} />
-                ) : null
-        }))
-}
+        .flatMap((message, index) => {
+            const displays: React.ReactNode[] = [];
+
+            if (message.role === 'user') {
+                displays.push(<UserMessage>{message.content as string}</UserMessage>);
+            } else if (message.role === 'assistant') {
+                if (typeof message.content === 'string') {
+                    displays.push(<BotMessage content={message.content} />);
+                } else if (Array.isArray(message.content)) {
+                    message.content.forEach((item: any) => {
+                        if (item.type === 'tool-call') {
+                            // Handle tool calls if needed
+                        }
+                    });
+                }
+            } else if (message.role === 'tool') {
+                message.content.forEach((tool: any) => {
+                    if (tool.toolName === 'viewFileContents') {
+                        displays.push(
+                            <BotCard key={tool.toolCallId}>
+                                <DynamicFileViewer
+                                    content={tool.result.content}
+                                    filename={tool.result.path}
+                                />
+                            </BotCard>
+                        );
+                    }
+                    // Handle other tool types here
+                });
+            }
+
+            return displays.map((display, subIndex) => ({
+                id: `${aiState.chatId}-${index}-${subIndex}`,
+                display
+            }));
+        });
+};
