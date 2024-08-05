@@ -6,7 +6,6 @@ import * as Popover from '@radix-ui/react-popover'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
-    console.log(repo)
     const setRepo = useRepoStore((state) => state.setRepo)
 
     const [repoInput, setRepoInput] = React.useState({
@@ -15,6 +14,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         branch: repo?.branch || ''
     })
 
+    const [open, setOpen] = React.useState(false)
+
     const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
     }
@@ -22,6 +23,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
     const handleRepoSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         setRepo(repoInput)
+        setOpen(false)
     }
 
     return (
@@ -45,7 +47,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                         4
                     </span>
                     {repo && (
-                        <Popover.Root>
+                        <Popover.Root open={open} onOpenChange={setOpen}>
                             <Popover.Trigger asChild>
                                 <button className="bg-black text-white rounded px-2 py-0.5 text-xs flex items-center opacity-75 space-x-1">
                                     <Github size={14} />
