@@ -6,14 +6,14 @@ interface ChatState {
     messages: Message[];
     input: string;
     id: string | undefined;
-    user: User | null;
+    user: User | undefined;
     addMessage: (message: Message) => void;
     setMessages: (messages: Message[]) => void;
     updateMessage: (id: string, updates: Partial<Message>) => void;
     clearMessages: () => void;
     setInput: (input: string) => void;
     setId: (id: string | undefined) => void;
-    setUser: (user: User | null) => void;
+    setUser: (user: User | undefined) => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -22,7 +22,7 @@ export const useChatStore = create<ChatState>()(
             messages: [],
             input: '',
             id: undefined,
-            user: null,
+            user: undefined,
 
             addMessage: (message) => set((state) => ({
                 messages: [...state.messages, message]

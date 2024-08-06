@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 interface UseChatProps {
     initialMessages?: Message[]
     initialId?: string
-    initialUser?: User | null
+    initialUser?: User
     missingKeys: string[]
 }
 
