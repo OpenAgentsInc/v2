@@ -14,10 +14,9 @@ export interface ChatProps extends React.ComponentProps<'div'> {
     initialMessages?: Message[]
     id?: string
     user?: User | undefined
-    missingKeys: string[]
 }
 
-export function Chat({ className, initialMessages, id: initialId, user: initialUser, missingKeys }: ChatProps) {
+export function Chat({ className, initialMessages, id: initialId, user: initialUser }: ChatProps) {
     const {
         messages,
         input,
@@ -30,7 +29,6 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         initialMessages,
         initialId,
         initialUser,
-        missingKeys,
         maxToolRoundtrips: 5,
         async onToolCall({ toolCall }) {
             if (toolCall.toolName === 'getLocation') {
@@ -46,12 +44,47 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         },
     })
 
+    console.log("messages in Chat:", messages)
+
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
 
     const handleSubmitWrapper = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         handleSubmit(e)
+    }
+
+    const renderToolInvocation = (toolInvocation: ToolInvocation) => {
+        const toolCallId = toolInvocation.toolCallId
+        const addResult = (result: string) =>
+            addToolResult({ toolCallId, result })
+
+        if (toolInvocation.toolName === 'askForConfirmation') {
+            return (
+                <div key={toolCallId}>
+                    {toolInvocation.args.message}
+                    <div>
+                        {'result' in toolInvocation ? (
+                            <b>{toolInvocation.result}</b>
+                        ) : (
+                            <>
+                                <button onClick={() => addResult('Yes')}>Yes</button>
+                                <button onClick={() => addResult('No')}>No</button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )
+        }
+
+        return 'result' in toolInvocation ? (
+            <div key={toolCallId}>
+                Tool call {`${toolInvocation.toolName}: `}
+                {toolInvocation.result}
+            </div>
+        ) : (
+            <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
+        )
     }
 
     return (
@@ -64,45 +97,14 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                 ref={messagesRef}
             >
                 {messages.length ? (
-                    <ChatList messages={messages} isShared={false} user={user}>
+                    <div>
                         {messages.map((message) => (
-                            <div key={message.id}>
+                            <div key={message.id} className="mb-4">
                                 <strong>{message.role}:</strong> {message.content}
-                                {message.toolInvocations?.map((toolInvocation: ToolInvocation) => {
-                                    const toolCallId = toolInvocation.toolCallId
-                                    const addResult = (result: string) =>
-                                        addToolResult({ toolCallId, result })
-
-                                    if (toolInvocation.toolName === 'askForConfirmation') {
-                                        return (
-                                            <div key={toolCallId}>
-                                                {toolInvocation.args.message}
-                                                <div>
-                                                    {'result' in toolInvocation ? (
-                                                        <b>{toolInvocation.result}</b>
-                                                    ) : (
-                                                        <>
-                                                            <button onClick={() => addResult('Yes')}>Yes</button>
-                                                            <button onClick={() => addResult('No')}>No</button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-
-                                    return 'result' in toolInvocation ? (
-                                        <div key={toolCallId}>
-                                            Tool call {`${toolInvocation.toolName}: `}
-                                            {toolInvocation.result}
-                                        </div>
-                                    ) : (
-                                        <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
-                                    )
-                                })}
+                                {message.toolInvocations?.map(renderToolInvocation)}
                             </div>
                         ))}
-                    </ChatList>
+                    </div>
                 ) : (
                     <EmptyScreen />
                 )}
