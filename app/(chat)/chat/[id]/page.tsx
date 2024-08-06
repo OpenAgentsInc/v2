@@ -25,8 +25,7 @@ export async function generateMetadata({
     const chat = await getChat(params.id, session.userId)
 
     if (!chat || 'error' in chat) {
-        console.log('chat not found ????')
-        // redirect('/')
+        redirect('/')
     } else {
         return {
             title: chat?.title.toString().slice(0, 50) ?? 'Chat'
@@ -46,8 +45,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     const chat = await getChat(params.id, userId)
 
     if (!chat || 'error' in chat) {
-        console.log('chat not found ?!!!!!???')
-        // redirect('/')
+        redirect('/')
     } else {
         if (chat?.userId !== session?.userId) {
             notFound()
@@ -57,7 +55,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
             <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
                 <Chat
                     id={chat.id}
-                    user={session}
+                    user={{ id: userId }}
                     initialMessages={chat.messages}
                     missingKeys={missingKeys}
                 />

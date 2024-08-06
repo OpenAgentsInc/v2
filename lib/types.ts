@@ -42,5 +42,4 @@ export interface OldUser extends Record<string, any> {
 
 export interface User {
     id: string
-    email: string
 }
