@@ -1,9 +1,7 @@
-import { getSystemPrompt } from 'lib/systemPrompt'
-import { openai } from '@ai-sdk/openai'
 import { convertToCoreMessages, streamText } from 'ai'
-import { currentUser } from '@clerk/nextjs/server'
-import { Repo } from '@/lib/types'
-import { getTools } from '@/tools'
+import { openai } from '@ai-sdk/openai'
+import { getSystemPrompt } from '@/lib/systemPrompt'
+import { getTools, getToolContext } from '@/tools'
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -22,13 +20,3 @@ export async function POST(req: Request) {
     return result.toAIStreamResponse();
 }
 
-const getToolContext = async (body: any) => {
-    const { repoOwner, repoName, repoBranch } = body
-    const repo: Repo = {
-        owner: repoOwner,
-        name: repoName,
-        branch: repoBranch
-    }
-    const user = await currentUser()
-    return { repo, user }
-}
