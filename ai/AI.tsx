@@ -1,119 +1,179 @@
+import 'server-only';
 import React from 'react';
-import { createAI } from 'ai/rsc';
+import { createAI, getMutableAIState, getAIState, streamUI } from 'ai/rsc';
 import { nanoid } from 'nanoid';
-import { AIState, Message } from './AIState';
+import { AIState, Message, Chat } from './AIState';
 import { UIState, UIMessage } from './UIState';
-import { SpinnerMessage } from '@/components/stocks/message';
+import { openai } from '@ai-sdk/openai';
+import { SpinnerMessage } from '../components/SpinnerMessage';
+import { BotMessage, UserMessage } from '../components/Message';
+import { saveChat } from '../app/actions';
+import { auth } from '../auth';
+import { tools } from './tools';
+import { createStreamableValue } from './streamableValue';
 
-/**
- * Represents a chat object that combines AIState and additional metadata.
- */
-interface Chat extends AIState {
-    id: string;
-    title: string;
-    createdAt: number;
-    path: string;
-}
+async function submitUserMessage(content: string): Promise<UIMessage> {
+  'use server';
 
-/**
- * Converts AIState to UIState.
- * This function maps the serializable AIState to the React-renderable UIState.
- */
-function getUIStateFromAIState(aiState: Chat): UIState {
-    return {
-        messages: aiState.messages.map((message: Message): UIMessage => ({
-            id: message.id,
-            role: message.role,
-            display: renderMessageContent(message),
-            createdAt: message.createdAt,
-        })),
-        inputState: 'idle',
-    };
-}
+  const aiState = getMutableAIState<typeof AI>();
 
-/**
- * Renders the content of a message based on its role and content.
- * This function can be expanded to handle different types of message content.
- */
-function renderMessageContent(message: Message): React.ReactNode {
-    // For now, we're just returning the content as text
-    // In a more complex app, you might render different components based on the message role or content type
-    return <div>{message.content}</div>;
-}
-
-/**
- * Submits a user message to the AI.
- * This is a placeholder function that should be implemented with actual AI interaction logic.
- */
-async function submitUserMessage(message: string): Promise<UIMessage> {
-    'use server';
-
-    // TODO: Implement the actual logic for processing the user message and generating an AI response
-    // This might involve calling an external AI service, processing the response, and updating the state
-
-    // For now, we'll just echo the user's message
-    const aiResponse: UIMessage = {
+  aiState.update({
+    ...aiState.get(),
+    messages: [
+      ...aiState.get().messages,
+      {
         id: nanoid(),
-        role: 'assistant',
-        display: <div>Echo: {message}</div>,
-        createdAt: Date.now(),
-    };
+        role: 'user',
+        content
+      }
+    ]
+  });
 
-    return aiResponse;
+  let textStream: ReturnType<typeof createStreamableValue<string>> | undefined;
+  let textNode: React.ReactNode | undefined;
+
+  const result = await streamUI({
+    model: openai('gpt-4o'),
+    initial: <SpinnerMessage />,
+    system: `\
+You are a stock trading conversation bot and you can help users buy stocks, step by step.
+You and the user can discuss stock prices and the user can adjust the amount of stocks they want to buy, or place an order, in the UI.
+
+Messages inside [] means that it's a UI element or a user event. For example:
+- "[Price of AAPL = 100]" means that an interface of the stock price of AAPL is shown to the user.
+- "[User has changed the amount of AAPL to 10]" means that the user has changed the amount of AAPL to 10 in the UI.
+
+If the user requests purchasing a stock, call \`show_stock_purchase_ui\` to show the purchase UI.
+If the user just wants the price, call \`show_stock_price\` to show the price.
+If you want to show trending stocks, call \`list_stocks\`.
+If you want to show events, call \`get_events\`.
+If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
+
+Besides that, you can also chat with users and do some calculations if needed.`,
+    messages: [
+      ...aiState.get().messages.map((message: any) => ({
+        role: message.role,
+        content: message.content,
+        name: message.name
+      }))
+    ],
+    text: ({ content, done, delta }) => {
+      if (!textStream) {
+        textStream = createStreamableValue('');
+        textNode = <BotMessage content={textStream.value} />;
+      }
+
+      if (done) {
+        textStream.done();
+        aiState.done({
+          ...aiState.get(),
+          messages: [
+            ...aiState.get().messages,
+            {
+              id: nanoid(),
+              role: 'assistant',
+              content
+            }
+          ]
+        });
+      } else {
+        textStream.update(delta);
+      }
+
+      return textNode;
+    },
+    tools
+  });
+
+  return {
+    id: nanoid(),
+    role: 'assistant',
+    display: result.value
+  };
 }
 
-/**
- * Creates the AI context provider using createAI from ai/rsc.
- * This sets up the initial state and defines how the AI and UI states are managed.
- */
 export const AI = createAI<AIState, UIState>({
-    actions: {
-        submitUserMessage,
-    },
-    initialAIState: {
-        chatId: nanoid(),
-        messages: [],
-        metadata: {
-            createdAt: Date.now(),
-            userId: '', // This should be set to the actual user ID when available
-            path: '', // This should be set to the current path when available
-        },
-    },
-    initialUIState: {
-        messages: [{
-            id: nanoid(),
-            role: 'system',
-            display: <SpinnerMessage />,
-            createdAt: Date.now(),
-        }],
-        inputState: 'idle',
-    },
-    onSetAIState: async ({ state, done }) => {
-        'use server';
-        if (done) {
-            // Save chat to database (implement this function)
-            // await saveChatToDB(state);
-            console.log('Chat saved:', state);
-        }
-    },
-    onGetUIState: async () => {
-        'use server';
-        const aiState = getAIState() as Chat | undefined;
-        if (aiState) {
-            return getUIStateFromAIState(aiState);
-        }
-        return undefined;
+  actions: {
+    submitUserMessage
+  },
+  initialAIState: {
+    chatId: nanoid(),
+    messages: [],
+    metadata: {
+      createdAt: Date.now(),
+      userId: '',
+      path: ''
     }
+  },
+  initialUIState: {
+    messages: [{
+      id: nanoid(),
+      role: 'system',
+      display: <SpinnerMessage />,
+      createdAt: Date.now(),
+    }],
+    inputState: 'idle',
+  },
+  onSetAIState: async ({ state }) => {
+    'use server';
+    const session = await auth();
+    if (session && session.user) {
+      const { chatId, messages } = state;
+      const createdAt = new Date();
+      const userId = session.user.id as string;
+      const path = `/chat/${chatId}`;
+      const firstMessageContent = messages[0].content as string;
+      const title = firstMessageContent.substring(0, 100);
+      const chat: Chat = {
+        id: chatId,
+        title,
+        userId,
+        createdAt,
+        messages,
+        path
+      };
+      await saveChat(chat);
+    }
+  },
+  onGetUIState: async () => {
+    'use server';
+    const session = await auth();
+    if (session && session.user) {
+      const aiState = getAIState() as Chat;
+      if (aiState) {
+        return getUIStateFromAIState(aiState);
+      }
+    }
+    return undefined;
+  }
 });
 
-/**
- * A placeholder function for getting the current AI state.
- * In a real application, this would likely involve retrieving the state from a database or server.
- */
-function getAIState(): Chat | undefined {
-    // TODO: Implement actual state retrieval logic
-    return undefined;
+export function getUIStateFromAIState(aiState: Chat): UIState {
+  return {
+    messages: aiState.messages
+      .filter(message => message.role !== 'system')
+      .map((message): UIMessage => ({
+        id: nanoid(),
+        role: message.role,
+        display: renderMessageContent(message),
+        createdAt: message.createdAt
+      })),
+    inputState: 'idle'
+  };
 }
 
-// Export other necessary functions or components
-export { getUIStateFromAIState, renderMessageContent };
+function renderMessageContent(message: Message): React.ReactNode {
+  switch (message.role) {
+    case 'user':
+      return <UserMessage>{message.content as string}</UserMessage>;
+    case 'assistant':
+      return <BotMessage content={message.content as string} />;
+    case 'tool':
+      // Implement tool message rendering based on the tool type
+      return null; // Placeholder
+    default:
+      return null;
+  }
+}
+
+export { submitUserMessage, getUIStateFromAIState };
