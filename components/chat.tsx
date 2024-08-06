@@ -5,12 +5,12 @@ import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useEffect, useState } from 'react'
-import { useUIState, useAIState } from 'ai/rsc'
+import { useEffect } from 'react'
 import { Message, User } from '@/lib/types'
 import { usePathname, useRouter } from 'next/navigation'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { toast } from 'sonner'
+import { useChatStore } from '@/store/chat'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     initialMessages?: Message[]
@@ -19,14 +19,28 @@ export interface ChatProps extends React.ComponentProps<'div'> {
     missingKeys: string[]
 }
 
-export function Chat({ id, className, user, missingKeys }: ChatProps) {
+export function Chat({ className, initialMessages, id: initialId, user: initialUser, missingKeys }: ChatProps) {
     const router = useRouter()
     const path = usePathname()
-    const [input, setInput] = useState('')
-    const [messages] = useUIState()
-    const [aiState] = useAIState()
+
+    const {
+        messages,
+        input,
+        id,
+        user,
+        setMessages,
+        setInput,
+        setId,
+        setUser
+    } = useChatStore()
 
     const [_, setNewChatId] = useLocalStorage('newChatId', id)
+
+    useEffect(() => {
+        if (initialMessages) setMessages(initialMessages)
+        if (initialId) setId(initialId)
+        if (initialUser) setUser(initialUser)
+    }, [initialMessages, initialId, initialUser, setMessages, setId, setUser])
 
     useEffect(() => {
         if (user) {
@@ -37,18 +51,11 @@ export function Chat({ id, className, user, missingKeys }: ChatProps) {
     }, [id, path, user, messages])
 
     useEffect(() => {
-        const messagesLength = aiState.messages?.length
-        if (messagesLength === 2) {
-            router.refresh()
-        }
-    }, [aiState.messages, router])
-
-    useEffect(() => {
         setNewChatId(id)
-    })
+    }, [id, setNewChatId])
 
     useEffect(() => {
-        missingKeys.map(key => {
+        missingKeys.forEach(key => {
             toast.error(`Missing ${key} environment variable!`)
         })
     }, [missingKeys])
