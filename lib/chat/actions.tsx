@@ -1,4 +1,4 @@
-import { createAI, createStreamableUI, getMutableAIState } from 'ai/rsc';
+import { createAI, createStreamableUI, getMutableAIState, AIState } from 'ai/rsc';
 import { nanoid } from '@/lib/utils';
 import { Message, ServerMessage, ClientMessage } from '@/lib/types';
 
@@ -6,7 +6,7 @@ import { Message, ServerMessage, ClientMessage } from '@/lib/types';
 async function continueConversation(message: ClientMessage) {
   'use server';
 
-  const aiState = getMutableAIState<ServerMessage[]>();
+  const aiState = getMutableAIState<AIState>();
   aiState.update([...aiState.get(), { role: 'user', content: message.content, id: nanoid() }]);
 
   const ui = createStreamableUI(
@@ -27,7 +27,7 @@ async function continueConversation(message: ClientMessage) {
   aiState.update([...aiState.get(), aiMessage]);
   ui.update(
     <div className="inline-block px-3 py-1 rounded-lg bg-blue-500 text-white">
-      {aiMessage.content}
+      {aiMessage.content as string}
     </div>
   );
   ui.done();
