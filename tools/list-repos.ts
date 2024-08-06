@@ -20,10 +20,11 @@ type Result = {
 };
 
 export const listReposTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
-    name: 'list_repos',
+    // name: 'list_repos',
     description: 'Lists the most recent repositories for the authenticated user',
     parameters: params,
     execute: async ({ perPage, sort, direction }: Params): Promise<Result> => {
+        console.log("Attempting to execute listRepos")
         if (!context.user || !context.gitHubToken) {
             return {
                 success: false,

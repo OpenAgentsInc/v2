@@ -1,41 +1,43 @@
 import { z } from 'zod';
-import { CoreTool } from 'ai';
+import { tool, CoreTool } from 'ai';
 import { Octokit } from '@octokit/rest';
+import { ToolContext } from '@/types';
 
-const RepoContextSchema = z.object({
-    owner: z.string(),
-    name: z.string(),
-    branch: z.string().optional(),
-});
-
-const CreateFileParamsSchema = z.object({
+const params = z.object({
     path: z.string().describe('The path where the new file should be created'),
     content: z.string().describe('The content of the new file'),
-    token: z.string().describe('GitHub access token'),
-    repoContext: RepoContextSchema,
 });
 
-type CreateFileParams = z.infer<typeof CreateFileParamsSchema>;
+type Params = z.infer<typeof params>;
 
-interface CreateFileResult {
+type Result = {
     success: boolean;
     content: string;
     summary: string;
     details: string;
-}
+};
 
-export const createFileTool: CoreTool<typeof CreateFileParamsSchema, CreateFileResult> = {
+export const createFileTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     description: 'Creates a new file at the given path with the provided content',
-    parameters: CreateFileParamsSchema,
-    execute: async ({ path, content, token, repoContext }: CreateFileParams): Promise<CreateFileResult> => {
-        const octokit = new Octokit({ auth: token });
-        const branch = repoContext.branch || 'main';
+    parameters: params,
+    execute: async ({ path, content }: Params): Promise<Result> => {
+        if (!context.repo || !context.gitHubToken) {
+            return {
+                success: false,
+                content: 'Missing repository information or GitHub token',
+                summary: 'Failed to create file due to missing context',
+                details: 'The tool context is missing required repository information or GitHub token.'
+            };
+        }
+
+        const octokit = new Octokit({ auth: context.gitHubToken });
+        const branch = context.repo.branch || 'main';
         console.log(`Creating file on branch: ${branch}`);
 
         try {
-            const response = await octokit.repos.createOrUpdateFileContents({
-                owner: repoContext.owner,
-                repo: repoContext.name,
+            await octokit.repos.createOrUpdateFileContents({
+                owner: context.repo.owner,
+                repo: context.repo.name,
                 path,
                 message: `Create file ${path}`,
                 content: Buffer.from(content).toString('base64'),
@@ -46,16 +48,17 @@ export const createFileTool: CoreTool<typeof CreateFileParamsSchema, CreateFileR
                 success: true,
                 content: `File ${path} created successfully.`,
                 summary: `Created file at ${path}`,
-                details: `File ${path} was created in the repository ${repoContext.owner}/${repoContext.name} on branch ${branch}.`,
+                details: `File ${path} was created in the repository ${context.repo.owner}/${context.repo.name} on branch ${branch}.`,
             };
         } catch (error) {
             console.error('Error creating file:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
             return {
                 success: false,
                 content: `Failed to create file ${path}.`,
                 summary: `Error creating file at ${path}`,
-                details: `Error: ${error instanceof Error ? error.message : String(error)}`,
+                details: `Error: ${errorMessage}`,
             };
         }
     },
-};
+});

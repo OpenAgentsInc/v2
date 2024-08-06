@@ -1,14 +1,16 @@
 import { Repo, ToolContext } from "@/types"
 import { currentUser, User } from '@clerk/nextjs/server'
+import { createFileTool } from './create-file'
 import { listReposTool } from './list-repos'
 import { viewFileTool } from './view-file'
 import { viewHierarchyTool } from './view-hierarchy'
 import { getGitHubToken } from "@/lib/github/isGitHubUser"
 
 export const getTools = (context: ToolContext) => ({
-    listRepos: listReposTool(context),
-    viewFile: viewFileTool(context),
-    viewHierarchy: viewHierarchyTool(context)
+    create_file: createFileTool(context),
+    list_repos: listReposTool(context),
+    view_file: viewFileTool(context),
+    view_hierarchy: viewHierarchyTool(context)
 })
 
 interface ToolContextBody {
