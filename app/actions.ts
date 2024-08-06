@@ -10,6 +10,9 @@ import { type Chat } from '@/lib/types'
 export async function getChats(userId?: string | null) {
     const { userId: authUserId } = auth()
 
+    console.log('[getChats] userId:', userId)
+    console.log('[getChats] authUserId:', authUserId)
+
     if (!userId) {
         return []
     }
@@ -34,6 +37,7 @@ export async function getChats(userId?: string | null) {
 
         return results as Chat[]
     } catch (error) {
+        console.log("Error getting chats:", error)
         return []
     }
 }

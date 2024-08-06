@@ -3,9 +3,8 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { getChat, getMissingKeys } from '@/app/actions'
+import { getChat } from '@/app/actions'
 import { Chat } from '@/components/chat'
-import { AI } from '@/lib/chat/actions'
 
 export interface ChatPageProps {
     params: {
@@ -25,8 +24,8 @@ export async function generateMetadata({
     const chat = await getChat(params.id, session.userId)
 
     if (!chat || 'error' in chat) {
-        console.log("Skipping redirect in metadata.")
-        // redirect('/')
+        console.log("Metadata error redirecting...")
+        redirect('/')
     } else {
         return {
             title: chat?.title.toString().slice(0, 50) ?? 'Chat'
@@ -36,35 +35,31 @@ export async function generateMetadata({
 
 export default async function ChatPage({ params }: ChatPageProps) {
     const session = auth()
-    const missingKeys = await getMissingKeys()
 
     if (!session?.userId) {
-        redirect(`/login?next=/chat/${params.id}`)
+        console.log("Skipping unauthed redirect...")
+        // redirect(`/login?next=/chat/${params.id}`)
     }
 
     const userId = session.userId as string
     const chat = await getChat(params.id, userId)
 
     if (!chat || 'error' in chat) {
-        console.log("Skipping redirect in page.")
-        // redirect('/')
+        // console.log("Skipping redirect in page.")
+        console.log("Chat not found, redirecting...")
+        redirect('/')
     } else {
         if (chat?.userId !== session?.userId) {
             console.log("Not found.")
             notFound()
         }
 
-        console.log("chat:", chat)
-
         return (
-            <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
-                <Chat
-                    id={chat.id}
-                    user={{ id: userId }}
-                    initialMessages={chat.messages}
-                    missingKeys={missingKeys}
-                />
-            </AI>
+            <Chat
+                id={chat.id}
+                user={{ id: userId }}
+                initialMessages={chat.messages}
+            />
         )
     }
 }
