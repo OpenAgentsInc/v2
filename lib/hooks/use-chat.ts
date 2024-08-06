@@ -4,16 +4,14 @@ import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { Message, User } from '@/lib/types'
-import { toast } from 'sonner'
 
 interface UseChatProps {
     initialMessages?: Message[]
     initialId?: string
     initialUser?: User
-    missingKeys: string[]
 }
 
-export function useChat({ initialMessages, initialId, initialUser, missingKeys }: UseChatProps) {
+export function useChat({ initialMessages, initialId, initialUser }: UseChatProps) {
     const router = useRouter()
     const path = usePathname()
 
@@ -41,12 +39,6 @@ export function useChat({ initialMessages, initialId, initialUser, missingKeys }
             }
         }
     }, [id, path, user, messages])
-
-    useEffect(() => {
-        missingKeys.forEach(key => {
-            toast.error(`Missing ${key} environment variable!`)
-        })
-    }, [missingKeys])
 
     useEffect(() => {
         const messagesLength = messages?.length
