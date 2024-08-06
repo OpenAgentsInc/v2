@@ -1,37 +1,14 @@
-import { Chat, Message } from '@/lib/types'
 import dynamic from 'next/dynamic';
+import { Chat, Message } from '@/lib/types'
 import { BotCard, BotMessage } from '@/components/stocks';
 import { auth } from '@/auth'
-import {
-    createAI,
-    createStreamableUI,
-    getMutableAIState,
-    getAIState,
-    streamUI,
-    createStreamableValue
-} from 'ai/rsc'
+import { createAI, getMutableAIState, getAIState, streamUI, createStreamableValue } from 'ai/rsc'
 import { openai } from '@ai-sdk/openai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { getTools } from '@/tools'
-import { z } from 'zod'
-import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
-import { Stocks } from '@/components/stocks/stocks'
-import {
-    formatNumber,
-    runAsyncFnWithoutBlocking,
-    sleep,
-    nanoid
-} from '@/lib/utils'
+import { nanoid } from '@/lib/utils'
 import { saveChat } from '@/app/actions'
-import {
-    spinner,
-    SystemMessage,
-    Stock,
-    Purchase
-} from '@/components/stocks'
 import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { FileViewer } from '@/components/github/file-viewer'
-import { useRepoStore } from '@/store/repo'
 
 export type AIState = {
     chatId: string
