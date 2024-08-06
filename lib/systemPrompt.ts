@@ -38,10 +38,11 @@ ${basePrompt}
 
 Available tools:
 - \`create_file\` - Create a new file at path
+- \`list_repos\` - Lists all repositories for the authenticated user
 - \`rewrite_file\` - Rewrite file contents at path
+- \`scrape_webpage\` - Scrape webpage for information
 - \`view_file\` - View file contents at path
 - \`view_hierarchy\` - View file/folder hierarchy at path
-- \`list_repos\` - Lists all repositories for the authenticated user
 
 ACTIVE REPO: ${repo.owner}/${repo.name}
 ACTIVE BRANCH: ${repo.branch}

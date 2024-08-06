@@ -3,6 +3,7 @@ import { currentUser, User } from '@clerk/nextjs/server'
 import { createFileTool } from './create-file'
 import { listReposTool } from './list-repos'
 import { rewriteFileTool } from './rewrite-file'
+import { scrapeWebpageTool } from './scrape-webpage'
 import { viewFileTool } from './view-file'
 import { viewHierarchyTool } from './view-hierarchy'
 import { getGitHubToken } from "@/lib/github/isGitHubUser"
@@ -11,6 +12,7 @@ export const getTools = (context: ToolContext) => ({
     create_file: createFileTool(context),
     list_repos: listReposTool(context),
     rewrite_file: rewriteFileTool(context),
+    scrape_webpage: scrapeWebpageTool(context),
     view_file: viewFileTool(context),
     view_hierarchy: viewHierarchyTool(context)
 })
