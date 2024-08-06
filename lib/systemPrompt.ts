@@ -1,5 +1,13 @@
-// File: lib/systemPrompt.ts
-import { User } from "@clerk/nextjs/server"
+import { ToolContext } from "@/types"
+import { ExternalAccount } from "@clerk/nextjs/server"
+
+export function getSystemPrompt(context: ToolContext): string {
+    const { user, repo } = context
+    const isGithubAuthed = !!user && !!user.externalAccounts.find(
+        (account: ExternalAccount) => account.provider === 'oauth_github'
+    );
+    return isGithubAuthed ? getAuthenticatedPrompt(repo) : unauthenticatedPrompt;
+}
 
 const basePrompt = `
 SYSTEM INFORMATION:
@@ -15,11 +23,6 @@ ${basePrompt}
 
 CRITICAL: GitHub account connection required for full functionality.
 
-Available commands:
-- \`help\` - Display available commands
-- \`connect_github\` - Instructions to connect GitHub account
-- \`status\` - Check current system status
-
 Until GitHub is connected:
 - Respond to queries about your capabilities and the need for GitHub connection
 - Decline to perform any actions requiring GitHub access
@@ -29,7 +32,8 @@ Until GitHub is connected:
 Remember: Always respond in a concise, terminal-like manner. Do not break character or provide lengthy explanations unless specifically requested. Prioritize GitHub connection instructions until connected.
 `;
 
-const authenticatedPrompt = `
+function getAuthenticatedPrompt(repo: { owner: string; name: string; branch: string }): string {
+    return `
 ${basePrompt}
 
 Available tools:
@@ -39,8 +43,8 @@ Available tools:
 - \`view_hierarchy\` - View file/folder hierarchy at path
 - \`list_repos\` - Lists all repositories for the authenticated user
 
-ACTIVE REPO: {REPO_OWNER}/{REPO_NAME}
-ACTIVE BRANCH: {REPO_BRANCH}
+ACTIVE REPO: ${repo.owner}/${repo.name}
+ACTIVE BRANCH: ${repo.branch}
 
 Primary functions:
 1. Analyze project structure and codebase
@@ -75,19 +79,4 @@ IMPORTANT: Never ask for the GitHub token or Firecrawl API token. The system alr
 
 If there is a docs/ folder in the repository, at least once during a conversation, browse its contents and read anything that seems like it will be relevant. For example, if the user asks about anything relating to database storage and there's a docs/ folder, first use the view_file tool on docs/storage.md and anything else relevant like docs/storage-vercel-postgres.md.
 `;
-
-export function getSystemPrompt(user: User | null, repoInfo?: { owner: string; name: string; branch: string }): string {
-    const isGithubAuthed = !!user && !!user.externalAccounts.find(
-        account => account.provider === 'oauth_github'
-    );
-    let prompt = isGithubAuthed ? authenticatedPrompt : unauthenticatedPrompt;
-
-    if (isGithubAuthed && repoInfo) {
-        prompt = prompt.replace('{REPO_OWNER}', repoInfo.owner)
-            .replace('{REPO_NAME}', repoInfo.name)
-            .replace('{REPO_BRANCH}', repoInfo.branch);
-    }
-
-    return prompt;
 }
-

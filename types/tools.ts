@@ -1,4 +1,18 @@
 /**
+ * Info passed to generate tools.
+ */
+export interface ToolContext {
+    /**
+     * The user who is running the tools.
+     */
+    user: User | null;
+    /**
+     * The repository that the tools are running on.
+     */
+    repo: Repo | null;
+}
+
+/**
  * Typed tool call that is returned by generateText and streamText. 
  * It contains the tool call ID, the tool name, and the tool arguments. 
  */

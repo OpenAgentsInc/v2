@@ -10,8 +10,21 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
     const body = await req.json();
+    const toolContext = await getToolContext(body)
+
+    const result = await streamText({
+        model: openai('gpt-4o'),
+        messages: convertToCoreMessages(body.messages),
+        prompt: getSystemPrompt(toolContext),
+        tools: getTools(toolContext)
+    });
+
+    return result.toAIStreamResponse();
+}
+
+const getToolContext = async (body: any) => {
     console.log('Request body:', JSON.stringify(body));
-    const { messages, repoOwner, repoName, repoBranch } = body
+    const { repoOwner, repoName, repoBranch } = body
 
     const repo: Repo = {
         owner: repoOwner,
@@ -21,12 +34,5 @@ export async function POST(req: Request) {
 
     const user = await currentUser()
 
-    const result = await streamText({
-        model: openai('gpt-4o'),
-        messages: convertToCoreMessages(messages),
-        prompt: getSystemPrompt(user),
-        tools: getTools(user, repo)
-    });
-
-    return result.toAIStreamResponse();
+    return { repo, user }
 }
