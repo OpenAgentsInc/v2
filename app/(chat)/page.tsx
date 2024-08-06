@@ -16,6 +16,7 @@ export default async function IndexPage() {
     const id = nanoid()
     const missingKeys = await getMissingKeys()
     const user: User | null = await currentUser();
+    console.log("current user", user)
     const userOrNah = user ? { id: user.id } : { id: 'anon' }
 
     return (

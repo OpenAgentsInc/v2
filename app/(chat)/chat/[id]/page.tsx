@@ -50,8 +50,11 @@ export default async function ChatPage({ params }: ChatPageProps) {
         // redirect('/')
     } else {
         if (chat?.userId !== session?.userId) {
+            console.log("Not found.")
             notFound()
         }
+
+        console.log("chat:", chat)
 
         return (
             <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
