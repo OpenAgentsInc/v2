@@ -59,20 +59,53 @@ The process is similar to a guest visit, with the following additions:
    - It manages the state for sharing the chat
    - It renders a PromptForm component for user input
 7. As the user interacts with the chat:
-   - The submitUserMessage function is called when a message is sent
-   - New messages are added to the UI state using the setMessages function
-   - The AI component likely manages the communication with the AI model and updates the AI state
-   - The user's ID from Clerk is used to associate the chat with the authenticated user
+   - The submitUserMessage function (from lib/chat/actions.tsx) is called when a message is sent
+   - The function updates the AI state with the new user message
+   - It then streams the AI response using the streamUI function, which can use either OpenAI or Anthropic models
+   - The AI response is processed and added to the UI state
+   - The chat history is updated with both the user message and the AI response
 8. Chat sharing functionality:
    - When the chat has at least two messages, a "Share" button is displayed
    - Clicking the "Share" button opens a ChatShareDialog
    - The shareChat function (from app/actions.ts) is used to handle the sharing process
 
-Note: While the code doesn't explicitly show Vercel KV usage, it's likely that the chat history and user-specific data are stored and retrieved using Vercel KV in other parts of the application, such as within the AI component or in server-side actions.
+## AI and State Management (lib/chat/actions.tsx)
+
+1. The AI component is created using createAI from the ai/rsc library, with the following configuration:
+   - actions: Defines the submitUserMessage function
+   - initialUIState: An empty array
+   - initialAIState: Contains a generated chatId and an empty messages array
+   - onGetUIState: Retrieves the current UI state for authenticated users
+   - onSetAIState: Saves the chat state for authenticated users
+
+2. The submitUserMessage function:
+   - Updates the AI state with the new user message
+   - Streams the AI response using streamUI
+   - Supports both OpenAI and Anthropic models
+   - Uses a system prompt that identifies the AI as a coding agent for OpenAgents.com
+   - Processes the AI response and updates the UI state
+
+3. The onSetAIState function:
+   - Creates a chat object with the following properties:
+     - id: The chat ID
+     - title: First 100 characters of the first message
+     - userId: The authenticated user's ID
+     - createdAt: Current timestamp
+     - messages: Array of chat messages
+     - path: URL path for the chat
+   - Saves the chat using the saveChat function (likely interacts with a database)
+
+4. The getUIStateFromAIState function:
+   - Converts the AI state (chat history) into UI components
+   - Handles different message types (user, assistant, tool)
+   - Supports rendering file contents for the viewFileContents tool
+
+Note: While the code doesn't explicitly show Vercel KV usage, the saveChat function (called in onSetAIState) likely interacts with a database, which could be Vercel KV, to persist chat data.
 
 Important points about user ID handling and state management:
-- User IDs are obtained from Clerk using the currentUser() function
-- The user ID is passed to the Chat component, ensuring that chat interactions are associated with the correct user
-- Chat state is managed using the useUIState and useAIState hooks from the ai/rsc library
-- Local storage is used to persist the chat ID across page reloads
+- User IDs are obtained from the auth session
+- The user ID is used to associate chats with specific users
+- Chat state is managed using the createAI function from the ai/rsc library
 - The nanoid() function is used to generate unique IDs for chats and messages
+- The AI component supports both OpenAI and Anthropic models
+- Tool calls (e.g., viewFileContents) are supported and can be rendered in the UI
