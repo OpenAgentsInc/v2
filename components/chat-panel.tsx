@@ -17,7 +17,6 @@ export interface ChatPanelProps {
     title?: string
     isAtBottom: boolean
     scrollToBottom: () => void
-    missingKeys: string[]
 }
 
 export function ChatPanel({
@@ -25,9 +24,8 @@ export function ChatPanel({
     title,
     isAtBottom,
     scrollToBottom,
-    missingKeys
 }: ChatPanelProps) {
-    const { messages, input, setInput, setMessages } = useChat({ initialId: id, missingKeys })
+    const { messages, input, setInput, setMessages } = useChat({ initialId: id })
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
 
     const exampleMessages: any[] = []
