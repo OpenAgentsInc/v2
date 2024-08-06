@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { useChatStore } from '@/store/chat'
 import { Message, User } from '@/lib/types'
 import { toast } from 'sonner'
@@ -29,8 +28,6 @@ export function useChat({ initialMessages, initialId, initialUser, missingKeys }
         setUser
     } = useChatStore()
 
-    const [_, setNewChatId] = useLocalStorage('newChatId', id)
-
     useEffect(() => {
         if (initialMessages) setMessages(initialMessages)
         if (initialId) setId(initialId)
@@ -46,14 +43,17 @@ export function useChat({ initialMessages, initialId, initialUser, missingKeys }
     }, [id, path, user, messages])
 
     useEffect(() => {
-        setNewChatId(id)
-    }, [id, setNewChatId])
-
-    useEffect(() => {
         missingKeys.forEach(key => {
             toast.error(`Missing ${key} environment variable!`)
         })
     }, [missingKeys])
+
+    useEffect(() => {
+        const messagesLength = messages?.length
+        if (messagesLength === 2) {
+            router.refresh()
+        }
+    }, [messages, router])
 
     return {
         messages,

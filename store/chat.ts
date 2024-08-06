@@ -1,43 +1,51 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { Message, User } from '@/lib/types'
 
 interface ChatState {
     messages: Message[];
     input: string;
     id: string | undefined;
-    user: User | undefined;
+    user: User | null;
     addMessage: (message: Message) => void;
     setMessages: (messages: Message[]) => void;
     updateMessage: (id: string, updates: Partial<Message>) => void;
     clearMessages: () => void;
     setInput: (input: string) => void;
     setId: (id: string | undefined) => void;
-    setUser: (user: User | undefined) => void;
+    setUser: (user: User | null) => void;
 }
 
-export const useChatStore = create<ChatState>((set) => ({
-    messages: [],
-    input: '',
-    id: '1234',
-    user: { id: 'guest' } as User,
+export const useChatStore = create<ChatState>()(
+    persist(
+        (set) => ({
+            messages: [],
+            input: '',
+            id: undefined,
+            user: null,
 
-    addMessage: (message) => set((state) => ({
-        messages: [...state.messages, message]
-    })),
+            addMessage: (message) => set((state) => ({
+                messages: [...state.messages, message]
+            })),
 
-    setMessages: (messages) => set({ messages }),
+            setMessages: (messages) => set({ messages }),
 
-    updateMessage: (id, updates) => set((state) => ({
-        messages: state.messages.map(msg =>
-            msg.id === id ? { ...msg, ...updates } as Message : msg
-        )
-    })),
+            updateMessage: (id, updates) => set((state) => ({
+                messages: state.messages.map(msg =>
+                    msg.id === id ? { ...msg, ...updates } as Message : msg
+                )
+            })),
 
-    clearMessages: () => set({ messages: [] }),
+            clearMessages: () => set({ messages: [] }),
 
-    setInput: (input) => set({ input }),
+            setInput: (input) => set({ input }),
 
-    setId: (id) => set({ id }),
+            setId: (id) => set({ id }),
 
-    setUser: (user) => set({ user }),
-}))
+            setUser: (user) => set({ user }),
+        }),
+        {
+            name: 'chat-storage', // name of the item in the storage (must be unique)
+        }
+    )
+)
