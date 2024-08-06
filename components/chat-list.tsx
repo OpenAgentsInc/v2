@@ -43,7 +43,7 @@ export function ChatList({ messages, user, isShared }: ChatListProps) {
 
             {messages.map((message, index) => (
                 <div key={message.id}>
-                    <ChatMessage message={message} />
+                    <ChatMessage message={message as any} />
                     {index < messages.length - 1 && <Separator className="my-4" />}
                 </div>
             ))}
