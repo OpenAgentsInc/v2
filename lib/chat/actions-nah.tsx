@@ -25,7 +25,6 @@ async function submitUserMessage(content: string, repo: any, model: any) {
     'use server'
 
     const user = await currentUser()
-
     const aiState = getMutableAIState<typeof AI>()
 
     aiState.update({
@@ -40,8 +39,8 @@ async function submitUserMessage(content: string, repo: any, model: any) {
         ]
     })
 
-    let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
-    let textNode: undefined | React.ReactNode
+    let streamedText = ''
+    let textNode: React.ReactNode | null = null
 
     const result = await streamUI({
         // @ts-ignore
@@ -55,41 +54,47 @@ async function submitUserMessage(content: string, repo: any, model: any) {
         messages: [
             ...aiState.get().messages.map((message: any) => ({
                 role: message.role,
-                content: message.content,
-                name: message.name
+                content: message.content
             }))
         ],
         text: ({ content, done, delta }) => {
-            if (!textStream) {
-                textStream = createStreamableValue('')
-                textNode = <BotMessage content={textStream.value} />
-            }
-
             if (done) {
-                textStream.done()
-                aiState.done({
-                    ...aiState.get(),
-                    messages: [
-                        ...aiState.get().messages,
-                        {
-                            id: nanoid(),
-                            role: 'assistant',
-                            content
-                        }
-                    ]
-                })
+                console.log("Done, updating with content", content)
+                streamedText = content
             } else {
-                textStream.update(delta)
+                streamedText += delta
+                console.log("updated with:", delta)
             }
 
+            textNode = <BotMessage content={streamedText} />
             return textNode
         },
-        tools: getTools(aiState, user, repo)
+        tools: getTools(aiState, user, repo),
+        onFinish: (completion) => {
+            console.log("Finished with:", completion)
+            const assistantMessage = {
+                id: nanoid(),
+                role: 'assistant',
+                content: streamedText
+            }
+            aiState.done({
+                ...aiState.get(),
+                messages: [
+                    ...aiState.get().messages,
+                    assistantMessage
+                ]
+            })
+        }
     })
 
     return {
         id: nanoid(),
-        display: result.value
+        display: (
+            <>
+                {textNode}
+                {result.value}
+            </>
+        )
     }
 }
 
@@ -160,31 +165,32 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             if (message.role === 'user') {
                 displays.push(<UserMessage>{message.content as string}</UserMessage>);
             } else if (message.role === 'assistant') {
-                if (typeof message.content === 'string') {
-                    displays.push(<BotMessage content={message.content} />);
-                } else if (Array.isArray(message.content)) {
-                    console.log("??!!!!???")
-                    message.content.forEach((item: any) => {
-                        console.log(item)
-                        if (item.type === 'tool-call') {
-                            // Handle tool calls if needed
-                        }
-                    });
-                }
+                displays.push(<BotMessage content={message.content as string} />);
             } else if (message.role === 'tool') {
                 message.content.forEach((tool: any) => {
-                    if (tool.toolName === 'viewFileContents') {
-                        console.log("ok so")
-                        displays.push(
-                            <BotCard key={tool.toolCallId}>
-                                <DynamicFileViewer
-                                    content={tool.result.content}
-                                    filename={tool.result.path}
-                                />
-                            </BotCard>
-                        );
+                    switch (tool.toolName) {
+                        case 'viewFileContents':
+                            displays.push(
+                                <BotCard key={tool.toolCallId}>
+                                    <DynamicFileViewer
+                                        content={tool.result.content}
+                                        filename={tool.result.path}
+                                    />
+                                </BotCard>
+                            );
+                            break;
+                        case 'viewHierarchy':
+                            displays.push(
+                                <BotCard key={tool.toolCallId}>
+                                    <div>
+                                        <h3>File/Folder Hierarchy at {tool.result.path}</h3>
+                                        <pre>{tool.result.contents}</pre>
+                                    </div>
+                                </BotCard>
+                            );
+                            break;
+                        // Add other tool cases as needed
                     }
-                    // Handle other tool types here
                 });
             }
 

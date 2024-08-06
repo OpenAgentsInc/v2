@@ -34,9 +34,7 @@ export const viewFileContents = (aiState: any, user: User | null, repo: Repo | n
         }
 
         const gitHubUser = !!user ? isGitHubUser(user) : false
-        console.log('GitHub user:', gitHubUser)
         let gitHubToken = gitHubUser && !!user ? await getGitHubToken(user) : undefined
-        console.log('GitHub token:', gitHubToken)
 
         try {
             const repoString = `${repo.owner}/${repo.name}`
