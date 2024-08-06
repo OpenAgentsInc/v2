@@ -72,9 +72,9 @@ export function useChat({
 
     useEffect(() => {
         if (vercelMessages.length === 2 && !refreshedRef.current) {
-            console.log("skipping refresh")
-            // console.log('refreshing')
-            // router.refresh()
+            // console.log("skipping refresh")
+            console.log('refreshing')
+            router.refresh()
             refreshedRef.current = true
         }
     }, [vercelMessages, router])
