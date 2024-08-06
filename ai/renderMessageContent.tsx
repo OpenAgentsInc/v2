@@ -1,6 +1,6 @@
 import React from 'react';
 import { Message } from './AIState';
-import { BotMessage, UserMessage, BotCard } from '@/components/stocks';
+import { BotMessage, BotCard } from '@/components/stocks';
 import { Stocks } from '@/components/stocks/stocks';
 import { Stock } from '@/components/stocks/stock-skeleton';
 import { Purchase } from '@/components/stocks';
@@ -9,10 +9,10 @@ import { Events } from '@/components/stocks/events';
 export function renderMessageContent(message: Message): React.ReactNode {
   switch (message.role) {
     case 'user':
-      return <UserMessage>{message.content as string}</UserMessage>;
+      return <div>{message.content}</div>;
     case 'assistant':
       return <BotMessage content={message.content as string} />;
-    case 'tool':
+    case 'function':
       if (Array.isArray(message.content)) {
         return message.content.map(tool => {
           switch (tool.toolName) {
