@@ -2,10 +2,15 @@ import React from 'react';
 import { Message } from './AIState';
 import { BotMessage, BotCard } from '@/components/stocks';
 import { Stocks } from '@/components/stocks/stocks';
-import { Stock } from '@/components/stocks/stock-skeleton';
+import { Stock } from '@/components/stocks/stock';
 import { Purchase } from '@/components/stocks';
 import { Events } from '@/components/stocks/events';
 
+/**
+ * Renders the content of a message based on its role and content.
+ * @param message The message object to render.
+ * @returns A React node representing the rendered message content.
+ */
 export function renderMessageContent(message: Message): React.ReactNode {
   switch (message.role) {
     case 'user':
