@@ -8,7 +8,6 @@ import { auth } from '@clerk/nextjs/server'
 import { type Chat } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
-    console.log('getChats', userId)
     const { userId: authUserId } = auth()
 
     if (!userId) {
@@ -42,8 +41,6 @@ export async function getChats(userId?: string | null) {
 export async function getChat(id: string, userId: string) {
     const { userId: authUserId } = auth()
 
-    console.log('getChat', id, userId, authUserId)
-
     if (userId !== authUserId) {
         return {
             error: 'Unauthorized'
@@ -51,8 +48,6 @@ export async function getChat(id: string, userId: string) {
     }
 
     const chat = await kv.hgetall<Chat>(`chat:${id}`)
-
-    console.log("Got chat?", chat)
 
     if (!chat || (userId && chat.userId !== userId)) {
         return null

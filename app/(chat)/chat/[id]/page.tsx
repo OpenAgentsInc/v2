@@ -1,11 +1,9 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-
 import { auth } from '@/auth'
 import { getChat, getMissingKeys } from '@/app/actions'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-import { Session } from '@/lib/types'
 
 export interface ChatPageProps {
     params: {

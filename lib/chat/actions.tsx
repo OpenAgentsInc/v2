@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import { Chat, Message } from '@/lib/types'
 import { BotCard, BotMessage } from '@/components/stocks';
 import { auth } from '@/auth'
+import { currentUser } from '@clerk/nextjs/server'
 import { createAI, getMutableAIState, getAIState, streamUI, createStreamableValue } from 'ai/rsc'
 import { openai } from '@ai-sdk/openai'
 import { anthropic } from '@ai-sdk/anthropic'
@@ -22,6 +23,9 @@ export type UIState = {
 
 async function submitUserMessage(content: string, repo: any, model: any) {
     'use server'
+
+    const user = await currentUser()
+    console.log("USER!", user)
 
     const aiState = getMutableAIState<typeof AI>()
 
