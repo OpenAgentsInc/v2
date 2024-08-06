@@ -4,13 +4,9 @@ import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
-import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useEffect } from 'react'
-import { Message, User } from '@/lib/types'
-import { usePathname, useRouter } from 'next/navigation'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
-import { toast } from 'sonner'
-import { useChatStore } from '@/store/chat'
+import { useChat } from '@/lib/hooks/use-chat'
+import { Message, User } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     initialMessages?: Message[]
@@ -20,54 +16,13 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ className, initialMessages, id: initialId, user: initialUser, missingKeys }: ChatProps) {
-    const router = useRouter()
-    const path = usePathname()
-
     const {
         messages,
         input,
         id,
         user,
-        setMessages,
-        setInput,
-        setId,
-        setUser
-    } = useChatStore()
-
-    console.log('Chat', { messages, input, id, user })
-
-    const [_, setNewChatId] = useLocalStorage('newChatId2', id)
-
-    useEffect(() => {
-        if (initialMessages) setMessages(initialMessages)
-        if (initialId) setId(initialId)
-        if (initialUser) setUser(initialUser)
-    }, [initialMessages, initialId, initialUser, setMessages, setId, setUser])
-
-    useEffect(() => {
-        if (user) {
-            if (!path.includes('chat') && messages.length === 1) {
-                window.history.replaceState({}, '', `/chat/${id}`)
-            }
-        }
-    }, [id, path, user, messages])
-
-    useEffect(() => {
-        const messagesLength = messages?.length
-        if (messagesLength === 2) {
-            router.refresh()
-        }
-    }, [messages, router])
-
-    useEffect(() => {
-        setNewChatId(id)
-    }, [id, setNewChatId])
-
-    useEffect(() => {
-        missingKeys.forEach(key => {
-            toast.error(`Missing ${key} environment variable!`)
-        })
-    }, [missingKeys])
+        setInput
+    } = useChat({ initialMessages, initialId, initialUser, missingKeys })
 
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
