@@ -41,6 +41,7 @@ async function submitUserMessage(content: string, repo: any, model: any) {
     let textNode: undefined | React.ReactNode
 
     const result = await streamUI({
+        // @ts-ignore
         model: model.provider === 'openai' ? openai(model.id) : anthropic(model.id),
         initial: <SpinnerMessage />,
         system: `\
@@ -98,9 +99,9 @@ export const AI = createAI<AIState, UIState>({
     onGetUIState: async () => {
         'use server'
 
-        const session = await auth()
+        const session = auth()
 
-        if (session && session.user) {
+        if (session && session.userId) {
             const aiState = getAIState() as Chat
 
             if (aiState) {
@@ -114,13 +115,13 @@ export const AI = createAI<AIState, UIState>({
     onSetAIState: async ({ state }) => {
         'use server'
 
-        const session = await auth()
+        const session = auth()
 
-        if (session && session.user) {
+        if (session && session.userId) {
             const { chatId, messages } = state
 
             const createdAt = new Date()
-            const userId = session.user.id as string
+            const userId = session.userId as string
             const path = `/chat/${chatId}`
 
             const firstMessageContent = messages[0].content as string
