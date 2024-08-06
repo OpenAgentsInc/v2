@@ -1,11 +1,10 @@
 import React from 'react';
 import { Message } from './AIState';
-import { BotMessage, UserMessage } from '../components/Message';
-import { BotCard } from '../components/BotCard';
-import { Stocks } from '../components/stocks/Stocks';
-import { Stock } from '../components/stocks/Stock';
-import { Purchase } from '../components/stocks/Purchase';
-import { Events } from '../components/stocks/Events';
+import { BotMessage, UserMessage, BotCard } from '@/components/stocks';
+import { Stocks } from '@/components/stocks/stocks';
+import { Stock } from '@/components/stocks/stock-skeleton';
+import { Purchase } from '@/components/stocks';
+import { Events } from '@/components/stocks/events';
 
 export function renderMessageContent(message: Message): React.ReactNode {
   switch (message.role) {
