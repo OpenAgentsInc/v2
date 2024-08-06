@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { Message, User } from '@/lib/types'
@@ -33,6 +33,7 @@ export function useChat({
     } = useChatStore()
 
     const [localChatId, setLocalChatId] = useState<string | undefined>(initialId || currentChatId)
+    const refreshedRef = useRef(false)
 
     useEffect(() => {
         if (initialId) setLocalChatId(initialId)
@@ -63,14 +64,18 @@ export function useChat({
     useEffect(() => {
         if (storeUser) {
             if (!path.includes('chat') && vercelMessages.length === 1) {
+                console.log("doing replace thing")
                 window.history.replaceState({}, '', `/chat/${localChatId}`)
             }
         }
     }, [localChatId, path, storeUser, vercelMessages])
 
     useEffect(() => {
-        if (vercelMessages.length === 2) {
-            router.refresh()
+        if (vercelMessages.length === 2 && !refreshedRef.current) {
+            console.log("skipping refresh")
+            // console.log('refreshing')
+            // router.refresh()
+            refreshedRef.current = true
         }
     }, [vercelMessages, router])
 
@@ -87,13 +92,18 @@ export function useChat({
         }
     }
 
+    const handleSubmitWrapper = (e: React.FormEvent<HTMLFormElement>) => {
+        refreshedRef.current = false
+        handleSubmit(e)
+    }
+
     return {
         messages: vercelMessages,
         input,
         id: localChatId,
         user: storeUser,
         handleInputChange: handleInputChangeWrapper,
-        handleSubmit,
+        handleSubmit: handleSubmitWrapper,
         addToolResult,
         setMessages: (messages: Message[]) => {
             if (localChatId) {

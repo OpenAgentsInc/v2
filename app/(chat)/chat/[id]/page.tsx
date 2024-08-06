@@ -23,11 +23,10 @@ export async function generateMetadata({
     }
 
     const chat = await getChat(params.id, session.userId)
-    console.log('generateMetadata chat:', chat)
 
     if (!chat || 'error' in chat) {
         // console.log("Skipping redirect in metadata.")
-        console.log("Redirecting in metadata.")
+        // console.log("Redirecting in metadata.")
         redirect('/')
     } else {
         return {
@@ -48,8 +47,8 @@ export default async function ChatPage({ params }: ChatPageProps) {
     const chat = await getChat(params.id, userId)
 
     if (!chat || 'error' in chat) {
-        console.log("Skipping redirect in page.")
-        // redirect('/')
+        // console.log("Skipping redirect in page.")
+        redirect('/')
     } else {
         if (chat?.userId !== session?.userId) {
             console.log("Not found.")
@@ -64,7 +63,6 @@ export default async function ChatPage({ params }: ChatPageProps) {
                     id={chat.id}
                     user={{ id: userId }}
                     initialMessages={chat.messages}
-                    missingKeys={missingKeys}
                 />
             </AI>
         )
