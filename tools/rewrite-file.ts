@@ -1,43 +1,48 @@
 import { z } from 'zod';
-import { CoreTool } from 'ai';
+import { tool, CoreTool } from 'ai';
 import { Octokit } from '@octokit/rest';
+import { ToolContext } from '@/types';
 
-const RepoContextSchema = z.object({
-    owner: z.string(),
-    name: z.string(),
-    branch: z.string().optional(),
-});
-
-const RewriteFileParamsSchema = z.object({
+const params = z.object({
     path: z.string().describe('The path of the file to rewrite'),
     content: z.string().describe('The new content to write to the file'),
-    token: z.string().describe('GitHub access token'),
-    repoContext: RepoContextSchema,
 });
 
-type RewriteFileParams = z.infer<typeof RewriteFileParamsSchema>;
+type Params = z.infer<typeof params>;
 
-interface RewriteFileResult {
+type Result = {
+    success: boolean;
     summary: string;
     details: string;
     commitMessage: string;
     newContent: string;
     oldContent: string;
-}
+};
 
-export const rewriteFileTool: CoreTool<typeof RewriteFileParamsSchema, RewriteFileResult> = {
+export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     description: 'Rewrites the contents of a file at the given path',
-    parameters: RewriteFileParamsSchema,
-    execute: async ({ path, content, token, repoContext }: RewriteFileParams) => {
-        const octokit = new Octokit({ auth: token });
+    parameters: params,
+    execute: async ({ path, content }: Params): Promise<Result> => {
+        if (!context.repo || !context.gitHubToken) {
+            return {
+                success: false,
+                summary: 'Failed to rewrite file due to missing context',
+                details: 'The tool context is missing required repository information or GitHub token.',
+                commitMessage: '',
+                newContent: '',
+                oldContent: '',
+            };
+        }
+
+        const octokit = new Octokit({ auth: context.gitHubToken });
 
         try {
             // Get the current file to retrieve its SHA and content
             const { data: currentFile } = await octokit.repos.getContent({
-                owner: repoContext.owner,
-                repo: repoContext.name,
+                owner: context.repo.owner,
+                repo: context.repo.name,
                 path,
-                ref: repoContext.branch,
+                ref: context.repo.branch,
             });
 
             if ('sha' in currentFile && 'content' in currentFile) {
@@ -46,17 +51,19 @@ export const rewriteFileTool: CoreTool<typeof RewriteFileParamsSchema, RewriteFi
 
                 // Update the file
                 const { data } = await octokit.repos.createOrUpdateFileContents({
-                    owner: repoContext.owner,
-                    repo: repoContext.name,
+                    owner: context.repo.owner,
+                    repo: context.repo.name,
                     path,
                     message: commitMessage,
                     content: Buffer.from(content).toString('base64'),
                     sha: currentFile.sha,
-                    branch: repoContext.branch,
+                    branch: context.repo.branch,
                 });
 
                 const summary = `Edited ${path.split('/').pop()} - ${commitMessage}`;
+
                 return {
+                    success: true,
                     summary,
                     details: `File ${path} has been successfully updated. Commit SHA: ${data.commit.sha}`,
                     commitMessage,
@@ -68,10 +75,18 @@ export const rewriteFileTool: CoreTool<typeof RewriteFileParamsSchema, RewriteFi
             }
         } catch (error) {
             console.error('Error rewriting file:', error);
-            throw new Error(`Failed to rewrite file: ${error}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            return {
+                success: false,
+                summary: 'Failed to rewrite file',
+                details: `Error: ${errorMessage}`,
+                commitMessage: '',
+                newContent: '',
+                oldContent: '',
+            };
         }
     },
-};
+});
 
 function generateCommitMessage(path: string, oldContent: string, newContent: string): string {
     const fileExtension = path.split('.').pop()?.toLowerCase();
