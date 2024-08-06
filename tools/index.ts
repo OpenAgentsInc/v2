@@ -2,6 +2,7 @@ import { Repo, ToolContext } from "@/types"
 import { currentUser, User } from '@clerk/nextjs/server'
 import { createFileTool } from './create-file'
 import { listReposTool } from './list-repos'
+import { rewriteFileTool } from './rewrite-file'
 import { viewFileTool } from './view-file'
 import { viewHierarchyTool } from './view-hierarchy'
 import { getGitHubToken } from "@/lib/github/isGitHubUser"
@@ -9,6 +10,7 @@ import { getGitHubToken } from "@/lib/github/isGitHubUser"
 export const getTools = (context: ToolContext) => ({
     create_file: createFileTool(context),
     list_repos: listReposTool(context),
+    rewrite_file: rewriteFileTool(context),
     view_file: viewFileTool(context),
     view_hierarchy: viewHierarchyTool(context)
 })
@@ -28,10 +30,12 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     }
     const user = await currentUser()
     const gitHubToken = user ? await getGitHubToken(user) : undefined
+    const firecrawlToken = process.env.FIRECRAWL_API_KEY
 
     return {
         repo,
         user: user as User | null,
-        gitHubToken
+        gitHubToken,
+        firecrawlToken
     }
 }

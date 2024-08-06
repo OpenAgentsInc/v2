@@ -18,6 +18,12 @@ export interface ToolContext {
      * This token is used to authenticate with the GitHub API.
      */
     gitHubToken: string | undefined;
+    /**
+     * The Firecrawl token for the user.
+     * This token is used to authenticate with the Firecrawl API.
+     * We'll probably use a central token, but we can also use a user-specific token.
+     */
+    firecrawlToken: string | undefined;
 }
 
 /**

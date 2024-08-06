@@ -1,15 +1,10 @@
 import { tool, CoreTool } from 'ai';
 import { z } from 'zod';
 import axios from 'axios';
+import { ToolContext } from '@/types';
 
 const params = z.object({
     url: z.string().url().describe("The URL of the webpage to scrape"),
-    firecrawlToken: z.string().describe("Firecrawl API key"),
-    repoContext: z.object({
-        owner: z.string(),
-        name: z.string(),
-        branch: z.string().optional()
-    }).describe("Repository context"),
     pageOptions: z.object({
         onlyMainContent: z.boolean().optional().describe("Whether to extract only the main content of the page")
     }).optional().describe("Options for page processing")
@@ -35,11 +30,20 @@ type Result = {
     details: string;
 };
 
-export const scrapeWebpageTool: CoreTool<typeof params, Result> = tool({
+export const scrapeWebpageTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     name: 'scrape_webpage',
     description: 'Scrapes a webpage using Firecrawl and returns the content in markdown format',
     parameters: params,
-    execute: async ({ url, firecrawlToken, pageOptions }: Params): Promise<Result> => {
+    execute: async ({ url, pageOptions }: Params): Promise<Result> => {
+        if (!context.firecrawlToken) {
+            return {
+                success: false,
+                error: "Missing Firecrawl token",
+                summary: "Failed to scrape webpage due to missing Firecrawl token",
+                details: "The tool context is missing the required Firecrawl token."
+            };
+        }
+
         try {
             const response = await axios.post('https://api.firecrawl.dev/v0/scrape', {
                 url,
@@ -47,7 +51,7 @@ export const scrapeWebpageTool: CoreTool<typeof params, Result> = tool({
             }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${firecrawlToken}`
+                    'Authorization': `Bearer ${context.firecrawlToken}`
                 }
             });
 
