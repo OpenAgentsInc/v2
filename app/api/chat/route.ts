@@ -1,4 +1,5 @@
 import { convertToCoreMessages, streamText } from 'ai'
+import { anthropic } from '@ai-sdk/anthropic'
 import { openai } from '@ai-sdk/openai'
 import { getSystemPrompt } from '@/lib/systemPrompt'
 import { getTools, getToolContext } from '@/tools'
@@ -12,7 +13,8 @@ export async function POST(req: Request) {
 
     const result = await streamText({
         messages: convertToCoreMessages(body.messages),
-        model: openai('gpt-4o'),
+        model: anthropic('claude-3-5-sonnet-20240620'),
+        // model: openai('gpt-4o'),
         system: getSystemPrompt(toolContext),
         tools: getTools(toolContext)
     });

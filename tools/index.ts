@@ -1,12 +1,19 @@
 import { Repo, ToolContext } from "@/types"
-import { currentUser } from '@clerk/nextjs/server'
+import { currentUser, User } from '@clerk/nextjs/server'
+import { viewFileTool } from './view-file'
+import { getGitHubToken } from "@/lib/github/isGitHubUser"
 
-export const getTools = (context: ToolContext) => {
-    console.log("getTools with context:", context)
-    return {}
+export const getTools = (context: ToolContext) => ({
+    viewFile: viewFileTool(context)
+})
+
+interface ToolContextBody {
+    repoOwner: string;
+    repoName: string;
+    repoBranch: string;
 }
 
-export const getToolContext = async (body: any) => {
+export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
     const { repoOwner, repoName, repoBranch } = body
     const repo: Repo = {
         owner: repoOwner,
@@ -14,5 +21,11 @@ export const getToolContext = async (body: any) => {
         branch: repoBranch
     }
     const user = await currentUser()
-    return { repo, user }
+    const gitHubToken = user ? await getGitHubToken(user) : undefined
+
+    return {
+        repo,
+        user: user as User | null,
+        gitHubToken
+    }
 }

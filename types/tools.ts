@@ -1,3 +1,6 @@
+import { Repo } from "./repo";
+import { User } from "@clerk/nextjs/server";
+
 /**
  * Info passed to generate tools.
  */
@@ -10,6 +13,11 @@ export interface ToolContext {
      * The repository that the tools are running on.
      */
     repo: Repo | null;
+    /**
+     * The GitHub token for the user.
+     * This token is used to authenticate with the GitHub API.
+     */
+    gitHubToken: string | undefined;
 }
 
 /**
