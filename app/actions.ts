@@ -144,9 +144,7 @@ export async function shareChat(id: string) {
 }
 
 export async function saveChat(chat: Chat) {
-    console.log("Attemptign to save chat", chat)
     const { userId } = auth()
-    console.log('saveChat', userId)
 
     if (userId) {
         const pipeline = kv.pipeline()
