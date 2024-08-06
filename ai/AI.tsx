@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { AIState, Message, Chat } from './AIState';
 import { UIState, UIMessage } from './UIState';
 import { openai } from '@ai-sdk/openai';
-import { SpinnerMessage, BotMessage } from '@/components/stocks';
+import { BotMessage } from '@/components/stocks';
 import { saveChat } from '@/app/actions';
 import { auth } from '@/auth';
 import { tools } from './tools';
@@ -25,7 +25,8 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
       {
         id: nanoid(),
         role: 'user',
-        content
+        content,
+        createdAt: Date.now()
       }
     ]
   });
@@ -35,10 +36,10 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
 
   const result = await streamUI({
     model: openai('gpt-4o'),
-    initial: <SpinnerMessage />,
+    initial: <div>Loading...</div>,
     system: systemPrompt,
     messages: [
-      ...aiState.get().messages.map((message: any) => ({
+      ...aiState.get().messages.map((message: Message) => ({
         role: message.role,
         content: message.content,
         name: message.name
@@ -59,7 +60,8 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
             {
               id: nanoid(),
               role: 'assistant',
-              content
+              content,
+              createdAt: Date.now()
             }
           ]
         });
@@ -75,7 +77,8 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
   return {
     id: nanoid(),
     role: 'assistant',
-    display: result.value
+    display: result.value,
+    createdAt: Date.now()
   };
 }
 
@@ -96,7 +99,7 @@ export const AI = createAI<AIState, UIState>({
     messages: [{
       id: nanoid(),
       role: 'system',
-      display: <SpinnerMessage />,
+      display: <div>Welcome to the chat!</div>,
       createdAt: Date.now(),
     }],
     inputState: 'idle',
@@ -104,12 +107,12 @@ export const AI = createAI<AIState, UIState>({
   onSetAIState: async ({ state }) => {
     'use server';
     const session = await auth();
-    if (session && session.user) {
+    if (session) {
       const { chatId, messages } = state;
       const createdAt = new Date();
-      const userId = session.user.id as string;
+      const userId = session.userId as string;
       const path = `/chat/${chatId}`;
-      const firstMessageContent = messages[0].content as string;
+      const firstMessageContent = messages[0]?.content as string || '';
       const title = firstMessageContent.substring(0, 100);
       const chat: Chat = {
         id: chatId,
@@ -117,7 +120,8 @@ export const AI = createAI<AIState, UIState>({
         userId,
         createdAt,
         messages,
-        path
+        path,
+        metadata: state.metadata
       };
       await saveChat(chat);
     }
@@ -125,7 +129,7 @@ export const AI = createAI<AIState, UIState>({
   onGetUIState: async () => {
     'use server';
     const session = await auth();
-    if (session && session.user) {
+    if (session) {
       const aiState = getAIState() as Chat;
       if (aiState) {
         return getUIStateFromAIState(aiState);
@@ -135,11 +139,11 @@ export const AI = createAI<AIState, UIState>({
   }
 });
 
-export function getUIStateFromAIState(aiState: Chat): UIState {
+function getUIStateFromAIState(aiState: Chat): UIState {
   return {
     messages: aiState.messages
-      .filter(message => message.role !== 'system')
-      .map((message): UIMessage => ({
+      .filter((message: Message) => message.role !== 'system')
+      .map((message: Message): UIMessage => ({
         id: nanoid(),
         role: message.role,
         display: renderMessageContent(message),
@@ -149,4 +153,4 @@ export function getUIStateFromAIState(aiState: Chat): UIState {
   };
 }
 
-export { submitUserMessage, getUIStateFromAIState };
+export { submitUserMessage };
