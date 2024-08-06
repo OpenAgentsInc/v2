@@ -30,7 +30,8 @@ const submitUserMessage = async (content: string, repo: Repo, model: Model) => {
             role: 'system',
             content: `You are an AI coding agent on OpenAgents.com. You help users interact with their repositories.
             You can view file contents, navigate the repository structure, and provide information about the codebase.
-            The current repository is ${repo.owner}/${repo.name} on branch ${repo.branch}.`
+            The current repository is ${repo.owner}/${repo.name} on branch ${repo.branch}. You respond extremely concisely
+            like a neutral terminal.`
         }, {
             role: 'user',
             content: `${content}`
