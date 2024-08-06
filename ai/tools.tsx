@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
 import { BotCard } from '@/components/stocks';
-import { StocksSkeleton, Stocks } from '@/components/stocks/stocks';
-import { StockSkeleton, Stock } from '@/components/stocks/stock-skeleton';
-import { EventsSkeleton, Events } from '@/components/stocks/events';
+import { Stocks } from '@/components/stocks/stocks';
+import { Stock } from '@/components/stocks/stock-skeleton';
+import { Events } from '@/components/stocks/events';
 import { Purchase } from '@/components/stocks';
 import { sleep } from '@/lib/utils';
 
@@ -19,10 +19,10 @@ export const tools = {
         })
       )
     }),
-    generate: async function*({ stocks }) {
+    generate: async function*({ stocks }: { stocks: any[] }) {
       yield (
         <BotCard>
-          <StocksSkeleton />
+          <div>Loading stocks...</div>
         </BotCard>
       );
 
@@ -49,10 +49,10 @@ export const tools = {
       price: z.number().describe('The price of the stock.'),
       delta: z.number().describe('The change in price of the stock')
     }),
-    generate: async function*({ symbol, price, delta }) {
+    generate: async function*({ symbol, price, delta }: { symbol: string, price: number, delta: number }) {
       yield (
         <BotCard>
-          <StockSkeleton />
+          <div>Loading stock price...</div>
         </BotCard>
       );
 
@@ -82,7 +82,7 @@ export const tools = {
           'The **number of shares** for a stock or currency to purchase. Can be optional if the user did not specify it.'
         )
     }),
-    generate: async function*({ symbol, price, numberOfShares = 100 }) {
+    generate: async function*({ symbol, price, numberOfShares = 100 }: { symbol: string, price: number, numberOfShares?: number }) {
       if (numberOfShares <= 0 || numberOfShares > 1000) {
         return <BotCard>Invalid amount</BotCard>;
       } else {
@@ -115,10 +115,10 @@ export const tools = {
         })
       )
     }),
-    generate: async function*({ events }) {
+    generate: async function*({ events }: { events: any[] }) {
       yield (
         <BotCard>
-          <EventsSkeleton />
+          <div>Loading events...</div>
         </BotCard>
       );
 
