@@ -41,6 +41,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                 return cities[Math.floor(Math.random() * cities.length)]
             }
             // Add more tool call handlers here as needed
+            console.log('Tool call:', toolCall)
         },
     })
 
