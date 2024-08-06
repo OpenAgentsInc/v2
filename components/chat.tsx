@@ -87,6 +87,16 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         )
     }
 
+    const uiMessages = messages.map(message => ({
+        ...message,
+        display: (
+            <div className="mb-4">
+                <strong>{message.role}:</strong> {message.content}
+                {message.toolInvocations?.map(renderToolInvocation)}
+            </div>
+        )
+    }))
+
     return (
         <div
             className={cn("bg-white dark:bg-black group w-full overflow-auto pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]", className)}
@@ -97,14 +107,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                 ref={messagesRef}
             >
                 {messages.length ? (
-                    <div>
-                        {messages.map((message) => (
-                            <div key={message.id} className="mb-4">
-                                <strong>{message.role}:</strong> {message.content}
-                                {message.toolInvocations?.map(renderToolInvocation)}
-                            </div>
-                        ))}
-                    </div>
+                    <ChatList messages={uiMessages} user={user} isShared={false} />
                 ) : (
                     <EmptyScreen />
                 )}
