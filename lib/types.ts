@@ -22,11 +22,9 @@ export interface Chat extends Record<string, any> {
     sharePath?: string
 }
 
-export type ServerActionResult<r> = Promise<
-    | Result
-    | {
-        error: string
-    }
+export type ServerActionResult<T> = Promise<
+    | { success: true; data: T }
+    | { success: false; error: string }
 >
 
 export interface Session {
