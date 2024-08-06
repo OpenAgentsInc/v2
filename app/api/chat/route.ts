@@ -23,16 +23,12 @@ export async function POST(req: Request) {
 }
 
 const getToolContext = async (body: any) => {
-    console.log('Request body:', JSON.stringify(body));
     const { repoOwner, repoName, repoBranch } = body
-
     const repo: Repo = {
         owner: repoOwner,
         name: repoName,
         branch: repoBranch
     }
-
     const user = await currentUser()
-
     return { repo, user }
 }
