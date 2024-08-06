@@ -20,7 +20,7 @@ export function PromptForm() {
     const router = useRouter()
     const { formRef, onKeyDown } = useEnterSubmit()
     const inputRef = React.useRef<HTMLTextAreaElement>(null)
-    const { messages, input, setInput, setMessages } = useChat({ missingKeys: [] })
+    const { messages, input, setInput, setMessages } = useChat({})
     const repo = useRepoStore((state) => state.repo)
     const model = useModelStore((state) => state.model)
 
