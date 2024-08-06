@@ -1,4 +1,5 @@
 import { CoreMessage } from 'ai'
+import { models } from "@/lib/models"
 
 export type Message = CoreMessage & {
     id: string
@@ -48,6 +49,12 @@ export interface OldUser extends Record<string, any> {
 
 export interface User {
     id: string
+}
+
+export interface Model {
+    id: string
+    name: string
+    provider: string
 }
 
 export interface Repo {

@@ -1,60 +1,59 @@
-import { createAI, createStreamableUI, getAIState, getMutableAIState } from 'ai/rsc';
+import { createAI, getAIState, streamUI } from 'ai/rsc';
+import { openai } from '@ai-sdk/openai'
+import { anthropic } from '@ai-sdk/anthropic'
+import { SpinnerMessage } from '@/components/stocks/message';
+import { Chat, Message, Model, Repo } from '@/lib/types';
 import { nanoid } from '@/lib/utils';
-import { Chat, Message, Repo, ServerMessage, ClientMessage } from '@/lib/types';
-import React from 'react';
 
-export type AIState = {
-    chatId: string;
-    messages: Message[];
+type AIState = {
+    chatId: string
+    messages: Message[]
 }
 
-export type UIState = {
-    id: string;
-    display: React.ReactNode;
-}[]
+type UIState = {
+    id: string
+    display: React.ReactNode
+}
 
-// Function to submit user message and continue the conversation
-async function submitUserMessage(message: ClientMessage, repo: Repo, model: string) {
+const submitUserMessage = async (content: string, repo: Repo, model: Model) => {
     'use server';
 
-    console.log("submitUserMessage", message, repo, model);
-    const aiState = getMutableAIState<typeof AI>();
-    const currentMessages = aiState.get().messages || [];
-    aiState.update({
-        ...aiState.get(),
-        messages: [...currentMessages, { role: 'user', content: message.content, id: nanoid() }]
-    });
+    console.log('User message:', content);
+    console.log('Repo:', repo);
+    console.log('Model:', model);
 
-    const ui = createStreamableUI(
-        <div className="inline-block px-3 py-1 rounded-lg bg-gray-100 text-gray-800">
-            Thinking...
-        </div>
-    );
-
-    // Simulate AI response (replace with actual AI integration)
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    const aiMessage: ServerMessage = {
+    const result = await streamUI({
+        initial: <SpinnerMessage />,
+        // @ts-ignore
+        model: model.provider === 'openai' ? openai(model.id) : anthropic(model.id),
+        messages: [{
+            role: 'system',
+            content: `You are an AI coding agent on OpenAgents.com. You help users interact with their repositories.
+            You can view file contents, navigate the repository structure, and provide information about the codebase.
+            The current repository is ${repo.owner}/${repo.name} on branch ${repo.branch}.`
+        }, {
+            role: 'user',
+            content: `${content}`
+        }],
+        text: ({ content, done, delta }) => {
+            console.log('AI response:', content);
+            return (
+                <>
+                    {content}
+                </>
+            );
+        }
+    })
+    return {
         id: nanoid(),
-        role: 'assistant',
-        content: `This is a simulated AI response to: "${message.content}"`,
-    };
-
-    aiState.update({
-        ...aiState.get(),
-        messages: [...currentMessages, aiMessage]
-    });
-    ui.update(
-        <div className="inline-block px-3 py-1 rounded-lg bg-blue-500 text-white">
-            {typeof aiMessage.content === 'string' ? aiMessage.content : JSON.stringify(aiMessage.content)}
-        </div>
-    );
-    ui.done();
-
-    return aiMessage;
+        display: (
+            <>
+                {result.value}
+            </>
+        )
+    }
 }
 
-// Create the AI context
 export const AI = createAI<AIState, UIState>({
     actions: {
         submitUserMessage,
@@ -63,7 +62,10 @@ export const AI = createAI<AIState, UIState>({
         chatId: nanoid(),
         messages: [],
     },
-    initialUIState: [],
+    initialUIState: {
+        id: nanoid(),
+        display: <SpinnerMessage />,
+    },
     onSetAIState: async ({ state, done }) => {
         'use server';
         if (done) {
@@ -73,39 +75,27 @@ export const AI = createAI<AIState, UIState>({
     },
     onGetUIState: async () => {
         'use server';
-        // Implement logic to restore UI state from AI state if needed
-        // const historyFromDB = await loadChatFromDB();
-        const aiState = getAIState() as Chat
-
+        const aiState = getAIState() as Chat | undefined;
         if (aiState) {
-            const uiState = getUIStateFromAIState(aiState)
-            return uiState
-        } else {
-            return []
-            // if (historyFromDB.length !== historyFromApp.length) {
-            //   return historyFromDB.map(({ role, content }) => ({
-            //     id: nanoid(),
-            //     role,
-            //     content,
-            //   }));
-            // }
+            return getUIStateFromAIState(aiState);
         }
+        return undefined;
     }
 });
 
-export default AI;
 
 const getUIStateFromAIState = (aiState: Chat): UIState => {
+    const displays = aiState.messages
+        .filter(message => message.role !== 'system')
+        .map((message, index) => (
+            <div key={index}>
+                {message.role === 'user' ? 'You: ' : 'Assistant: '}
+                {message.content as string}
+            </div>
+        ));
 
-    return aiState.messages.map((message) => {
-        return {
-            id: message.id,
-            display: (
-                <div className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-gray-100' : 'bg-blue-500'} text-white`}>
-                    {message.content.toString()}
-                </div>
-            )
-        }
-    });
+    return {
+        id: aiState.chatId,
+        display: <>{displays}</>
+    };
 }
-
