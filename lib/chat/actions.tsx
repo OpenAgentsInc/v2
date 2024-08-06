@@ -13,8 +13,8 @@ export type UIState = {
     display: React.ReactNode;
 }[]
 
-// Function to continue the conversation
-async function continueConversation(message: ClientMessage) {
+// Function to submit user message and continue the conversation
+async function submitUserMessage(message: ClientMessage) {
     'use server';
 
     const aiState = getMutableAIState<typeof AI>();
@@ -56,7 +56,7 @@ async function continueConversation(message: ClientMessage) {
 // Create the AI context
 export const AI = createAI<AIState, UIState>({
     actions: {
-        continueConversation,
+        submitUserMessage,
     },
     initialAIState: {
         chatId: nanoid(),
