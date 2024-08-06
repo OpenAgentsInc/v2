@@ -13,9 +13,9 @@ export async function POST(req: Request) {
     const toolContext = await getToolContext(body)
 
     const result = await streamText({
-        model: openai('gpt-4o'),
         messages: convertToCoreMessages(body.messages),
-        prompt: getSystemPrompt(toolContext),
+        model: openai('gpt-4o'),
+        system: getSystemPrompt(toolContext),
         tools: getTools(toolContext)
     });
 
