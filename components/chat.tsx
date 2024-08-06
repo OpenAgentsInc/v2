@@ -51,6 +51,13 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
     }, [id, path, user, messages])
 
     useEffect(() => {
+        const messagesLength = messages?.length
+        if (messagesLength === 2) {
+            router.refresh()
+        }
+    }, [messages, router])
+
+    useEffect(() => {
         setNewChatId(id)
     }, [id, setNewChatId])
 
