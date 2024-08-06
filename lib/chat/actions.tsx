@@ -25,7 +25,6 @@ async function submitUserMessage(content: string, repo: any, model: any) {
     'use server'
 
     const user = await currentUser()
-    console.log("USER!", user)
 
     const aiState = getMutableAIState<typeof AI>()
 
@@ -85,7 +84,7 @@ async function submitUserMessage(content: string, repo: any, model: any) {
 
             return textNode
         },
-        tools: getTools(aiState, repo)
+        tools: getTools(aiState, user, repo)
     })
 
     return {
