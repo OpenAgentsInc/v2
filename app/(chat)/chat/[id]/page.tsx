@@ -3,9 +3,8 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { getChat, getMissingKeys } from '@/app/actions'
+import { getChat } from '@/app/actions'
 import { Chat } from '@/components/chat'
-import { AI } from '@/lib/chat/actions'
 
 export interface ChatPageProps {
     params: {
@@ -25,8 +24,6 @@ export async function generateMetadata({
     const chat = await getChat(params.id, session.userId)
 
     if (!chat || 'error' in chat) {
-        // console.log("Skipping redirect in metadata.")
-        // console.log("Redirecting in metadata.")
         redirect('/')
     } else {
         return {
@@ -39,7 +36,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     const session = auth()
 
     if (!session?.userId) {
-        console.log("skipping redirect...")
+        console.log("Skipping unauthed redirect...")
         // redirect(`/login?next=/chat/${params.id}`)
     }
 
@@ -55,16 +52,12 @@ export default async function ChatPage({ params }: ChatPageProps) {
             notFound()
         }
 
-        console.log("chat:", chat)
-
         return (
-            <AI initialAIState={{ chatId: chat.id, messages: chat.messages }}>
-                <Chat
-                    id={chat.id}
-                    user={{ id: userId }}
-                    initialMessages={chat.messages}
-                />
-            </AI>
+            <Chat
+                id={chat.id}
+                user={{ id: userId }}
+                initialMessages={chat.messages}
+            />
         )
     }
 }
