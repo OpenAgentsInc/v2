@@ -34,7 +34,9 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         setUser
     } = useChatStore()
 
-    const [_, setNewChatId] = useLocalStorage('newChatId', id)
+    console.log('Chat', { messages, input, id, user })
+
+    const [_, setNewChatId] = useLocalStorage('newChatId2', id)
 
     useEffect(() => {
         if (initialMessages) setMessages(initialMessages)

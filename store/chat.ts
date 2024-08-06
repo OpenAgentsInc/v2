@@ -18,8 +18,8 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set) => ({
     messages: [],
     input: '',
-    id: undefined,
-    user: undefined,
+    id: '1234',
+    user: { id: 'guest' } as User,
 
     addMessage: (message) => set((state) => ({
         messages: [...state.messages, message]
