@@ -1,9 +1,8 @@
 "use client"
-
 import * as React from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { IconNextChat } from '@/components/ui/icons'
+import { IconOpenAgents } from '@/components/ui/icons'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
@@ -21,8 +20,7 @@ function UserOrLogin() {
             </SignedIn>
             <SignedOut>
                 <Link href="/new" rel="nofollow">
-                    <IconNextChat className="size-6 mr-2 dark:hidden" inverted />
-                    <IconNextChat className="hidden size-6 mr-2 dark:block" />
+                    <IconOpenAgents className="size-6 mr-2" />
                 </Link>
             </SignedOut>
         </>
