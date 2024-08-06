@@ -43,3 +43,10 @@ export interface OldUser extends Record<string, any> {
 export interface User {
     id: string
 }
+
+export interface Repo {
+    id: string
+    name: string
+    owner: string
+    branch: string
+}

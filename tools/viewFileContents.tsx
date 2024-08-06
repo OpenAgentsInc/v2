@@ -16,7 +16,7 @@ export const viewFileContents = (aiState: any, repo: Repo | null) => ({
         path: z.string().describe('The file path within the repository'),
         ref: z.string().optional().describe('The branch or commit reference (optional)')
     }),
-    generate: async function*({ path, ref }) {
+    generate: async function*({ path, ref }: any) {
         yield (
             <BotCard>
                 <div>Loading file contents...</div>
