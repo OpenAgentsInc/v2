@@ -2,7 +2,7 @@ import 'server-only';
 import React from 'react';
 import { createAI, getMutableAIState, getAIState, streamUI } from 'ai/rsc';
 import { nanoid } from 'nanoid';
-import { AIState, Message, Chat } from './AIState';
+import { AIState, Message } from './AIState';
 import { UIState, UIMessage } from './UIState';
 import { openai } from '@ai-sdk/openai';
 import { BotMessage } from '@/components/stocks';
@@ -13,11 +13,17 @@ import { createStreamableValue } from './streamableValue';
 import { systemPrompt } from './systemPrompt';
 import { renderMessageContent } from './renderMessageContent';
 
+/**
+ * Submits a user message and generates an AI response.
+ * @param content The content of the user's message.
+ * @returns A Promise resolving to a UIMessage object.
+ */
 async function submitUserMessage(content: string): Promise<UIMessage> {
   'use server';
 
   const aiState = getMutableAIState<typeof AI>();
 
+  // Update the AI state with the new user message
   aiState.update({
     ...aiState.get(),
     messages: [
@@ -41,8 +47,7 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
     messages: [
       ...aiState.get().messages.map((message: Message) => ({
         role: message.role,
-        content: message.content,
-        name: message.name
+        content: message.content
       }))
     ],
     text: ({ content, done, delta }) => {
@@ -82,6 +87,9 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
   };
 }
 
+/**
+ * The main AI component that manages the chat state and UI.
+ */
 export const AI = createAI<AIState, UIState>({
   actions: {
     submitUserMessage
@@ -114,7 +122,7 @@ export const AI = createAI<AIState, UIState>({
       const path = `/chat/${chatId}`;
       const firstMessageContent = messages[0]?.content as string || '';
       const title = firstMessageContent.substring(0, 100);
-      const chat: Chat = {
+      const chat = {
         id: chatId,
         title,
         userId,
@@ -130,7 +138,7 @@ export const AI = createAI<AIState, UIState>({
     'use server';
     const session = await auth();
     if (session) {
-      const aiState = getAIState() as Chat;
+      const aiState = getAIState();
       if (aiState) {
         return getUIStateFromAIState(aiState);
       }
@@ -139,7 +147,12 @@ export const AI = createAI<AIState, UIState>({
   }
 });
 
-function getUIStateFromAIState(aiState: Chat): UIState {
+/**
+ * Converts the AI state to UI state.
+ * @param aiState The current AI state.
+ * @returns The corresponding UI state.
+ */
+function getUIStateFromAIState(aiState: AIState): UIState {
   return {
     messages: aiState.messages
       .filter((message: Message) => message.role !== 'system')
