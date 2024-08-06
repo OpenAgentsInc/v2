@@ -12,7 +12,7 @@ export default async function IndexPage() {
     const id = nanoid()
     const missingKeys = await getMissingKeys()
     const user: User | null = await currentUser();
-    const userOrNah = user ? user : { id: 'anon' }
+    const userOrNah = user ? { id: user.id } : { id: 'anon' }
 
     return (
         <AI initialAIState={{ chatId: id, messages: [] }}>
