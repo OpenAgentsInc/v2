@@ -4,6 +4,14 @@ export type Message = CoreMessage & {
     id: string
 }
 
+export type ServerMessage = Message & {
+    role: 'system' | 'assistant' | 'function'
+}
+
+export type ClientMessage = Message & {
+    role: 'user'
+}
+
 export interface Chat extends Record<string, any> {
     id: string
     title: string
@@ -14,7 +22,7 @@ export interface Chat extends Record<string, any> {
     sharePath?: string
 }
 
-export type ServerActionResult<Result> = Promise<
+export type ServerActionResult<r> = Promise<
     | Result
     | {
         error: string
