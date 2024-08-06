@@ -1,60 +1,87 @@
-// lib/hooks/use-chat.ts
-
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { Message, User } from '@/lib/types'
+import { useChat as useVercelChat } from 'ai/react'
 
 interface UseChatProps {
     initialMessages?: Message[]
     initialId?: string
     initialUser?: User
+    maxToolRoundtrips?: number
+    onToolCall?: ({ toolCall }: { toolCall: any }) => Promise<any>
 }
 
-export function useChat({ initialMessages, initialId, initialUser }: UseChatProps) {
+export function useChat({
+    initialMessages,
+    initialId,
+    initialUser,
+    maxToolRoundtrips = 5,
+    onToolCall
+}: UseChatProps) {
     const router = useRouter()
     const path = usePathname()
 
     const {
-        messages,
-        input,
-        id,
-        user,
-        setMessages,
-        setInput,
-        setId,
-        setUser
+        messages: storeMessages,
+        id: storeId,
+        user: storeUser,
+        setMessages: setStoreMessages,
+        setId: setStoreId,
+        setUser: setStoreUser
     } = useChatStore()
 
-    useEffect(() => {
-        if (initialMessages) setMessages(initialMessages)
-        if (initialId) setId(initialId)
-        if (initialUser) setUser(initialUser)
-    }, [initialMessages, initialId, initialUser, setMessages, setId, setUser])
+    const [localMessages, setLocalMessages] = useState<Message[]>(initialMessages || storeMessages)
+
+    const {
+        messages: vercelMessages,
+        input,
+        handleInputChange,
+        handleSubmit,
+        addToolResult
+    } = useVercelChat({
+        initialMessages: localMessages,
+        id: storeId,
+        maxToolRoundtrips,
+        onToolCall
+    })
 
     useEffect(() => {
-        if (user) {
-            if (!path.includes('chat') && messages.length === 1) {
-                window.history.replaceState({}, '', `/chat/${id}`)
+        if (initialMessages) setLocalMessages(initialMessages)
+        if (initialId) setStoreId(initialId)
+        if (initialUser) setStoreUser(initialUser)
+    }, [initialMessages, initialId, initialUser, setStoreMessages, setStoreId, setStoreUser])
+
+    useEffect(() => {
+        if (storeUser) {
+            if (!path.includes('chat') && localMessages.length === 1) {
+                window.history.replaceState({}, '', `/chat/${storeId}`)
             }
         }
-    }, [id, path, user, messages])
+    }, [storeId, path, storeUser, localMessages])
 
     useEffect(() => {
-        const messagesLength = messages?.length
+        const messagesLength = localMessages?.length
         if (messagesLength === 2) {
             router.refresh()
         }
-    }, [messages, router])
+    }, [localMessages, router])
+
+    useEffect(() => {
+        setLocalMessages(vercelMessages)
+        setStoreMessages(vercelMessages)
+    }, [vercelMessages, setStoreMessages])
 
     return {
-        messages,
+        messages: localMessages,
         input,
-        id,
-        user,
-        setInput,
-        setMessages,
-        setId,
-        setUser
+        id: storeId,
+        user: storeUser,
+        handleInputChange,
+        handleSubmit,
+        addToolResult,
+        setMessages: setLocalMessages,
+        setId: setStoreId,
+        setUser: setStoreUser
     }
 }

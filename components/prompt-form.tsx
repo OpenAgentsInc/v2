@@ -9,18 +9,20 @@ import {
     TooltipTrigger
 } from '@/components/ui/tooltip'
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
-import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
-import { useChat } from '@/lib/hooks/use-chat'
-import { Message } from '@/lib/types'
 
-export function PromptForm() {
+interface PromptFormProps {
+    input: string
+    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+}
+
+export function PromptForm({ input, handleInputChange, handleSubmit }: PromptFormProps) {
     const router = useRouter()
     const { formRef, onKeyDown } = useEnterSubmit()
     const inputRef = React.useRef<HTMLTextAreaElement>(null)
-    const { messages, input, setInput, setMessages } = useChat({})
     const repo = useRepoStore((state) => state.repo)
     const model = useModelStore((state) => state.model)
 
@@ -29,49 +31,6 @@ export function PromptForm() {
             inputRef.current.focus()
         }
     }, [])
-
-    const submitUserMessage = async (value: string, repo: any, model: any) => {
-        // Implement your message submission logic here
-        // This is a placeholder and should be replaced with your actual implementation
-        console.log("Submitting message:", value, "Repo:", repo, "Model:", model)
-        // Return a placeholder message
-        return {
-            id: nanoid(),
-            role: 'assistant',
-            content: 'This is a placeholder response.'
-        } as Message
-    }
-
-    const handleSubmit = React.useCallback(async (e: React.FormEvent) => {
-        e.preventDefault()
-        // Blur focus on mobile
-        if (window.innerWidth < 600) {
-            inputRef.current?.blur()
-        }
-        const value = input.trim()
-        setInput('')
-        if (!value) return
-
-        // Ensure messages is always an array
-        const currentMessages = Array.isArray(messages) ? messages : []
-
-        // Optimistically add user message UI
-        const userMessage: Message = {
-            id: nanoid(),
-            role: 'user',
-            content: value
-        }
-        setMessages([...currentMessages, userMessage])
-
-        try {
-            // Submit and get response message
-            const responseMessage = await submitUserMessage(value, repo, model)
-            setMessages([...currentMessages, userMessage, responseMessage])
-        } catch (error) {
-            console.error('Error submitting message:', error)
-            // Optionally, you can add error handling UI here
-        }
-    }, [input, setInput, messages, setMessages, repo, model])
 
     return (
         <form
@@ -108,7 +67,7 @@ export function PromptForm() {
                     name="message"
                     rows={1}
                     value={input}
-                    onChange={e => setInput(e.target.value)}
+                    onChange={handleInputChange}
                 />
                 <div className="absolute right-0 top-[13px] sm:right-4">
                     <Tooltip>
