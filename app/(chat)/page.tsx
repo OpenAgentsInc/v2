@@ -17,10 +17,14 @@ export default async function IndexPage() {
     const session = {}
     const user: User | null = await currentUser();
 
+    if (!user) {
+        return <></>
+    }
+
     console.log(user)
     return (
         <AI initialAIState={{ chatId: id, messages: [] }}>
-            <Chat id={id} user={{ id: 'testo' }} missingKeys={missingKeys} />
+            <Chat id={id} user={{ id: user.id }} missingKeys={missingKeys} />
         </AI>
     )
 }

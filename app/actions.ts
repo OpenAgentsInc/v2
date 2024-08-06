@@ -42,7 +42,7 @@ export async function getChats(userId?: string | null) {
 export async function getChat(id: string, userId: string) {
     const { userId: authUserId } = auth()
 
-    console.log('getChat', userId, authUserId)
+    console.log('getChat', id, userId, authUserId)
 
     if (userId !== authUserId) {
         return {
@@ -149,7 +149,9 @@ export async function shareChat(id: string) {
 }
 
 export async function saveChat(chat: Chat) {
+    console.log("Attemptign to save chat", chat)
     const { userId } = auth()
+    console.log('saveChat', userId)
 
     if (userId) {
         const pipeline = kv.pipeline()
