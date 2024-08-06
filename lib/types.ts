@@ -51,7 +51,7 @@ export interface User {
 }
 
 export interface Repo {
-    id: string
+    id?: string
     name: string
     owner: string
     branch: string

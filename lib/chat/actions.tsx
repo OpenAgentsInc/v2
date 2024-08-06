@@ -1,6 +1,6 @@
-import { createAI, createStreamableUI, getMutableAIState } from 'ai/rsc';
+import { createAI, createStreamableUI, getAIState, getMutableAIState } from 'ai/rsc';
 import { nanoid } from '@/lib/utils';
-import { Message, ServerMessage, ClientMessage } from '@/lib/types';
+import { Chat, Message, Repo, ServerMessage, ClientMessage } from '@/lib/types';
 import React from 'react';
 
 export type AIState = {
@@ -14,9 +14,10 @@ export type UIState = {
 }[]
 
 // Function to submit user message and continue the conversation
-async function submitUserMessage(message: ClientMessage) {
+async function submitUserMessage(message: ClientMessage, repo: Repo, model: string) {
     'use server';
 
+    console.log("submitUserMessage", message, repo, model);
     const aiState = getMutableAIState<typeof AI>();
     const currentMessages = aiState.get().messages || [];
     aiState.update({
@@ -74,16 +75,37 @@ export const AI = createAI<AIState, UIState>({
         'use server';
         // Implement logic to restore UI state from AI state if needed
         // const historyFromDB = await loadChatFromDB();
-        // const historyFromApp = getAIState();
-        // if (historyFromDB.length !== historyFromApp.length) {
-        //   return historyFromDB.map(({ role, content }) => ({
-        //     id: nanoid(),
-        //     role,
-        //     content,
-        //   }));
-        // }
-        return []; // Return an empty array as a placeholder
-    },
+        const aiState = getAIState() as Chat
+
+        if (aiState) {
+            const uiState = getUIStateFromAIState(aiState)
+            return uiState
+        } else {
+            return []
+            // if (historyFromDB.length !== historyFromApp.length) {
+            //   return historyFromDB.map(({ role, content }) => ({
+            //     id: nanoid(),
+            //     role,
+            //     content,
+            //   }));
+            // }
+        }
+    }
 });
 
 export default AI;
+
+const getUIStateFromAIState = (aiState: Chat): UIState => {
+
+    return aiState.messages.map((message) => {
+        return {
+            id: message.id,
+            display: (
+                <div className={`p-2 rounded-lg ${message.role === 'user' ? 'bg-gray-100' : 'bg-blue-500'} text-white`}>
+                    {message.content.toString()}
+                </div>
+            )
+        }
+    });
+}
+
