@@ -1,44 +1,31 @@
-import { openai } from '@ai-sdk/openai';
-import { convertToCoreMessages, streamText } from 'ai';
-import { z } from 'zod';
+import { getSystemPrompt } from 'lib/systemPrompt'
+import { openai } from '@ai-sdk/openai'
+import { convertToCoreMessages, streamText } from 'ai'
+import { currentUser } from '@clerk/nextjs/server'
+import { Repo } from '@/lib/types'
+import { getTools } from '@/tools'
 
-// Allow streaming responses up to 30 seconds
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-    const { messages } = await req.json();
-    console.log('messages', messages);
+    const body = await req.json();
+    console.log('Request body:', JSON.stringify(body));
+    const { messages, repoOwner, repoName, repoBranch } = body
+
+    const repo: Repo = {
+        owner: repoOwner,
+        name: repoName,
+        branch: repoBranch
+    }
+
+    const user = await currentUser()
 
     const result = await streamText({
         model: openai('gpt-4o'),
         messages: convertToCoreMessages(messages),
-        tools: {
-            // server-side tool with execute function:
-            getWeatherInformation: {
-                description: 'show the weather in a given city to the user',
-                parameters: z.object({ city: z.string() }),
-                execute: async ({ }: { city: string }) => {
-                    const weatherOptions = ['sunny', 'cloudy', 'rainy', 'snowy', 'windy'];
-                    return weatherOptions[
-                        Math.floor(Math.random() * weatherOptions.length)
-                    ];
-                },
-            },
-            // client-side tool that starts user interaction:
-            askForConfirmation: {
-                description: 'Ask the user for confirmation.',
-                parameters: z.object({
-                    message: z.string().describe('The message to ask for confirmation.'),
-                }),
-            },
-            // client-side tool that is automatically executed on the client:
-            getLocation: {
-                description:
-                    'Get the user location. Always ask for confirmation before using this tool.',
-                parameters: z.object({}),
-            },
-        },
+        prompt: getSystemPrompt(user),
+        tools: getTools(user, repo)
     });
 
     return result.toAIStreamResponse();
