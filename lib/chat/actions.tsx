@@ -7,7 +7,7 @@ async function continueConversation(message: ClientMessage) {
   'use server';
 
   const aiState = getMutableAIState<ServerMessage[]>();
-  aiState.push({ role: 'user', content: message.content });
+  aiState.update([...aiState.get(), { role: 'user', content: message.content, id: nanoid() }]);
 
   const ui = createStreamableUI(
     <div className="inline-block px-3 py-1 rounded-lg bg-gray-100 text-gray-800">
@@ -24,7 +24,7 @@ async function continueConversation(message: ClientMessage) {
     content: `This is a simulated AI response to: "${message.content}"`,
   };
 
-  aiState.push(aiMessage);
+  aiState.update([...aiState.get(), aiMessage]);
   ui.update(
     <div className="inline-block px-3 py-1 rounded-lg bg-blue-500 text-white">
       {aiMessage.content}
@@ -61,6 +61,7 @@ export const AI = createAI<ServerMessage[], ClientMessage[]>({
     //     content,
     //   }));
     // }
+    return []; // Return an empty array as a placeholder
   },
 });
 
