@@ -40,21 +40,39 @@ The process is similar to a guest visit, with the following additions:
    - A new chat ID is generated using nanoid()
    - The currentUser() function from Clerk is called to get the authenticated user's information
    - If no user is found (not authenticated), an empty fragment is returned
-   - The getMissingKeys() function is called (possibly to check for required API keys or configurations)
+   - The getMissingKeys() function is called to check for required API keys or configurations
    - The Chat component is rendered with the following props:
      - id: The generated chat ID
      - user: An object containing the user's ID from Clerk
      - missingKeys: The result of getMissingKeys()
    - The Chat component is wrapped in an AI component, which receives an initial AI state with the chat ID and an empty messages array
-5. As the user interacts with the chat:
-   - Client-side JavaScript handles real-time updates
-   - The AI component likely manages the chat state and communication with the AI model
+5. The Chat component (components/chat.tsx) is rendered:
+   - It uses the useUIState and useAIState hooks to manage the chat state
+   - The chat ID is stored in local storage using the useLocalStorage hook
+   - If the user is authenticated and there's only one message, the URL is updated to include the chat ID
+   - The component renders either a ChatList (if there are messages) or an EmptyScreen
+   - A ChatPanel component is rendered at the bottom of the page
+6. The ChatPanel component (components/chat-panel.tsx) is rendered:
+   - It manages the input state for the user's messages
+   - It provides example messages when the chat is empty
+   - It handles the submission of user messages using the submitUserMessage function from the useActions hook
+   - It manages the state for sharing the chat
+   - It renders a PromptForm component for user input
+7. As the user interacts with the chat:
+   - The submitUserMessage function is called when a message is sent
+   - New messages are added to the UI state using the setMessages function
+   - The AI component likely manages the communication with the AI model and updates the AI state
    - The user's ID from Clerk is used to associate the chat with the authenticated user
-   - The chat history may be stored and retrieved using Vercel KV, although this is not explicitly shown in the provided code
+8. Chat sharing functionality:
+   - When the chat has at least two messages, a "Share" button is displayed
+   - Clicking the "Share" button opens a ChatShareDialog
+   - The shareChat function (from app/actions.ts) is used to handle the sharing process
 
-Note: The actual implementation details may vary based on the specific components and logic implemented in the Chat and AI components. The use of Clerk for authentication provides a seamless and secure user experience across the application.
+Note: While the code doesn't explicitly show Vercel KV usage, it's likely that the chat history and user-specific data are stored and retrieved using Vercel KV in other parts of the application, such as within the AI component or in server-side actions.
 
-Important points about user ID handling and potential KV usage:
+Important points about user ID handling and state management:
 - User IDs are obtained from Clerk using the currentUser() function
 - The user ID is passed to the Chat component, ensuring that chat interactions are associated with the correct user
-- While not explicitly shown in the provided code, the chat history and user-specific data are likely stored and retrieved using Vercel KV in other parts of the application, such as within the Chat or AI components
+- Chat state is managed using the useUIState and useAIState hooks from the ai/rsc library
+- Local storage is used to persist the chat ID across page reloads
+- The nanoid() function is used to generate unique IDs for chats and messages
