@@ -23,15 +23,29 @@ export function useChat({
     const path = usePathname()
 
     const {
-        messages: storeMessages,
-        id: storeId,
+        currentChatId,
         user: storeUser,
+        setCurrentChatId,
+        setUser: setStoreUser,
+        getChatData,
         setMessages: setStoreMessages,
-        setId: setStoreId,
-        setUser: setStoreUser
+        setInput: setStoreInput
     } = useChatStore()
 
-    const [localMessages, setLocalMessages] = useState<Message[]>(initialMessages || storeMessages)
+    const [localChatId, setLocalChatId] = useState<string | undefined>(initialId || currentChatId)
+
+    useEffect(() => {
+        if (initialId) setLocalChatId(initialId)
+        if (initialUser) setStoreUser(initialUser)
+    }, [initialId, initialUser, setStoreUser])
+
+    useEffect(() => {
+        if (localChatId) {
+            setCurrentChatId(localChatId)
+        }
+    }, [localChatId, setCurrentChatId])
+
+    const chatData = getChatData(localChatId || '')
 
     const {
         messages: vercelMessages,
@@ -40,48 +54,53 @@ export function useChat({
         handleSubmit,
         addToolResult
     } = useVercelChat({
-        initialMessages: localMessages,
-        id: storeId,
+        initialMessages: initialMessages || chatData.messages,
+        id: localChatId,
         maxToolRoundtrips,
         onToolCall
     })
 
     useEffect(() => {
-        if (initialMessages) setLocalMessages(initialMessages)
-        if (initialId) setStoreId(initialId)
-        if (initialUser) setStoreUser(initialUser)
-    }, [initialMessages, initialId, initialUser, setStoreMessages, setStoreId, setStoreUser])
-
-    useEffect(() => {
         if (storeUser) {
-            if (!path.includes('chat') && localMessages.length === 1) {
-                window.history.replaceState({}, '', `/chat/${storeId}`)
+            if (!path.includes('chat') && vercelMessages.length === 1) {
+                window.history.replaceState({}, '', `/chat/${localChatId}`)
             }
         }
-    }, [storeId, path, storeUser, localMessages])
+    }, [localChatId, path, storeUser, vercelMessages])
 
     useEffect(() => {
-        const messagesLength = localMessages?.length
-        if (messagesLength === 2) {
+        if (vercelMessages.length === 2) {
             router.refresh()
         }
-    }, [localMessages, router])
+    }, [vercelMessages, router])
 
     useEffect(() => {
-        setLocalMessages(vercelMessages)
-        setStoreMessages(vercelMessages)
-    }, [vercelMessages, setStoreMessages])
+        if (localChatId) {
+            setStoreMessages(localChatId, vercelMessages)
+        }
+    }, [localChatId, vercelMessages, setStoreMessages])
+
+    const handleInputChangeWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleInputChange(e)
+        if (localChatId) {
+            setStoreInput(localChatId, e.target.value)
+        }
+    }
 
     return {
-        messages: localMessages,
+        messages: vercelMessages,
         input,
-        id: storeId,
+        id: localChatId,
         user: storeUser,
-        handleInputChange,
+        handleInputChange: handleInputChangeWrapper,
         handleSubmit,
         addToolResult,
-        setMessages: setLocalMessages,
-        setId: setStoreId,
+        setMessages: (messages: Message[]) => {
+            if (localChatId) {
+                setStoreMessages(localChatId, messages)
+            }
+        },
+        setId: setLocalChatId,
         setUser: setStoreUser
     }
 }

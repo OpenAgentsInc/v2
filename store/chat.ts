@@ -2,50 +2,71 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Message, User } from '@/lib/types'
 
-interface ChatState {
+interface ChatData {
     messages: Message[];
     input: string;
-    id: string | undefined;
+}
+
+interface ChatState {
+    chats: Record<string, ChatData>;
+    currentChatId: string | undefined;
     user: User | undefined;
-    addMessage: (message: Message) => void;
-    setMessages: (messages: Message[]) => void;
-    updateMessage: (id: string, updates: Partial<Message>) => void;
-    clearMessages: () => void;
-    setInput: (input: string) => void;
-    setId: (id: string | undefined) => void;
+    addMessage: (chatId: string, message: Message) => void;
+    setMessages: (chatId: string, messages: Message[]) => void;
+    setInput: (chatId: string, input: string) => void;
+    setCurrentChatId: (id: string | undefined) => void;
     setUser: (user: User | undefined) => void;
+    getChatData: (chatId: string) => ChatData;
 }
 
 export const useChatStore = create<ChatState>()(
     persist(
-        (set) => ({
-            messages: [],
-            input: '',
-            id: undefined,
+        (set, get) => ({
+            chats: {},
+            currentChatId: undefined,
             user: undefined,
 
-            addMessage: (message) => set((state) => ({
-                messages: [...state.messages, message]
+            addMessage: (chatId, message) => set((state) => ({
+                chats: {
+                    ...state.chats,
+                    [chatId]: {
+                        ...state.chats[chatId],
+                        messages: [...(state.chats[chatId]?.messages || []), message],
+                    },
+                },
             })),
 
-            setMessages: (messages) => set({ messages }),
-
-            updateMessage: (id, updates) => set((state) => ({
-                messages: state.messages.map(msg =>
-                    msg.id === id ? { ...msg, ...updates } as Message : msg
-                )
+            setMessages: (chatId, messages) => set((state) => ({
+                chats: {
+                    ...state.chats,
+                    [chatId]: {
+                        ...state.chats[chatId],
+                        messages,
+                    },
+                },
             })),
 
-            clearMessages: () => set({ messages: [] }),
+            setInput: (chatId, input) => set((state) => ({
+                chats: {
+                    ...state.chats,
+                    [chatId]: {
+                        ...state.chats[chatId],
+                        input,
+                    },
+                },
+            })),
 
-            setInput: (input) => set({ input }),
-
-            setId: (id) => set({ id }),
+            setCurrentChatId: (id) => set({ currentChatId: id }),
 
             setUser: (user) => set({ user }),
+
+            getChatData: (chatId) => {
+                const state = get();
+                return state.chats[chatId] || { messages: [], input: '' };
+            },
         }),
         {
-            name: 'chat-storage', // name of the item in the storage (must be unique)
+            name: 'chat-storage',
         }
     )
 )

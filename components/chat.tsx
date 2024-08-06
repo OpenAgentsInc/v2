@@ -98,7 +98,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
     return (
         <div
             className={cn(
-                "bg-white dark:bg-black group w-full overflow-auto",
+                "h-full bg-white dark:bg-black group w-full overflow-auto",
                 "transition-[padding] duration-300 ease-in-out",
                 "pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]",
                 className

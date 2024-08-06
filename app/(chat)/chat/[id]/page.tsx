@@ -23,10 +23,12 @@ export async function generateMetadata({
     }
 
     const chat = await getChat(params.id, session.userId)
+    console.log('generateMetadata chat:', chat)
 
     if (!chat || 'error' in chat) {
-        console.log("Skipping redirect in metadata.")
-        // redirect('/')
+        // console.log("Skipping redirect in metadata.")
+        console.log("Redirecting in metadata.")
+        redirect('/')
     } else {
         return {
             title: chat?.title.toString().slice(0, 50) ?? 'Chat'
@@ -36,10 +38,10 @@ export async function generateMetadata({
 
 export default async function ChatPage({ params }: ChatPageProps) {
     const session = auth()
-    const missingKeys = await getMissingKeys()
 
     if (!session?.userId) {
-        redirect(`/login?next=/chat/${params.id}`)
+        console.log("skipping redirect...")
+        // redirect(`/login?next=/chat/${params.id}`)
     }
 
     const userId = session.userId as string
