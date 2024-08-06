@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
-import { BotCard } from '../components/BotCard';
-import { StocksSkeleton, Stocks } from '../components/stocks/Stocks';
-import { StockSkeleton, Stock } from '../components/stocks/Stock';
-import { EventsSkeleton, Events } from '../components/stocks/Events';
-import { Purchase } from '../components/stocks/Purchase';
-import { sleep } from '../lib/utils';
+import { BotCard } from '@/components/stocks';
+import { StocksSkeleton, Stocks } from '@/components/stocks/stocks';
+import { StockSkeleton, Stock } from '@/components/stocks/stock-skeleton';
+import { EventsSkeleton, Events } from '@/components/stocks/events';
+import { Purchase } from '@/components/stocks';
+import { sleep } from '@/lib/utils';
 
 export const tools = {
   listStocks: {
