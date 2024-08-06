@@ -12,7 +12,7 @@ const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer'
     loading: () => <div>Loading file viewer...</div>
 });
 
-export const viewFileContents = (aiState: any, user: User, repo: Repo | null) => ({
+export const viewFileContents = (aiState: any, user: User | null, repo: Repo | null) => ({
     description: 'View the contents of a file in the GitHub repository',
     parameters: z.object({
         path: z.string().describe('The file path within the repository'),
@@ -33,9 +33,9 @@ export const viewFileContents = (aiState: any, user: User, repo: Repo | null) =>
             )
         }
 
-        const gitHubUser = await isGitHubUser(user)
+        const gitHubUser = !!user ? isGitHubUser(user) : false
         console.log('GitHub user:', gitHubUser)
-        let gitHubToken = gitHubUser ? await getGitHubToken(user) : null
+        let gitHubToken = gitHubUser && !!user ? await getGitHubToken(user) : undefined
         console.log('GitHub token:', gitHubToken)
 
         try {

@@ -163,7 +163,9 @@ export const getUIStateFromAIState = (aiState: Chat) => {
                 if (typeof message.content === 'string') {
                     displays.push(<BotMessage content={message.content} />);
                 } else if (Array.isArray(message.content)) {
+                    console.log("??!!!!???")
                     message.content.forEach((item: any) => {
+                        console.log(item)
                         if (item.type === 'tool-call') {
                             // Handle tool calls if needed
                         }
@@ -172,7 +174,7 @@ export const getUIStateFromAIState = (aiState: Chat) => {
             } else if (message.role === 'tool') {
                 message.content.forEach((tool: any) => {
                     if (tool.toolName === 'viewFileContents') {
-                        console.log("????")
+                        console.log("ok so")
                         displays.push(
                             <BotCard key={tool.toolCallId}>
                                 <DynamicFileViewer

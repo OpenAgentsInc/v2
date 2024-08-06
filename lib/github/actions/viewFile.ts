@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 
-export async function viewFileContents(repo: string, path: string, ref: string, token?: string): Promise<string> {
+export async function viewFileContents(repo: string, path: string, ref: string, token: string | undefined): Promise<string> {
     const octokit = new Octokit({ auth: token ?? process.env.GITHUB_TOKEN });
     const [owner, repoName] = repo.split('/');
 
