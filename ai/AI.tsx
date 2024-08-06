@@ -2,7 +2,7 @@ import 'server-only';
 import React from 'react';
 import { createAI, getMutableAIState, getAIState, streamUI } from 'ai/rsc';
 import { nanoid } from 'nanoid';
-import { AIState, Message } from './AIState';
+import { AIState, Message, Chat, ChatMetadata } from './AIState';
 import { UIState, UIMessage } from './UIState';
 import { openai } from '@ai-sdk/openai';
 import { BotMessage } from '@/components/stocks';
@@ -44,12 +44,10 @@ async function submitUserMessage(content: string): Promise<UIMessage> {
     model: openai('gpt-4o'),
     initial: <div>Loading...</div>,
     system: systemPrompt,
-    messages: [
-      ...aiState.get().messages.map((message: Message) => ({
-        role: message.role,
-        content: message.content
-      }))
-    ],
+    messages: aiState.get().messages.map((message: Message) => ({
+      role: message.role === 'function' ? 'tool' : message.role,
+      content: message.content
+    })),
     text: ({ content, done, delta }) => {
       if (!textStream) {
         textStream = createStreamableValue('');
@@ -116,20 +114,20 @@ export const AI = createAI<AIState, UIState>({
     'use server';
     const session = await auth();
     if (session) {
-      const { chatId, messages } = state;
+      const { chatId, messages, metadata } = state;
       const createdAt = new Date();
       const userId = session.userId as string;
       const path = `/chat/${chatId}`;
       const firstMessageContent = messages[0]?.content as string || '';
       const title = firstMessageContent.substring(0, 100);
-      const chat = {
+      const chat: Chat = {
         id: chatId,
         title,
         userId,
         createdAt,
         messages,
         path,
-        metadata: state.metadata
+        metadata
       };
       await saveChat(chat);
     }
