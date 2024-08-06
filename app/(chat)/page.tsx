@@ -1,8 +1,6 @@
 import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
-// import { auth } from '@/auth'
-// import { Session } from '@/lib/types'
 import { getMissingKeys } from '@/app/actions'
 import { currentUser, User } from '@clerk/nextjs/server';
 
@@ -12,19 +10,13 @@ export const metadata = {
 
 export default async function IndexPage() {
     const id = nanoid()
-    // const session = (await auth()) as Session
     const missingKeys = await getMissingKeys()
-    const session = {}
     const user: User | null = await currentUser();
+    const userOrNah = user ? user : { id: 'anon' }
 
-    if (!user) {
-        return <></>
-    }
-
-    console.log(user)
     return (
         <AI initialAIState={{ chatId: id, messages: [] }}>
-            <Chat id={id} user={{ id: user.id }} missingKeys={missingKeys} />
+            <Chat id={id} user={userOrNah} missingKeys={missingKeys} />
         </AI>
     )
 }
