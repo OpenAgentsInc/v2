@@ -12,7 +12,7 @@ const DynamicFileViewer = dynamic(() => import('@/components/github/file-viewer'
     loading: () => <div>Loading file viewer...</div>
 });
 
-export const viewFileContents = (aiState: any, user: User | null, repo: Repo | null) => ({
+export const viewFileContents = (user: User | null, repo: Repo | null) => ({
     description: 'View the contents of a file in the GitHub repository',
     parameters: z.object({
         path: z.string().describe('The file path within the repository'),
