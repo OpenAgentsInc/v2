@@ -1,3 +1,5 @@
+"use server"
+
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
@@ -23,7 +25,8 @@ export async function generateMetadata({
     const chat = await getChat(params.id, session.userId)
 
     if (!chat || 'error' in chat) {
-        redirect('/')
+        console.log("Skipping redirect in metadata.")
+        // redirect('/')
     } else {
         return {
             title: chat?.title.toString().slice(0, 50) ?? 'Chat'
@@ -43,7 +46,8 @@ export default async function ChatPage({ params }: ChatPageProps) {
     const chat = await getChat(params.id, userId)
 
     if (!chat || 'error' in chat) {
-        redirect('/')
+        console.log("Skipping redirect in page.")
+        // redirect('/')
     } else {
         if (chat?.userId !== session?.userId) {
             notFound()

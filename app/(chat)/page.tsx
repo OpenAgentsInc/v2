@@ -1,11 +1,15 @@
+"use server"
+
 import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
 import { AI } from '@/lib/chat/actions'
 import { getMissingKeys } from '@/app/actions'
 import { currentUser, User } from '@clerk/nextjs/server';
 
-export const metadata = {
-    title: 'Chat',
+export async function generateMetadata() {
+    return {
+        title: 'Chat',
+    }
 }
 
 export default async function IndexPage() {
