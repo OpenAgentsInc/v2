@@ -19,130 +19,130 @@ import { renderMessageContent } from './renderMessageContent';
  * @returns A Promise resolving to a UIMessage object.
  */
 async function submitUserMessage(content: string): Promise<UIMessage> {
-  'use server';
+    'use server';
 
-  const aiState = getMutableAIState<typeof AI>();
+    const aiState = getMutableAIState<typeof AI>();
 
-  // Update the AI state with the new user message
-  aiState.update({
-    ...aiState.get(),
-    messages: [
-      ...aiState.get().messages,
-      {
-        id: nanoid(),
-        role: 'user',
-        content,
-        createdAt: Date.now()
-      }
-    ]
-  });
-
-  let textStream: ReturnType<typeof createStreamableValue<string>> | undefined;
-  let textNode: React.ReactNode | undefined;
-
-  const result = await streamUI({
-    model: openai('gpt-4o'),
-    initial: <div>Loading...</div>,
-    system: systemPrompt,
-    messages: aiState.get().messages.map((message: Message) => ({
-      role: message.role === 'function' ? 'tool' : message.role,
-      content: message.content
-    })),
-    text: ({ content, done, delta }) => {
-      if (!textStream) {
-        textStream = createStreamableValue('');
-        textNode = <BotMessage content={textStream.value} />;
-      }
-
-      if (done) {
-        textStream.done();
-        aiState.done({
-          ...aiState.get(),
-          messages: [
+    // Update the AI state with the new user message
+    aiState.update({
+        ...aiState.get(),
+        messages: [
             ...aiState.get().messages,
             {
-              id: nanoid(),
-              role: 'assistant',
-              content,
-              createdAt: Date.now()
+                id: nanoid(),
+                role: 'user',
+                content,
+                createdAt: Date.now()
             }
-          ]
-        });
-      } else {
-        textStream.update(delta);
-      }
+        ]
+    });
 
-      return textNode;
-    },
-    tools
-  });
+    let textStream: ReturnType<typeof createStreamableValue<string>> | undefined;
+    let textNode: React.ReactNode | undefined;
 
-  return {
-    id: nanoid(),
-    role: 'assistant',
-    display: result.value,
-    createdAt: Date.now()
-  };
+    const result = await streamUI({
+        model: openai('gpt-4o'),
+        initial: <div>Loading...</div>,
+        system: systemPrompt,
+        messages: aiState.get().messages.map((message: Message) => ({
+            role: message.role === 'function' ? 'tool' : message.role,
+            content: message.content
+        })),
+        text: ({ content, done, delta }) => {
+            if (!textStream) {
+                textStream = createStreamableValue('');
+                textNode = <BotMessage content={textStream.value} />;
+            }
+
+            if (done) {
+                textStream.done();
+                aiState.done({
+                    ...aiState.get(),
+                    messages: [
+                        ...aiState.get().messages,
+                        {
+                            id: nanoid(),
+                            role: 'assistant',
+                            content,
+                            createdAt: Date.now()
+                        }
+                    ]
+                });
+            } else {
+                textStream.update(delta);
+            }
+
+            return textNode;
+        },
+        tools
+    });
+
+    return {
+        id: nanoid(),
+        role: 'assistant',
+        display: result.value,
+        createdAt: Date.now()
+    };
 }
 
 /**
  * The main AI component that manages the chat state and UI.
  */
 export const AI = createAI<AIState, UIState>({
-  actions: {
-    submitUserMessage
-  },
-  initialAIState: {
-    chatId: nanoid(),
-    messages: [],
-    metadata: {
-      createdAt: Date.now(),
-      userId: '',
-      path: ''
+    actions: {
+        submitUserMessage
+    },
+    initialAIState: {
+        chatId: nanoid(),
+        messages: [],
+        metadata: {
+            createdAt: Date.now(),
+            userId: '',
+            path: ''
+        }
+    },
+    initialUIState: {
+        messages: [{
+            id: nanoid(),
+            role: 'system',
+            display: <div>Welcome to the chat!</div>,
+            createdAt: Date.now(),
+        }],
+        inputState: 'idle',
+    },
+    onSetAIState: async ({ state }) => {
+        'use server';
+        const session = await auth();
+        if (session) {
+            const { chatId, messages, metadata } = state;
+            const createdAt = new Date();
+            const userId = session.userId as string;
+            const path = `/chat/${chatId}`;
+            const firstMessageContent = messages[0]?.content as string || '';
+            const title = firstMessageContent.substring(0, 100);
+            const chat: Chat = {
+                id: chatId,
+                title,
+                userId,
+                createdAt,
+                messages,
+                path,
+                metadata
+            };
+            await saveChat(chat);
+        }
+    },
+    onGetUIState: async () => {
+        'use server';
+        const session = await auth();
+        if (session) {
+            const aiState = getAIState();
+            if (aiState) {
+                return getUIStateFromAIState(aiState);
+            }
+        }
+        return undefined;
     }
-  },
-  initialUIState: {
-    messages: [{
-      id: nanoid(),
-      role: 'system',
-      display: <div>Welcome to the chat!</div>,
-      createdAt: Date.now(),
-    }],
-    inputState: 'idle',
-  },
-  onSetAIState: async ({ state }) => {
-    'use server';
-    const session = await auth();
-    if (session) {
-      const { chatId, messages, metadata } = state;
-      const createdAt = new Date();
-      const userId = session.userId as string;
-      const path = `/chat/${chatId}`;
-      const firstMessageContent = messages[0]?.content as string || '';
-      const title = firstMessageContent.substring(0, 100);
-      const chat: Chat = {
-        id: chatId,
-        title,
-        userId,
-        createdAt,
-        messages,
-        path,
-        metadata
-      };
-      await saveChat(chat);
-    }
-  },
-  onGetUIState: async () => {
-    'use server';
-    const session = await auth();
-    if (session) {
-      const aiState = getAIState();
-      if (aiState) {
-        return getUIStateFromAIState(aiState);
-      }
-    }
-    return undefined;
-  }
 });
 
 /**
@@ -151,17 +151,17 @@ export const AI = createAI<AIState, UIState>({
  * @returns The corresponding UI state.
  */
 function getUIStateFromAIState(aiState: AIState): UIState {
-  return {
-    messages: aiState.messages
-      .filter((message: Message) => message.role !== 'system')
-      .map((message: Message): UIMessage => ({
-        id: nanoid(),
-        role: message.role,
-        display: renderMessageContent(message),
-        createdAt: message.createdAt
-      })),
-    inputState: 'idle'
-  };
+    return {
+        messages: aiState.messages
+            .filter((message: Message) => message.role !== 'system')
+            .map((message: Message): UIMessage => ({
+                id: nanoid(),
+                role: message.role,
+                display: renderMessageContent(message),
+                createdAt: message.createdAt
+            })),
+        inputState: 'idle'
+    };
 }
 
 export { submitUserMessage };
