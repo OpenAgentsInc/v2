@@ -44,8 +44,6 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         },
     })
 
-    console.log("messages in Chat:", messages)
-
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
 
