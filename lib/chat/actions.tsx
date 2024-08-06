@@ -45,7 +45,7 @@ async function continueConversation(message: ClientMessage) {
     });
     ui.update(
         <div className="inline-block px-3 py-1 rounded-lg bg-blue-500 text-white">
-            {aiMessage.content}
+            {typeof aiMessage.content === 'string' ? aiMessage.content : JSON.stringify(aiMessage.content)}
         </div>
     );
     ui.done();
