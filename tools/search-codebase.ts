@@ -8,7 +8,7 @@ const params = z.object({
     repositories: z.array(z.object({
         remote: z.string().describe("The remote URL of the repository"),
         branch: z.string().describe("The branch to search in"),
-        repository: z.string().describe("The name of the repository")
+        repository: z.string().describe("The name of the repository in owner/repo format")
     })).describe("The repositories to search in"),
     sessionId: z.string().optional().describe("A unique session ID for the search")
 });
@@ -64,7 +64,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
 
         for (const repo of repositories) {
             try {
-                const repositoryId = encodeURIComponent(`github:${repo.branch}:${repo.repository}`);
+                const repositoryId = `github:${repo.branch}:${repo.repository}`;
                 console.log(`Checking indexing status for repository: ${repositoryId}`);
                 const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
                 console.log(`Indexing status response:`, checkResponse.data);
