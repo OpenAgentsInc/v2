@@ -16,6 +16,9 @@ export interface ChatPanelProps {
     title?: string
     isAtBottom: boolean
     scrollToBottom: () => void
+    input: string
+    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
 export function ChatPanel({
@@ -23,27 +26,17 @@ export function ChatPanel({
     title,
     isAtBottom,
     scrollToBottom,
+    input,
+    handleInputChange,
+    handleSubmit
 }: ChatPanelProps) {
-    const {
-        messages,
-        input,
-        handleInputChange,
-        handleSubmit,
-        addToolResult
-    } = useChat({
-        initialId: id,
-        maxToolRoundtrips: 5,
-        async onToolCall({ toolCall }) {
-            // Implement your tool call logic here
-            console.log("Tool called:", toolCall)
-        }
-    })
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
+    const { messages } = useChat({ initialId: id })
 
     const exampleMessages: any[] = []
 
     return (
-        <div className="absolute inset-x-0 bottom-0 w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% duration-300 ease-in-out animate-in dark:from-background/10 dark:from-10% dark:to-background/80">
+        <div className="w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% dark:from-background/10 dark:from-10% dark:to-background/80">
             <ButtonScrollToBottom
                 isAtBottom={isAtBottom}
                 scrollToBottom={scrollToBottom}
