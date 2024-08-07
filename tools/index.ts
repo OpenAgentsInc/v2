@@ -6,6 +6,7 @@ import { rewriteFileTool } from './rewrite-file'
 import { scrapeWebpageTool } from './scrape-webpage'
 import { viewFileTool } from './view-file'
 import { viewHierarchyTool } from './view-hierarchy'
+import { createPullRequestTool } from './create-pull-request'
 import { getGitHubToken } from "@/lib/github/isGitHubUser"
 
 export const getTools = (context: ToolContext) => ({
@@ -14,7 +15,8 @@ export const getTools = (context: ToolContext) => ({
     rewrite_file: rewriteFileTool(context),
     scrape_webpage: scrapeWebpageTool(context),
     view_file: viewFileTool(context),
-    view_hierarchy: viewHierarchyTool(context)
+    view_hierarchy: viewHierarchyTool(context),
+    create_pull_request: createPullRequestTool(context)
 })
 
 interface ToolContextBody {
