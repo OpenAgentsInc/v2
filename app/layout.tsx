@@ -35,7 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     jetbrainsMono.variable
                 )}
             >
-                {children}
                 <Scene
                     style={{
                         position: 'fixed',
@@ -44,8 +43,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         width: '100vw',
                         height: '100vh',
                         pointerEvents: 'none',
+                        zIndex: 0
                     }}
                 />
+                {children}
             </body>
         </html>
     )
