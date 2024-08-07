@@ -31,18 +31,23 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <Providers>
-            <html lang='en' className='antialiased'>
-                {/*
+        <html lang='en' className='antialiased'>
+            {/*
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
         */}
-                <head />
-                <body
-                    className={cn(
-                        'font-mono w-screen h-screen bg-black fixed',
-                        jetbrainsMono.variable
-                    )}
+            <head />
+            <body
+                className={cn(
+                    'font-mono w-screen h-screen bg-black fixed',
+                    jetbrainsMono.variable
+                )}
+            >
+                <Providers
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
                 >
                     <Scene
                         style={{
@@ -56,9 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         }}
                     />
                     {children}
-                </body>
-            </html>
-        </Providers>
+                </Providers>
+            </body>
+        </html>
     )
 }
 
