@@ -27,7 +27,7 @@ const prettyPrintJson = (obj: any): string => {
 };
 
 const getToolParams = (toolName: string, args: any): string => {
-    const filteredArgs = Object.entries(args).filter(([key]) => !['token', 'repoContext', 'content'].includes(key));
+    const filteredArgs = Object.entries(args).filter(([key]) => !['token', 'repoContext', 'content', 'path'].includes(key));
     return filteredArgs.map(([key, value]) => `${key}: ${typeof value === 'string' ? value : '[complex value]'}`).join(', ');
 };
 
@@ -44,6 +44,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     delete filteredArgs.token;
     delete filteredArgs.repoContext;
     delete filteredArgs.content;
+    delete filteredArgs.path;
 
     const renderResult = () => {
         if (currentState === 'result' && currentResult) {
