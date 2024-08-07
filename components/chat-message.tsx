@@ -1,4 +1,5 @@
 // components/chat-message.tsx
+"use client"
 
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
