@@ -39,11 +39,13 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     const user = await currentUser()
     const gitHubToken = user ? await getGitHubToken(user) : undefined
     const firecrawlToken = process.env.FIRECRAWL_API_KEY
+    const greptileToken = process.env.GREPTILE_API_KEY
 
     return {
         repo,
         user: user as User | null,
         gitHubToken,
-        firecrawlToken
+        firecrawlToken,
+        greptileToken
     }
 }
