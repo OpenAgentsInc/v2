@@ -9,7 +9,20 @@ import { ClerkProvider } from '@clerk/nextjs'
 
 export function Providers({ children, ...props }: ThemeProviderProps) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            appearance={{
+                variables: {
+                    colorBackground: "black",
+                    colorText: "white",
+                    colorPrimary: "white",
+                    colorTextOnPrimaryBackground: "black",
+                    colorTextSecondary: "white",
+                    colorInputBackground: "black",
+                    colorInputText: "white",
+                    colorNeutral: "white",
+                }
+            }}
+        >
             <NextThemesProvider {...props}>
                 <SidebarProvider>
                     <TooltipProvider>{children}</TooltipProvider>
