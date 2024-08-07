@@ -2,8 +2,7 @@ import dynamic from 'next/dynamic'
 import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import '@/app/globals.css'
-import { ClerkProvider } from '@clerk/nextjs'
-import { dark } from '@clerk/themes';
+import { Providers } from '@/components/providers'
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
@@ -23,34 +22,32 @@ export const metadata = {
     }
 }
 
+export const viewport = {
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: 'white' },
+        { media: '(prefers-color-scheme: dark)', color: 'black' }
+    ]
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <ClerkProvider
-            appearance={{
-                baseTheme: dark,
-                variables: {
-                    colorBackground: "black",
-                    colorText: "white",
-                    colorPrimary: "white",
-                    colorTextOnPrimaryBackground: "black",
-                    colorTextSecondary: "white",
-                    colorInputBackground: "black",
-                    colorInputText: "white",
-                    colorNeutral: "white",
-                }
-            }}
-        >
-            <html lang='en' className='antialiased'>
-                {/*
+        <html lang='en' className='antialiased'>
+            {/*
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
         */}
-                <head />
-                <body
-                    className={cn(
-                        'font-mono w-screen h-screen bg-black fixed',
-                        jetbrainsMono.variable
-                    )}
+            <head />
+            <body
+                className={cn(
+                    'font-mono w-screen h-screen bg-black fixed',
+                    jetbrainsMono.variable
+                )}
+            >
+                <Providers
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
                 >
                     <Scene
                         style={{
@@ -64,9 +61,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         }}
                     />
                     {children}
-                </body>
-            </html>
-        </ClerkProvider>
+                </Providers>
+            </body>
+        </html>
     )
 }
 
