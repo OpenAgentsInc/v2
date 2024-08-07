@@ -14,5 +14,3 @@ The developer has a dashboard consisting of a few components:
   - Collapsible
   - Top: List of relevant files, found via Greptile search
 
-
-
