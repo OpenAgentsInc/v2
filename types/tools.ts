@@ -24,6 +24,11 @@ export interface ToolContext {
      * We'll probably use a central token, but we can also use a user-specific token.
      */
     firecrawlToken: string | undefined;
+    /**
+     * The Greptile token for the user.
+     * This token is used to authenticate with the Greptile API.
+     */
+    greptileToken: string | undefined;
 }
 
 /**
