@@ -1,5 +1,6 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignedIn, SignedOut } from '@clerk/nextjs'
 import { HomeUnauthed } from '@/components/auth/HomeUnauthed'
+import { HomeDashboard } from '@/components/dashboard/HomeDashboard'
 
 export default function Page() {
     return (
@@ -8,9 +9,7 @@ export default function Page() {
                 <HomeUnauthed />
             </SignedOut>
             <SignedIn>
-                <main className="h-screen flex items-center justify-center">
-                    <UserButton />
-                </main>
+                <HomeDashboard />
             </SignedIn>
         </>
     )
