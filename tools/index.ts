@@ -8,6 +8,7 @@ import { viewFileTool } from './view-file'
 import { viewHierarchyTool } from './view-hierarchy'
 import { createPullRequestTool } from './create-pull-request'
 import { createBranchTool } from './create-branch'
+import { searchCodebaseTool } from './search-codebase'
 import { getGitHubToken } from "@/lib/github/isGitHubUser"
 
 export const getTools = (context: ToolContext) => ({
@@ -18,7 +19,8 @@ export const getTools = (context: ToolContext) => ({
     view_file: viewFileTool(context),
     view_hierarchy: viewHierarchyTool(context),
     create_pull_request: createPullRequestTool(context),
-    create_branch: createBranchTool(context)
+    create_branch: createBranchTool(context),
+    search_codebase: searchCodebaseTool(context)
 })
 
 interface ToolContextBody {
