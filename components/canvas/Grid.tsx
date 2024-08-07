@@ -1,10 +1,8 @@
 "use client"
-
 import React from 'react'
 import * as THREE from 'three'
 import { extend, Object3DNode } from '@react-three/fiber'
 import { shaderMaterial, MeshReflectorMaterial } from '@react-three/drei'
-// import { RigidBody } from '@react-three/rapier'
 
 const FadingGridMaterial = shaderMaterial(
     {
@@ -31,10 +29,8 @@ const FadingGridMaterial = shaderMaterial(
     }
   `
 )
-
 extend({ FadingGridMaterial })
 
-// Add this to fix the TypeScript error with fadingGridMaterial
 declare global {
     namespace JSX {
         interface IntrinsicElements {
@@ -47,7 +43,7 @@ export function Grid() {
     return (
         <group rotation={[0, 0, 0]} position={[0, 0, 0]}>
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
-                <planeGeometry args={[100, 100]} />
+                <planeGeometry args={[50, 50]} />
                 <MeshReflectorMaterial
                     resolution={2048}
                     mixBlur={1}
@@ -58,12 +54,12 @@ export function Grid() {
                     maxDepthThreshold={1.4}
                     color="#202020"
                     metalness={0.8}
-                    mirror={0}  // Added this line
+                    mirror={0}
                 />
             </mesh>
-            <gridHelper args={[100, 100]} position={[0, 0.002, 0]}>
+            <gridHelper args={[50, 100]} position={[0, 0.002, 0]}>
                 <fadingGridMaterial attach="material" transparent />
             </gridHelper>
-        </group >
+        </group>
     )
 }
