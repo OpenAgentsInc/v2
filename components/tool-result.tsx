@@ -62,9 +62,9 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
 
     const renderStateIcon = () => {
         if (currentState === 'call') {
-            return <Loader2 className="animate-spin w-5 h-5" />;
+            return <Loader2 className="animate-spin w-5 h-5 text-foreground" />;
         } else if (currentState === 'result') {
-            return <CheckCircle2 className="text-white w-6 h-6" />;
+            return <CheckCircle2 className="text-foreground w-6 h-6" />;
         }
         return null;
     };
@@ -78,9 +78,9 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     };
 
     return (
-        <div className="mt-5 px-4 text-sm text-white">
-            <div className={cn("bg-gray-800 text-white rounded border border-gray-700 overflow-hidden")}>
-                <div className="flex justify-between items-center p-2 bg-gray-900 border-b border-gray-700">
+        <div className="mt-6 mb-4 px-4 text-sm text-foreground">
+            <div className={cn("bg-background text-foreground rounded border border-border overflow-hidden")}>
+                <div className="flex justify-between items-center p-2 bg-secondary border-b border-border">
                     <span className="font-bold">{toolName}</span>
                     <span className="text-xs">{args.path}</span>
                 </div>
@@ -96,7 +96,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
                     </pre>
                     {showFileContents && (
                         <div className="mt-2 flex space-x-4">
-                            <button onClick={handleViewContents} className="flex items-center text-white hover:bg-gray-700 px-3 py-1 rounded border border-gray-600 transition-colors duration-200">
+                            <button onClick={handleViewContents} className="flex items-center text-foreground hover:bg-secondary px-3 py-1 rounded border border-border transition-colors duration-200">
                                 <GitCompare className="w-4 h-4 mr-2" />
                                 View changes
                             </button>
