@@ -10,7 +10,7 @@ export const HomeDashboard = () => {
             <div className="absolute top-4 right-4">
                 <UserButton />
             </div>
-            <Pane title="Threads" id="sidebar" x={20} y={20} height={450} width={260}>
+            <Pane title="Chat History" id="sidebar" x={20} y={20} height={450} width={260}>
                 <ChatHistory />
             </Pane>
             <Pane title="Chat" id="what" x={310} y={20} height={900} width={1000}>
