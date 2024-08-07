@@ -1,6 +1,6 @@
 import { tool, CoreTool } from 'ai';
 import { z } from 'zod';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { ToolContext } from '@/types';
 
 const params = z.object({
@@ -64,11 +64,12 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
 
         for (const repo of repositories) {
             try {
-                // Check if the repository is indexed
+                console.log(`Checking indexing status for repository: ${repo.repository}`);
                 const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repo.repository}`, { headers });
+                console.log(`Indexing status response:`, checkResponse.data);
                 
                 if (checkResponse.data.status !== 'ready') {
-                    // Repository is not indexed, start indexing
+                    console.log(`Repository ${repo.repository} is not indexed. Starting indexing process.`);
                     const indexResponse = await axios.post('https://api.greptile.com/v2/repositories', {
                         remote: repo.remote,
                         repository: repo.repository,
@@ -76,13 +77,16 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                         reload: true,
                         notify: false
                     }, { headers });
+                    console.log(`Indexing response:`, indexResponse.data);
 
                     if (indexResponse.data.response.includes("Processing started")) {
-                        // Wait for indexing to complete (max 5 minutes)
+                        console.log(`Indexing started for ${repo.repository}. Waiting for completion...`);
                         for (let i = 0; i < 30; i++) {
-                            await delay(10000); // Wait for 10 seconds
+                            await delay(10000);
                             const statusResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repo.repository}`, { headers });
+                            console.log(`Indexing status check ${i + 1}:`, statusResponse.data);
                             if (statusResponse.data.status === 'ready') {
+                                console.log(`Indexing completed for ${repo.repository}`);
                                 break;
                             }
                             if (i === 29) {
@@ -102,24 +106,29 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                             details: indexResponse.data.response
                         };
                     }
+                } else {
+                    console.log(`Repository ${repo.repository} is already indexed.`);
                 }
             } catch (error) {
+                const axiosError = error as AxiosError;
                 return {
                     success: false,
                     error: "Repository check/indexing failed",
                     summary: `Failed to check or index repository ${repo.repository}`,
-                    details: error instanceof Error ? error.message : String(error)
+                    details: `Error: ${axiosError.message}. Status: ${axiosError.response?.status}. Data: ${JSON.stringify(axiosError.response?.data)}`
                 };
             }
         }
 
         try {
+            console.log(`Performing search with query: "${query}"`);
             const response = await axios.post('https://api.greptile.com/v2/search', {
                 query,
                 repositories,
                 sessionId,
                 stream: false
             }, { headers });
+            console.log(`Search response:`, response.data);
 
             return {
                 success: true,
@@ -128,12 +137,12 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                 details: `Found ${response.data.length} results for query: ${query}`
             };
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const axiosError = error as AxiosError;
             return {
                 success: false,
-                error: errorMessage,
+                error: "Search failed",
                 summary: 'Failed to search codebase',
-                details: `An error occurred while trying to search the codebase: ${errorMessage}`
+                details: `Error: ${axiosError.message}. Status: ${axiosError.response?.status}. Data: ${JSON.stringify(axiosError.response?.data)}`
             };
         }
     },
