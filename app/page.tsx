@@ -1,7 +1,8 @@
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
-import { GridHelper } from 'three'
+// import { Grid } from '@/components/canvas/Grid'
 
+const Grid = dynamic(() => import('@/components/canvas/Grid').then((mod) => mod.Grid), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
     ssr: false,
     loading: () => (
@@ -18,9 +19,6 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
     ),
 })
 
-const Grid = () => {
-    return <gridHelper args={[100, 100, 0xffffff, 0xffffff]} />
-}
 
 export default function FullScreenGrid() {
     return (
