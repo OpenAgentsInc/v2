@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { ToolContext } from '@/types';
 
 const params = z.object({
-    query: z.string().describe("The search query string"),
+    query: z.string().describe("The natural-language search query string"),
     repositories: z.array(z.object({
         remote: z.string().describe("The remote URL of the repository"),
         branch: z.string().describe("The branch to search in"),
@@ -66,7 +66,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
             try {
                 const repositoryId = `github:${repo.branch}:${repo.repository}`;
                 console.log(`Checking indexing status for repository: ${repositoryId}`);
-                
+
                 let needsIndexing = false;
                 try {
                     const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
@@ -82,7 +82,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                         throw error;
                     }
                 }
-                
+
                 if (needsIndexing) {
                     console.log(`Repository ${repo.repository} needs indexing. Starting indexing process.`);
                     try {
