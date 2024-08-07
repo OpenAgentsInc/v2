@@ -1,6 +1,9 @@
+"use client"
+
 import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
-// import { Grid } from '@/components/canvas/Grid'
+import { Suspense, useRef, useEffect } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
+import { Vector3 } from 'three'
 
 const Grid = dynamic(() => import('@/components/canvas/Grid').then((mod) => mod.Grid), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
@@ -19,13 +22,39 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
     ),
 })
 
+function CameraAnimation() {
+    const { camera } = useThree()
+    const startPosition = useRef(new Vector3(0, 50, 0))
+    const endPosition = useRef(new Vector3(0, 10, 0))
+    const animationDuration = 3 // seconds
+    const startTime = useRef(Date.now())
+
+    useEffect(() => {
+        camera.position.copy(startPosition.current)
+        camera.lookAt(0, 0, 0)
+    }, [camera])
+
+    useFrame(() => {
+        const elapsedTime = (Date.now() - startTime.current) / 1000
+        if (elapsedTime < animationDuration) {
+            const t = elapsedTime / animationDuration
+            camera.position.lerpVectors(startPosition.current, endPosition.current, t)
+        } else {
+            camera.position.copy(endPosition.current)
+        }
+        camera.lookAt(0, 0, 0)
+    })
+
+    return null
+}
 
 export default function FullScreenGrid() {
     return (
         <div className='h-screen w-full bg-black'>
-            <View className='h-full w-full' orbit>
+            <View className='h-full w-full' orbit={false}>
                 <Suspense fallback={null}>
                     <Grid />
+                    <CameraAnimation />
                 </Suspense>
             </View>
         </div>
