@@ -58,13 +58,6 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         toolInvocations: message.toolInvocations
     }))
 
-    // Debug logging
-    useEffect(() => {
-        console.log('Scroll container:', scrollRef.current)
-        console.log('Messages container:', messagesRef.current)
-        console.log('Visibility marker:', visibilityRef.current)
-    }, [scrollRef, messagesRef, visibilityRef])
-
     // Ensure scroll to bottom on new messages
     useEffect(() => {
         if (messages.length > 0) {
