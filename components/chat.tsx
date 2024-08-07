@@ -53,47 +53,9 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         handleSubmit(e)
     }
 
-    const renderToolInvocation = (toolInvocation: ToolInvocation) => {
-        const toolCallId = toolInvocation.toolCallId
-        const addResult = (result: string) =>
-            addToolResult({ toolCallId, result })
-
-        if (toolInvocation.toolName === 'askForConfirmation') {
-            return (
-                <div key={toolCallId}>
-                    {toolInvocation.args.message}
-                    <div>
-                        {'result' in toolInvocation ? (
-                            <b>{toolInvocation.result}</b>
-                        ) : (
-                            <>
-                                <button onClick={() => addResult('Yes')}>Yes</button>
-                                <button onClick={() => addResult('No')}>No</button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            )
-        }
-
-        return 'result' in toolInvocation ? (
-            <div key={toolCallId}>
-                Tool call {`${toolInvocation.toolName}: `}
-                {toolInvocation.result}
-            </div>
-        ) : (
-            <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
-        )
-    }
-
     const uiMessages = messages.map(message => ({
         ...message,
-        display: (
-            <div className="mb-4">
-                <strong>{message.role}:</strong> {message.content}
-                {message.toolInvocations?.map(renderToolInvocation)}
-            </div>
-        )
+        toolInvocations: message.toolInvocations
     }))
 
     // Debug logging

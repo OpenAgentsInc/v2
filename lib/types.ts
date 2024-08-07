@@ -3,6 +3,7 @@ import { models } from "@/lib/models"
 
 export type Message = CoreMessage & {
     id: string
+    toolInvocations?: any[]
 }
 
 export type ServerMessage = Message & {
