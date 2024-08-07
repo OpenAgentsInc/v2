@@ -66,11 +66,25 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
             try {
                 const repositoryId = `github:${repo.branch}:${repo.repository}`;
                 console.log(`Checking indexing status for repository: ${repositoryId}`);
-                const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
-                console.log(`Indexing status response:`, checkResponse.data);
                 
-                if (checkResponse.data.status !== 'ready') {
-                    console.log(`Repository ${repo.repository} is not indexed. Starting indexing process.`);
+                let needsIndexing = false;
+                try {
+                    const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
+                    console.log(`Indexing status response:`, checkResponse.data);
+                    if (checkResponse.data.status !== 'ready') {
+                        needsIndexing = true;
+                    }
+                } catch (error) {
+                    if (axios.isAxiosError(error) && error.response?.status === 404) {
+                        console.log(`Repository ${repo.repository} not found. Starting indexing process.`);
+                        needsIndexing = true;
+                    } else {
+                        throw error;
+                    }
+                }
+                
+                if (needsIndexing) {
+                    console.log(`Repository ${repo.repository} needs indexing. Starting indexing process.`);
                     const indexResponse = await axios.post('https://api.greptile.com/v2/repositories', {
                         remote: 'github',
                         repository: repo.repository,
