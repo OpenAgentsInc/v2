@@ -16,14 +16,14 @@ export const useRepoStore = create<RepoState>()(
     persist(
         (set) => ({
             repo: {
-                owner: 'bitcoin',
-                name: 'bitcoin',
-                branch: 'master',
+                owner: 'openagents',
+                name: 'v2',
+                branch: 'main',
             },
             setRepo: (repo) => set({ repo }),
         }),
         {
-            name: 'openagents-repo-storage-5',
+            name: 'openagents-repo-storage-6',
             partialize: (state) => ({ repo: state.repo }),
         }
     )
