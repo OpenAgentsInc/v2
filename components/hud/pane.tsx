@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
 import { useHudStore } from "@/store/hud"
 
@@ -104,7 +104,7 @@ const useResizeHandlers = (
         }, { memo: null }),
     }
 
-    return { position, size, resizeHandlers }
+    return { position, size, setPosition, setSize, resizeHandlers }
 }
 
 export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons }) => {
@@ -112,7 +112,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
 
-    const { position, size, resizeHandlers } = useResizeHandlers(
+    const { position, size, setPosition, setSize, resizeHandlers } = useResizeHandlers(
         id,
         { x: initialX, y: initialY },
         { width: initialWidth, height: initialHeight },
@@ -134,6 +134,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
     }, [size.width, size.height])
 
     const bindDrag = useDrag(({ offset: [ox, oy] }) => {
+        setPosition({ x: ox, y: oy })
         updatePanePosition(id, ox, oy)
     }, {
         from: () => [position.x, position.y],
