@@ -16,7 +16,7 @@ export default function Page() {
                             <SignIn
                                 appearance={{
                                     elements: {
-                                        formButtonPrimary: 'bg-slate-500 hover:bg-slate-400 text-sm normal-case',
+                                        // formButtonPrimary: 'bg-slate-500 hover:bg-slate-400 text-sm normal-case',
                                     },
                                 }}
                             />

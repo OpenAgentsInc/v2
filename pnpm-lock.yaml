@@ -14,6 +14,9 @@ dependencies:
   '@clerk/nextjs':
     specifier: ^5.2.13
     version: 5.2.13(next@14.2.4)(react-dom@18.3.1)(react@18.3.1)
+  '@clerk/themes':
+    specifier: ^2.1.18
+    version: 2.1.18
   '@octokit/rest':
     specifier: ^21.0.1
     version: 21.0.1
@@ -516,8 +519,23 @@ packages:
       swr: 2.2.0(react@18.3.1)
     dev: false
 
+  /@clerk/themes@2.1.18:
+    resolution: {integrity: sha512-n9IFNxgoWUNDx/ME37pxKvfRz8glXoJOcIGYrRmkNzmo96QxqFKAg3ZebskVYekiYkF/Z7HBy4EG6LNMNpC7Ng==}
+    engines: {node: '>=18.17.0'}
+    dependencies:
+      '@clerk/types': 4.12.1
+      tslib: 2.4.1
+    dev: false
+
   /@clerk/types@4.12.0:
     resolution: {integrity: sha512-y5P36XMWRphFPwcC8NxptAvPbeH6MZcicULn4x7c1K6gHyGwoieGywwPHAdrc5c/aKGIVp8Zlg93iQi7Vj0qJg==}
+    engines: {node: '>=18.17.0'}
+    dependencies:
+      csstype: 3.1.1
+    dev: false
+
+  /@clerk/types@4.12.1:
+    resolution: {integrity: sha512-0torlmJM3S3kYdaZuIrw1pf4K8aMvoFV+PE1xg7MGfZ0enD9UO3Vhw24pP/yBhI4hVGtNu95E63gpeOFIYysrA==}
     engines: {node: '>=18.17.0'}
     dependencies:
       csstype: 3.1.1

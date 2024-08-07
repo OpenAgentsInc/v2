@@ -3,6 +3,7 @@ import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import '@/app/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
+import { dark } from '@clerk/themes';
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
@@ -24,7 +25,21 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            appearance={{
+                baseTheme: dark,
+                variables: {
+                    colorBackground: "black",
+                    colorText: "white",
+                    colorPrimary: "white",
+                    colorTextOnPrimaryBackground: "black",
+                    colorTextSecondary: "white",
+                    colorInputBackground: "black",
+                    colorInputText: "white",
+                    colorNeutral: "white",
+                }
+            }}
+        >
             <html lang='en' className='antialiased'>
                 {/*
         <head /> will contain the components returned by the nearest parent
