@@ -110,23 +110,21 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                                     break;
                                 }
                             }
+                        } else if (indexResponse.data.response.includes("repo already exists")) {
+                            console.log(`Repository ${repo.repository} is already indexed. Proceeding with search.`);
                         } else {
                             console.log(`Unexpected indexing response for ${repo.repository}. Proceeding with search anyway.`);
                         }
                     } catch (indexError) {
-                        if (axios.isAxiosError(indexError) && indexError.response?.data.includes("repo already exists")) {
-                            console.log(`Repository ${repo.repository} already indexed. Proceeding with search.`);
-                        } else {
-                            throw indexError;
-                        }
+                        console.error(`Error during indexing for ${repo.repository}:`, indexError);
+                        console.log(`Proceeding with search despite indexing error for ${repo.repository}.`);
                     }
                 } else {
                     console.log(`Repository ${repo.repository} is already indexed.`);
                 }
             } catch (error) {
-                const axiosError = error as AxiosError;
-                console.log(`Error during repository check/indexing for ${repo.repository}:`, axiosError.message);
-                console.log(`Proceeding with search anyway.`);
+                console.error(`Error checking/indexing repository ${repo.repository}:`, error);
+                console.log(`Proceeding with search despite error for ${repo.repository}.`);
             }
         }
 
