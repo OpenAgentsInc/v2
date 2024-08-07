@@ -64,7 +64,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
 
         for (const repo of repositories) {
             try {
-                const repositoryId = encodeURIComponent(`${repo.remote}:${repo.branch}:${repo.repository}`);
+                const repositoryId = encodeURIComponent(`github:${repo.branch}:${repo.repository}`);
                 console.log(`Checking indexing status for repository: ${repositoryId}`);
                 const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
                 console.log(`Indexing status response:`, checkResponse.data);
@@ -72,7 +72,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                 if (checkResponse.data.status !== 'ready') {
                     console.log(`Repository ${repo.repository} is not indexed. Starting indexing process.`);
                     const indexResponse = await axios.post('https://api.greptile.com/v2/repositories', {
-                        remote: repo.remote,
+                        remote: 'github',
                         repository: repo.repository,
                         branch: repo.branch,
                         reload: true,
@@ -125,7 +125,11 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
             console.log(`Performing search with query: "${query}"`);
             const response = await axios.post('https://api.greptile.com/v2/search', {
                 query,
-                repositories,
+                repositories: repositories.map(repo => ({
+                    remote: 'github',
+                    repository: repo.repository,
+                    branch: repo.branch
+                })),
                 sessionId,
                 stream: false
             }, { headers });
