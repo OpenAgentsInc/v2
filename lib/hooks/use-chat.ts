@@ -17,7 +17,7 @@ export function useChat({
     initialMessages,
     initialId,
     initialUser,
-    maxToolRoundtrips = 5,
+    maxToolRoundtrips = 25,
     onToolCall
 }: UseChatProps) {
     const router = useRouter()

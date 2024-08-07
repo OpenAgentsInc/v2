@@ -58,13 +58,6 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         toolInvocations: message.toolInvocations
     }))
 
-    // Debug logging
-    useEffect(() => {
-        console.log('Scroll container:', scrollRef.current)
-        console.log('Messages container:', messagesRef.current)
-        console.log('Visibility marker:', visibilityRef.current)
-    }, [scrollRef, messagesRef, visibilityRef])
-
     // Ensure scroll to bottom on new messages
     useEffect(() => {
         if (messages.length > 0) {
@@ -76,8 +69,9 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         <div
             className={cn(
                 "flex flex-col h-full bg-white dark:bg-black group w-full",
-                "transition-[padding] duration-300 ease-in-out",
+                "transition-[padding,width] duration-300 ease-in-out",
                 "pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]",
+                "peer-[[data-workspace-open=true]]:w-3/5",
                 className
             )}
         >

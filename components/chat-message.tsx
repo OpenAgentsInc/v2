@@ -1,5 +1,6 @@
-// Inspired by Chatbot-UI and modified to fit the needs of this project
-// @see https://github.com/mckaywrigley/chatbot-ui/blob/main/components/Chat/ChatMessage.tsx
+// components/chat-message.tsx
+"use client"
+
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -8,49 +9,23 @@ import { CodeBlock } from '@/components/ui/codeblock'
 import { MemoizedReactMarkdown } from '@/components/markdown'
 import { IconOpenAgents, IconUser } from '@/components/ui/icons'
 import { ChatMessageActions } from '@/components/chat-message-actions'
+import { FileViewer } from '@/components/github/file-viewer'
+import { ToolResult } from '@/components/tool-result'
 
 export interface ChatMessageProps {
     message: Message & { toolInvocations?: any[] }
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
-    const renderToolResult = (result: any) => {
-        if (typeof result === 'string') {
-            return result;
-        }
-        if (typeof result === 'object') {
-            return (
-                <div>
-                    {result.success !== undefined && (
-                        <div>Success: {result.success.toString()}</div>
-                    )}
-                    {result.content && <div>Content: {result.content}</div>}
-                    {result.summary && <div>Summary: {result.summary}</div>}
-                    {result.details && (
-                        <div>
-                            Details:
-                            <pre>{JSON.stringify(result.details, null, 2)}</pre>
-                        </div>
-                    )}
-                </div>
-            );
-        }
-        return JSON.stringify(result);
-    };
-
     const renderToolInvocation = (toolInvocation: any) => {
         return (
-            <div key={toolInvocation.toolCallId} className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                <div className="font-semibold">{toolInvocation.toolName}</div>
-                <div className="text-sm">
-                    {toolInvocation.args && (
-                        <div>Args: {JSON.stringify(toolInvocation.args)}</div>
-                    )}
-                    {toolInvocation.result && (
-                        <div>Result: {renderToolResult(toolInvocation.result)}</div>
-                    )}
-                </div>
-            </div>
+            <ToolResult
+                key={toolInvocation.toolCallId}
+                toolName={toolInvocation.toolName}
+                args={toolInvocation.args}
+                result={toolInvocation.result}
+                state={toolInvocation.result ? 'result' : 'call'}
+            />
         )
     }
 
@@ -84,7 +59,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
                                         <span className="mt-1 cursor-default animate-pulse">▍</span>
                                     )
                                 }
-                                children[0] = (children[0] as string).replace('`▍`', '▍')
+                                children[0] = (children[0] as string).replace('▍', '▍')
                             }
                             const match = /language-(\w+)/.exec(className || '')
                             if (inline) {
