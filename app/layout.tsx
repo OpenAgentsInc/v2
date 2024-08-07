@@ -1,7 +1,9 @@
-import { Layout } from '@/components/dom/Layout'
+import dynamic from 'next/dynamic'
 import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import '@/app/globals.css'
+
+const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
 export const metadata = {
     metadataBase: process.env.VERCEL_URL
@@ -29,11 +31,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <head />
             <body
                 className={cn(
-                    'font-mono fixed w-screen h-screen',
+                    'font-mono w-screen h-screen', // fixed
                     jetbrainsMono.variable
                 )}
             >
-                <Layout>{children}</Layout>
+                {children}
+                <Scene
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        pointerEvents: 'none',
+                    }}
+                />
             </body>
         </html>
     )

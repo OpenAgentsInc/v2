@@ -1,8 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { Preload, Plane } from '@react-three/drei'
-import { View } from './View'
+import { Preload, Plane, View } from '@react-three/drei'
 import { r3f } from '@/helpers/global'
 import * as THREE from 'three'
 
