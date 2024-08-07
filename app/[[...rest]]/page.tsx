@@ -1,5 +1,5 @@
 import localFont from 'next/font/local'
-import { SignIn, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignIn, SignedIn, SignUp, SignedOut, UserButton } from '@clerk/nextjs'
 import cn from 'clsx'
 
 const apfel = localFont({
@@ -13,13 +13,7 @@ export default function Page() {
                 <main className={cn(apfel.className, 'pointer-events-none select-none text-white h-screen w-screen bg-black flex items-center justify-center')}>
                     <div className='w-full max-w-md p-6'>
                         <div className="font-mono pointer-events-auto">
-                            <SignIn
-                                appearance={{
-                                    elements: {
-                                        // formButtonPrimary: 'bg-slate-500 hover:bg-slate-400 text-sm normal-case',
-                                    },
-                                }}
-                            />
+                            <SignUp />
                         </div>
                     </div>
                 </main>
