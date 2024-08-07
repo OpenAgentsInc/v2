@@ -1,5 +1,4 @@
-// hooks/useCameraAnimation.ts
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { useSpring } from '@react-spring/three'
 import { useControls, button } from 'leva'
@@ -8,6 +7,8 @@ const SHOW_CONTROLS = false
 
 export function useCameraAnimation() {
     const { camera } = useThree()
+    const animationRunRef = useRef(false)
+
     const defaultConfig = {
         startX: 0, startY: 1, startZ: -10,
         endX: 0, endY: 10, endZ: 0,
@@ -38,15 +39,18 @@ export function useCameraAnimation() {
     }))
 
     const restartAnimation = useCallback(() => {
-        api.start({
-            from: { x: config.startX, y: config.startY, z: config.startZ },
-            to: { x: config.endX, y: config.endY, z: config.endZ },
-            config: {
-                mass: config.mass,
-                tension: config.tension,
-                friction: config.friction,
-            },
-        })
+        if (!animationRunRef.current) {
+            api.start({
+                from: { x: config.startX, y: config.startY, z: config.startZ },
+                to: { x: config.endX, y: config.endY, z: config.endZ },
+                config: {
+                    mass: config.mass,
+                    tension: config.tension,
+                    friction: config.friction,
+                },
+            })
+            animationRunRef.current = true
+        }
     }, [api, config])
 
     useEffect(() => {
