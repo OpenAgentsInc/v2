@@ -1,6 +1,6 @@
 # Pull Request Flow
 
-The #1 objective of the OpenAgents v2 project is to enable a developer to produce production-ready code as fast as possible. A key part of this process is efficiently managing pull requests through an LLM-powered chat interface.
+The #1 objective of the OpenAgents v2 project is to enable a developer to produce production-ready code as fast as possible. A key part of this process is efficiently managing pull requests and code changes through an LLM-powered chat interface.
 
 ## Dashboard Components
 
@@ -27,8 +27,9 @@ Our current toolset includes:
 
 ## New Tools to Implement
 
-To fully support pull request management through the LLM chat interface, we need to implement the following tools:
+To fully support pull request management and code changes through the LLM chat interface, we need to implement the following tools:
 
+### Pull Request Management
 1. `list_pull_requests`: Lists open pull requests for the current repository.
 2. `view_pull_request`: Shows details of a specific pull request, including title, description, and changed files.
 3. `create_pull_request`: Creates a new pull request with specified title, description, and branch.
@@ -39,28 +40,68 @@ To fully support pull request management through the LLM chat interface, we need
 8. `list_pull_request_comments`: Lists all comments on a specific pull request.
 9. `view_pull_request_diff`: Shows the diff for a specific pull request.
 
+### File and Code Management
+10. `create_file`: Creates a new file with specified content at a given path.
+11. `edit_file`: Modifies the content of an existing file.
+12. `delete_file`: Removes a file from the repository.
+13. `create_patch`: Generates a patch file for changes made to one or more files.
+14. `apply_patch`: Applies a patch file to the current branch.
+15. `create_branch`: Creates a new branch in the repository.
+16. `switch_branch`: Switches the current working branch.
+17. `commit_changes`: Commits changes made to files in the current branch.
+
 ## Integration and Workflow
 
-These tools will work together to provide a seamless pull request management experience:
+These tools will work together to provide a seamless pull request and code management experience:
 
-1. The user initiates a conversation about pull requests in the chat interface.
+1. The user initiates a conversation about code changes or pull requests in the chat interface.
 
-2. The LLM uses `list_pull_requests` to provide an overview of open PRs.
+2. For new features or bug fixes, the LLM can use `create_branch` to start a new line of development.
 
-3. The user can then ask for more details about a specific PR, triggering `view_pull_request`.
+3. The LLM can make code changes using `create_file`, `edit_file`, or `delete_file` based on the user's requirements.
 
-4. If the user wants to see the changes, `view_pull_request_diff` is used.
+4. Changes can be committed using `commit_changes`.
 
-5. The LLM can suggest comments or reviews based on the diff, using `comment_on_pull_request` or `review_pull_request`.
+5. If needed, the LLM can generate patches using `create_patch` or apply existing patches with `apply_patch`.
 
-6. If changes are needed, the user can request updates using natural language, which the LLM translates into `update_pull_request` calls.
+6. Once changes are ready, the LLM can create a pull request using `create_pull_request`.
 
-7. When a PR is ready, the user can ask to merge it, triggering `merge_pull_request`.
+7. The user can review open pull requests using `list_pull_requests` and `view_pull_request`.
 
-8. Throughout this process, `view_file` and `view_hierarchy` can be used to provide context about the codebase.
+8. The LLM can provide detailed diff information using `view_pull_request_diff`.
 
-9. If external information is needed, `scrape_webpage` can be used to gather relevant documentation or references.
+9. Reviews and comments can be added using `review_pull_request` and `comment_on_pull_request`.
+
+10. If updates are needed, the LLM can make further changes and update the pull request using `update_pull_request`.
+
+11. When a PR is ready and approved, the user can ask to merge it, triggering `merge_pull_request`.
+
+12. Throughout this process, `view_file` and `view_hierarchy` can be used to provide context about the codebase.
+
+13. If external information is needed, `scrape_webpage` can be used to gather relevant documentation or references.
 
 ## Implementation Details
 
 To implement these new tools:
+
+1. Create new files in the `tools/` directory for each of these functions, similar to existing tools like `list-repos.ts` or `view-file.ts`.
+
+2. Update `tools/index.ts` to include these new tools in the `getTools` function.
+
+3. Implement the necessary GitHub API calls in these new tool files. For file operations, you may need to use the Git Data API in addition to the Pull Requests API.
+
+4. Update the `ToolContext` interface in `@/types` to include any additional properties needed for these operations, such as the current branch.
+
+5. Modify `lib/hooks/use-chat.ts` to handle these new tools, possibly by extending the `onToolCall` function.
+
+6. Update the system prompt in `lib/systemPrompt.ts` to include information about these new code and pull request-related tools.
+
+7. Implement proper error handling and validation for each tool to ensure robustness.
+
+8. Add appropriate permissions checks to ensure the user has the right access levels for each operation.
+
+9. Consider implementing a local file system cache to improve performance for file-related operations.
+
+10. Develop unit and integration tests for each new tool to ensure reliability.
+
+By implementing these tools and integrating them into the chat interface, we'll enable the LLM to manage the entire pull request workflow and make code changes directly, significantly speeding up the development process.
