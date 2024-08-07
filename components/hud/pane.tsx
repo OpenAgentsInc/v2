@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useDrag } from '@use-gesture/react'
 import { useHudStore } from "@/store/hud"
 
@@ -48,41 +48,43 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
         },
     })
 
-    const bindResize = (direction: string) =>
-        useDrag(
-            ({ movement: [deltaX, deltaY], first, memo }) => {
-                if (first) {
-                    memo = { ...position, ...size }
-                }
+    const bindResize = useDrag(
+        ({ movement: [deltaX, deltaY], direction, first, memo }) => {
+            if (first) {
+                memo = { ...position, ...size }
+            }
 
-                let newX = memo.x
-                let newY = memo.y
-                let newWidth = memo.width
-                let newHeight = memo.height
+            let newX = memo.x
+            let newY = memo.y
+            let newWidth = memo.width
+            let newHeight = memo.height
 
-                if (direction.includes("left")) {
-                    newX = Math.min(memo.x + deltaX, memo.x + memo.width - 200)
-                    newWidth = Math.max(200, memo.width - deltaX)
-                } else if (direction.includes("right")) {
-                    newWidth = Math.max(200, memo.width + deltaX)
-                }
+            if (direction[0] < 0) {  // Left
+                newX = Math.min(memo.x + deltaX, memo.x + memo.width - 200)
+                newWidth = Math.max(200, memo.width - deltaX)
+            } else if (direction[0] > 0) {  // Right
+                newWidth = Math.max(200, memo.width + deltaX)
+            }
 
-                if (direction.includes("top")) {
-                    newY = Math.min(memo.y + deltaY, memo.y + memo.height - 100)
-                    newHeight = Math.max(100, memo.height - deltaY)
-                } else if (direction.includes("bottom")) {
-                    newHeight = Math.max(100, memo.height + deltaY)
-                }
+            if (direction[1] < 0) {  // Top
+                newY = Math.min(memo.y + deltaY, memo.y + memo.height - 100)
+                newHeight = Math.max(100, memo.height - deltaY)
+            } else if (direction[1] > 0) {  // Bottom
+                newHeight = Math.max(100, memo.height + deltaY)
+            }
 
-                setPosition({ x: newX, y: newY })
-                setSize({ width: newWidth, height: newHeight })
-                updatePanePosition(id, newX, newY)
-                updatePaneSize(id, newWidth, newHeight)
+            setPosition({ x: newX, y: newY })
+            setSize({ width: newWidth, height: newHeight })
+            updatePanePosition(id, newX, newY)
+            updatePaneSize(id, newWidth, newHeight)
 
-                return memo
-            },
-            { memo: null }
-        )
+            return memo
+        },
+        {
+            from: () => [position.x, position.y],
+            memo: { ...position, ...size },
+        }
+    )
 
     return (
         <div
@@ -108,14 +110,14 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
             </div>
             <div className="absolute inset-0 pointer-events-none border border-white rounded-lg opacity-50"></div>
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(255,255,255,0.2)] rounded-lg"></div>
-            <div {...bindResize("topleft")()} className="absolute -top-1 -left-1 w-4 h-4 cursor-nwse-resize" />
-            <div {...bindResize("top")()} className="absolute -top-1 left-3 right-3 h-4 cursor-ns-resize" />
-            <div {...bindResize("topright")()} className="absolute -top-1 -right-1 w-4 h-4 cursor-nesw-resize" />
-            <div {...bindResize("right")()} className="absolute top-3 -right-1 w-4 bottom-3 cursor-ew-resize" />
-            <div {...bindResize("bottomright")()} className="absolute -bottom-1 -right-1 w-4 h-4 cursor-se-resize" />
-            <div {...bindResize("bottom")()} className="absolute -bottom-1 left-3 right-3 h-4 cursor-ns-resize" />
-            <div {...bindResize("bottomleft")()} className="absolute -bottom-1 -left-1 w-4 h-4 cursor-nesw-resize" />
-            <div {...bindResize("left")()} className="absolute top-3 -left-1 w-4 bottom-3 cursor-ew-resize" />
+            <div {...bindResize()} style={{ transform: "translate(-50%, -50%)", touchAction: "none" }} className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize" />
+            <div {...bindResize()} style={{ transform: "translateY(-50%)", touchAction: "none" }} className="absolute top-0 left-1/2 w-4 h-4 cursor-ns-resize" />
+            <div {...bindResize()} style={{ transform: "translate(50%, -50%)", touchAction: "none" }} className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize" />
+            <div {...bindResize()} style={{ transform: "translateX(50%)", touchAction: "none" }} className="absolute top-1/2 right-0 w-4 h-4 cursor-ew-resize" />
+            <div {...bindResize()} style={{ transform: "translate(50%, 50%)", touchAction: "none" }} className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize" />
+            <div {...bindResize()} style={{ transform: "translateY(50%)", touchAction: "none" }} className="absolute bottom-0 left-1/2 w-4 h-4 cursor-ns-resize" />
+            <div {...bindResize()} style={{ transform: "translate(-50%, 50%)", touchAction: "none" }} className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize" />
+            <div {...bindResize()} style={{ transform: "translateX(-50%)", touchAction: "none" }} className="absolute top-1/2 left-0 w-4 h-4 cursor-ew-resize" />
         </div>
     )
 }
