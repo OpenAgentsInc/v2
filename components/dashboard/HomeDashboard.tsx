@@ -2,10 +2,12 @@ import { UserButton } from '@clerk/nextjs'
 import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
 import { Pane } from '@/components/hud/pane'
+import { InitDatabase } from '@/components/db/InitDatabase'
 
 export const HomeDashboard = () => {
     return (
         <main className="h-screen flex items-center justify-center relative">
+            <InitDatabase />
             <div className="absolute top-4 right-4">
                 <UserButton />
             </div>
