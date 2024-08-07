@@ -18,12 +18,12 @@ export const useRepoStore = create<RepoState>()(
             repo: {
                 owner: 'openagentsinc',
                 name: 'v2',
-                branch: 'prflow',
+                branch: 'postgres',
             },
             setRepo: (repo) => set({ repo }),
         }),
         {
-            name: 'openagents-repo-storage-8',
+            name: 'openagents-repo-storage-9',
             partialize: (state) => ({ repo: state.repo }),
         }
     )
