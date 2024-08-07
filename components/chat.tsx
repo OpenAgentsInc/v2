@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
@@ -96,40 +96,47 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         )
     }))
 
+    // Debug logging
+    useEffect(() => {
+        console.log('Scroll container:', scrollRef.current)
+        console.log('Messages container:', messagesRef.current)
+        console.log('Visibility marker:', visibilityRef.current)
+    }, [scrollRef, messagesRef, visibilityRef])
+
+    // Ensure scroll to bottom on new messages
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom()
+        }
+    }, [messages, scrollToBottom])
+
     return (
         <div
             className={cn(
-                "flex flex-col h-full bg-white dark:bg-black group w-full overflow-hidden",
+                "flex flex-col h-full bg-white dark:bg-black group w-full",
                 "transition-[padding] duration-300 ease-in-out",
                 "pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]",
                 className
             )}
         >
             <div className="flex-grow overflow-auto" ref={scrollRef}>
-                <div className="relative min-h-full">
-                    <div
-                        className="pb-32 pt-4 md:pt-10"
-                        ref={messagesRef}
-                    >
-                        {messages.length ? (
-                            <ChatList messages={uiMessages} user={user} isShared={false} />
-                        ) : (
-                            <EmptyScreen />
-                        )}
-                        <div className="w-full h-px" ref={visibilityRef} />
-                    </div>
+                <div className="relative min-h-full" ref={messagesRef}>
+                    {messages.length ? (
+                        <ChatList messages={uiMessages} user={user} isShared={false} />
+                    ) : (
+                        <EmptyScreen />
+                    )}
+                    <div className="h-px" ref={visibilityRef} />
                 </div>
             </div>
-            <div className="w-full">
-                <ChatPanel
-                    id={id}
-                    isAtBottom={isAtBottom}
-                    scrollToBottom={scrollToBottom}
-                    input={input}
-                    handleInputChange={handleInputChange}
-                    handleSubmit={handleSubmitWrapper}
-                />
-            </div>
+            <ChatPanel
+                id={id}
+                isAtBottom={isAtBottom}
+                scrollToBottom={scrollToBottom}
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmitWrapper}
+            />
         </div>
     )
 }
