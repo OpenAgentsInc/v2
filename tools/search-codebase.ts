@@ -85,53 +85,48 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                 
                 if (needsIndexing) {
                     console.log(`Repository ${repo.repository} needs indexing. Starting indexing process.`);
-                    const indexResponse = await axios.post('https://api.greptile.com/v2/repositories', {
-                        remote: 'github',
-                        repository: repo.repository,
-                        branch: repo.branch,
-                        reload: true,
-                        notify: false
-                    }, { headers });
-                    console.log(`Indexing response:`, indexResponse.data);
+                    try {
+                        const indexResponse = await axios.post('https://api.greptile.com/v2/repositories', {
+                            remote: 'github',
+                            repository: repo.repository,
+                            branch: repo.branch,
+                            reload: true,
+                            notify: false
+                        }, { headers });
+                        console.log(`Indexing response:`, indexResponse.data);
 
-                    if (indexResponse.data.response.includes("started repo processing")) {
-                        console.log(`Indexing started for ${repo.repository}. Waiting for completion...`);
-                        for (let i = 0; i < 30; i++) {
-                            await delay(10000);
-                            const statusResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
-                            console.log(`Indexing status check ${i + 1}:`, statusResponse.data);
-                            if (statusResponse.data.status === 'ready') {
-                                console.log(`Indexing completed for ${repo.repository}`);
-                                break;
+                        if (indexResponse.data.response.includes("started repo processing")) {
+                            console.log(`Indexing started for ${repo.repository}. Waiting for completion...`);
+                            for (let i = 0; i < 30; i++) {
+                                await delay(10000);
+                                const statusResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
+                                console.log(`Indexing status check ${i + 1}:`, statusResponse.data);
+                                if (statusResponse.data.status === 'ready') {
+                                    console.log(`Indexing completed for ${repo.repository}`);
+                                    break;
+                                }
+                                if (i === 29) {
+                                    console.log(`Indexing of ${repo.repository} is still in progress after 5 minutes. Proceeding with search anyway.`);
+                                    break;
+                                }
                             }
-                            if (i === 29) {
-                                return {
-                                    success: false,
-                                    error: "Indexing in progress",
-                                    summary: `Indexing of ${repo.repository} is still in progress after 5 minutes`,
-                                    details: "The repository indexing process is taking longer than expected. Please try your search again in a few minutes."
-                                };
-                            }
+                        } else {
+                            console.log(`Unexpected indexing response for ${repo.repository}. Proceeding with search anyway.`);
                         }
-                    } else {
-                        return {
-                            success: false,
-                            error: "Indexing failed",
-                            summary: `Failed to start indexing for ${repo.repository}`,
-                            details: indexResponse.data.response
-                        };
+                    } catch (indexError) {
+                        if (axios.isAxiosError(indexError) && indexError.response?.data.includes("repo already exists")) {
+                            console.log(`Repository ${repo.repository} already indexed. Proceeding with search.`);
+                        } else {
+                            throw indexError;
+                        }
                     }
                 } else {
                     console.log(`Repository ${repo.repository} is already indexed.`);
                 }
             } catch (error) {
                 const axiosError = error as AxiosError;
-                return {
-                    success: false,
-                    error: "Repository check/indexing failed",
-                    summary: `Failed to check or index repository ${repo.repository}`,
-                    details: `Error: ${axiosError.message}. Status: ${axiosError.response?.status}. Data: ${JSON.stringify(axiosError.response?.data)}`
-                };
+                console.log(`Error during repository check/indexing for ${repo.repository}:`, axiosError.message);
+                console.log(`Proceeding with search anyway.`);
             }
         }
 
