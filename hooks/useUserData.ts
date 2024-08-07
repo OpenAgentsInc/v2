@@ -17,5 +17,3 @@ export function useUserData(userId: string) {
 
     return { isLoading, error };
 }
-
-
