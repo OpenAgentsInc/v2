@@ -94,7 +94,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                     }, { headers });
                     console.log(`Indexing response:`, indexResponse.data);
 
-                    if (indexResponse.data.response.includes("Processing started")) {
+                    if (indexResponse.data.response.includes("started repo processing")) {
                         console.log(`Indexing started for ${repo.repository}. Waiting for completion...`);
                         for (let i = 0; i < 30; i++) {
                             await delay(10000);
@@ -107,9 +107,9 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                             if (i === 29) {
                                 return {
                                     success: false,
-                                    error: "Indexing timeout",
-                                    summary: `Indexing of ${repo.repository} timed out after 5 minutes`,
-                                    details: "The repository indexing process took too long. Please try again later."
+                                    error: "Indexing in progress",
+                                    summary: `Indexing of ${repo.repository} is still in progress after 5 minutes`,
+                                    details: "The repository indexing process is taking longer than expected. Please try your search again in a few minutes."
                                 };
                             }
                         }
