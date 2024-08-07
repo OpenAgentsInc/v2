@@ -49,7 +49,6 @@ export function Grid() {
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
                 <planeGeometry args={[100, 100]} />
                 <MeshReflectorMaterial
-                    blur={[300, 30]}
                     resolution={2048}
                     mixBlur={1}
                     mixStrength={80}
@@ -59,7 +58,7 @@ export function Grid() {
                     maxDepthThreshold={1.4}
                     color="#202020"
                     metalness={0.8}
-                    mirror={0.5}  // Added this line
+                    mirror={0}  // Added this line
                 />
             </mesh>
             <gridHelper args={[100, 100]} position={[0, 0.002, 0]}>
