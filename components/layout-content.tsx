@@ -9,6 +9,7 @@ interface LayoutContentProps {
 
 export function LayoutContent({ children }: LayoutContentProps) {
     const isOpen = useSidebarStore((state) => state.isOpen)
+    console.log("??????")
 
     return (
         <div

@@ -14,7 +14,6 @@ export const useScrollAnchor = () => {
                 top: scrollHeight,
                 behavior: 'smooth'
             })
-            console.log('Scrolling to bottom:', scrollHeight)
         } else {
             console.warn('scrollRef is not set')
         }
@@ -24,7 +23,6 @@ export const useScrollAnchor = () => {
         if (scrollRef.current && isAtBottom && !isVisible) {
             const scrollHeight = scrollRef.current.scrollHeight
             scrollRef.current.scrollTop = scrollHeight
-            console.log('Auto-scrolling to bottom:', scrollHeight)
         }
     }, [isAtBottom, isVisible])
 
@@ -37,7 +35,6 @@ export const useScrollAnchor = () => {
                 const bottomThreshold = scrollHeight - offset
                 const isAtBottom = scrollTop + clientHeight >= bottomThreshold
                 setIsAtBottom(isAtBottom)
-                console.log('Scroll position:', { scrollTop, scrollHeight, clientHeight, isAtBottom })
             }
 
             current.addEventListener('scroll', handleScroll, { passive: true })
@@ -53,7 +50,6 @@ export const useScrollAnchor = () => {
                 entries => {
                     entries.forEach(entry => {
                         setIsVisible(entry.isIntersecting)
-                        console.log('Visibility changed:', entry.isIntersecting)
                     })
                 },
                 {
