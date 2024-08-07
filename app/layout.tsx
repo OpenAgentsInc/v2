@@ -1,13 +1,11 @@
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import dynamic from 'next/dynamic'
 import { jetbrainsMono } from '@/lib/fonts'
-
-import '@/app/globals.css'
 import { cn } from '@/lib/utils'
-import { TailwindIndicator } from '@/components/tailwind-indicator'
-import { Providers } from '@/components/providers'
-import { Header } from '@/components/header'
-import { Toaster } from '@/components/ui/sonner'
+import '@/app/globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
+import { dark } from '@clerk/themes';
+
+const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
 export const metadata = {
     metadataBase: process.env.VERCEL_URL
@@ -20,47 +18,55 @@ export const metadata = {
     description: 'Your AI productivity dashboard',
     icons: {
         icon: '/favicon.ico',
-        shortcut: '/favicon-16x16.png',
-        apple: '/apple-touch-icon.png'
+        // shortcut: '/favicon-16x16.png',
+        // apple: '/apple-touch-icon.png'
     }
 }
 
-export const viewport = {
-    themeColor: [
-        { media: '(prefers-color-scheme: light)', color: 'white' },
-        { media: '(prefers-color-scheme: dark)', color: 'black' }
-    ]
-}
-
-interface RootLayoutProps {
-    children: React.ReactNode
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body
-                className={cn(
-                    'font-mono fixed w-screen antialiased',
-                    GeistSans.variable,
-                    GeistMono.variable,
-                    jetbrainsMono.variable
-                )}
-            >
-                <Toaster position="top-center" />
-                <Providers
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
+        <ClerkProvider
+            appearance={{
+                baseTheme: dark,
+                variables: {
+                    colorBackground: "black",
+                    colorText: "white",
+                    colorPrimary: "white",
+                    colorTextOnPrimaryBackground: "black",
+                    colorTextSecondary: "white",
+                    colorInputBackground: "black",
+                    colorInputText: "white",
+                    colorNeutral: "white",
+                }
+            }}
+        >
+            <html lang='en' className='antialiased'>
+                {/*
+        <head /> will contain the components returned by the nearest parent
+        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
+        */}
+                <head />
+                <body
+                    className={cn(
+                        'font-mono w-screen h-screen bg-black fixed',
+                        jetbrainsMono.variable
+                    )}
                 >
-                    <div className="flex flex-col min-h-screen">
-                        <Header />
-                        <main className="flex flex-col flex-1 bg-muted/50">{children}</main>
-                    </div>
-                    <TailwindIndicator />
-                </Providers>
-            </body>
-        </html>
+                    <Scene
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100vw',
+                            height: '100vh',
+                            pointerEvents: 'none',
+                            zIndex: 0,
+                        }}
+                    />
+                    {children}
+                </body>
+            </html>
+        </ClerkProvider>
     )
 }
+
