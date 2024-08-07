@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <head />
             <body
                 className={cn(
-                    'font-mono fixed w-screen',
+                    'font-mono fixed w-screen h-screen',
                     jetbrainsMono.variable
                 )}
             >
