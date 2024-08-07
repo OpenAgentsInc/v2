@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
@@ -41,6 +41,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                 return cities[Math.floor(Math.random() * cities.length)]
             }
             // Add more tool call handlers here as needed
+            console.log('Tool call:', toolCall)
         },
     })
 
@@ -52,82 +53,52 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
         handleSubmit(e)
     }
 
-    const renderToolInvocation = (toolInvocation: ToolInvocation) => {
-        const toolCallId = toolInvocation.toolCallId
-        const addResult = (result: string) =>
-            addToolResult({ toolCallId, result })
-
-        if (toolInvocation.toolName === 'askForConfirmation') {
-            return (
-                <div key={toolCallId}>
-                    {toolInvocation.args.message}
-                    <div>
-                        {'result' in toolInvocation ? (
-                            <b>{toolInvocation.result}</b>
-                        ) : (
-                            <>
-                                <button onClick={() => addResult('Yes')}>Yes</button>
-                                <button onClick={() => addResult('No')}>No</button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            )
-        }
-
-        return 'result' in toolInvocation ? (
-            <div key={toolCallId}>
-                Tool call {`${toolInvocation.toolName}: `}
-                {toolInvocation.result}
-            </div>
-        ) : (
-            <div key={toolCallId}>Calling {toolInvocation.toolName}...</div>
-        )
-    }
-
     const uiMessages = messages.map(message => ({
         ...message,
-        display: (
-            <div className="mb-4">
-                <strong>{message.role}:</strong> {message.content}
-                {message.toolInvocations?.map(renderToolInvocation)}
-            </div>
-        )
+        toolInvocations: message.toolInvocations
     }))
+
+    // Debug logging
+    useEffect(() => {
+        console.log('Scroll container:', scrollRef.current)
+        console.log('Messages container:', messagesRef.current)
+        console.log('Visibility marker:', visibilityRef.current)
+    }, [scrollRef, messagesRef, visibilityRef])
+
+    // Ensure scroll to bottom on new messages
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom()
+        }
+    }, [messages, scrollToBottom])
 
     return (
         <div
             className={cn(
-                "h-full bg-white dark:bg-black group w-full overflow-auto",
+                "flex flex-col h-full bg-white dark:bg-black group w-full",
                 "transition-[padding] duration-300 ease-in-out",
                 "pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]",
                 className
             )}
-            ref={scrollRef}
         >
-            <div className="relative min-h-full">
-                <div
-                    className="pb-[200px] pt-4 md:pt-10"
-                    ref={messagesRef}
-                >
+            <div className="flex-grow overflow-auto" ref={scrollRef}>
+                <div className="relative min-h-full" ref={messagesRef}>
                     {messages.length ? (
                         <ChatList messages={uiMessages} user={user} isShared={false} />
                     ) : (
                         <EmptyScreen />
                     )}
-                    <div className="w-full h-px" ref={visibilityRef} />
-                </div>
-                <div className="absolute bottom-0 left-0 w-full">
-                    <ChatPanel
-                        id={id}
-                        isAtBottom={isAtBottom}
-                        scrollToBottom={scrollToBottom}
-                        input={input}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={handleSubmitWrapper}
-                    />
+                    <div className="h-px" ref={visibilityRef} />
                 </div>
             </div>
+            <ChatPanel
+                id={id}
+                isAtBottom={isAtBottom}
+                scrollToBottom={scrollToBottom}
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmitWrapper}
+            />
         </div>
     )
 }

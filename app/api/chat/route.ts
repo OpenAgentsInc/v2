@@ -1,45 +1,24 @@
-import { openai } from '@ai-sdk/openai';
-import { convertToCoreMessages, streamText } from 'ai';
-import { z } from 'zod';
+import { convertToCoreMessages, streamText } from 'ai'
+import { anthropic } from '@ai-sdk/anthropic'
+import { openai } from '@ai-sdk/openai'
+import { getSystemPrompt } from '@/lib/systemPrompt'
+import { getTools, getToolContext } from '@/tools'
 
-// Allow streaming responses up to 30 seconds
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-    const { messages } = await req.json();
-    console.log('messages', messages);
+    const body = await req.json();
+    const toolContext = await getToolContext(body)
 
     const result = await streamText({
-        model: openai('gpt-4o'),
-        messages: convertToCoreMessages(messages),
-        tools: {
-            // server-side tool with execute function:
-            getWeatherInformation: {
-                description: 'show the weather in a given city to the user',
-                parameters: z.object({ city: z.string() }),
-                execute: async ({ }: { city: string }) => {
-                    const weatherOptions = ['sunny', 'cloudy', 'rainy', 'snowy', 'windy'];
-                    return weatherOptions[
-                        Math.floor(Math.random() * weatherOptions.length)
-                    ];
-                },
-            },
-            // client-side tool that starts user interaction:
-            askForConfirmation: {
-                description: 'Ask the user for confirmation.',
-                parameters: z.object({
-                    message: z.string().describe('The message to ask for confirmation.'),
-                }),
-            },
-            // client-side tool that is automatically executed on the client:
-            getLocation: {
-                description:
-                    'Get the user location. Always ask for confirmation before using this tool.',
-                parameters: z.object({}),
-            },
-        },
+        messages: convertToCoreMessages(body.messages),
+        model: anthropic('claude-3-5-sonnet-20240620'),
+        // model: openai('gpt-4o'),
+        system: getSystemPrompt(toolContext),
+        tools: getTools(toolContext)
     });
 
     return result.toAIStreamResponse();
 }
+

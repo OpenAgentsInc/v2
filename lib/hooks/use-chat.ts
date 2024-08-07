@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
+import { useRepoStore } from '@/store/repo'
 import { Message, User } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
 
@@ -48,6 +49,8 @@ export function useChat({
 
     const chatData = getChatData(localChatId || '')
 
+    const repo = useRepoStore((state) => state.repo)
+
     const {
         messages: vercelMessages,
         input,
@@ -58,7 +61,13 @@ export function useChat({
         initialMessages: initialMessages || chatData.messages,
         id: localChatId,
         maxToolRoundtrips,
-        onToolCall
+        onToolCall,
+        // If repo is defined, pass it to body
+        body: repo ? {
+            repoOwner: repo.owner,
+            repoName: repo.name,
+            repoBranch: repo.branch,
+        } : undefined
     })
 
     useEffect(() => {
@@ -73,9 +82,9 @@ export function useChat({
     useEffect(() => {
         if (vercelMessages.length === 2 && !refreshedRef.current) {
             // console.log("skipping refresh")
-            console.log('refreshing')
-            router.refresh()
-            refreshedRef.current = true
+            // console.log('refreshing')
+            // router.refresh()
+            // refreshedRef.current = true
         }
     }, [vercelMessages, router])
 

@@ -9,7 +9,8 @@ export async function getGitHubToken(user: User) {
     if (tokenResponse.data.length > 0) {
         return tokenResponse.data[0].token;
     } else {
-        // throw error
+        console.log("No GitHub token found for user:", user.id);
+        return undefined;
     }
 }
 

@@ -25,7 +25,7 @@ export async function generateMetadata({
 
     if (!chat || 'error' in chat) {
         console.log("Metadata error redirecting...")
-        redirect('/')
+        // redirect('/')
     } else {
         return {
             title: chat?.title.toString().slice(0, 50) ?? 'Chat'
