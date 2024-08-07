@@ -4,14 +4,13 @@ import { Chat } from '@/components/chat'
 
 export const HomeDashboard = () => {
     return (
-        <main className="h-screen relative">
+        <main className="h-screen flex items-center justify-center relative">
             <div className="absolute top-4 right-4">
                 <UserButton />
             </div>
-            <div className="max-w-[500px] h-[800px]">
+            <div className="w-[40%] h-[90%] border border-white rounded-xl overflow-hidden bg-gray-800 shadow-lg">
                 <Chat id={nanoid()} />
             </div>
         </main>
     )
 }
-
