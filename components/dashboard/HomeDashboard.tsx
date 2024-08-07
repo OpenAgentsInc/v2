@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { UserButton } from '@clerk/nextjs'
 import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
@@ -7,7 +8,9 @@ import { InitDatabase } from '@/components/db/InitDatabase'
 export const HomeDashboard = () => {
     return (
         <main className="h-screen flex items-center justify-center relative">
-            <InitDatabase />
+            <Suspense fallback={null}>
+                <InitDatabase />
+            </Suspense>
             <div className="absolute top-4 right-4">
                 <UserButton />
             </div>
