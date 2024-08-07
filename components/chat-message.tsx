@@ -8,13 +8,25 @@ import { CodeBlock } from '@/components/ui/codeblock'
 import { MemoizedReactMarkdown } from '@/components/markdown'
 import { IconOpenAgents, IconUser } from '@/components/ui/icons'
 import { ChatMessageActions } from '@/components/chat-message-actions'
+import { FileViewer } from '@/components/github/file-viewer'
+import { ToolResult } from '@/components/tool-result'
 
 export interface ChatMessageProps {
     message: Message & { toolInvocations?: any[] }
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
-    const renderToolResult = (result: any) => {
+    const renderToolResult = (result: any, toolName: string) => {
+        if (toolName === 'view_file') {
+            return (
+                <FileViewer
+                    content={result.content}
+                    filename={result.details.split('\n')[0].replace('File contents of ', '').replace(' on branch prflow have been retrieved:', '')}
+                />
+            );
+        }
+
+        // Existing code for other tool results
         if (typeof result === 'string') {
             return result;
         }
@@ -47,7 +59,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
                         <div>Args: {JSON.stringify(toolInvocation.args)}</div>
                     )}
                     {toolInvocation.result && (
-                        <div>Result: {renderToolResult(toolInvocation.result)}</div>
+                        <div>Result: {renderToolResult(toolInvocation.result, toolInvocation.toolName)}</div>
                     )}
                 </div>
             </div>
