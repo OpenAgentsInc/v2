@@ -64,8 +64,9 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
 
         for (const repo of repositories) {
             try {
-                console.log(`Checking indexing status for repository: ${repo.repository}`);
-                const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repo.repository}`, { headers });
+                const repositoryId = encodeURIComponent(`${repo.remote}:${repo.branch}:${repo.repository}`);
+                console.log(`Checking indexing status for repository: ${repositoryId}`);
+                const checkResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
                 console.log(`Indexing status response:`, checkResponse.data);
                 
                 if (checkResponse.data.status !== 'ready') {
@@ -83,7 +84,7 @@ export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params
                         console.log(`Indexing started for ${repo.repository}. Waiting for completion...`);
                         for (let i = 0; i < 30; i++) {
                             await delay(10000);
-                            const statusResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repo.repository}`, { headers });
+                            const statusResponse = await axios.get(`https://api.greptile.com/v2/repositories/${repositoryId}`, { headers });
                             console.log(`Indexing status check ${i + 1}:`, statusResponse.data);
                             if (statusResponse.data.status === 'ready') {
                                 console.log(`Indexing completed for ${repo.repository}`);
