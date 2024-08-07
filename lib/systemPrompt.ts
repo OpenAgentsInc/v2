@@ -32,7 +32,9 @@ function getAuthenticatedPrompt(repo: { owner: string; name: string; branch: str
     return `
 ${basePrompt}
 Available tools:
+- \`create_file\` - Create a new file at path with content
 - \`list_repos\` - Lists all repositories for the authenticated user
+- \`rewrite_file\` - Rewrite file at path with new content
 - \`scrape_webpage\` - Scrape webpage for information
 - \`view_file\` - View file contents at path
 - \`view_hierarchy\` - View file/folder hierarchy at path
