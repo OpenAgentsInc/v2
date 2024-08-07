@@ -19,7 +19,7 @@ export default function Scene(props) {
     // Everything defined in here will persist between route changes, only children are swapped
     return (
         <>
-            <View className='pointer-events-none absolute left-0 top-0 z-[-1] h-full w-full bg-black'>
+            <View className='pointer-events-none absolute left-0 top-0 z-[-1] h-full w-full'>
                 <GridScene />
             </View>
             <Canvas shadows {...props} eventSource={document.body} eventPrefix='client'>
