@@ -8,12 +8,14 @@ export function useUserData(userId: string) {
     const { isLoading, error } = useQuery(['userData', userId], async () => {
         const userData = await getUserData(userId);
         const userThreads = await getUserThreads(userId);
-        
+
         setUser(userData);
         setThreads(userThreads);
-        
+
         return { userData, userThreads };
     });
 
     return { isLoading, error };
 }
+
+
