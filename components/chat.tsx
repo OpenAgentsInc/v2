@@ -108,7 +108,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
             <div className="flex-grow overflow-auto" ref={scrollRef}>
                 <div className="relative min-h-full">
                     <div
-                        className="pb-[200px] pt-4 md:pt-10"
+                        className="pb-32 pt-4 md:pt-10"
                         ref={messagesRef}
                     >
                         {messages.length ? (
@@ -120,14 +120,16 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                     </div>
                 </div>
             </div>
-            <ChatPanel
-                id={id}
-                isAtBottom={isAtBottom}
-                scrollToBottom={scrollToBottom}
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={handleSubmitWrapper}
-            />
+            <div className="w-full">
+                <ChatPanel
+                    id={id}
+                    isAtBottom={isAtBottom}
+                    scrollToBottom={scrollToBottom}
+                    input={input}
+                    handleInputChange={handleInputChange}
+                    handleSubmit={handleSubmitWrapper}
+                />
+            </div>
         </div>
     )
 }
