@@ -1,4 +1,6 @@
 import { Layout } from '@/components/dom/Layout'
+import { jetbrainsMono } from '@/lib/fonts'
+import { cn } from '@/lib/utils'
 import '@/app/globals.css'
 
 export const metadata = {
@@ -25,7 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
         */}
             <head />
-            <body>
+            <body
+                className={cn(
+                    'font-mono fixed w-screen',
+                    jetbrainsMono.variable
+                )}
+            >
                 <Layout>{children}</Layout>
             </body>
         </html>
