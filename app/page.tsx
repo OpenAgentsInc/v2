@@ -1,33 +1,28 @@
-"use client"
+'use client'
 
 import dynamic from 'next/dynamic'
 import { Suspense, useRef, useEffect } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { useThree, useFrame } from '@react-three/fiber'
+import { useSpring } from '@react-spring/three'
+import * as THREE from 'three'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 
 const Grid = dynamic(() => import('@/components/canvas/Grid').then((mod) => mod.Grid), { ssr: false })
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
     ssr: false,
-    loading: () => (
-        <div className='flex h-screen w-full items-center justify-center'>
-            <svg className='h-8 w-8 animate-spin text-white' fill='none' viewBox='0 0 24 24'>
-                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-            </svg>
-        </div>
-    ),
+    loading: () => <LoadingSpinner />
 })
 
 function CameraAnimation() {
     const { camera } = useThree()
-    const startPosition = useRef(new Vector3(0, 50, 0))
-    const endPosition = useRef(new Vector3(0, 10, 0))
-    const animationDuration = 3 // seconds
-    const startTime = useRef(Date.now())
+    const startPosition = useRef(new THREE.Vector3(0, 10, -3.5))  // Adjusted for a steeper angle (about 70 degrees)
+
+    const { cameraPosition } = useSpring({
+        from: { cameraPosition: [0, 10, -3.5] },
+        to: { cameraPosition: [0, 10, 0] },
+        config: { mass: 1, tension: 50, friction: 30 },  // Adjusted for even slower motion
+        duration: 30000,  // 30 seconds for a very slow motion
+    })
 
     useEffect(() => {
         camera.position.copy(startPosition.current)
@@ -35,13 +30,7 @@ function CameraAnimation() {
     }, [camera])
 
     useFrame(() => {
-        const elapsedTime = (Date.now() - startTime.current) / 1000
-        if (elapsedTime < animationDuration) {
-            const t = elapsedTime / animationDuration
-            camera.position.lerpVectors(startPosition.current, endPosition.current, t)
-        } else {
-            camera.position.copy(endPosition.current)
-        }
+        camera.position.set(...cameraPosition.get())
         camera.lookAt(0, 0, 0)
     })
 
