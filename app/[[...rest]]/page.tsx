@@ -12,11 +12,6 @@ export default function Page() {
             <SignedOut>
                 <main className={cn(apfel.className, 'pointer-events-none select-none text-white h-screen w-screen bg-black flex items-center justify-center')}>
                     <div className='w-full max-w-md p-6'>
-                        <div className='text-center mb-6'>
-                            <h2 className={cn(apfel.className, 'tracking-wide text-xl font-bold')}>
-                                Create an account or log in
-                            </h2>
-                        </div>
                         <div className="font-mono pointer-events-auto">
                             <SignIn
                                 appearance={{

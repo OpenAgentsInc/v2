@@ -9,8 +9,8 @@ const SHOW_CONTROLS = false
 export function useCameraAnimation() {
     const { camera } = useThree()
     const defaultConfig = {
-        startX: -10, startY: 1, startZ: -10,
-        endX: 2, endY: 10, endZ: 0,
+        startX: 0, startY: 1, startZ: -10,
+        endX: 0, endY: 10, endZ: 0,
         mass: 10, tension: 200, friction: 100
     }
 

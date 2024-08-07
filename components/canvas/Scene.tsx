@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { Canvas, addEffect } from '@react-three/fiber'
-import { Plane, Preload, View } from '@react-three/drei'
+import { Preload, View } from '@react-three/drei'
 import Lenis from '@studio-freight/lenis'
 import { GridScene } from './GridScene'
 
@@ -20,7 +20,6 @@ export default function Scene(props) {
     return (
         <>
             <View className='pointer-events-none absolute left-0 top-0 z-[-1] h-full w-full bg-black'>
-                <Plane args={[4, 2]} position={[-2, 0, 0]} {...props} />
                 <GridScene />
             </View>
             <Canvas shadows {...props} eventSource={document.body} eventPrefix='client'>
