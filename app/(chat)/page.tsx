@@ -15,8 +15,6 @@ export default async function IndexPage() {
     const user: User | null = await currentUser();
     const userOrNah = user ? { id: user.id } : undefined
 
-    console.log("Passing id:", id)
-
     return (
         <Chat id={id} user={userOrNah} />
     )
