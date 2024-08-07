@@ -3,7 +3,6 @@
 import { type Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { getChat } from '@/app/actions'
 import { Chat } from '@/components/chat'
 
 export interface ChatPageProps {
@@ -21,15 +20,11 @@ export async function generateMetadata({
         return {}
     }
 
-    const chat = await getChat(params.id, session.userId)
+    // TODO: Implement getChat using Postgres
+    const chat = { title: 'Chat' }
 
-    if (!chat || 'error' in chat) {
-        console.log("Metadata error redirecting...")
-        // redirect('/')
-    } else {
-        return {
-            title: chat?.title.toString().slice(0, 50) ?? 'Chat'
-        }
+    return {
+        title: chat?.title.toString().slice(0, 50) ?? 'Chat'
     }
 }
 
@@ -42,24 +37,20 @@ export default async function ChatPage({ params }: ChatPageProps) {
     }
 
     const userId = session.userId as string
-    const chat = await getChat(params.id, userId)
+    
+    // TODO: Implement getChat using Postgres
+    const chat = { id: params.id, userId: session.userId, messages: [] }
 
-    if (!chat || 'error' in chat) {
-        // console.log("Skipping redirect in page.")
-        console.log("Chat not found, redirecting...")
-        redirect('/')
-    } else {
-        if (chat?.userId !== session?.userId) {
-            console.log("Not found.")
-            notFound()
-        }
-
-        return (
-            <Chat
-                id={chat.id}
-                user={{ id: userId }}
-                initialMessages={chat.messages}
-            />
-        )
+    if (chat?.userId !== session?.userId) {
+        console.log("Not found.")
+        notFound()
     }
+
+    return (
+        <Chat
+            id={chat.id}
+            user={{ id: userId }}
+            initialMessages={chat.messages}
+        />
+    )
 }
