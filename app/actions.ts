@@ -2,165 +2,44 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { kv } from '@vercel/kv'
+// import { kv } from '@vercel/kv'
 
 import { auth } from '@clerk/nextjs/server'
 import { type Chat } from '@/lib/types'
 
 export async function getChats(userId?: string | null) {
-    const { userId: authUserId } = auth()
-
-    console.log('[getChats] userId:', userId)
-    console.log('[getChats] authUserId:', authUserId)
-
-    if (!userId) {
-        return []
-    }
-
-    if (userId !== authUserId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    try {
-        const pipeline = kv.pipeline()
-        const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1, {
-            rev: true
-        })
-
-        for (const chat of chats) {
-            pipeline.hgetall(chat)
-        }
-
-        const results = await pipeline.exec()
-
-        return results as Chat[]
-    } catch (error) {
-        console.log("Error getting chats:", error)
-        return []
-    }
+    // TODO: Implement getChats using Postgres
+    throw new Error('Not implemented: getChats')
 }
 
 export async function getChat(id: string, userId: string) {
-    const { userId: authUserId } = auth()
-
-    if (userId !== authUserId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    const chat = await kv.hgetall<Chat>(`chat:${id}`)
-
-    if (!chat || (userId && chat.userId !== userId)) {
-        return null
-    }
-
-    return chat
+    // TODO: Implement getChat using Postgres
+    throw new Error('Not implemented: getChat')
 }
 
 export async function removeChat({ id, path }: { id: string; path: string }) {
-    const { userId } = auth()
-
-    if (!userId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    const uid = String(await kv.hget(`chat:${id}`, 'userId'))
-
-    if (uid !== userId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    await kv.del(`chat:${id}`)
-    await kv.zrem(`user:chat:${userId}`, `chat:${id}`)
-
-    revalidatePath('/')
-    return revalidatePath(path)
+    // TODO: Implement removeChat using Postgres
+    throw new Error('Not implemented: removeChat')
 }
 
 export async function clearChats() {
-    const { userId } = auth()
-
-    if (!userId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    const chats: string[] = await kv.zrange(`user:chat:${userId}`, 0, -1)
-    if (!chats.length) {
-        return redirect('/')
-    }
-    const pipeline = kv.pipeline()
-
-    for (const chat of chats) {
-        pipeline.del(chat)
-        pipeline.zrem(`user:chat:${userId}`, chat)
-    }
-
-    await pipeline.exec()
-
-    revalidatePath('/')
-    return redirect('/')
+    // TODO: Implement clearChats using Postgres
+    throw new Error('Not implemented: clearChats')
 }
 
 export async function getSharedChat(id: string) {
-    const chat = await kv.hgetall<Chat>(`chat:${id}`)
-
-    if (!chat || !chat.sharePath) {
-        return null
-    }
-
-    return chat
+    // TODO: Implement getSharedChat using Postgres
+    throw new Error('Not implemented: getSharedChat')
 }
 
 export async function shareChat(id: string) {
-    const { userId } = auth()
-
-    if (!userId) {
-        return {
-            error: 'Unauthorized'
-        }
-    }
-
-    const chat = await kv.hgetall<Chat>(`chat:${id}`)
-
-    if (!chat || chat.userId !== userId) {
-        return {
-            error: 'Something went wrong'
-        }
-    }
-
-    const payload = {
-        ...chat,
-        sharePath: `/share/${chat.id}`
-    }
-
-    await kv.hmset(`chat:${chat.id}`, payload)
-
-    return payload
+    // TODO: Implement shareChat using Postgres
+    throw new Error('Not implemented: shareChat')
 }
 
 export async function saveChat(chat: Chat) {
-    const { userId } = auth()
-
-    if (userId) {
-        const pipeline = kv.pipeline()
-        pipeline.hmset(`chat:${chat.id}`, chat)
-        pipeline.zadd(`user:chat:${chat.userId}`, {
-            score: Date.now(),
-            member: `chat:${chat.id}`
-        })
-        await pipeline.exec()
-    } else {
-        return
-    }
+    // TODO: Implement saveChat using Postgres
+    throw new Error('Not implemented: saveChat')
 }
 
 export async function refreshHistory(path: string) {
