@@ -62,10 +62,19 @@ export async function seed(dropTables = true) {
 
     // Add foreign key constraint for threads.first_message_id
     await sql`
-    ALTER TABLE threads
-    ADD CONSTRAINT IF NOT EXISTS fk_threads_first_message_id
-    FOREIGN KEY (first_message_id)
-    REFERENCES messages(id);
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM information_schema.table_constraints
+            WHERE constraint_name = 'fk_threads_first_message_id'
+        ) THEN
+            ALTER TABLE threads
+            ADD CONSTRAINT fk_threads_first_message_id
+            FOREIGN KEY (first_message_id)
+            REFERENCES messages(id);
+        END IF;
+    END $$;
     `;
     console.log(`Added foreign key constraint for threads.first_message_id`);
 
