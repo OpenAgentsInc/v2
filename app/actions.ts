@@ -1,11 +1,11 @@
 'use server'
 
-import { saveMessage, createThread, getThreadMessages, updateThread } from '@/lib/db/queries'
-import { Message } from '@/lib/types'
+import { saveMessage, createThread, getThreadMessages, updateThread, getUserData, getUserThreads } from '@/lib/db/queries'
+import { Message, User } from '@/lib/types'
 
 export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
     if (threadId) {
-        await saveMessage(parseInt(threadId), clerkUserId, message)
+        return await saveMessage(parseInt(threadId), clerkUserId, message)
     }
 }
 
@@ -18,5 +18,13 @@ export async function fetchThreadMessages(threadId: string) {
 }
 
 export async function updateThreadData(threadId: string, metadata: any) {
-    await updateThread(parseInt(threadId), { metadata })
+    return await updateThread(parseInt(threadId), { metadata })
+}
+
+export async function fetchUserData(userId: string) {
+    return await getUserData(userId)
+}
+
+export async function fetchUserThreads(userId: string) {
+    return await getUserThreads(userId)
 }
