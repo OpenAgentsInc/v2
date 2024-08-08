@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
-import { Message, User } from '@/lib/types'
+import { Message, User, Chat } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
+import { createChat, saveMessage, getChatMessages, updateChat } from '@/lib/db/queries'
 
 interface UseChatProps {
     initialMessages?: Message[]
@@ -62,37 +63,45 @@ export function useChat({
         id: localChatId,
         maxToolRoundtrips,
         onToolCall,
-        // If repo is defined, pass it to body
         body: repo ? {
             repoOwner: repo.owner,
             repoName: repo.name,
             repoBranch: repo.branch,
-        } : undefined
+        } : undefined,
+        onFinish: async (message) => {
+            if (localChatId) {
+                await saveMessage(localChatId, message)
+            }
+        }
     })
 
     useEffect(() => {
-        if (storeUser) {
-            if (!path.includes('chat') && vercelMessages.length === 1) {
-                console.log("doing replace thing")
-                window.history.replaceState({}, '', `/chat/${localChatId}`)
+        if (storeUser && vercelMessages.length === 1) {
+            const createNewChat = async () => {
+                const newChat: Chat = {
+                    id: localChatId || '',
+                    title: vercelMessages[0].content.substring(0, 100),
+                    createdAt: new Date(),
+                    userId: storeUser.id,
+                    path: path,
+                    messages: vercelMessages
+                }
+                const { chatId } = await createChat(storeUser.id, newChat)
+                setLocalChatId(chatId)
+                window.history.replaceState({}, '', `/chat/${chatId}`)
             }
+            createNewChat()
         }
     }, [localChatId, path, storeUser, vercelMessages])
 
     useEffect(() => {
-        if (vercelMessages.length === 2 && !refreshedRef.current) {
-            // console.log("skipping refresh")
-            // console.log('refreshing')
-            // router.refresh()
-            // refreshedRef.current = true
-        }
-    }, [vercelMessages, router])
-
-    useEffect(() => {
         if (localChatId) {
-            setStoreMessages(localChatId, vercelMessages)
+            const updateMessages = async () => {
+                await updateChat(localChatId, { messages: vercelMessages })
+            }
+            updateMessages()
         }
-    }, [localChatId, vercelMessages, setStoreMessages])
+    }, [localChatId, vercelMessages])
 
     const handleInputChangeWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
@@ -101,9 +110,14 @@ export function useChat({
         }
     }
 
-    const handleSubmitWrapper = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitWrapper = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         refreshedRef.current = false
-        handleSubmit(e)
+        await handleSubmit(e)
+        if (localChatId) {
+            const updatedMessages = await getChatMessages(localChatId)
+            setStoreMessages(localChatId, updatedMessages)
+        }
     }
 
     return {
@@ -114,8 +128,9 @@ export function useChat({
         handleInputChange: handleInputChangeWrapper,
         handleSubmit: handleSubmitWrapper,
         addToolResult,
-        setMessages: (messages: Message[]) => {
+        setMessages: async (messages: Message[]) => {
             if (localChatId) {
+                await updateChat(localChatId, { messages })
                 setStoreMessages(localChatId, messages)
             }
         },
