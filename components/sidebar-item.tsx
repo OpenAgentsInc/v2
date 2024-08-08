@@ -23,7 +23,7 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const { panes, addPane, setChatOpen } = useHudStore()
+    const { panes, openChatPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
@@ -32,14 +32,12 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
-        if (!isActive) {
-            addPane({
-                id: chat.id,
-                title: chat.title,
-                type: 'chat',
-                content: { oldContent: chat.messages?.join('\n') }
-            })
-        }
+        openChatPane({
+            id: chat.id,
+            title: chat.title,
+            type: 'chat',
+            content: { oldContent: chat.messages?.join('\n') }
+        })
         setChatOpen(true)
     }
 
@@ -84,7 +82,7 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                     buttonVariants({ variant: 'ghost' }),
                     'group w-full px-8 transition-colors hover:bg-zinc-200/40 dark:hover:bg-zinc-300/10',
                     isActive && 'bg-zinc-200 pr-16 font-semibold dark:bg-zinc-800',
-                    'text-left' // Add this class to left-align the text
+                    'text-left'
                 )}
             >
                 <div
