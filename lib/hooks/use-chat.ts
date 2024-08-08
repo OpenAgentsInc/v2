@@ -51,11 +51,14 @@ export function useChat({
 
     const createNewThreadAction = useCallback(async (message: Message) => {
         if (storeUser) {
-            const { threadId } = await createNewThread(storeUser.id, message)
-            setLocalThreadId(threadId.toString())
+            console.log('Creating new thread for user:', storeUser.id)
+            const result = await createNewThread(storeUser.id, message)
+            console.log('New thread created:', result)
+            const newThreadId = result.threadId.toString()
+            setLocalThreadId(newThreadId)
             lastSavedMessageRef.current = message.content
             isNewChatRef.current = false
-            return threadId.toString()
+            return newThreadId
         }
         return null
     }, [storeUser])
@@ -83,6 +86,7 @@ export function useChat({
             }
             if (threadId && storeUser) {
                 if (message.content !== lastSavedMessageRef.current) {
+                    console.log('Saving message to thread:', threadId)
                     await saveChatMessage(threadId, storeUser.id, message)
                     lastSavedMessageRef.current = message.content
                     await updateThreadData(threadId, { lastMessage: message.content })
