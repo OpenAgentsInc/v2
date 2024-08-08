@@ -129,7 +129,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                     <Github size={14} />
                                     <span>{repo.owner}/{repo.name}</span>
                                     <GitBranch size={14} />
-                                    <span>{repo.branch}</n>
+                                    <span>{repo.branch}</span>
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
