@@ -1,22 +1,22 @@
 'use server'
 
-import { saveMessage, createChat, getChatMessages, updateChat } from '@/lib/db/queries'
-import { Message, Chat } from '@/lib/types'
+import { saveMessage, createThread, getThreadMessages, updateThread } from '@/lib/db/queries'
+import { Message } from '@/lib/types'
 
-export async function saveChatMessage(chatId: string, message: any) {
-    if (chatId) {
-        await saveMessage(chatId, message)
+export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
+    if (threadId) {
+        await saveMessage(parseInt(threadId), clerkUserId, message)
     }
 }
 
-export async function createNewChat(userId: string, chat: Chat) {
-    return await createChat(userId, chat)
+export async function createNewThread(clerkUserId: string, firstMessage: Message) {
+    return await createThread(clerkUserId, firstMessage)
 }
 
-export async function fetchChatMessages(chatId: string) {
-    return await getChatMessages(chatId)
+export async function fetchThreadMessages(threadId: string) {
+    return await getThreadMessages(parseInt(threadId))
 }
 
-export async function updateChatData(chatId: string, data: Partial<Chat>) {
-    await updateChat(chatId, data)
+export async function updateThreadData(threadId: string, metadata: any) {
+    await updateThread(parseInt(threadId), { metadata })
 }
