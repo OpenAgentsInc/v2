@@ -2,65 +2,72 @@ import { sql } from '@vercel/postgres';
 import { Message, Chat } from '@/lib/types';
 
 export async function getUserData(userId: string) {
-    const { rows } = await sql`SELECT * FROM users WHERE id = ${userId}`;
+    const { rows } = await sql`SELECT * FROM users WHERE clerk_user_id = ${userId}`;
     return rows[0];
 }
 
-export async function getUserChats(clerkUserId: string) {
+export async function getUserThreads(userId: string) {
     const { rows } = await sql`
-    SELECT t.id, t.metadata, t."createdAt", m.content as "firstMessageContent"
-    FROM threads t
-    LEFT JOIN messages m ON t.first_message_id = m.id
-    WHERE t.clerk_user_id = ${clerkUserId}
-    ORDER BY t."createdAt" DESC
-    `;
+    SELECT id, metadata, "createdAt"
+    FROM threads
+    WHERE clerk_user_id = ${userId}
+    ORDER BY "createdAt" DESC
+  `;
     return rows;
 }
 
-export async function saveMessage(chatId: string, message: Message) {
+export async function saveMessage(threadId: number, clerkUserId: string, message: Message) {
     const { rows } = await sql`
-    INSERT INTO messages (id, chat_id, role, content, created_at, tool_invocations)
-    VALUES (${message.id}, ${chatId}, ${message.role}, ${message.content}, ${message.createdAt}, ${JSON.stringify(message.toolInvocations)}::jsonb)
+    INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations)
+    VALUES (${threadId}, ${clerkUserId}, ${message.role}, ${message.content}, ${JSON.stringify(message.toolInvocations)}::jsonb)
     RETURNING id, created_at as "createdAt"
   `;
     return { ...message, id: rows[0].id, createdAt: rows[0].createdAt };
 }
 
-export async function getChatMessages(chatId: string) {
+export async function getThreadMessages(threadId: number) {
     const { rows } = await sql`
     SELECT id, role, content, created_at as "createdAt", tool_invocations as "toolInvocations"
     FROM messages
-    WHERE chat_id = ${chatId}
+    WHERE thread_id = ${threadId}
     ORDER BY created_at ASC
   `;
     return rows;
 }
 
-export async function createChat(userId: string, chat: Chat) {
-    const { rows: [newChat] } = await sql`
-    INSERT INTO chats (id, title, created_at, user_id, path, share_path)
-    VALUES (${chat.id}, ${chat.title}, ${chat.createdAt}, ${userId}, ${chat.path}, ${chat.sharePath})
+export async function createThread(clerkUserId: string, firstMessage: Message) {
+    const { rows: [thread] } = await sql`
+    INSERT INTO threads (user_id, clerk_user_id, metadata)
+    VALUES (
+      (SELECT id FROM users WHERE clerk_user_id = ${clerkUserId}),
+      ${clerkUserId},
+      ${JSON.stringify({ title: firstMessage.content.substring(0, 100) })}::jsonb
+    )
     RETURNING id
   `;
 
-    const savedMessages = await Promise.all(chat.messages.map(message => saveMessage(newChat.id, message)));
+    const savedMessage = await saveMessage(thread.id, clerkUserId, firstMessage);
 
-    return { chatId: newChat.id, messages: savedMessages };
-}
-
-export async function updateChat(chatId: string, updates: Partial<Chat>) {
-    const { rows: [updatedChat] } = await sql`
-    UPDATE chats
-    SET
-      title = COALESCE(${updates.title}, title),
-      path = COALESCE(${updates.path}, path),
-      share_path = COALESCE(${updates.sharePath}, share_path)
-    WHERE id = ${chatId}
-    RETURNING id, title, created_at as "createdAt", user_id as "userId", path, share_path as "sharePath"
+    await sql`
+    UPDATE threads
+    SET first_message_id = ${savedMessage.id}
+    WHERE id = ${thread.id}
   `;
-    return updatedChat;
+
+    return { threadId: thread.id, message: savedMessage };
 }
 
-export async function deleteChat(chatId: string) {
-    await sql`DELETE FROM chats WHERE id = ${chatId}`;
+export async function updateThread(threadId: number, updates: Partial<Chat>) {
+    const { rows: [updatedThread] } = await sql`
+    UPDATE threads
+    SET
+      metadata = COALESCE(${JSON.stringify(updates.metadata)}::jsonb, metadata)
+    WHERE id = ${threadId}
+    RETURNING id, metadata, "createdAt"
+  `;
+    return updatedThread;
+}
+
+export async function deleteThread(threadId: number) {
+    await sql`DELETE FROM threads WHERE id = ${threadId}`;
 }
