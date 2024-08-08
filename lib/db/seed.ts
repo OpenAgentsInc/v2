@@ -25,10 +25,6 @@ export async function seed(dropTables = true) {
     `;
     console.log(`Created "users" table`);
 
-    // Create index on clerk_user_id
-    await sql`CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);`;
-    console.log(`Created index on clerk_user_id`);
-
     // Create threads table
     await sql`
     CREATE TABLE IF NOT EXISTS threads (
@@ -37,9 +33,7 @@ export async function seed(dropTables = true) {
       clerk_user_id VARCHAR(255) NOT NULL,
       metadata JSONB,
       first_message_id INTEGER,
-      "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id)
+      "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
     `;
     console.log(`Created "threads" table`);
@@ -53,38 +47,34 @@ export async function seed(dropTables = true) {
       role VARCHAR(50) NOT NULL,
       content TEXT NOT NULL,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      tool_invocations JSONB,
-      FOREIGN KEY (thread_id) REFERENCES threads(id),
-      FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id)
+      tool_invocations JSONB
     );
     `;
     console.log(`Created "messages" table`);
 
-    // Add foreign key constraint for threads.first_message_id
+    // Add foreign key constraints
     await sql`
-    DO $$
-    BEGIN
-        IF NOT EXISTS (
-            SELECT 1
-            FROM information_schema.table_constraints
-            WHERE constraint_name = 'fk_threads_first_message_id'
-        ) THEN
-            ALTER TABLE threads
-            ADD CONSTRAINT fk_threads_first_message_id
-            FOREIGN KEY (first_message_id)
-            REFERENCES messages(id);
-        END IF;
-    END $$;
+    ALTER TABLE threads
+    ADD CONSTRAINT fk_threads_user_id FOREIGN KEY (user_id) REFERENCES users(id),
+    ADD CONSTRAINT fk_threads_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id),
+    ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);
+
+    ALTER TABLE messages
+    ADD CONSTRAINT fk_messages_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id),
+    ADD CONSTRAINT fk_messages_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);
     `;
-    console.log(`Added foreign key constraint for threads.first_message_id`);
+    console.log(`Added foreign key constraints`);
 
     // Create indexes
-    await sql`CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);`;
-    await sql`CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);`;
-    console.log(`Created indexes on threads and messages tables`);
+    await sql`
+    CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);
+    CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);
+    CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);
+    CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);
+    CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);
+    CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);
+    `;
+    console.log(`Created indexes on tables`);
 
     let userId = null;
 
