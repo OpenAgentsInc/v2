@@ -113,6 +113,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
     const removePane = useHudStore(state => state.removePane)
+    const bringPaneToFront = useHudStore(state => state.bringPaneToFront)
 
     const { position, size, setPosition, setSize, resizeHandlers } = useResizeHandlers(
         id,
@@ -153,6 +154,10 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
         removePane(id)
     }
 
+    const handlePaneClick = () => {
+        bringPaneToFront(id)
+    }
+
     return (
         <div
             style={{
@@ -162,6 +167,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 height: size.height,
             }}
             className="pointer-events-auto z-[9999] absolute bg-black/90 border border-white rounded-lg overflow-hidden shadow-lg transition-colors duration-200"
+            onClick={handlePaneClick}
         >
             <div
                 {...bindDrag()}
