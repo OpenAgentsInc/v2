@@ -32,6 +32,7 @@ export function useChat({
 
     const [localThreadId, setLocalThreadId] = useState<string | undefined>(initialId || currentThreadId)
     const lastSavedMessageRef = useRef<string | null>(null)
+    const isNewChatRef = useRef<boolean>(!initialId && !currentThreadId)
 
     useEffect(() => {
         if (initialId) setLocalThreadId(initialId)
@@ -47,6 +48,17 @@ export function useChat({
     const threadData = getThreadData(localThreadId || '')
 
     const repo = useRepoStore((state) => state.repo)
+
+    const createNewThreadAction = useCallback(async (message: Message) => {
+        if (storeUser) {
+            const { threadId } = await createNewThread(storeUser.id, message)
+            setLocalThreadId(threadId.toString())
+            lastSavedMessageRef.current = message.content
+            isNewChatRef.current = false
+            return threadId.toString()
+        }
+        return null
+    }, [storeUser])
 
     const {
         messages: vercelMessages,
@@ -65,29 +77,19 @@ export function useChat({
             repoBranch: repo.branch,
         } : undefined,
         onFinish: async (message) => {
-            if (localThreadId && storeUser) {
+            let threadId = localThreadId
+            if (isNewChatRef.current) {
+                threadId = await createNewThreadAction({ content: input, role: 'user' })
+            }
+            if (threadId && storeUser) {
                 if (message.content !== lastSavedMessageRef.current) {
-                    await saveChatMessage(localThreadId, storeUser.id, message)
+                    await saveChatMessage(threadId, storeUser.id, message)
                     lastSavedMessageRef.current = message.content
-                    await updateThreadData(localThreadId, { lastMessage: message.content })
+                    await updateThreadData(threadId, { lastMessage: message.content })
                 }
             }
         }
     })
-
-    const createNewThreadAction = useCallback(async (message: Message) => {
-        if (storeUser) {
-            const { threadId } = await createNewThread(storeUser.id, message)
-            setLocalThreadId(threadId.toString())
-            lastSavedMessageRef.current = message.content
-        }
-    }, [storeUser])
-
-    useEffect(() => {
-        if (storeUser && vercelMessages.length === 1 && !localThreadId) {
-            createNewThreadAction(vercelMessages[0])
-        }
-    }, [storeUser, vercelMessages, createNewThreadAction, localThreadId])
 
     const handleInputChangeWrapper = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
@@ -98,16 +100,18 @@ export function useChat({
 
     const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (!localThreadId && storeUser && vercelMessages.length === 0) {
-            const { threadId } = await createNewThread(storeUser.id, { content: input, role: 'user' })
-            setLocalThreadId(threadId.toString())
+        if (isNewChatRef.current && storeUser) {
+            const threadId = await createNewThreadAction({ content: input, role: 'user' })
+            if (threadId) {
+                setLocalThreadId(threadId)
+            }
         }
         await handleSubmit(e)
         if (localThreadId) {
             const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
-    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, vercelMessages.length, input])
+    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction])
 
     return {
         messages: vercelMessages,
