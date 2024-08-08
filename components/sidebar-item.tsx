@@ -40,8 +40,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
         }
         
         if (e.metaKey || e.ctrlKey) {
-            // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new pane
-            addPane(newPane)
+            // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new tiled pane
+            addPane(newPane, true)
         } else {
             // Check if the pane already exists
             const existingPane = panes.find(pane => pane.id === chat.id)
@@ -49,8 +49,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                 // If it exists, bring it to the front
                 bringPaneToFront(chat.id)
             } else {
-                // If it doesn't exist, open a new chat pane
-                addPane(newPane)
+                // If it doesn't exist, open a new chat pane (not tiled)
+                addPane(newPane, false)
             }
         }
         setChatOpen(true)
