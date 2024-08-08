@@ -23,7 +23,15 @@ export async function saveChatMessage(threadId: string, clerkUserId: string, mes
 }
 
 export async function createNewThread(clerkUserId: string, firstMessage: Message) {
-    return await createThread(clerkUserId, firstMessage)
+    try {
+        console.log('Creating new thread for user:', clerkUserId)
+        const result = await createThread(clerkUserId, firstMessage)
+        console.log('New thread created:', result)
+        return result
+    } catch (error) {
+        console.error('Error creating new thread:', error)
+        throw error
+    }
 }
 
 export async function fetchThreadMessages(threadId: string) {
