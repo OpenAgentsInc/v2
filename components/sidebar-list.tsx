@@ -2,7 +2,6 @@ import { SidebarItems } from '@/components/sidebar-items'
 import { cache } from 'react'
 import { fetchUserThreads } from '@/app/actions'
 import { Chat } from '@/lib/types'
-import { seed } from '@/lib/db/seed'
 
 interface SidebarListProps {
     userId?: string
@@ -26,11 +25,6 @@ const loadThreads = cache(async (userId?: string) => {
 
 export async function SidebarList({ userId }: SidebarListProps) {
     console.log("In SidebarList with userId:", userId)
-    try {
-        await seed()
-    } catch (error) {
-        console.error("Error seeding database:", error)
-    }
     const threads = await loadThreads(userId)
     const formattedThreads = threads.map((thread) => {
         return {
