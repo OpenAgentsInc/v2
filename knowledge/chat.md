@@ -16,7 +16,7 @@ A few points:
 ## Request Lifecycle
 - An authed user visits the home route @ openagents.com
 - The `middleware.ts` file uses the default Clerk middleware so methods like `auth()` and `getCurrentUser()` are available. (Those two methods are server-only)
-- `app/layout.tsx` calls `initDatabase()` to initialize the database connection and ensure seed data is present (temporary)
+- `app/layout.tsx` calls `initDatabase()` to initialize the database connection and ensure seed data is present (temporary / commented out for now)
   - `initDatabase()` in `lib/init-db.ts` ensures the `seed()` function runs only once when the app starts
   - `lib/db/seed.ts` seeds the database with test data
 - The main catchall route `app/[[...rest]]/page.tsx` confirms the user is logged in and shows the `HomeDashboard` component

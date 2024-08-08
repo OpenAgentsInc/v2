@@ -31,7 +31,7 @@ export const viewport = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    await initializeDatabase();
+    // await initializeDatabase();
 
     return (
         <html lang='en' className='antialiased' suppressHydrationWarning>
