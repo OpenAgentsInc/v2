@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
@@ -35,7 +35,7 @@ export function useChat({
     } = useChatStore()
 
     const [localThreadId, setLocalThreadId] = useState<string | undefined>(initialId || currentThreadId)
-    const refreshedRef = useRef(false)
+    const lastSavedMessageRef = useRef<string | null>(null)
 
     useEffect(() => {
         if (initialId) setLocalThreadId(initialId)
@@ -71,47 +71,40 @@ export function useChat({
         onFinish: async (message) => {
             if (localThreadId && storeUser) {
                 await saveChatMessage(localThreadId, storeUser.id, message)
+                lastSavedMessageRef.current = message.content
+                await updateThreadData(localThreadId, { lastMessage: message.content })
             }
         }
     })
 
+    const createNewThreadAction = useCallback(async (message: Message) => {
+        if (storeUser) {
+            const { threadId } = await createNewThread(storeUser.id, message)
+            setLocalThreadId(threadId.toString())
+        }
+    }, [storeUser])
+
     useEffect(() => {
         if (storeUser && vercelMessages.length === 1) {
-            const createNewThreadAction = async () => {
-                const { threadId } = await createNewThread(storeUser.id, vercelMessages[0])
-                setLocalThreadId(threadId.toString())
-                window.history.replaceState({}, '', `/chat/${threadId}`)
-            }
-            createNewThreadAction()
+            createNewThreadAction(vercelMessages[0])
         }
-    }, [storeUser, vercelMessages])
+    }, [storeUser, vercelMessages, createNewThreadAction])
 
-    useEffect(() => {
-        if (localThreadId && vercelMessages.length > 0) {
-            const updateMessages = async () => {
-                const lastMessage = vercelMessages[vercelMessages.length - 1]
-                await updateThreadData(localThreadId, { lastMessage: lastMessage.content })
-            }
-            updateMessages()
-        }
-    }, [localThreadId, vercelMessages])
-
-    const handleInputChangeWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChangeWrapper = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
         if (localThreadId) {
             setStoreInput(localThreadId, e.target.value)
         }
-    }
+    }, [handleInputChange, localThreadId, setStoreInput])
 
-    const handleSubmitWrapper = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        refreshedRef.current = false
         await handleSubmit(e)
         if (localThreadId) {
             const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
-    }
+    }, [handleSubmit, localThreadId, setStoreMessages])
 
     return {
         messages: vercelMessages,

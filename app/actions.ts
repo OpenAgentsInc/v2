@@ -18,6 +18,15 @@ export async function fetchThreadMessages(threadId: string) {
 }
 
 export async function updateThreadData(threadId: string, metadata: any) {
+    console.log("Attempting to update thread data for threadId:", threadId)
+    // This is returning errors so lets try the parse separately and console message and return if it dont work
+    console.log("Attempting to update thread data for threadId:", parseInt(threadId))
+    const threadIdInt = parseInt(threadId)
+    console.log("Attempting to update thread data for threadId:", threadIdInt)
+    if (!threadIdInt) {
+        console.log("ThreadIdInt is falsey:", threadIdInt)
+        return
+    }
     return await updateThread(parseInt(threadId), { metadata })
 }
 
