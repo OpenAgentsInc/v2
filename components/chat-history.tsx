@@ -8,7 +8,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 
 interface ChatHistoryProps {
-    userId?: string
+    userId: string
 }
 
 export async function ChatHistory({ userId }: ChatHistoryProps) {
