@@ -1,5 +1,11 @@
+/**
+ * @file use-chat.ts
+ * @description Chat hook
+ */
+
 export function useChat() {
     return {
-        messages: [],
+        handleSubmit,
+        messages,
     }
 }
