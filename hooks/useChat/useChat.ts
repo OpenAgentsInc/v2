@@ -2,11 +2,11 @@
  * @file hooks/useChat/useChat.ts
  * @description Chat hook with streaming support. Import as { useChat } from "@/hooks/useChat"
  */
-import { useState, useCallback, useMemo } from 'react'
-import { Message, UseChatProps } from './types'
+import { useState, useCallback, useMemo, useRef } from 'react'
+import { Message, UseChatProps, ToolInvocation } from './types'
 import { nanoid } from 'lib/utils'
-import { sendChatRequest } from './api'
-import { createMessage, handleStreamResponse, updateMessages } from './utils'
+import { sendChatRequest, parseToolInvocation } from './api'
+import { createMessage } from './utils'
 
 /**
  * A custom React hook for managing chat state and interactions.
@@ -23,34 +23,81 @@ export function useChat({ id: propId }: UseChatProps = {}) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     // State for storing any error that occurs during the chat
     const [error, setError] = useState<Error | undefined>()
-
     // Generate a unique id for the chat if not provided
     const id = useMemo(() => propId || nanoid(), [propId])
+    // Ref to store the current message being streamed
+    const currentMessageRef = useRef<Message | null>(null)
 
     /**
-     * Sends a request to the chat API and handles the streaming response.
+     * Handles the streaming response from the chat API.
      * 
      * @param chatMessages - The current array of chat messages
      */
-    const triggerRequest = useCallback(async (chatMessages: Message[]) => {
+    const handleStreamResponse = useCallback(async (chatMessages: Message[]) => {
         setIsLoading(true)
         setError(undefined)
         try {
-            const response = await sendChatRequest(chatMessages)
-            const reader = response.body?.getReader()
-            if (reader) {
-                await handleStreamResponse(reader, (content) => {
-                    setMessages(prevMessages => updateMessages(prevMessages, content))
-                })
-            } else {
-                throw new Error('Failed to get response reader')
-            }
+            const handleStream = await sendChatRequest(chatMessages)
+            await handleStream((chunk) => {
+                const toolInvocation = parseToolInvocation(chunk)
+                if (toolInvocation) {
+                    handleToolInvocation(toolInvocation)
+                } else if (chunk.content) {
+                    updateStreamedMessage(chunk.content)
+                }
+            })
         } catch (err) {
             console.error('Error in chat request:', err)
             setError(err instanceof Error ? err : new Error('An error occurred'))
         } finally {
             setIsLoading(false)
+            currentMessageRef.current = null
         }
+    }, [])
+
+    /**
+     * Updates the current streamed message or creates a new one.
+     * 
+     * @param content - The new content to append to the message
+     */
+    const updateStreamedMessage = useCallback((content: string) => {
+        setMessages(prevMessages => {
+            const lastMessage = prevMessages[prevMessages.length - 1]
+            if (lastMessage && lastMessage.role === 'assistant' && currentMessageRef.current === lastMessage) {
+                // Update existing message
+                const updatedMessage = { ...lastMessage, content: lastMessage.content + content }
+                currentMessageRef.current = updatedMessage
+                return [...prevMessages.slice(0, -1), updatedMessage]
+            } else {
+                // Create new message
+                const newMessage = createMessage('assistant', content)
+                currentMessageRef.current = newMessage
+                return [...prevMessages, newMessage]
+            }
+        })
+    }, [])
+
+    /**
+     * Handles tool invocations received from the stream.
+     * 
+     * @param toolInvocation - The tool invocation to handle
+     */
+    const handleToolInvocation = useCallback((toolInvocation: ToolInvocation) => {
+        setMessages(prevMessages => {
+            const lastMessage = prevMessages[prevMessages.length - 1]
+            if (lastMessage && lastMessage.role === 'assistant') {
+                // Append tool invocation to the last assistant message
+                const updatedMessage = {
+                    ...lastMessage,
+                    toolInvocations: [...(lastMessage.toolInvocations || []), toolInvocation]
+                }
+                return [...prevMessages.slice(0, -1), updatedMessage]
+            } else {
+                // Create a new assistant message with the tool invocation
+                const newMessage = createMessage('assistant', '', [toolInvocation])
+                return [...prevMessages, newMessage]
+            }
+        })
     }, [])
 
     /**
@@ -62,10 +109,10 @@ export function useChat({ id: propId }: UseChatProps = {}) {
         const newMessage = createMessage(message.role, message.content)
         setMessages(prevMessages => {
             const updatedMessages = [...prevMessages, newMessage]
-            triggerRequest(updatedMessages)
+            handleStreamResponse(updatedMessages)
             return updatedMessages
         })
-    }, [triggerRequest])
+    }, [handleStreamResponse])
 
     /**
      * Handles the submission of a new user message.
@@ -78,11 +125,11 @@ export function useChat({ id: propId }: UseChatProps = {}) {
         const userMessage = createMessage('user', input)
         setMessages(prevMessages => {
             const updatedMessages = [...prevMessages, userMessage]
-            triggerRequest(updatedMessages)
+            handleStreamResponse(updatedMessages)
             return updatedMessages
         })
         setInput('') // Clear the input after submission
-    }, [input, triggerRequest])
+    }, [input, handleStreamResponse])
 
     /**
      * Handles changes to the input field.
