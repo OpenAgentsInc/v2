@@ -1,14 +1,14 @@
 import { sql } from '@vercel/postgres';
 import { currentUser } from "@clerk/nextjs/server";
 
-export async function seed(dropTables = true) {
+export async function seed(dropTables = false) {
     const user = await currentUser();
     console.log("We have user:", user);
 
     if (dropTables) {
         // Drop existing tables if the flag is set
-        await sql`DROP TABLE IF EXISTS threads CASCADE;`;
         await sql`DROP TABLE IF EXISTS messages CASCADE;`;
+        await sql`DROP TABLE IF EXISTS threads CASCADE;`;
         await sql`DROP TABLE IF EXISTS users CASCADE;`;
         console.log("Dropped existing tables");
     }
