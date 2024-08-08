@@ -170,14 +170,14 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
             </div>
             <div className="absolute inset-0 pointer-events-none border border-white rounded-lg opacity-50"></div>
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(255,255,255,0.2)] rounded-lg"></div>
-            <div {...resizeHandlers.topleft()} className="absolute -top-1 -left-1 w-4 h-4 cursor-nwse-resize" />
-            <div {...resizeHandlers.top()} className="absolute -top-1 left-3 right-3 h-4 cursor-ns-resize" />
-            <div {...resizeHandlers.topright()} className="absolute -top-1 -right-1 w-4 h-4 cursor-nesw-resize" />
-            <div {...resizeHandlers.right()} className="absolute top-3 -right-1 w-4 bottom-3 cursor-ew-resize" />
-            <div {...resizeHandlers.bottomright()} className="absolute -bottom-1 -right-1 w-4 h-4 cursor-se-resize" />
-            <div {...resizeHandlers.bottom()} className="absolute -bottom-1 left-3 right-3 h-4 cursor-ns-resize" />
-            <div {...resizeHandlers.bottomleft()} className="absolute -bottom-1 -left-1 w-4 h-4 cursor-nesw-resize" />
-            <div {...resizeHandlers.left()} className="absolute top-3 -left-1 w-4 bottom-3 cursor-ew-resize" />
+            <div {...resizeHandlers.topleft()} className="absolute -top-1 -left-1 w-4 h-4 cursor-nwse-resize touch-none" />
+            <div {...resizeHandlers.top()} className="absolute -top-1 left-3 right-3 h-4 cursor-ns-resize touch-none" />
+            <div {...resizeHandlers.topright()} className="absolute -top-1 -right-1 w-4 h-4 cursor-nesw-resize touch-none" />
+            <div {...resizeHandlers.right()} className="absolute top-3 -right-1 w-4 bottom-3 cursor-ew-resize touch-none" />
+            <div {...resizeHandlers.bottomright()} className="absolute -bottom-1 -right-1 w-4 h-4 cursor-se-resize touch-none" />
+            <div {...resizeHandlers.bottom()} className="absolute -bottom-1 left-3 right-3 h-4 cursor-ns-resize touch-none" />
+            <div {...resizeHandlers.bottomleft()} className="absolute -bottom-1 -left-1 w-4 h-4 cursor-nesw-resize touch-none" />
+            <div {...resizeHandlers.left()} className="absolute top-3 -left-1 w-4 bottom-3 cursor-ew-resize touch-none" />
         </div>
     )
 }
