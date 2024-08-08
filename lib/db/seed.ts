@@ -84,8 +84,8 @@ export async function seed(dropTables = true) {
             // Insert user and get the id
             const insertedUser = await sql`
                 INSERT INTO users (clerk_user_id, email, image)
-                VALUES (${user.id}, ${user.emailAddresses[0].emailAddress}, 'https://placekitten.com/200/200')
-                ON CONFLICT (clerk_user_id) DO UPDATE SET email = EXCLUDED.email
+                VALUES (${user.id}, ${user.emailAddresses[0].emailAddress}, ${user.imageUrl})
+                ON CONFLICT (clerk_user_id) DO UPDATE SET email = EXCLUDED.email, image = EXCLUDED.image
                 RETURNING id, clerk_user_id;
             `;
             userId = insertedUser.rows[0].id;
@@ -93,27 +93,39 @@ export async function seed(dropTables = true) {
             console.log(`Upserted user with id: ${userId} and clerk_user_id: ${clerkUserId}`);
 
             // Insert sample threads and messages
-            for (let i = 1; i <= 3; i++) {
+            const threadTitles = [
+                "Welcome to AI Chat",
+                "Exploring Machine Learning",
+                "The Future of AI"
+            ];
+
+            for (let i = 0; i < threadTitles.length; i++) {
                 // Insert a thread
                 const insertedThread = await sql`
                     INSERT INTO threads (user_id, clerk_user_id, metadata)
-                    VALUES (${userId}, ${clerkUserId}, ${JSON.stringify({ title: `Sample Thread ${i}`, description: `This is sample thread ${i}` })}::jsonb)
+                    VALUES (${userId}, ${clerkUserId}, ${JSON.stringify({ title: threadTitles[i] })}::jsonb)
                     RETURNING id;
                 `;
                 const threadId = insertedThread.rows[0].id;
 
-                // Insert a message
-                const insertedMessage = await sql`
+                // Insert user message
+                const userMessage = await sql`
                     INSERT INTO messages (thread_id, clerk_user_id, role, content)
-                    VALUES (${threadId}, ${clerkUserId}, 'user', ${`This is sample message ${i}`})
+                    VALUES (${threadId}, ${clerkUserId}, 'user', ${`Tell me about ${threadTitles[i].toLowerCase()}`})
                     RETURNING id;
                 `;
-                const messageId = insertedMessage.rows[0].id;
+
+                // Insert AI response
+                const aiMessage = await sql`
+                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
+                    VALUES (${threadId}, ${clerkUserId}, 'assistant', ${`Here's some information about ${threadTitles[i].toLowerCase()}...`})
+                    RETURNING id;
+                `;
 
                 // Update the thread with the first_message_id
                 await sql`
                     UPDATE threads
-                    SET first_message_id = ${messageId}
+                    SET first_message_id = ${userMessage.rows[0].id}
                     WHERE id = ${threadId};
                 `;
             }
