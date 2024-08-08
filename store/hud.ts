@@ -71,14 +71,14 @@ export const useHudStore = create<HudStore>()(
 
                 const existingPane = state.panes.find(pane => pane.id === newPane.id)
                 if (existingPane) {
-                    // If the pane already exists, just set it as active
+                    // If the pane already exists, bring it to the front
                     return {
-                        panes: state.panes.map(pane => ({
-                            ...pane,
-                            isActive: pane.id === newPane.id
-                        })),
+                        panes: [
+                            ...state.panes.filter(pane => pane.id !== newPane.id).map(pane => ({ ...pane, isActive: false })),
+                            { ...existingPane, isActive: true }
+                        ],
                         isChatOpen: true,
-                        lastPanePosition: state.lastPanePosition
+                        lastPanePosition: { x: existingPane.x, y: existingPane.y, width: existingPane.width, height: existingPane.height }
                     }
                 }
 
