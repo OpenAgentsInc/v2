@@ -4,7 +4,7 @@ import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
 import { Message, User } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
-import { createThread, saveMessage, getThreadMessages, updateThread } from '@/lib/db/queries'
+import { saveChatMessage, createNewThread, fetchThreadMessages, updateThreadData } from '@/app/actions'
 
 interface UseChatProps {
     initialMessages?: Message[]
@@ -70,26 +70,26 @@ export function useChat({
         } : undefined,
         onFinish: async (message) => {
             if (localThreadId && storeUser) {
-                await saveMessage(parseInt(localThreadId), storeUser.id, message)
+                await saveChatMessage(localThreadId, storeUser.id, message)
             }
         }
     })
 
     useEffect(() => {
         if (storeUser && vercelMessages.length === 1) {
-            const createNewThread = async () => {
-                const { threadId } = await createThread(storeUser.id, vercelMessages[0])
+            const createNewThreadAction = async () => {
+                const { threadId } = await createNewThread(storeUser.id, vercelMessages[0])
                 setLocalThreadId(threadId.toString())
                 window.history.replaceState({}, '', `/chat/${threadId}`)
             }
-            createNewThread()
+            createNewThreadAction()
         }
     }, [storeUser, vercelMessages])
 
     useEffect(() => {
         if (localThreadId) {
             const updateMessages = async () => {
-                await updateThread(parseInt(localThreadId), { metadata: { lastMessage: vercelMessages[vercelMessages.length - 1].content } })
+                await updateThreadData(localThreadId, { lastMessage: vercelMessages[vercelMessages.length - 1].content })
             }
             updateMessages()
         }
@@ -107,7 +107,7 @@ export function useChat({
         refreshedRef.current = false
         await handleSubmit(e)
         if (localThreadId) {
-            const updatedMessages = await getThreadMessages(parseInt(localThreadId))
+            const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
     }
@@ -122,7 +122,7 @@ export function useChat({
         addToolResult,
         setMessages: async (messages: Message[]) => {
             if (localThreadId && storeUser) {
-                await Promise.all(messages.map(message => saveMessage(parseInt(localThreadId), storeUser.id, message)))
+                await Promise.all(messages.map(message => saveChatMessage(localThreadId, storeUser.id, message)))
                 setStoreMessages(localThreadId, messages)
             }
         },
