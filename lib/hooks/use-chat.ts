@@ -35,12 +35,14 @@ export function useChat({
     const isNewChatRef = useRef<boolean>(!initialId && !currentThreadId)
 
     useEffect(() => {
+        console.log('useChat: Initial values', { initialId, currentThreadId, localThreadId, isNewChat: isNewChatRef.current })
         if (initialId) setLocalThreadId(initialId)
         if (initialUser) setStoreUser(initialUser)
-    }, [initialId, initialUser, setStoreUser])
+    }, [initialId, initialUser, setStoreUser, currentThreadId])
 
     useEffect(() => {
         if (localThreadId) {
+            console.log('useChat: Setting current thread ID', localThreadId)
             setCurrentThreadId(localThreadId)
         }
     }, [localThreadId, setCurrentThreadId])
@@ -55,6 +57,7 @@ export function useChat({
             const result = await createNewThread(storeUser.id, message)
             console.log('New thread created:', result)
             const newThreadId = result.threadId.toString()
+            console.log('Setting new thread ID:', newThreadId)
             setLocalThreadId(newThreadId)
             setCurrentThreadId(newThreadId)
             lastSavedMessageRef.current = message.content
@@ -81,6 +84,7 @@ export function useChat({
             repoBranch: repo.branch,
         } : undefined,
         onFinish: async (message) => {
+            console.log('onFinish called', { localThreadId, isNewChat: isNewChatRef.current })
             let threadId = localThreadId
             if (isNewChatRef.current) {
                 threadId = await createNewThreadAction({ content: input, role: 'user' })
@@ -105,9 +109,11 @@ export function useChat({
 
     const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        console.log('handleSubmitWrapper called', { isNewChat: isNewChatRef.current, localThreadId })
         if (isNewChatRef.current && storeUser) {
             const threadId = await createNewThreadAction({ content: input, role: 'user' })
             if (threadId) {
+                console.log('New thread created in handleSubmitWrapper:', threadId)
                 setLocalThreadId(threadId)
                 setCurrentThreadId(threadId)
             }
@@ -118,6 +124,8 @@ export function useChat({
             setStoreMessages(localThreadId, updatedMessages)
         }
     }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction, setCurrentThreadId])
+
+    console.log('useChat: Current state', { localThreadId, isNewChat: isNewChatRef.current, messagesCount: vercelMessages.length })
 
     return {
         messages: vercelMessages,
