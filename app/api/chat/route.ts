@@ -14,8 +14,8 @@ export async function POST(req: Request) {
 
     const result = await streamText({
         messages: convertToCoreMessages(body.messages),
-        model: anthropic('claude-3-5-sonnet-20240620'),
-        // model: openai('gpt-4o'),
+        // model: anthropic('claude-3-5-sonnet-20240620'),
+        model: openai('gpt-4o'),
         system: getSystemPrompt(toolContext),
         tools: getTools(toolContext)
     });
