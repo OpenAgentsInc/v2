@@ -56,12 +56,13 @@ export function useChat({
             console.log('New thread created:', result)
             const newThreadId = result.threadId.toString()
             setLocalThreadId(newThreadId)
+            setCurrentThreadId(newThreadId)
             lastSavedMessageRef.current = message.content
             isNewChatRef.current = false
             return newThreadId
         }
         return null
-    }, [storeUser])
+    }, [storeUser, setCurrentThreadId])
 
     const {
         messages: vercelMessages,
@@ -108,6 +109,7 @@ export function useChat({
             const threadId = await createNewThreadAction({ content: input, role: 'user' })
             if (threadId) {
                 setLocalThreadId(threadId)
+                setCurrentThreadId(threadId)
             }
         }
         await handleSubmit(e)
@@ -115,7 +117,7 @@ export function useChat({
             const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
-    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction])
+    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction, setCurrentThreadId])
 
     return {
         messages: vercelMessages,
