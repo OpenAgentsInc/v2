@@ -14,14 +14,23 @@ const loadThreads = cache(async (userId?: string) => {
     if (!userId) {
         return []
     }
-    const threads = await fetchUserThreads(userId)
-    console.log("Fetched threads:", threads)
-    return threads
+    try {
+        const threads = await fetchUserThreads(userId)
+        console.log("Fetched threads:", threads)
+        return threads
+    } catch (error) {
+        console.error("Error fetching threads:", error)
+        return []
+    }
 })
 
 export async function SidebarList({ userId }: SidebarListProps) {
     console.log("In SidebarList with userId:", userId)
-    await seed()
+    try {
+        await seed()
+    } catch (error) {
+        console.error("Error seeding database:", error)
+    }
     const threads = await loadThreads(userId)
     const formattedThreads = threads.map((thread) => {
         return {
