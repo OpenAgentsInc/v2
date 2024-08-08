@@ -2,9 +2,6 @@
 
 import * as React from 'react'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-
 import { motion } from 'framer-motion'
 
 import { buttonVariants } from '@/components/ui/button'
@@ -17,6 +14,7 @@ import {
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { type Chat } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { useHudStore } from '@/store/hud'
 
 interface SidebarItemProps {
     index: number
@@ -25,13 +23,25 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const pathname = usePathname()
-
-    const isActive = pathname === chat.path
+    const { panes, addPane, setChatOpen } = useHudStore()
+    const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
     if (!chat?.id) return null
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        if (!isActive) {
+            addPane({
+                id: chat.id,
+                title: chat.title,
+                type: 'chat',
+                content: { oldContent: chat.messages?.join('\n') }
+            })
+        }
+        setChatOpen(true)
+    }
 
     return (
         <motion.div
@@ -68,8 +78,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                     <IconMessage className="mr-2 mt-1 text-zinc-500" />
                 )}
             </div>
-            <Link
-                href={chat.path}
+            <button
+                onClick={handleClick}
                 className={cn(
                     buttonVariants({ variant: 'ghost' }),
                     'group w-full px-8 transition-colors hover:bg-zinc-200/40 dark:hover:bg-zinc-300/10',
@@ -117,7 +127,7 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                         )}
                     </span>
                 </div>
-            </Link>
+            </button>
             {isActive && <div className="absolute right-2 top-1">{children}</div>}
         </motion.div>
     )
