@@ -51,7 +51,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                             </button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
-                            <DropdownMenu.Content className="bg-background border border-input rounded-lg shadow-lg p-1 z-50 focus:outline-none">
+                            <DropdownMenu.Content className="bg-background border border-input rounded-lg shadow-lg p-1 z-[9999] focus:outline-none">
                                 {models.map((m) => (
                                     <DropdownMenu.Item
                                         key={m.id}
@@ -79,8 +79,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
-                                <Popover.Content 
-                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-50 focus:outline-none" 
+                                <Popover.Content
+                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-50 focus:outline-none"
                                     style={{ width: '200px' }}
                                     onOpenAutoFocus={(e) => e.preventDefault()}
                                 >
@@ -115,7 +115,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                             autoComplete="off"
                                             autoFocus={false}
                                         />
-                                        <button 
+                                        <button
                                             type="submit"
                                             className="w-full p-2 bg-background text-foreground border border-input rounded hover:bg-accent hover:text-accent-foreground focus:outline-none text-sm transition-colors duration-200"
                                         >

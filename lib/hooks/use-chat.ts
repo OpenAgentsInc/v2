@@ -38,7 +38,10 @@ export function useChat({
 
     useEffect(() => {
         console.log('useChat: Initial values', { initialId, currentThreadId, localThreadId, isNewChat: isNewChatRef.current })
-        if (initialId) setLocalThreadId(parseInt(initialId))
+        if (initialId) {
+            setLocalThreadId(parseInt(initialId))
+            isNewChatRef.current = false
+        }
         if (initialUser) setStoreUser(initialUser)
     }, [initialId, initialUser, setStoreUser, currentThreadId])
 
@@ -46,6 +49,7 @@ export function useChat({
         if (localThreadId) {
             console.log('useChat: Setting current thread ID', localThreadId)
             setCurrentThreadId(localThreadId.toString())
+            isNewChatRef.current = false
         }
     }, [localThreadId, setCurrentThreadId])
 
@@ -120,6 +124,7 @@ export function useChat({
                 setLocalThreadId(threadId)
                 setCurrentThreadId(threadId.toString())
                 setMessages([{ role: 'user', content: input }])
+                isNewChatRef.current = false  // Reset the flag after creating a new thread
             }
         }
         await handleSubmit(e)
@@ -150,7 +155,10 @@ export function useChat({
             }
             setMessages(messages)
         },
-        setId: (id: string) => setLocalThreadId(parseInt(id)),
+        setId: (id: string) => {
+            setLocalThreadId(parseInt(id))
+            isNewChatRef.current = false  // Reset the flag when setting a new ID
+        },
         setUser: setStoreUser
     }
 }
