@@ -52,6 +52,8 @@ const initialChatPane: Pane = {
     type: 'chat'
 }
 
+const PANE_OFFSET = 30 // Offset for new panes
+
 export const useHudStore = create<HudStore>()(
     persist(
         (set) => ({
@@ -60,18 +62,32 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane) => set((state) => {
-                const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(state.panes.length)
-                const newPaneWithPosition: Pane = {
-                    ...newPane,
-                    x: panePosition.x,
-                    y: panePosition.y,
+                const lastPane = state.panes[state.panes.length - 1]
+                const panePosition = newPane.paneProps || (lastPane ? {
+                    x: lastPane.x + PANE_OFFSET,
+                    y: lastPane.y + PANE_OFFSET,
+                    width: lastPane.width,
+                    height: lastPane.height
+                } : calculatePanePosition(state.panes.length))
+
+                // Ensure the new pane is within the viewport
+                const maxX = (typeof window !== 'undefined' ? window.innerWidth : 1920) - panePosition.width
+                const maxY = (typeof window !== 'undefined' ? window.innerHeight : 1080) - panePosition.height
+                const adjustedPosition = {
+                    x: Math.min(Math.max(panePosition.x, 0), maxX),
+                    y: Math.min(Math.max(panePosition.y, 0), maxY),
                     width: panePosition.width,
                     height: panePosition.height
+                }
+
+                const newPaneWithPosition: Pane = {
+                    ...newPane,
+                    ...adjustedPosition
                 }
                 return {
                     panes: [...state.panes, newPaneWithPosition],
                     isChatOpen: newPane.type === 'chat' ? true : state.isChatOpen,
-                    lastPanePosition: panePosition
+                    lastPanePosition: adjustedPosition
                 }
             }),
             removePane: (id) => set((state) => {
@@ -148,8 +164,8 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
 
     // For additional panes, use the previous offset logic
     return {
-        x: screenWidth * 0.3 + (paneCount * 20),
-        y: 80 + (paneCount * 20),
+        x: screenWidth * 0.3 + (paneCount * PANE_OFFSET),
+        y: 80 + (paneCount * PANE_OFFSET),
         width: screenWidth * 0.4,
         height: screenHeight * 0.8
     }
