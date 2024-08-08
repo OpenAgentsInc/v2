@@ -1,12 +1,25 @@
 'use server'
 
-import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads } from '@/lib/db/queries'
+import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from '@/lib/db/queries'
 import { Message } from '@/lib/types'
 
 export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
     if (threadId) {
-        return await saveMessage(parseInt(threadId), clerkUserId, message)
+        const threadIdInt = parseInt(threadId)
+        if (isNaN(threadIdInt)) {
+            console.error("Invalid threadId:", threadId)
+            return null
+        }
+        
+        const lastMessage = await getLastMessage(threadIdInt)
+        if (lastMessage && lastMessage.content === message.content) {
+            console.log("Duplicate message, not saving:", message.content)
+            return null
+        }
+        
+        return await saveMessage(threadIdInt, clerkUserId, message)
     }
+    return null
 }
 
 export async function createNewThread(clerkUserId: string, firstMessage: Message) {
@@ -14,20 +27,21 @@ export async function createNewThread(clerkUserId: string, firstMessage: Message
 }
 
 export async function fetchThreadMessages(threadId: string) {
-    return await getThreadMessages(parseInt(threadId))
+    const threadIdInt = parseInt(threadId)
+    if (isNaN(threadIdInt)) {
+        console.error("Invalid threadId:", threadId)
+        return []
+    }
+    return await getThreadMessages(threadIdInt)
 }
 
 export async function updateThreadData(threadId: string, metadata: any) {
-    console.log("Attempting to update thread data for threadId:", threadId)
-    // This is returning errors so lets try the parse separately and console message and return if it dont work
-    console.log("Attempting to update thread data for threadId:", parseInt(threadId))
     const threadIdInt = parseInt(threadId)
-    console.log("Attempting to update thread data for threadId:", threadIdInt)
-    if (!threadIdInt) {
-        console.log("ThreadIdInt is falsey:", threadIdInt)
-        return
+    if (isNaN(threadIdInt)) {
+        console.error("Invalid threadId:", threadId)
+        return null
     }
-    return await updateThread(parseInt(threadId), { metadata })
+    return await updateThread(threadIdInt, { metadata })
 }
 
 export async function fetchUserThreads(userId: string) {
