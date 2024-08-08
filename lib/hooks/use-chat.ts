@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
 import { Message, User, Chat } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
-import { createChat, saveMessage, getChatMessages, updateChat } from '@/lib/db/queries'
+import { saveChatMessage, createNewChat, fetchChatMessages, updateChatData } from '@/app/actions'
 
 interface UseChatProps {
     initialMessages?: Message[]
@@ -21,7 +21,6 @@ export function useChat({
     maxToolRoundtrips = 25,
     onToolCall
 }: UseChatProps) {
-    const router = useRouter()
     const path = usePathname()
 
     const {
@@ -70,14 +69,14 @@ export function useChat({
         } : undefined,
         onFinish: async (message) => {
             if (localChatId) {
-                await saveMessage(localChatId, message)
+                await saveChatMessage(localChatId, message)
             }
         }
     })
 
     useEffect(() => {
         if (storeUser && vercelMessages.length === 1) {
-            const createNewChat = async () => {
+            const createNewChatAction = async () => {
                 const newChat: Chat = {
                     id: localChatId || '',
                     title: vercelMessages[0].content.substring(0, 100),
@@ -86,18 +85,18 @@ export function useChat({
                     path: path,
                     messages: vercelMessages
                 }
-                const { chatId } = await createChat(storeUser.id, newChat)
+                const { chatId } = await createNewChat(storeUser.id, newChat)
                 setLocalChatId(chatId)
                 window.history.replaceState({}, '', `/chat/${chatId}`)
             }
-            createNewChat()
+            createNewChatAction()
         }
     }, [localChatId, path, storeUser, vercelMessages])
 
     useEffect(() => {
         if (localChatId) {
             const updateMessages = async () => {
-                await updateChat(localChatId, { messages: vercelMessages })
+                await updateChatData(localChatId, { messages: vercelMessages })
             }
             updateMessages()
         }
@@ -115,7 +114,7 @@ export function useChat({
         refreshedRef.current = false
         await handleSubmit(e)
         if (localChatId) {
-            const updatedMessages = await getChatMessages(localChatId)
+            const updatedMessages = await fetchChatMessages(localChatId)
             setStoreMessages(localChatId, updatedMessages)
         }
     }
@@ -130,7 +129,7 @@ export function useChat({
         addToolResult,
         setMessages: async (messages: Message[]) => {
             if (localChatId) {
-                await updateChat(localChatId, { messages })
+                await updateChatData(localChatId, { messages })
                 setStoreMessages(localChatId, messages)
             }
         },

@@ -6,13 +6,14 @@ export async function getUserData(userId: string) {
     return rows[0];
 }
 
-export async function getUserChats(userId: string) {
+export async function getUserChats(clerkUserId: string) {
     const { rows } = await sql`
-    SELECT id, title, created_at as "createdAt", path, share_path as "sharePath"
-    FROM chats
-    WHERE user_id = ${userId}
-    ORDER BY created_at DESC
-  `;
+    SELECT t.id, t.metadata, t."createdAt", m.content as "firstMessageContent"
+    FROM threads t
+    LEFT JOIN messages m ON t.first_message_id = m.id
+    WHERE t.clerk_user_id = ${clerkUserId}
+    ORDER BY t."createdAt" DESC
+    `;
     return rows;
 }
 
