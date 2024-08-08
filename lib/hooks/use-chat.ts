@@ -66,9 +66,11 @@ export function useChat({
         } : undefined,
         onFinish: async (message) => {
             if (localThreadId && storeUser) {
-                await saveChatMessage(localThreadId, storeUser.id, message)
-                lastSavedMessageRef.current = message.content
-                await updateThreadData(localThreadId, { lastMessage: message.content })
+                if (message.content !== lastSavedMessageRef.current) {
+                    await saveChatMessage(localThreadId, storeUser.id, message)
+                    lastSavedMessageRef.current = message.content
+                    await updateThreadData(localThreadId, { lastMessage: message.content })
+                }
             }
         }
     })
@@ -77,14 +79,15 @@ export function useChat({
         if (storeUser) {
             const { threadId } = await createNewThread(storeUser.id, message)
             setLocalThreadId(threadId.toString())
+            lastSavedMessageRef.current = message.content
         }
     }, [storeUser])
 
     useEffect(() => {
-        if (storeUser && vercelMessages.length === 1) {
+        if (storeUser && vercelMessages.length === 1 && !localThreadId) {
             createNewThreadAction(vercelMessages[0])
         }
-    }, [storeUser, vercelMessages, createNewThreadAction])
+    }, [storeUser, vercelMessages, createNewThreadAction, localThreadId])
 
     const handleInputChangeWrapper = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
@@ -95,12 +98,16 @@ export function useChat({
 
     const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        if (!localThreadId && storeUser && vercelMessages.length === 0) {
+            const { threadId } = await createNewThread(storeUser.id, { content: input, role: 'user' })
+            setLocalThreadId(threadId.toString())
+        }
         await handleSubmit(e)
         if (localThreadId) {
             const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
-    }, [handleSubmit, localThreadId, setStoreMessages])
+    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, vercelMessages.length, input])
 
     return {
         messages: vercelMessages,
@@ -112,8 +119,12 @@ export function useChat({
         addToolResult,
         setMessages: async (messages: Message[]) => {
             if (localThreadId && storeUser) {
-                await Promise.all(messages.map(message => saveChatMessage(localThreadId, storeUser.id, message)))
+                const newMessages = messages.filter(message => message.content !== lastSavedMessageRef.current)
+                await Promise.all(newMessages.map(message => saveChatMessage(localThreadId, storeUser.id, message)))
                 setStoreMessages(localThreadId, messages)
+                if (newMessages.length > 0) {
+                    lastSavedMessageRef.current = newMessages[newMessages.length - 1].content
+                }
             }
         },
         setId: setLocalThreadId,
