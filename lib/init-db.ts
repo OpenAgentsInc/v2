@@ -4,6 +4,7 @@ let isInitialized = false;
 
 export async function initializeDatabase() {
     if (isInitialized) {
+        console.log('Database already initialized, skipping...');
         return;
     }
 
@@ -18,7 +19,7 @@ export async function initializeDatabase() {
             console.error('Error message:', error.message);
             console.error('Error stack:', error.stack);
         }
-        // You might want to throw the error here if you want to prevent the app from starting
+        // Optionally, you can throw the error here if you want to prevent the app from starting
         // throw error;
     }
 }
