@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
-import { Message, User, Chat } from '@/lib/types'
+import { Message, User } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
-import { saveChatMessage, createNewChat, fetchChatMessages, updateChatData } from '@/app/actions'
+import { createThread, saveMessage, getThreadMessages, updateThread } from '@/lib/db/queries'
 
 interface UseChatProps {
     initialMessages?: Message[]
@@ -21,33 +21,34 @@ export function useChat({
     maxToolRoundtrips = 25,
     onToolCall
 }: UseChatProps) {
+    const router = useRouter()
     const path = usePathname()
 
     const {
-        currentChatId,
+        currentThreadId,
         user: storeUser,
-        setCurrentChatId,
+        setCurrentThreadId,
         setUser: setStoreUser,
-        getChatData,
+        getThreadData,
         setMessages: setStoreMessages,
         setInput: setStoreInput
     } = useChatStore()
 
-    const [localChatId, setLocalChatId] = useState<string | undefined>(initialId || currentChatId)
+    const [localThreadId, setLocalThreadId] = useState<string | undefined>(initialId || currentThreadId)
     const refreshedRef = useRef(false)
 
     useEffect(() => {
-        if (initialId) setLocalChatId(initialId)
+        if (initialId) setLocalThreadId(initialId)
         if (initialUser) setStoreUser(initialUser)
     }, [initialId, initialUser, setStoreUser])
 
     useEffect(() => {
-        if (localChatId) {
-            setCurrentChatId(localChatId)
+        if (localThreadId) {
+            setCurrentThreadId(localThreadId)
         }
-    }, [localChatId, setCurrentChatId])
+    }, [localThreadId, setCurrentThreadId])
 
-    const chatData = getChatData(localChatId || '')
+    const threadData = getThreadData(localThreadId || '')
 
     const repo = useRepoStore((state) => state.repo)
 
@@ -58,8 +59,8 @@ export function useChat({
         handleSubmit,
         addToolResult
     } = useVercelChat({
-        initialMessages: initialMessages || chatData.messages,
-        id: localChatId,
+        initialMessages: initialMessages || threadData.messages,
+        id: localThreadId,
         maxToolRoundtrips,
         onToolCall,
         body: repo ? {
@@ -68,44 +69,36 @@ export function useChat({
             repoBranch: repo.branch,
         } : undefined,
         onFinish: async (message) => {
-            if (localChatId) {
-                await saveChatMessage(localChatId, message)
+            if (localThreadId && storeUser) {
+                await saveMessage(parseInt(localThreadId), storeUser.id, message)
             }
         }
     })
 
     useEffect(() => {
         if (storeUser && vercelMessages.length === 1) {
-            const createNewChatAction = async () => {
-                const newChat: Chat = {
-                    id: localChatId || '',
-                    title: vercelMessages[0].content.substring(0, 100),
-                    createdAt: new Date(),
-                    userId: storeUser.id,
-                    path: path,
-                    messages: vercelMessages
-                }
-                const { chatId } = await createNewChat(storeUser.id, newChat)
-                setLocalChatId(chatId)
-                window.history.replaceState({}, '', `/chat/${chatId}`)
+            const createNewThread = async () => {
+                const { threadId } = await createThread(storeUser.id, vercelMessages[0])
+                setLocalThreadId(threadId.toString())
+                window.history.replaceState({}, '', `/chat/${threadId}`)
             }
-            createNewChatAction()
+            createNewThread()
         }
-    }, [localChatId, path, storeUser, vercelMessages])
+    }, [storeUser, vercelMessages])
 
     useEffect(() => {
-        if (localChatId) {
+        if (localThreadId) {
             const updateMessages = async () => {
-                await updateChatData(localChatId, { messages: vercelMessages })
+                await updateThread(parseInt(localThreadId), { metadata: { lastMessage: vercelMessages[vercelMessages.length - 1].content } })
             }
             updateMessages()
         }
-    }, [localChatId, vercelMessages])
+    }, [localThreadId, vercelMessages])
 
     const handleInputChangeWrapper = (e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
-        if (localChatId) {
-            setStoreInput(localChatId, e.target.value)
+        if (localThreadId) {
+            setStoreInput(localThreadId, e.target.value)
         }
     }
 
@@ -113,27 +106,27 @@ export function useChat({
         e.preventDefault()
         refreshedRef.current = false
         await handleSubmit(e)
-        if (localChatId) {
-            const updatedMessages = await fetchChatMessages(localChatId)
-            setStoreMessages(localChatId, updatedMessages)
+        if (localThreadId) {
+            const updatedMessages = await getThreadMessages(parseInt(localThreadId))
+            setStoreMessages(localThreadId, updatedMessages)
         }
     }
 
     return {
         messages: vercelMessages,
         input,
-        id: localChatId,
+        id: localThreadId,
         user: storeUser,
         handleInputChange: handleInputChangeWrapper,
         handleSubmit: handleSubmitWrapper,
         addToolResult,
         setMessages: async (messages: Message[]) => {
-            if (localChatId) {
-                await updateChatData(localChatId, { messages })
-                setStoreMessages(localChatId, messages)
+            if (localThreadId && storeUser) {
+                await Promise.all(messages.map(message => saveMessage(parseInt(localThreadId), storeUser.id, message)))
+                setStoreMessages(localThreadId, messages)
             }
         },
-        setId: setLocalChatId,
+        setId: setLocalThreadId,
         setUser: setStoreUser
     }
 }
