@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { useChat } from '@/hooks/useChat'
+import { debounce } from 'lodash'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     id?: string
@@ -24,12 +25,15 @@ export function Chat({ className, id: propId }: ChatProps) {
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
 
+    // Debounce the scrollToBottom function
+    const debouncedScrollToBottom = useCallback(debounce(scrollToBottom, 100), [scrollToBottom])
+
     // Ensure scroll to bottom on new messages
     useEffect(() => {
         if (messages.length > 0) {
-            scrollToBottom()
+            debouncedScrollToBottom()
         }
-    }, [messages, scrollToBottom])
+    }, [messages, debouncedScrollToBottom])
 
     return (
         <div
@@ -54,7 +58,7 @@ export function Chat({ className, id: propId }: ChatProps) {
             <ChatPanel
                 id={id}
                 isAtBottom={isAtBottom}
-                scrollToBottom={scrollToBottom}
+                scrollToBottom={debouncedScrollToBottom}
                 input={input}
                 handleInputChange={handleInputChange}
                 handleSubmit={handleSubmit}
