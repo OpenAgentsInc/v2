@@ -23,8 +23,8 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const { panes, addPane, setChatOpen } = useHudStore()
-    const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
+    const { panes, addPane, setChatOpen, setActivePane } = useHudStore()
+    const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat' && pane.isActive)
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
@@ -39,9 +39,15 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
             content: { oldContent: chat.messages?.join('\n') }
         }
         
-        // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new tiled pane
-        // Otherwise, replace the existing chat pane or add a new one if none exists
-        addPane(newPane, e.metaKey || e.ctrlKey)
+        const existingPane = panes.find(pane => pane.id === chat.id)
+        if (existingPane) {
+            // If the pane already exists, just set it as active
+            setActivePane(chat.id)
+        } else {
+            // If it doesn't exist, add a new pane
+            // Use tiling (true) if Command/Ctrl is pressed, otherwise false
+            addPane(newPane, e.metaKey || e.ctrlKey)
+        }
         setChatOpen(true)
     }
 
