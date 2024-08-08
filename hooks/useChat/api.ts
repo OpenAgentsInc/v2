@@ -47,13 +47,10 @@ export async function sendChatRequest(messages: Message[]): Promise<Response> {
 
     if (data.toolResults) {
         data.toolResults = data.toolResults.map((result: any) => ({
-            state: 'result',
-            id: result.id,
-            type: result.type,
-            function: {
-                name: result.function.name,
-                arguments: result.function.arguments,
-            },
+            state: 'result' as const,
+            toolCallId: result.id,
+            toolName: result.function.name,
+            args: JSON.parse(result.function.arguments),
             result: result.result
         } as ToolInvocation))
     }
