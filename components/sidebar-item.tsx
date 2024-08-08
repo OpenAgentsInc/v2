@@ -23,7 +23,7 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const { panes, addPane, setChatOpen, bringPaneToFront } = useHudStore()
+    const { panes, addPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
@@ -39,20 +39,9 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
             content: { oldContent: chat.messages?.join('\n') }
         }
         
-        if (e.metaKey || e.ctrlKey) {
-            // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new tiled pane
-            addPane(newPane, true)
-        } else {
-            // Check if the pane already exists
-            const existingPane = panes.find(pane => pane.id === chat.id)
-            if (existingPane) {
-                // If it exists, bring it to the front
-                bringPaneToFront(chat.id)
-            } else {
-                // If it doesn't exist, open a new chat pane (not tiled)
-                addPane(newPane, false)
-            }
-        }
+        // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new tiled pane
+        // Otherwise, replace the existing chat pane or add a new one if none exists
+        addPane(newPane, e.metaKey || e.ctrlKey)
         setChatOpen(true)
     }
 
