@@ -111,6 +111,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
     const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
+    const removePane = useHudStore(state => state.removePane)
 
     const { position, size, setPosition, setSize, resizeHandlers } = useResizeHandlers(
         id,
@@ -146,6 +147,11 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
         },
     })
 
+    const handleClose = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        removePane(id)
+    }
+
     return (
         <div
             style={{
@@ -163,6 +169,12 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 <span className="text-sm">{title}</span>
                 <div className="flex items-center">
                     {titleBarButtons}
+                    <button
+                        onClick={handleClose}
+                        className="ml-2 text-white hover:text-red-500 focus:outline-none"
+                    >
+                        ×
+                    </button>
                 </div>
             </div>
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
