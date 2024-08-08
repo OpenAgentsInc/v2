@@ -7,56 +7,23 @@ import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { useChat } from '@/hooks/useChat'
-import { Message, User } from '@/lib/types'
-import { ToolInvocation } from 'ai'
+import { Message } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-    initialMessages?: Message[]
     id?: string
-    user?: User | undefined
 }
 
-export function Chat({ className, initialMessages, id: initialId, user: initialUser }: ChatProps) {
+export function Chat({ className, id: propId }: ChatProps) {
     const {
         messages,
         input,
         id,
-        user,
         handleInputChange,
         handleSubmit,
-        addToolResult
-    } = useChat({
-        initialMessages,
-        initialId,
-        initialUser,
-        maxToolRoundtrips: 5,
-        async onToolCall({ toolCall }) {
-            if (toolCall.toolName === 'getLocation') {
-                const cities = [
-                    'New York',
-                    'Los Angeles',
-                    'Chicago',
-                    'San Francisco',
-                ]
-                return cities[Math.floor(Math.random() * cities.length)]
-            }
-            // Add more tool call handlers here as needed
-            console.log('Tool call:', toolCall)
-        },
-    })
+    } = useChat({ id: propId })
 
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
-
-    const handleSubmitWrapper = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        handleSubmit(e)
-    }
-
-    const uiMessages = messages.map(message => ({
-        ...message,
-        toolInvocations: message.toolInvocations
-    }))
 
     // Ensure scroll to bottom on new messages
     useEffect(() => {
@@ -78,7 +45,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
             <div className="flex-grow overflow-auto" ref={scrollRef}>
                 <div className="relative min-h-full" ref={messagesRef}>
                     {messages.length ? (
-                        <ChatList messages={uiMessages} user={user} isShared={false} />
+                        <ChatList messages={messages} isShared={false} />
                     ) : (
                         <EmptyScreen />
                     )}
@@ -91,7 +58,7 @@ export function Chat({ className, initialMessages, id: initialId, user: initialU
                 scrollToBottom={scrollToBottom}
                 input={input}
                 handleInputChange={handleInputChange}
-                handleSubmit={handleSubmitWrapper}
+                handleSubmit={handleSubmit}
             />
         </div>
     )
