@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 import { currentUser } from "@clerk/nextjs/server";
 
-export async function seed(dropTables = false) {
+export async function seed(dropTables = true) {
     const user = await currentUser();
     console.log("We have user:", user);
 
@@ -63,7 +63,7 @@ export async function seed(dropTables = false) {
     // Add foreign key constraint for threads.first_message_id
     await sql`
     ALTER TABLE threads
-    ADD CONSTRAINT fk_threads_first_message_id
+    ADD CONSTRAINT IF NOT EXISTS fk_threads_first_message_id
     FOREIGN KEY (first_message_id)
     REFERENCES messages(id);
     `;
