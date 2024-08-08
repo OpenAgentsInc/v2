@@ -40,6 +40,7 @@ type HudStore = {
     isRepoInputOpen: boolean
     setRepoInputOpen: (isOpen: boolean) => void
     openChatPane: (pane: PaneInput) => void
+    bringPaneToFront: (id: string) => void
 }
 
 const initialChatPane: Pane = {
@@ -52,7 +53,7 @@ const initialChatPane: Pane = {
     type: 'chat'
 }
 
-const PANE_OFFSET = 30 // Offset for new panes
+const PANE_OFFSET = 50 // Increased offset for new panes
 
 export const useHudStore = create<HudStore>()(
     persist(
@@ -62,6 +63,19 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane) => set((state) => {
+                const existingPane = state.panes.find(pane => pane.id === newPane.id)
+                if (existingPane) {
+                    // If the pane already exists, bring it to the front
+                    return {
+                        panes: [
+                            ...state.panes.filter(pane => pane.id !== newPane.id),
+                            existingPane
+                        ],
+                        isChatOpen: true,
+                        lastPanePosition: { x: existingPane.x, y: existingPane.y, width: existingPane.width, height: existingPane.height }
+                    }
+                }
+
                 const lastPane = state.panes[state.panes.length - 1]
                 const panePosition = newPane.paneProps || (lastPane ? {
                     x: lastPane.x + PANE_OFFSET,
@@ -138,6 +152,17 @@ export const useHudStore = create<HudStore>()(
                     ],
                     isChatOpen: true,
                     lastPanePosition: panePosition
+                }
+            }),
+            bringPaneToFront: (id) => set((state) => {
+                const paneToMove = state.panes.find(pane => pane.id === id)
+                if (!paneToMove) return state
+                return {
+                    panes: [
+                        ...state.panes.filter(pane => pane.id !== id),
+                        paneToMove
+                    ],
+                    lastPanePosition: { x: paneToMove.x, y: paneToMove.y, width: paneToMove.width, height: paneToMove.height }
                 }
             }),
         }),
