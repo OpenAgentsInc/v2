@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message } from 'ai/react';
-import { useModelStore } from '@/store/models'
-import { useRepoStore } from '@/store/repo'
-import { useToolStore } from '@/store/tools'
+import { useModelStore } from '@/store/models';
+import { useRepoStore } from '@/store/repo';
+import { useToolStore } from '@/store/tools';
 
 interface User {
     id: string;
@@ -65,10 +65,10 @@ interface UseChatProps {
  * @description Chat hook with streaming support. Import as { useChat } from "@/hooks/useChat"
  */
 export function useChat({ id: propsId }: UseChatProps = {}) {
-    // Get repo data from the repo store
-    const model = useModelStore((state) => state.model)
-    const repo = useRepoStore((state) => state.repo)
-    const tools = useToolStore((state) => state.tools)
+    const model = useModelStore((state) => state.model);
+    const repo = useRepoStore((state) => state.repo);
+    const tools = useToolStore((state) => state.tools);
+
     const {
         currentThreadId,
         user,
@@ -82,13 +82,13 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const id = propsId || currentThreadId || 'default';
     const threadData = getThreadData(id);
 
-    // Build the body object from model and repo if it exists
-    const body = repo ? {
-        repoOwner: repo.owner,
-        repoName: repo.name,
-        repoBranch: repo.branch,
-        model
-    } : { model };
+    // Build the body object with model, repo (if it exists), and tools
+    const body: any = { model, tools };
+    if (repo) {
+        body.repoOwner = repo.owner;
+        body.repoName = repo.name;
+        body.repoBranch = repo.branch;
+    }
 
     const vercelChatProps = useVercelChat({
         id,
