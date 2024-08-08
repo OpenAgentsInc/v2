@@ -7,7 +7,6 @@ import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { useChat } from '@/hooks/useChat'
-import { Message } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     id?: string
