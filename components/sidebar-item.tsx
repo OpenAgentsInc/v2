@@ -23,7 +23,7 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const { panes, addPane, setChatOpen, setActivePane } = useHudStore()
+    const { panes, addPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat' && pane.isActive)
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
@@ -39,15 +39,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
             content: { oldContent: chat.messages?.join('\n') }
         }
         
-        const existingPane = panes.find(pane => pane.id === chat.id)
-        if (existingPane) {
-            // If the pane already exists, just set it as active
-            setActivePane(chat.id)
-        } else {
-            // If it doesn't exist, add a new pane
-            // Use tiling (true) if Command/Ctrl is pressed, otherwise false
-            addPane(newPane, e.metaKey || e.ctrlKey)
-        }
+        // Use tiling (true) if Command/Ctrl is pressed, otherwise false
+        addPane(newPane, e.metaKey || e.ctrlKey)
         setChatOpen(true)
     }
 
