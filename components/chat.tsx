@@ -6,7 +6,7 @@ import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
-import { useChat } from '@/lib/hooks/use-chat'
+import { useChat } from '@/hooks/useChat'
 import { Message, User } from '@/lib/types'
 import { ToolInvocation } from 'ai'
 

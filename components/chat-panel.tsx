@@ -7,7 +7,7 @@ import { IconShare } from '@/components/ui/icons'
 import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { UserMessage } from './stocks/message'
-import { useChat } from '@/lib/hooks/use-chat'
+import { useChat } from '@/hooks/useChat'
 import { Message } from '@/lib/types'
 
 const shareChat = async (chat: { id: string; title: string; messages: Message[] }) => {
