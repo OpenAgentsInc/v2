@@ -30,7 +30,7 @@ export async function createNewThread(clerkUserId: string, firstMessage: Message
         console.log('Creating new thread for user:', clerkUserId)
         const result = await createThread(clerkUserId, firstMessage)
         console.log('New thread created:', result)
-        return result
+        return { threadId: result.threadId, message: result.message }
     } catch (error) {
         console.error('Error creating new thread:', error)
         throw error
