@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
 import { Message, User } from '@/lib/types'
@@ -21,9 +20,6 @@ export function useChat({
     maxToolRoundtrips = 25,
     onToolCall
 }: UseChatProps) {
-    const router = useRouter()
-    const path = usePathname()
-
     const {
         currentThreadId,
         user: storeUser,
