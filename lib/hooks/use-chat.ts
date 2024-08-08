@@ -87,9 +87,10 @@ export function useChat({
     }, [storeUser, vercelMessages])
 
     useEffect(() => {
-        if (localThreadId) {
+        if (localThreadId && vercelMessages.length > 0) {
             const updateMessages = async () => {
-                await updateThreadData(localThreadId, { lastMessage: vercelMessages[vercelMessages.length - 1].content })
+                const lastMessage = vercelMessages[vercelMessages.length - 1]
+                await updateThreadData(localThreadId, { lastMessage: lastMessage.content })
             }
             updateMessages()
         }
