@@ -39,6 +39,7 @@ type HudStore = {
     setInputFocused: (isFocused: boolean) => void
     isRepoInputOpen: boolean
     setRepoInputOpen: (isOpen: boolean) => void
+    openChatPane: (pane: PaneInput) => void
 }
 
 const initialChatPane: Pane = {
@@ -105,6 +106,24 @@ export const useHudStore = create<HudStore>()(
             setInputFocused: (isFocused) => set({ isInputFocused: isFocused }),
             isRepoInputOpen: false,
             setRepoInputOpen: (isOpen) => set({ isRepoInputOpen: isOpen }),
+            openChatPane: (newPane) => set((state) => {
+                const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                const newPaneWithPosition: Pane = {
+                    ...newPane,
+                    x: panePosition.x,
+                    y: panePosition.y,
+                    width: panePosition.width,
+                    height: panePosition.height
+                }
+                return {
+                    panes: [
+                        ...state.panes.filter(pane => pane.type !== 'chat'),
+                        newPaneWithPosition
+                    ],
+                    isChatOpen: true,
+                    lastPanePosition: panePosition
+                }
+            }),
         }),
         {
             name: 'openagents-hud-storage-51',
