@@ -53,27 +53,20 @@ export async function seed(dropTables = true) {
     console.log(`Created "messages" table`);
 
     // Add foreign key constraints
-    await sql`
-    ALTER TABLE threads
-    ADD CONSTRAINT fk_threads_user_id FOREIGN KEY (user_id) REFERENCES users(id),
-    ADD CONSTRAINT fk_threads_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id),
-    ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);
-
-    ALTER TABLE messages
-    ADD CONSTRAINT fk_messages_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id),
-    ADD CONSTRAINT fk_messages_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);
-    `;
+    await sql`ALTER TABLE threads ADD CONSTRAINT fk_threads_user_id FOREIGN KEY (user_id) REFERENCES users(id);`;
+    await sql`ALTER TABLE threads ADD CONSTRAINT fk_threads_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);`;
+    await sql`ALTER TABLE threads ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);`;
+    await sql`ALTER TABLE messages ADD CONSTRAINT fk_messages_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id);`;
+    await sql`ALTER TABLE messages ADD CONSTRAINT fk_messages_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);`;
     console.log(`Added foreign key constraints`);
 
     // Create indexes
-    await sql`
-    CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);
-    CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);
-    CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);
-    CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);
-    CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);
-    CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);
-    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);`;
     console.log(`Created indexes on tables`);
 
     let userId = null;
