@@ -10,7 +10,7 @@ export async function initializeDatabase() {
 
     try {
         console.log('Starting database initialization...');
-        const result = await seed();
+        const result = await seed(true);
         isInitialized = true;
         console.log('Database initialized successfully:', result);
     } catch (error) {
