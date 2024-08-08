@@ -12,7 +12,7 @@ async function executeSQL(query: string, params: any[] = []) {
     }
 }
 
-export async function seed(dropTables = true) {
+export async function seed(dropTables = false) {
     const user = await currentUser();
     console.log("We have user:", user);
 
@@ -22,6 +22,8 @@ export async function seed(dropTables = true) {
         await executeSQL('DROP TABLE IF EXISTS threads CASCADE;');
         await executeSQL('DROP TABLE IF EXISTS users CASCADE;');
         console.log("Dropped existing tables");
+    } else {
+        console.log("Skipping table drop");
     }
 
     // Create users table
@@ -65,7 +67,7 @@ export async function seed(dropTables = true) {
     await executeSQL('ALTER TABLE threads ADD CONSTRAINT fk_threads_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);');
     await executeSQL('ALTER TABLE messages ADD CONSTRAINT fk_messages_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id);');
     await executeSQL('ALTER TABLE messages ADD CONSTRAINT fk_messages_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);');
-    
+
     // We'll add this constraint after inserting the first message
     // await executeSQL('ALTER TABLE threads ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);');
 

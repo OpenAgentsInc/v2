@@ -17,9 +17,12 @@ A few points:
 - An authed user visits the home route @ openagents.com
 - The `middleware.ts` file uses the default Clerk middleware so methods like `auth()` and `getCurrentUser()` are available. (Those two methods are server-only)
 - `app/layout.tsx` calls `initDatabase()` to initialize the database connection and ensure seed data is present (temporary)
+  - `initDatabase()` in `lib/init-db.ts` ensures the `seed()` function runs only once when the app starts
+  - `lib/db/seed.ts` seeds the database with test data
 - The main catchall route `app/[[...rest]]/page.tsx` confirms the user is logged in and shows the `HomeDashboard` component
 - Server component `components/dashboard/HomeDashboard.tsx` renders a pane with the user's chat history and the HUD
 - Client component `components/hud/hud.tsx` renders all chat panes managed by the hud store
   - Panes are defined in `components/hud/pane.tsx` and managed in `store/hud.ts`
 - Each chat pane has a child Chat component defined in `components/chat.tsx` 
+  - This should probably be passed an ID of the thread to load. Right now it is not being passed the props it expects.
 
