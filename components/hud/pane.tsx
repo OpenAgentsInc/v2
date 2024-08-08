@@ -14,6 +14,7 @@ interface PaneProps {
     height: number
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
+    threadId?: string  // Add this line
 }
 
 const useResizeHandlers = (
@@ -108,7 +109,7 @@ const useResizeHandlers = (
     return { position, size, setPosition, setSize, resizeHandlers }
 }
 
-export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons }) => {
+export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons, threadId }) => {
     const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
@@ -185,7 +186,11 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 </div>
             </div>
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
-                {children}
+                {React.Children.map(children, child =>
+                    React.isValidElement(child)
+                        ? React.cloneElement(child, { threadId: threadId })
+                        : child
+                )}
             </div>
             <div className="absolute inset-0 pointer-events-none border border-white rounded-lg opacity-50"></div>
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(255,255,255,0.2)] rounded-lg"></div>
