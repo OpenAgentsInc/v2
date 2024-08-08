@@ -9,6 +9,7 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
     const body = await req.json();
+    console.log("In chat with body", body);
     const toolContext = await getToolContext(body)
 
     const result = await streamText({
