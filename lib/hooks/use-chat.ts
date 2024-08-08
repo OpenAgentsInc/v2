@@ -86,7 +86,7 @@ export function useChat({
         onFinish: async (message) => {
             console.log('onFinish called', { localThreadId, isNewChat: isNewChatRef.current })
             let threadId = localThreadId
-            if (isNewChatRef.current) {
+            if (isNewChatRef.current || !threadId) {
                 threadId = await createNewThreadAction({ content: input, role: 'user' })
             }
             if (threadId && storeUser) {
@@ -110,7 +110,7 @@ export function useChat({
     const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         console.log('handleSubmitWrapper called', { isNewChat: isNewChatRef.current, localThreadId })
-        if (isNewChatRef.current && storeUser) {
+        if (isNewChatRef.current || !localThreadId) {
             const threadId = await createNewThreadAction({ content: input, role: 'user' })
             if (threadId) {
                 console.log('New thread created in handleSubmitWrapper:', threadId)
