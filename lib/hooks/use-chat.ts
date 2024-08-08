@@ -30,24 +30,26 @@ export function useChat({
         setInput: setStoreInput
     } = useChatStore()
 
-    const [localThreadId, setLocalThreadId] = useState<string | undefined>(initialId || currentThreadId)
+    const [localThreadId, setLocalThreadId] = useState<number | undefined>(
+        initialId ? parseInt(initialId) : currentThreadId ? parseInt(currentThreadId) : undefined
+    )
     const lastSavedMessageRef = useRef<string | null>(null)
     const isNewChatRef = useRef<boolean>(!initialId && !currentThreadId)
 
     useEffect(() => {
         console.log('useChat: Initial values', { initialId, currentThreadId, localThreadId, isNewChat: isNewChatRef.current })
-        if (initialId) setLocalThreadId(initialId)
+        if (initialId) setLocalThreadId(parseInt(initialId))
         if (initialUser) setStoreUser(initialUser)
     }, [initialId, initialUser, setStoreUser, currentThreadId])
 
     useEffect(() => {
         if (localThreadId) {
             console.log('useChat: Setting current thread ID', localThreadId)
-            setCurrentThreadId(localThreadId)
+            setCurrentThreadId(localThreadId.toString())
         }
     }, [localThreadId, setCurrentThreadId])
 
-    const threadData = getThreadData(localThreadId || '')
+    const threadData = getThreadData(localThreadId ? localThreadId.toString() : '')
 
     const repo = useRepoStore((state) => state.repo)
 
@@ -56,10 +58,10 @@ export function useChat({
             console.log('Creating new thread for user:', storeUser.id)
             const result = await createNewThread(storeUser.id, message)
             console.log('New thread created:', result)
-            const newThreadId = result.threadId.toString()
+            const newThreadId = result.threadId
             console.log('Setting new thread ID:', newThreadId)
             setLocalThreadId(newThreadId)
-            setCurrentThreadId(newThreadId)
+            setCurrentThreadId(newThreadId.toString())
             lastSavedMessageRef.current = message.content
             isNewChatRef.current = false
             return newThreadId
@@ -76,7 +78,7 @@ export function useChat({
         setMessages
     } = useVercelChat({
         initialMessages: initialMessages || threadData.messages,
-        id: localThreadId,
+        id: localThreadId ? localThreadId.toString() : undefined,
         maxToolRoundtrips,
         onToolCall,
         body: repo ? {
@@ -93,9 +95,9 @@ export function useChat({
             if (threadId && storeUser) {
                 if (message.content !== lastSavedMessageRef.current) {
                     console.log('Saving message to thread:', threadId)
-                    await saveChatMessage(threadId, storeUser.id, message)
+                    await saveChatMessage(threadId.toString(), storeUser.id, message)
                     lastSavedMessageRef.current = message.content
-                    await updateThreadData(threadId, { lastMessage: message.content })
+                    await updateThreadData(threadId.toString(), { lastMessage: message.content })
                 }
             }
         }
@@ -104,7 +106,7 @@ export function useChat({
     const handleInputChangeWrapper = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
         if (localThreadId) {
-            setStoreInput(localThreadId, e.target.value)
+            setStoreInput(localThreadId.toString(), e.target.value)
         }
     }, [handleInputChange, localThreadId, setStoreInput])
 
@@ -116,14 +118,14 @@ export function useChat({
             if (threadId) {
                 console.log('New thread created in handleSubmitWrapper:', threadId)
                 setLocalThreadId(threadId)
-                setCurrentThreadId(threadId)
+                setCurrentThreadId(threadId.toString())
                 setMessages([{ role: 'user', content: input }])
             }
         }
         await handleSubmit(e)
         if (localThreadId) {
-            const updatedMessages = await fetchThreadMessages(localThreadId)
-            setStoreMessages(localThreadId, updatedMessages)
+            const updatedMessages = await fetchThreadMessages(localThreadId.toString())
+            setStoreMessages(localThreadId.toString(), updatedMessages)
         }
     }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction, setCurrentThreadId, setMessages])
 
@@ -132,7 +134,7 @@ export function useChat({
     return {
         messages: vercelMessages,
         input,
-        id: localThreadId,
+        id: localThreadId ? localThreadId.toString() : undefined,
         user: storeUser,
         handleInputChange: handleInputChangeWrapper,
         handleSubmit: handleSubmitWrapper,
@@ -140,15 +142,15 @@ export function useChat({
         setMessages: async (messages: Message[]) => {
             if (localThreadId && storeUser) {
                 const newMessages = messages.filter(message => message.content !== lastSavedMessageRef.current)
-                await Promise.all(newMessages.map(message => saveChatMessage(localThreadId, storeUser.id, message)))
-                setStoreMessages(localThreadId, messages)
+                await Promise.all(newMessages.map(message => saveChatMessage(localThreadId.toString(), storeUser.id, message)))
+                setStoreMessages(localThreadId.toString(), messages)
                 if (newMessages.length > 0) {
                     lastSavedMessageRef.current = newMessages[newMessages.length - 1].content
                 }
             }
             setMessages(messages)
         },
-        setId: setLocalThreadId,
+        setId: (id: string) => setLocalThreadId(parseInt(id)),
         setUser: setStoreUser
     }
 }
