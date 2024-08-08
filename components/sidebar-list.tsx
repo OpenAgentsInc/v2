@@ -2,6 +2,7 @@ import { SidebarItems } from '@/components/sidebar-items'
 import { cache } from 'react'
 import { getUserThreads } from 'lib/db/queries'
 import { Chat } from '@/lib/types'
+import { seed } from '@/lib/db/seed'
 
 interface SidebarListProps {
     userId?: string
@@ -20,6 +21,7 @@ const loadChats = cache(async (userId?: string) => {
 
 export async function SidebarList({ userId }: SidebarListProps) {
     console.log("In SidebarList with userId:", userId)
+    await seed()
     const chats = await loadChats(userId)
     const formattedChats = chats.map((chat) => {
         return {

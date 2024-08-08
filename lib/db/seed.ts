@@ -63,12 +63,22 @@ export async function seed(dropTables = true) {
             console.log(`Upserted user with id: ${userId} and clerk_user_id: ${clerkUserId}`);
 
             // Insert a sample thread
-            const insertedThread = await sql`
+            await sql`
                 INSERT INTO threads (user_id, clerk_user_id, metadata)
                 VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread", description: "This is a sample thread" }}::jsonb)
                 RETURNING id;
             `;
-            console.log(`Inserted sample thread with id: ${insertedThread.rows[0].id}`);
+
+            // Insert two more sample threads
+            await sql`
+                INSERT INTO threads (user_id, clerk_user_id, metadata)
+                VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread 2", description: "This is another sample thread" }}::jsonb)
+            `;
+
+            await sql`
+                INSERT INTO threads (user_id, clerk_user_id, metadata)
+                VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread 3", description: "This is yet another sample thread" }}::jsonb)
+            `;
         } catch (error) {
             console.error("Error inserting data:", error);
         }
