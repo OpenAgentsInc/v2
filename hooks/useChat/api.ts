@@ -1,9 +1,9 @@
 /**
  * @file hooks/useChat/api.ts
- * @description API functions for chat operations
+ * @description API functions for chat operations with proper ToolInvocation formatting
  */
 
-import { Message } from './types'
+import { Message, ToolInvocation } from './types'
 import { useRepoStore } from '@/store/repo'
 
 /**
@@ -27,8 +27,6 @@ export async function sendChatRequest(messages: Message[]): Promise<Response> {
         } : {})
     }
 
-    console.log("Sending request with body:", requestBody)
-
     // Send a POST request to the chat API endpoint
     const response = await fetch('/api/chat', {
         method: 'POST',
@@ -44,6 +42,26 @@ export async function sendChatRequest(messages: Message[]): Promise<Response> {
         throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    // Return the entire response object, which includes the body stream
-    return response
+    // Parse the response and format tool results
+    const data = await response.json()
+
+    if (data.toolResults) {
+        data.toolResults = data.toolResults.map((result: any) => ({
+            state: 'result',
+            id: result.id,
+            type: result.type,
+            function: {
+                name: result.function.name,
+                arguments: result.function.arguments,
+            },
+            result: result.result
+        } as ToolInvocation))
+    }
+
+    // Return a new response with the formatted data
+    return new Response(JSON.stringify(data), {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+    })
 }
