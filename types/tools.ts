@@ -32,7 +32,7 @@ export interface ToolContext {
     /**
      * The model that the tools are running on.
      */
-    model: string;
+    model: any; // LanguageModelV1(?)
 }
 
 /**

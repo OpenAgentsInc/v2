@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { useChat as useVercelChat, Message } from 'ai/react';
 import { useModelStore } from '@/store/models'
 import { useRepoStore } from '@/store/repo'
+import { useToolStore } from '@/store/tools'
 
 interface User {
     id: string;
@@ -67,6 +68,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     // Get repo data from the repo store
     const model = useModelStore((state) => state.model)
     const repo = useRepoStore((state) => state.repo)
+    const tools = useToolStore((state) => state.tools)
     const {
         currentThreadId,
         user,
