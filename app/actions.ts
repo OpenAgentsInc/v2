@@ -4,6 +4,7 @@ import { saveMessage, createThread, getThreadMessages, updateThread, getUserThre
 import { Message } from '@/lib/types'
 
 export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
+    console.log('Saving chat message:', { threadId, clerkUserId, messageContent: message.content })
     if (threadId) {
         const threadIdInt = parseInt(threadId)
         if (isNaN(threadIdInt)) {
@@ -17,7 +18,9 @@ export async function saveChatMessage(threadId: string, clerkUserId: string, mes
             return null
         }
         
-        return await saveMessage(threadIdInt, clerkUserId, message)
+        const savedMessage = await saveMessage(threadIdInt, clerkUserId, message)
+        console.log('Message saved:', savedMessage)
+        return savedMessage
     }
     return null
 }
@@ -35,21 +38,27 @@ export async function createNewThread(clerkUserId: string, firstMessage: Message
 }
 
 export async function fetchThreadMessages(threadId: string) {
+    console.log('Fetching messages for thread:', threadId)
     const threadIdInt = parseInt(threadId)
     if (isNaN(threadIdInt)) {
         console.error("Invalid threadId:", threadId)
         return []
     }
-    return await getThreadMessages(threadIdInt)
+    const messages = await getThreadMessages(threadIdInt)
+    console.log('Fetched messages:', messages.length)
+    return messages
 }
 
 export async function updateThreadData(threadId: string, metadata: any) {
+    console.log('Updating thread data:', { threadId, metadata })
     const threadIdInt = parseInt(threadId)
     if (isNaN(threadIdInt)) {
         console.error("Invalid threadId:", threadId)
         return null
     }
-    return await updateThread(threadIdInt, { metadata })
+    const updatedThread = await updateThread(threadIdInt, { metadata })
+    console.log('Thread updated:', updatedThread)
+    return updatedThread
 }
 
 export async function fetchUserThreads(userId: string) {
