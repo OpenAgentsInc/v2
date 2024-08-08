@@ -32,7 +32,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         setOpen(false)
     }
 
-    const tools = [
+    const ourtools = [
         'create_file',
         'list_repos',
         'rewrite_file',
@@ -91,7 +91,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                 onOpenAutoFocus={(e) => e.preventDefault()}
                             >
                                 <form className="space-y-2">
-                                    {tools.map((tool) => (
+                                    {ourtools.map((tool) => (
                                         <div key={tool} className="flex items-center">
                                             <input
                                                 type="checkbox"
@@ -115,7 +115,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                     <Github size={14} />
                                     <span>{repo.owner}/{repo.name}</span>
                                     <GitBranch size={14} />
-                                    <span>{repo.branch}</n>
+                                    <span>{repo.branch}</span>
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
