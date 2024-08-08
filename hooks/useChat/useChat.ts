@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message } from 'ai/react';
+import { useRepoStore } from '@/store/repo'
 
 interface User {
     id: string;
@@ -62,6 +63,8 @@ interface UseChatProps {
  * @description Chat hook with streaming support. Import as { useChat } from "@/hooks/useChat"
  */
 export function useChat({ id: propsId }: UseChatProps = {}) {
+    // Get repo data from the repo store
+    const repo = useRepoStore((state) => state.repo)
     const {
         currentThreadId,
         user,
@@ -82,6 +85,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             const updatedMessages = [...threadData.messages, message];
             setMessages(id, updatedMessages);
         },
+        body: repo ? {
+            repoOwner: repo.owner,
+            repoName: repo.name,
+            repoBranch: repo.branch,
+        } : undefined,
+        maxToolRoundtrips: 20
     });
 
     const setInput = (input: string) => {
