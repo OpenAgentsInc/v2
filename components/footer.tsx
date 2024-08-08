@@ -20,6 +20,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
     })
 
     const [open, setOpen] = React.useState(false)
+    const [toolsOpen, setToolsOpen] = React.useState(false)
 
     const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
@@ -30,6 +31,18 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         setRepo(repoInput)
         setOpen(false)
     }
+
+    const tools = [
+        'create_file',
+        'list_repos',
+        'rewrite_file',
+        'scrape_webpage',
+        'view_file',
+        'view_hierarchy',
+        'create_pull_request',
+        'create_branch',
+        'search_codebase'
+    ]
 
     return (
         <div
@@ -64,10 +77,37 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                             </DropdownMenu.Content>
                         </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
-                        <Wrench className="mr-1" size={14} />
-                        9
-                    </span>
+                    <Popover.Root open={toolsOpen} onOpenChange={setToolsOpen}>
+                        <Popover.Trigger asChild>
+                            <button className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75 focus:outline-none focus:ring-0">
+                                <Wrench className="mr-1" size={14} />
+                                9
+                            </button>
+                        </Popover.Trigger>
+                        <Popover.Portal>
+                            <Popover.Content
+                                className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
+                                style={{ width: '200px' }}
+                                onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                                <form className="space-y-2">
+                                    {tools.map((tool) => (
+                                        <div key={tool} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id={tool}
+                                                name={tool}
+                                                className="mr-2"
+                                            />
+                                            <label htmlFor={tool} className="text-foreground text-sm">
+                                                {tool}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </form>
+                            </Popover.Content>
+                        </Popover.Portal>
+                    </Popover.Root>
                     {repo && (
                         <Popover.Root open={open} onOpenChange={setOpen}>
                             <Popover.Trigger asChild>
@@ -75,7 +115,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                     <Github size={14} />
                                     <span>{repo.owner}/{repo.name}</span>
                                     <GitBranch size={14} />
-                                    <span>{repo.branch}</span>
+                                    <span>{repo.branch}</n>
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
