@@ -1,6 +1,6 @@
 import { SidebarItems } from '@/components/sidebar-items'
 import { cache } from 'react'
-import { getUserChats } from 'lib/db/queries'
+import { fetchUserThreads } from '@/app/actions'
 import { Chat } from '@/lib/types'
 import { seed } from '@/lib/db/seed'
 
@@ -9,12 +9,12 @@ interface SidebarListProps {
     children?: React.ReactNode
 }
 
-const loadChats = cache(async (userId?: string) => {
-    console.log('Loading chats for user:', userId)
+const loadThreads = cache(async (userId?: string) => {
+    console.log('Loading threads for user:', userId)
     if (!userId) {
         return []
     }
-    const threads = await getUserChats(userId)
+    const threads = await fetchUserThreads(userId)
     console.log("Fetched threads:", threads)
     return threads
 })
@@ -22,13 +22,13 @@ const loadChats = cache(async (userId?: string) => {
 export async function SidebarList({ userId }: SidebarListProps) {
     console.log("In SidebarList with userId:", userId)
     await seed()
-    const chats = await loadChats(userId)
-    const formattedChats = chats.map((chat) => {
+    const threads = await loadThreads(userId)
+    const formattedThreads = threads.map((thread) => {
         return {
-            id: chat.id,
-            title: chat.metadata?.title || chat.firstMessageContent?.substring(0, 100) || 'Untitled Chat',
-            path: `/chat/${chat.id}`,
-            createdAt: chat.createdAt,
+            id: thread.id,
+            title: thread.metadata?.title || 'Untitled Thread',
+            path: `/chat/${thread.id}`,
+            createdAt: thread.createdAt,
             messages: [],
             userId: userId,
         } as Chat
@@ -36,9 +36,9 @@ export async function SidebarList({ userId }: SidebarListProps) {
     return (
         <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 overflow-auto">
-                {formattedChats.length ? (
+                {formattedThreads.length ? (
                     <div className="space-y-2 px-2">
-                        <SidebarItems chats={formattedChats} />
+                        <SidebarItems chats={formattedThreads} />
                     </div>
                 ) : (
                     <div className="p-8 text-center">
