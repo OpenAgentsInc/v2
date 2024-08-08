@@ -25,6 +25,7 @@ interface SidebarItemProps {
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat' && pane.isActive)
+    const isOpen = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
@@ -84,7 +85,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                 className={cn(
                     buttonVariants({ variant: 'ghost' }),
                     'group w-full px-8 transition-colors hover:bg-zinc-200/40 dark:hover:bg-zinc-300/10',
-                    isActive && 'bg-zinc-200 pr-16 font-semibold dark:bg-zinc-800',
+                    isOpen && 'bg-zinc-200 dark:bg-zinc-800',
+                    isActive && 'pr-16 font-semibold',
                     'text-left'
                 )}
             >
