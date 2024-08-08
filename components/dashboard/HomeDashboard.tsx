@@ -2,8 +2,6 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
-import { nanoid } from '@/lib/utils'
-import { Chat } from '@/components/chat'
 import { Pane } from '@/components/hud/pane'
 import { ChatHistory } from '@/components/chat-history'
 import { HUD } from '@/components/hud/hud'
