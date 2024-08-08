@@ -108,3 +108,19 @@ export async function deleteThread(threadId: number) {
         throw error;
     }
 }
+
+export async function getLastMessage(threadId: number) {
+    try {
+        const { rows } = await sql`
+        SELECT id, role, content, created_at as "createdAt", tool_invocations as "toolInvocations"
+        FROM messages
+        WHERE thread_id = ${threadId}
+        ORDER BY created_at DESC
+        LIMIT 1
+        `;
+        return rows[0];
+    } catch (error) {
+        console.error('Error in getLastMessage:', error);
+        throw error;
+    }
+}
