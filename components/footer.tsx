@@ -66,7 +66,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                     </DropdownMenu.Root>
                     <span className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
                         <Wrench className="mr-1" size={14} />
-                        4
+                        9
                     </span>
                     {repo && (
                         <Popover.Root open={open} onOpenChange={setOpen}>
@@ -80,7 +80,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                             </Popover.Trigger>
                             <Popover.Portal>
                                 <Popover.Content
-                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-50 focus:outline-none"
+                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
                                     style={{ width: '200px' }}
                                     onOpenAutoFocus={(e) => e.preventDefault()}
                                 >
