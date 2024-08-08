@@ -63,20 +63,9 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane, shouldTile = false) => set((state) => {
-                const existingPane = state.panes.find(pane => pane.id === newPane.id)
-                if (existingPane) {
-                    // If the pane already exists, bring it to the front
-                    return {
-                        panes: [
-                            ...state.panes.filter(pane => pane.id !== newPane.id),
-                            existingPane
-                        ],
-                        isChatOpen: true,
-                        lastPanePosition: { x: existingPane.x, y: existingPane.y, width: existingPane.width, height: existingPane.height }
-                    }
-                }
-
                 let panePosition
+                let updatedPanes
+
                 if (shouldTile) {
                     const lastPane = state.panes[state.panes.length - 1]
                     panePosition = lastPane ? {
@@ -85,8 +74,15 @@ export const useHudStore = create<HudStore>()(
                         width: lastPane.width,
                         height: lastPane.height
                     } : calculatePanePosition(state.panes.length)
+                    updatedPanes = [...state.panes]
                 } else {
-                    panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                    // If not tiling, use the position of the last chat pane or default position
+                    const lastChatPane = state.panes.filter(pane => pane.type === 'chat').pop()
+                    panePosition = lastChatPane ? 
+                        { x: lastChatPane.x, y: lastChatPane.y, width: lastChatPane.width, height: lastChatPane.height } :
+                        calculatePanePosition(0)
+                    // Remove all existing chat panes
+                    updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
                 }
 
                 // Ensure the new pane is within the viewport
@@ -103,9 +99,10 @@ export const useHudStore = create<HudStore>()(
                     ...newPane,
                     ...adjustedPosition
                 }
+
                 return {
-                    panes: [...state.panes, newPaneWithPosition],
-                    isChatOpen: newPane.type === 'chat' ? true : state.isChatOpen,
+                    panes: [...updatedPanes, newPaneWithPosition],
+                    isChatOpen: true,
                     lastPanePosition: adjustedPosition
                 }
             }),
