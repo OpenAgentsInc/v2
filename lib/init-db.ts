@@ -13,5 +13,7 @@ export async function initializeDatabase() {
         console.log('Database initialized successfully');
     } catch (error) {
         console.error('Error initializing database:', error);
+        // You might want to throw the error here if you want to prevent the app from starting
+        // throw error;
     }
 }
