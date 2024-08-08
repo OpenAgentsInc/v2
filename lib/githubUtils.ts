@@ -15,7 +15,6 @@ export async function githubListContents(args: z.infer<typeof githubListContents
     if (branch) {
         url += `?ref=${branch}`;
     }
-    console.log("url:", url)
 
     const data = await githubApiRequest(url, token);
 
@@ -38,7 +37,6 @@ const githubReadFileArgsSchema = z.object({
 
 export async function githubReadFile(args: z.infer<typeof githubReadFileArgsSchema>): Promise<string> {
     const { path, token, repoOwner, repoName, branch } = githubReadFileArgsSchema.parse(args);
-    console.log("Attempting with token:", token, "path:", path, "repoOwner:", repoOwner, "repoName:", repoName, "branch:", branch);
     let url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
     if (branch) {
         url += `?ref=${branch}`;
