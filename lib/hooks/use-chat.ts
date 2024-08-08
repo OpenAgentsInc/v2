@@ -1,3 +1,4 @@
+// Import necessary hooks and functions from React and custom stores
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useChatStore } from '@/store/chat'
 import { useRepoStore } from '@/store/repo'
@@ -5,14 +6,16 @@ import { Message, User } from '@/lib/types'
 import { useChat as useVercelChat } from 'ai/react'
 import { saveChatMessage, createNewThread, fetchThreadMessages, updateThreadData } from '@/app/actions'
 
+// Define the props interface for the useChat hook
 interface UseChatProps {
-    initialMessages?: Message[]
-    initialId?: string
-    initialUser?: User
-    maxToolRoundtrips?: number
-    onToolCall?: ({ toolCall }: { toolCall: any }) => Promise<any>
+    initialMessages?: Message[]  // Optional initial messages for the chat
+    initialId?: string           // Optional initial thread ID
+    initialUser?: User           // Optional initial user
+    maxToolRoundtrips?: number   // Maximum number of tool roundtrips (default: 25)
+    onToolCall?: ({ toolCall }: { toolCall: any }) => Promise<any>  // Optional callback for tool calls
 }
 
+// Define and export the useChat hook
 export function useChat({
     initialMessages,
     initialId,
@@ -20,6 +23,7 @@ export function useChat({
     maxToolRoundtrips = 25,
     onToolCall
 }: UseChatProps) {
+    // Destructure necessary functions and state from the chat store
     const {
         currentThreadId,
         user: storeUser,
@@ -30,12 +34,16 @@ export function useChat({
         setInput: setStoreInput
     } = useChatStore()
 
+    // Initialize local state for thread ID
     const [localThreadId, setLocalThreadId] = useState<number | undefined>(
         initialId ? parseInt(initialId) : currentThreadId ? parseInt(currentThreadId) : undefined
     )
+
+    // Create refs to track the last saved message and whether it's a new chat
     const lastSavedMessageRef = useRef<string | null>(null)
     const isNewChatRef = useRef<boolean>(!initialId && !currentThreadId)
 
+    // Effect to handle initial values and user setup
     useEffect(() => {
         console.log('useChat: Initial values', { initialId, currentThreadId, localThreadId, isNewChat: isNewChatRef.current })
         if (initialId) {
@@ -45,6 +53,7 @@ export function useChat({
         if (initialUser) setStoreUser(initialUser)
     }, [initialId, initialUser, setStoreUser, currentThreadId])
 
+    // Effect to update the current thread ID in the store when localThreadId changes
     useEffect(() => {
         if (localThreadId) {
             console.log('useChat: Setting current thread ID', localThreadId)
@@ -53,10 +62,13 @@ export function useChat({
         }
     }, [localThreadId, setCurrentThreadId])
 
+    // Get thread data from the store
     const threadData = getThreadData(localThreadId ? localThreadId.toString() : '')
 
+    // Get repo data from the repo store
     const repo = useRepoStore((state) => state.repo)
 
+    // Function to create a new thread
     const createNewThreadAction = useCallback(async (message: Message) => {
         if (storeUser) {
             console.log('Creating new thread for user:', storeUser.id)
@@ -73,6 +85,7 @@ export function useChat({
         return null
     }, [storeUser, setCurrentThreadId])
 
+    // Use the Vercel AI SDK's useChat hook
     const {
         messages: vercelMessages,
         input,
@@ -107,6 +120,7 @@ export function useChat({
         }
     })
 
+    // Wrapper for handleInputChange to update store input
     const handleInputChangeWrapper = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         handleInputChange(e)
         if (localThreadId) {
@@ -114,6 +128,7 @@ export function useChat({
         }
     }, [handleInputChange, localThreadId, setStoreInput])
 
+    // Wrapper for handleSubmit to handle new thread creation and message saving
     const handleSubmitWrapper = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         console.log('handleSubmitWrapper called', { isNewChat: isNewChatRef.current, localThreadId })
@@ -136,6 +151,7 @@ export function useChat({
 
     console.log('useChat: Current state', { localThreadId, isNewChat: isNewChatRef.current, messagesCount: vercelMessages.length })
 
+    // Return an object with all necessary functions and state
     return {
         messages: vercelMessages,
         input,
