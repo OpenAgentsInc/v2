@@ -11,6 +11,7 @@ interface SidebarListProps {
 const loadThreads = cache(async (userId?: string) => {
     console.log('Loading threads for user:', userId)
     if (!userId) {
+        console.log('No userId provided, returning empty array')
         return []
     }
     try {
@@ -26,6 +27,7 @@ const loadThreads = cache(async (userId?: string) => {
 export async function SidebarList({ userId }: SidebarListProps) {
     console.log("In SidebarList with userId:", userId)
     const threads = await loadThreads(userId)
+    console.log("Loaded threads:", threads)
     const formattedThreads = threads.map((thread) => {
         return {
             id: thread.id,
@@ -36,6 +38,7 @@ export async function SidebarList({ userId }: SidebarListProps) {
             userId: userId,
         } as Chat
     })
+    console.log("Formatted threads:", formattedThreads)
     return (
         <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 overflow-auto">
