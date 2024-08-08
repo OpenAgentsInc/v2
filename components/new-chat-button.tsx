@@ -1,17 +1,25 @@
 'use client'
 
 import { useHudStore } from '@/store/hud'
+import { useChatStore } from '@/store/chat'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 export function NewChatButton() {
-    const { openChatPane } = useHudStore()
+    const { addPane } = useHudStore()
+    const { setCurrentThreadId, setMessages } = useChatStore()
 
     const handleNewChat = () => {
-        openChatPane({
+        setCurrentThreadId(undefined)
+        setMessages(undefined, [])
+        addPane({
             type: 'chat',
             title: 'New Chat',
+            x: 300,
+            y: 20,
+            width: 600,
+            height: 400
         })
     }
 
