@@ -7,6 +7,7 @@ export async function seed(dropTables = true) {
 
     if (dropTables) {
         // Drop existing tables if the flag is set
+        await sql`DROP TABLE IF EXISTS messages;`;
         await sql`DROP TABLE IF EXISTS threads;`;
         await sql`DROP TABLE IF EXISTS users;`;
         console.log("Dropped existing tables");
@@ -28,6 +29,27 @@ export async function seed(dropTables = true) {
     await sql`CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);`;
     console.log(`Created index on clerk_user_id`);
 
+    // Create messages table
+    await sql`
+    CREATE TABLE IF NOT EXISTS messages (
+      id SERIAL PRIMARY KEY,
+      thread_id INTEGER NOT NULL,
+      clerk_user_id VARCHAR(255) NOT NULL,
+      role VARCHAR(50) NOT NULL,
+      content TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      tool_invocations JSONB,
+      FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id)
+    );
+    `;
+    console.log(`Created "messages" table`);
+
+    // Create index on thread_id for faster queries
+    await sql`CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);`;
+    // Create index on clerk_user_id for faster queries
+    await sql`CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);`;
+    console.log(`Created indexes on messages table`);
+
     // Create threads table
     await sql`
     CREATE TABLE IF NOT EXISTS threads (
@@ -35,9 +57,11 @@ export async function seed(dropTables = true) {
       user_id INTEGER NOT NULL,
       clerk_user_id VARCHAR(255) NOT NULL,
       metadata JSONB,
+      first_message_id INTEGER,
       "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id),
-      FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id)
+      FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id),
+      FOREIGN KEY (first_message_id) REFERENCES messages(id)
     );
     `;
     console.log(`Created "threads" table`);
@@ -45,7 +69,17 @@ export async function seed(dropTables = true) {
     // Create indexes on threads table
     await sql`CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);`;
     console.log(`Created indexes on threads table`);
+
+    // Add foreign key constraint for messages.thread_id
+    await sql`
+    ALTER TABLE messages
+    ADD CONSTRAINT fk_messages_thread_id
+    FOREIGN KEY (thread_id)
+    REFERENCES threads(id);
+    `;
+    console.log(`Added foreign key constraint for messages.thread_id`);
 
     let userId = null;
 
@@ -62,23 +96,32 @@ export async function seed(dropTables = true) {
             const clerkUserId = insertedUser.rows[0].clerk_user_id;
             console.log(`Upserted user with id: ${userId} and clerk_user_id: ${clerkUserId}`);
 
-            // Insert a sample thread
-            await sql`
-                INSERT INTO threads (user_id, clerk_user_id, metadata)
-                VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread", description: "This is a sample thread" }}::jsonb)
-                RETURNING id;
-            `;
+            // Insert sample threads and messages
+            for (let i = 1; i <= 3; i++) {
+                // Insert a message
+                const insertedMessage = await sql`
+                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
+                    VALUES (0, ${clerkUserId}, 'user', ${`This is sample message ${i}`})
+                    RETURNING id;
+                `;
+                const messageId = insertedMessage.rows[0].id;
 
-            // Insert two more sample threads
-            await sql`
-                INSERT INTO threads (user_id, clerk_user_id, metadata)
-                VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread 2", description: "This is another sample thread" }}::jsonb)
-            `;
+                // Insert a thread
+                await sql`
+                    INSERT INTO threads (user_id, clerk_user_id, metadata, first_message_id)
+                    VALUES (${userId}, ${clerkUserId}, ${JSON.stringify({ title: `Sample Thread ${i}`, description: `This is sample thread ${i}` })}::jsonb, ${messageId})
+                    RETURNING id;
+                `;
 
-            await sql`
-                INSERT INTO threads (user_id, clerk_user_id, metadata)
-                VALUES (${userId}, ${clerkUserId}, ${{ title: "Sample Thread 3", description: "This is yet another sample thread" }}::jsonb)
-            `;
+                // Update the message with the correct thread_id
+                await sql`
+                    UPDATE messages
+                    SET thread_id = (SELECT id FROM threads WHERE first_message_id = ${messageId})
+                    WHERE id = ${messageId};
+                `;
+            }
+
+            console.log(`Inserted sample threads and messages`);
         } catch (error) {
             console.error("Error inserting data:", error);
         }
