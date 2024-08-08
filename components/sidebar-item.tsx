@@ -23,7 +23,7 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
-    const { panes, openChatPane, setChatOpen } = useHudStore()
+    const { panes, openChatPane, addPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === chat.id && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
@@ -32,12 +32,20 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
-        openChatPane({
+        const newPane = {
             id: chat.id,
             title: chat.title,
-            type: 'chat',
+            type: 'chat' as const,
             content: { oldContent: chat.messages?.join('\n') }
-        })
+        }
+        
+        if (e.metaKey || e.ctrlKey) {
+            // If Command (Mac) or Ctrl (Windows/Linux) is held down, add a new pane
+            addPane(newPane)
+        } else {
+            // Otherwise, open the chat pane and close others
+            openChatPane(newPane)
+        }
         setChatOpen(true)
     }
 
