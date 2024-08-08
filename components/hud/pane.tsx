@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
 import { useHudStore } from "@/store/hud"
+import { X } from 'lucide-react'
 
 interface PaneProps {
     id: string
@@ -173,7 +174,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                         onClick={handleClose}
                         className="ml-2 text-white hover:text-red-500 focus:outline-none"
                     >
-                        ×
+                        <X size={18} />
                     </button>
                 </div>
             </div>
