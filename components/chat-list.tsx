@@ -1,7 +1,5 @@
 import { Separator } from '@/components/ui/separator'
 import { Message, User } from '@/lib/types'
-import Link from 'next/link'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { ChatMessage } from '@/components/chat-message'
 
 export interface ChatListProps {
@@ -16,31 +14,7 @@ export function ChatList({ messages, user, isShared }: ChatListProps) {
     }
 
     return (
-        <div className="relative mx-auto max-w-2xl px-4">
-            {!isShared && !user ? (
-                <>
-                    <div className="group relative mb-4 flex items-start md:-ml-12">
-                        <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-md border shadow-sm">
-                            <ExclamationTriangleIcon />
-                        </div>
-                        <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
-                            <p className="text-muted-foreground leading-normal">
-                                Please{' '}
-                                <Link href="/login" className="underline">
-                                    log in
-                                </Link>{' '}
-                                or{' '}
-                                <Link href="/signup" className="underline">
-                                    sign up
-                                </Link>{' '}
-                                to save and revisit your chat history!
-                            </p>
-                        </div>
-                    </div>
-                    <Separator className="my-4" />
-                </>
-            ) : null}
-
+        <div className="overflow-y-scroll relative mx-auto max-w-2xl px-4">
             {messages.map((message, index) => (
                 <div key={message.id}>
                     <ChatMessage message={message as any} />
