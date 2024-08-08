@@ -9,14 +9,12 @@ interface SidebarListProps {
 }
 
 const loadThreads = cache(async (userId?: string) => {
-    console.log('Loading threads for user:', userId)
     if (!userId) {
         console.log('No userId provided, returning empty array')
         return []
     }
     try {
         const threads = await fetchUserThreads(userId)
-        console.log("Fetched threads:", threads)
         return threads
     } catch (error) {
         console.error("Error fetching threads:", error)

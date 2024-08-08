@@ -4,20 +4,20 @@ import { saveMessage, createThread, getThreadMessages, updateThread, getUserThre
 import { Message } from '@/lib/types'
 
 export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
-    console.log('Saving chat message:', { threadId, clerkUserId, messageContent: message.content })
+    // console.log('Saving chat message:', { threadId, clerkUserId, messageContent: message.content })
     if (threadId) {
         const threadIdInt = parseInt(threadId)
         if (isNaN(threadIdInt)) {
             console.error("Invalid threadId:", threadId)
             return null
         }
-        
+
         const lastMessage = await getLastMessage(threadIdInt)
         if (lastMessage && lastMessage.content === message.content) {
             console.log("Duplicate message, not saving:", message.content)
             return null
         }
-        
+
         const savedMessage = await saveMessage(threadIdInt, clerkUserId, message)
         console.log('Message saved:', savedMessage)
         return savedMessage
@@ -65,7 +65,6 @@ export async function fetchUserThreads(userId: string) {
     console.log('Fetching user threads for userId:', userId)
     try {
         const threads = await getUserThreads(userId)
-        console.log('Fetched threads:', threads)
         return threads
     } catch (error) {
         console.error('Error fetching user threads:', error)

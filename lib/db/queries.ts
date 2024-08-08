@@ -13,14 +13,12 @@ export async function getUserData(userId: string) {
 
 export async function getUserThreads(userId: string) {
     try {
-        console.log('Fetching threads for user:', userId);
         const { rows } = await sql`
         SELECT id, metadata, "createdAt"
         FROM threads
         WHERE clerk_user_id = ${userId}
         ORDER BY "createdAt" DESC
         `;
-        console.log('Fetched threads:', rows);
         return rows;
     } catch (error) {
         console.error('Error in getUserThreads:', error);
