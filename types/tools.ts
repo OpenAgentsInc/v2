@@ -29,6 +29,10 @@ export interface ToolContext {
      * This token is used to authenticate with the Greptile API.
      */
     greptileToken: string | undefined;
+    /**
+     * The model that the tools are running on.
+     */
+    model: string;
 }
 
 /**

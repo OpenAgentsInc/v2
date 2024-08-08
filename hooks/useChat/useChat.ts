@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message } from 'ai/react';
+import { useModelStore } from '@/store/models'
 import { useRepoStore } from '@/store/repo'
 
 interface User {
@@ -64,6 +65,7 @@ interface UseChatProps {
  */
 export function useChat({ id: propsId }: UseChatProps = {}) {
     // Get repo data from the repo store
+    const model = useModelStore((state) => state.model)
     const repo = useRepoStore((state) => state.repo)
     const {
         currentThreadId,
@@ -78,19 +80,23 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const id = propsId || currentThreadId || 'default';
     const threadData = getThreadData(id);
 
+    // Build the body object from model and repo if it exists
+    const body = repo ? {
+        repoOwner: repo.owner,
+        repoName: repo.name,
+        repoBranch: repo.branch,
+        model
+    } : { model };
+
     const vercelChatProps = useVercelChat({
         id,
         initialMessages: threadData.messages,
+        body,
+        maxToolRoundtrips: 20,
         onFinish: (message) => {
             const updatedMessages = [...threadData.messages, message];
             setMessages(id, updatedMessages);
         },
-        body: repo ? {
-            repoOwner: repo.owner,
-            repoName: repo.name,
-            repoBranch: repo.branch,
-        } : undefined,
-        maxToolRoundtrips: 20
     });
 
     const setInput = (input: string) => {
