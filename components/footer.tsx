@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
+import { useToolStore } from '@/store/tools'
 import * as Popover from '@radix-ui/react-popover'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { models } from '@/lib/models'
@@ -12,6 +13,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
     const setRepo = useRepoStore((state) => state.setRepo)
     const model = useModelStore((state) => state.model)
     const setModel = useModelStore((state) => state.setModel)
+    const tools = useToolStore((state) => state.tools)
+    const setTools = useToolStore((state) => state.setTools)
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -30,6 +33,15 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         e.preventDefault()
         setRepo(repoInput)
         setOpen(false)
+    }
+
+    const handleToolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target
+        if (checked) {
+            setTools([...tools, name])
+        } else {
+            setTools(tools.filter((tool) => tool !== name))
+        }
     }
 
     const ourtools = [
@@ -81,7 +93,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                         <Popover.Trigger asChild>
                             <button className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75 focus:outline-none focus:ring-0">
                                 <Wrench className="mr-1" size={14} />
-                                9
+                                {tools.length}
                             </button>
                         </Popover.Trigger>
                         <Popover.Portal>
@@ -97,6 +109,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                                 type="checkbox"
                                                 id={tool}
                                                 name={tool}
+                                                checked={tools.includes(tool)}
+                                                onChange={handleToolChange}
                                                 className="mr-2"
                                             />
                                             <label htmlFor={tool} className="text-foreground text-sm">
@@ -115,7 +129,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                     <Github size={14} />
                                     <span>{repo.owner}/{repo.name}</span>
                                     <GitBranch size={14} />
-                                    <span>{repo.branch}</span>
+                                    <span>{repo.branch}</n>
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
