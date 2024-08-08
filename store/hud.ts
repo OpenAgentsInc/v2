@@ -29,7 +29,7 @@ type HudStore = {
     isChatOpen: boolean
     activeTerminalId: number | null
     lastPanePosition: { x: number; y: number; width: number; height: number } | null
-    addPane: (pane: PaneInput) => void
+    addPane: (pane: PaneInput, shouldTile?: boolean) => void
     removePane: (id: string) => void
     updatePanePosition: (id: string, x: number, y: number) => void
     updatePaneSize: (id: string, width: number, height: number) => void
@@ -53,7 +53,7 @@ const initialChatPane: Pane = {
     type: 'chat'
 }
 
-const PANE_OFFSET = 50 // Increased offset for new panes
+const PANE_OFFSET = 50 // Offset for new panes when tiling
 
 export const useHudStore = create<HudStore>()(
     persist(
@@ -62,7 +62,7 @@ export const useHudStore = create<HudStore>()(
             isChatOpen: true,
             activeTerminalId: null,
             lastPanePosition: null,
-            addPane: (newPane) => set((state) => {
+            addPane: (newPane, shouldTile = false) => set((state) => {
                 const existingPane = state.panes.find(pane => pane.id === newPane.id)
                 if (existingPane) {
                     // If the pane already exists, bring it to the front
@@ -76,13 +76,18 @@ export const useHudStore = create<HudStore>()(
                     }
                 }
 
-                const lastPane = state.panes[state.panes.length - 1]
-                const panePosition = newPane.paneProps || (lastPane ? {
-                    x: lastPane.x + PANE_OFFSET,
-                    y: lastPane.y + PANE_OFFSET,
-                    width: lastPane.width,
-                    height: lastPane.height
-                } : calculatePanePosition(state.panes.length))
+                let panePosition
+                if (shouldTile) {
+                    const lastPane = state.panes[state.panes.length - 1]
+                    panePosition = lastPane ? {
+                        x: lastPane.x + PANE_OFFSET,
+                        y: lastPane.y + PANE_OFFSET,
+                        width: lastPane.width,
+                        height: lastPane.height
+                    } : calculatePanePosition(state.panes.length)
+                } else {
+                    panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                }
 
                 // Ensure the new pane is within the viewport
                 const maxX = (typeof window !== 'undefined' ? window.innerWidth : 1920) - panePosition.width
@@ -187,7 +192,7 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         }
     }
 
-    // For additional panes, use the previous offset logic
+    // For additional panes, use the offset logic
     return {
         x: screenWidth * 0.3 + (paneCount * PANE_OFFSET),
         y: 80 + (paneCount * PANE_OFFSET),
