@@ -72,7 +72,8 @@ export function useChat({
         input,
         handleInputChange,
         handleSubmit,
-        addToolResult
+        addToolResult,
+        setMessages
     } = useVercelChat({
         initialMessages: initialMessages || threadData.messages,
         id: localThreadId,
@@ -116,6 +117,7 @@ export function useChat({
                 console.log('New thread created in handleSubmitWrapper:', threadId)
                 setLocalThreadId(threadId)
                 setCurrentThreadId(threadId)
+                setMessages([{ role: 'user', content: input }])
             }
         }
         await handleSubmit(e)
@@ -123,7 +125,7 @@ export function useChat({
             const updatedMessages = await fetchThreadMessages(localThreadId)
             setStoreMessages(localThreadId, updatedMessages)
         }
-    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction, setCurrentThreadId])
+    }, [handleSubmit, localThreadId, setStoreMessages, storeUser, input, createNewThreadAction, setCurrentThreadId, setMessages])
 
     console.log('useChat: Current state', { localThreadId, isNewChat: isNewChatRef.current, messagesCount: vercelMessages.length })
 
@@ -144,6 +146,7 @@ export function useChat({
                     lastSavedMessageRef.current = newMessages[newMessages.length - 1].content
                 }
             }
+            setMessages(messages)
         },
         setId: setLocalThreadId,
         setUser: setStoreUser
