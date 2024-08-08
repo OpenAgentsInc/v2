@@ -6,16 +6,12 @@ import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 export function NewChatButton() {
-    const { addPane } = useHudStore()
+    const { openChatPane } = useHudStore()
 
     const handleNewChat = () => {
-        addPane({
+        openChatPane({
             type: 'chat',
             title: 'New Chat',
-            x: 300,
-            y: 20,
-            width: 600,
-            height: 400
         })
     }
 
