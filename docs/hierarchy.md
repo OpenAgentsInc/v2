@@ -38,7 +38,11 @@
       - Uses useState for managing open/closed state
   - hud/ - Heads-up display components
   - ui/ - Reusable UI components
-  - button-scroll-to-bottom.tsx
+  - button-scroll-to-bottom.tsx - Implements a button to scroll to the bottom of the chat
+    - Uses client-side rendering
+    - Accepts isAtBottom and scrollToBottom props
+    - Renders a button with an arrow down icon
+    - Toggles opacity based on scroll position
   - chat-history.tsx - Renders chat history with a new chat button and sidebar list
     - Uses React.Suspense for loading state
     - Renders NewChatButton and SidebarList components
