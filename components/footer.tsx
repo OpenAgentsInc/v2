@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
+import { useToolStore } from '@/store/tools'
 import * as Popover from '@radix-ui/react-popover'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { models } from '@/lib/models'
@@ -12,6 +13,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
     const setRepo = useRepoStore((state) => state.setRepo)
     const model = useModelStore((state) => state.model)
     const setModel = useModelStore((state) => state.setModel)
+    const tools = useToolStore((state) => state.tools)
+    const setTools = useToolStore((state) => state.setTools)
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -20,6 +23,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
     })
 
     const [open, setOpen] = React.useState(false)
+    const [toolsOpen, setToolsOpen] = React.useState(false)
 
     const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
@@ -30,6 +34,27 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
         setRepo(repoInput)
         setOpen(false)
     }
+
+    const handleToolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target
+        if (checked) {
+            setTools([...tools, name])
+        } else {
+            setTools(tools.filter((tool) => tool !== name))
+        }
+    }
+
+    const ourtools = [
+        'create_file',
+        'list_repos',
+        'rewrite_file',
+        'scrape_webpage',
+        'view_file',
+        'view_hierarchy',
+        'create_pull_request',
+        'create_branch',
+        'search_codebase'
+    ]
 
     return (
         <div
@@ -51,7 +76,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                             </button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
-                            <DropdownMenu.Content className="bg-background border border-input rounded-lg shadow-lg p-1 z-50 focus:outline-none">
+                            <DropdownMenu.Content className="bg-background border border-input rounded-lg shadow-lg p-1 z-[9999] focus:outline-none">
                                 {models.map((m) => (
                                     <DropdownMenu.Item
                                         key={m.id}
@@ -64,10 +89,39 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                             </DropdownMenu.Content>
                         </DropdownMenu.Portal>
                     </DropdownMenu.Root>
-                    <span className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75">
-                        <Wrench className="mr-1" size={14} />
-                        4
-                    </span>
+                    <Popover.Root open={toolsOpen} onOpenChange={setToolsOpen}>
+                        <Popover.Trigger asChild>
+                            <button className="bg-background text-foreground rounded-full px-2 py-0.5 text-xs flex items-center opacity-75 focus:outline-none focus:ring-0">
+                                <Wrench className="mr-1" size={14} />
+                                {tools.length}
+                            </button>
+                        </Popover.Trigger>
+                        <Popover.Portal>
+                            <Popover.Content
+                                className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
+                                style={{ width: '200px' }}
+                                onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                                <form className="space-y-2">
+                                    {ourtools.map((tool) => (
+                                        <div key={tool} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id={tool}
+                                                name={tool}
+                                                checked={tools.includes(tool)}
+                                                onChange={handleToolChange}
+                                                className="mr-2"
+                                            />
+                                            <label htmlFor={tool} className="text-foreground text-sm">
+                                                {tool}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </form>
+                            </Popover.Content>
+                        </Popover.Portal>
+                    </Popover.Root>
                     {repo && (
                         <Popover.Root open={open} onOpenChange={setOpen}>
                             <Popover.Trigger asChild>
@@ -79,8 +133,8 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                 </button>
                             </Popover.Trigger>
                             <Popover.Portal>
-                                <Popover.Content 
-                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-50 focus:outline-none" 
+                                <Popover.Content
+                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
                                     style={{ width: '200px' }}
                                     onOpenAutoFocus={(e) => e.preventDefault()}
                                 >
@@ -115,7 +169,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'div'>)
                                             autoComplete="off"
                                             autoFocus={false}
                                         />
-                                        <button 
+                                        <button
                                             type="submit"
                                             className="w-full p-2 bg-background text-foreground border border-input rounded hover:bg-accent hover:text-accent-foreground focus:outline-none text-sm transition-colors duration-200"
                                         >

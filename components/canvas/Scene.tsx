@@ -8,7 +8,9 @@ import { GridScene } from './GridScene'
 
 export default function Scene(props) {
     // Use lenis to control scrolling
+    //
     useEffect(() => {
+        return
         const lenis = new Lenis({ smoothWheel: true, syncTouch: true })
         const removeEffect = addEffect((time) => lenis.raf(time))
         return () => {

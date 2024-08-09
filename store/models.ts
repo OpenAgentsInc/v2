@@ -16,11 +16,11 @@ interface ModelState {
 export const useModelStore = create<ModelState>()(
     persist(
         (set) => ({
-            model: models[0], // Default to the first model
+            model: models[2], // Default to the first model
             setModel: (model) => set({ model }),
         }),
         {
-            name: 'openagents-model-storage-1',
+            name: 'openagents-model-storage-2',
             partialize: (state) => ({ model: state.model }),
         }
     )

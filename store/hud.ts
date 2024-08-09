@@ -1,3 +1,4 @@
+import { nanoid } from "lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -13,9 +14,11 @@ export type Pane = {
         oldContent?: string
         newContent?: string
     }
+    isActive?: boolean
 }
 
-type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height'> & {
+type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
+    id?: string;
     paneProps?: {
         x: number
         y: number
@@ -29,7 +32,7 @@ type HudStore = {
     isChatOpen: boolean
     activeTerminalId: number | null
     lastPanePosition: { x: number; y: number; width: number; height: number } | null
-    addPane: (pane: PaneInput) => void
+    addPane: (pane: PaneInput, shouldTile?: boolean) => void
     removePane: (id: string) => void
     updatePanePosition: (id: string, x: number, y: number) => void
     updatePaneSize: (id: string, width: number, height: number) => void
@@ -39,6 +42,9 @@ type HudStore = {
     setInputFocused: (isFocused: boolean) => void
     isRepoInputOpen: boolean
     setRepoInputOpen: (isOpen: boolean) => void
+    openChatPane: (pane: PaneInput) => void
+    bringPaneToFront: (id: string) => void
+    setActivePane: (id: string) => void
 }
 
 const initialChatPane: Pane = {
@@ -48,8 +54,11 @@ const initialChatPane: Pane = {
     y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.05,
     width: 800,
     height: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.9,
-    type: 'chat'
+    type: 'chat',
+    isActive: true
 }
+
+const PANE_OFFSET = 45 // Offset for new panes when tiling
 
 export const useHudStore = create<HudStore>()(
     persist(
@@ -58,26 +67,89 @@ export const useHudStore = create<HudStore>()(
             isChatOpen: true,
             activeTerminalId: null,
             lastPanePosition: null,
-            addPane: (newPane) => set((state) => {
-                const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(state.panes.length)
-                const newPaneWithPosition: Pane = {
-                    ...newPane,
-                    x: panePosition.x,
-                    y: panePosition.y,
+            addPane: (newPane, shouldTile = false) => set((state) => {
+                const paneId = newPane.id || nanoid(); // Use existing ID if provided, otherwise generate new
+                let updatedPanes: Pane[]
+                let panePosition
+
+                const existingPane = state.panes.find(pane => pane.id === paneId)
+                if (existingPane) {
+                    return {
+                        panes: [
+                            ...state.panes.filter(pane => pane.id !== paneId).map(pane => ({ ...pane, isActive: false })),
+                            { ...existingPane, isActive: true }
+                        ],
+                        isChatOpen: true,
+                        lastPanePosition: { x: existingPane.x, y: existingPane.y, width: existingPane.width, height: existingPane.height }
+                    }
+                }
+
+                if (shouldTile) {
+                    // Tiling behavior: add a new pane
+                    const lastPane = state.panes[state.panes.length - 1]
+                    panePosition = lastPane ? {
+                        x: lastPane.x + PANE_OFFSET,
+                        y: lastPane.y + PANE_OFFSET,
+                        width: lastPane.width,
+                        height: lastPane.height
+                    } : calculatePanePosition(state.panes.length)
+                    updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
+                } else {
+                    // Non-tiling behavior: replace the active pane or all panes if there's only one
+                    const chatPanes = state.panes.filter(pane => pane.type === 'chat')
+                    if (chatPanes.length <= 1) {
+                        // If there's only one or no chat panes, replace all panes
+                        panePosition = chatPanes[0] || calculatePanePosition(0)
+                        updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
+                    } else {
+                        // If there are multiple chat panes, replace only the active one
+                        const activePane = chatPanes.find(pane => pane.isActive) || chatPanes[chatPanes.length - 1]
+                        panePosition = {
+                            x: activePane.x,
+                            y: activePane.y,
+                            width: activePane.width,
+                            height: activePane.height
+                        }
+                        updatedPanes = state.panes.map(pane =>
+                            pane.id === activePane.id ? { ...pane, isActive: false } : pane
+                        )
+                    }
+                }
+
+                // Ensure the new pane is within the viewport
+                const maxX = (typeof window !== 'undefined' ? window.innerWidth : 1920) - panePosition.width
+                const maxY = (typeof window !== 'undefined' ? window.innerHeight : 1080) - panePosition.height
+                const adjustedPosition = {
+                    x: Math.min(Math.max(panePosition.x, 0), maxX),
+                    y: Math.min(Math.max(panePosition.y, 0), maxY),
                     width: panePosition.width,
                     height: panePosition.height
                 }
+
+                const newPaneWithPosition: Pane = {
+                    ...newPane,
+                    id: paneId, // Use the paneId we determined earlier
+                    ...adjustedPosition,
+                    isActive: true
+                }
+
                 return {
-                    panes: [...state.panes, newPaneWithPosition],
-                    isChatOpen: newPane.type === 'chat' ? true : state.isChatOpen,
-                    lastPanePosition: panePosition
+                    panes: [...updatedPanes, newPaneWithPosition],
+                    isChatOpen: true,
+                    lastPanePosition: adjustedPosition
                 }
             }),
             removePane: (id) => set((state) => {
                 const removedPane = state.panes.find(pane => pane.id === id)
+                const remainingPanes = state.panes.filter(pane => pane.id !== id)
+                const newActivePaneId = remainingPanes.length > 0 ? remainingPanes[remainingPanes.length - 1].id : null
+
                 return {
-                    panes: state.panes.filter(pane => pane.id !== id),
-                    isChatOpen: state.panes.filter(pane => pane.id !== id && pane.type === 'chat').length > 0,
+                    panes: remainingPanes.map(pane => ({
+                        ...pane,
+                        isActive: pane.id === newActivePaneId
+                    })),
+                    isChatOpen: remainingPanes.some(pane => pane.type === 'chat'),
                     lastPanePosition: removedPane ? { x: removedPane.x, y: removedPane.y, width: removedPane.width, height: removedPane.height } : state.lastPanePosition
                 }
             }),
@@ -105,9 +177,46 @@ export const useHudStore = create<HudStore>()(
             setInputFocused: (isFocused) => set({ isInputFocused: isFocused }),
             isRepoInputOpen: false,
             setRepoInputOpen: (isOpen) => set({ isRepoInputOpen: isOpen }),
+            openChatPane: (newPane) => set((state) => {
+                const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                const newPaneWithPosition: Pane = {
+                    ...newPane,
+                    x: panePosition.x,
+                    y: panePosition.y,
+                    width: panePosition.width,
+                    height: panePosition.height,
+                    isActive: true,
+                    id: nanoid()
+                }
+                return {
+                    panes: [
+                        ...state.panes.filter(pane => pane.type !== 'chat').map(pane => ({ ...pane, isActive: false })),
+                        newPaneWithPosition
+                    ],
+                    isChatOpen: true,
+                    lastPanePosition: panePosition
+                }
+            }),
+            bringPaneToFront: (id) => set((state) => {
+                const paneToMove = state.panes.find(pane => pane.id === id)
+                if (!paneToMove) return state
+                return {
+                    panes: [
+                        ...state.panes.filter(pane => pane.id !== id).map(pane => ({ ...pane, isActive: false })),
+                        { ...paneToMove, isActive: true }
+                    ],
+                    lastPanePosition: { x: paneToMove.x, y: paneToMove.y, width: paneToMove.width, height: paneToMove.height }
+                }
+            }),
+            setActivePane: (id) => set((state) => ({
+                panes: state.panes.map(pane => ({
+                    ...pane,
+                    isActive: pane.id === id
+                }))
+            })),
         }),
         {
-            name: 'openagents-hud-storage-51',
+            name: 'openagents-hud-storage-1522',
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )
@@ -127,10 +236,10 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         }
     }
 
-    // For additional panes, use the previous offset logic
+    // For additional panes, use the offset logic
     return {
-        x: screenWidth * 0.3 + (paneCount * 20),
-        y: 80 + (paneCount * 20),
+        x: screenWidth * 0.3 + (paneCount * PANE_OFFSET),
+        y: 80 + (paneCount * PANE_OFFSET),
         width: screenWidth * 0.4,
         height: screenHeight * 0.8
     }

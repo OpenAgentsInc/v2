@@ -3,6 +3,7 @@ import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import '@/app/globals.css'
 import { Providers } from '@/components/providers'
+import { initializeDatabase } from '@/db/init-db'
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
@@ -29,9 +30,11 @@ export const viewport = {
     ]
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    // await initializeDatabase();
+
     return (
-        <html lang='en' className='antialiased'>
+        <html lang='en' className='antialiased' suppressHydrationWarning>
             {/*
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
@@ -66,4 +69,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </html>
     )
 }
-

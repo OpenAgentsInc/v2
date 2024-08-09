@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-import { shareChat } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
@@ -8,8 +7,23 @@ import { IconShare } from '@/components/ui/icons'
 import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { UserMessage } from './stocks/message'
-import { useChat } from '@/lib/hooks/use-chat'
+import { useChat } from '@/hooks/useChat'
 import { Message } from '@/lib/types'
+
+const shareChat = async (chat: { id: string; title: string; messages: Message[] }) => {
+    console.log("Not implemented")
+    return
+    const url = new URL(`/chat/${chat.id}`, window.location.href)
+    const text = chat.messages
+        .map((message) => `${message.author}: ${message.text}`)
+        .join('\n')
+
+    await navigator.share({
+        title: chat.title,
+        text,
+        url: url.toString()
+    })
+}
 
 export interface ChatPanelProps {
     id?: string

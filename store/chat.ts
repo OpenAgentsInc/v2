@@ -2,67 +2,67 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Message, User } from '@/lib/types'
 
-interface ChatData {
+interface ThreadData {
     messages: Message[];
     input: string;
 }
 
 interface ChatState {
-    chats: Record<string, ChatData>;
-    currentChatId: string | undefined;
+    threads: Record<string, ThreadData>;
+    currentThreadId: string | undefined;
     user: User | undefined;
-    addMessage: (chatId: string, message: Message) => void;
-    setMessages: (chatId: string, messages: Message[]) => void;
-    setInput: (chatId: string, input: string) => void;
-    setCurrentChatId: (id: string | undefined) => void;
+    addMessage: (threadId: string, message: Message) => void;
+    setMessages: (threadId: string, messages: Message[]) => void;
+    setInput: (threadId: string, input: string) => void;
+    setCurrentThreadId: (id: string | undefined) => void;
     setUser: (user: User | undefined) => void;
-    getChatData: (chatId: string) => ChatData;
+    getThreadData: (threadId: string) => ThreadData;
 }
 
 export const useChatStore = create<ChatState>()(
     persist(
         (set, get) => ({
-            chats: {},
-            currentChatId: undefined,
+            threads: {},
+            currentThreadId: undefined,
             user: undefined,
 
-            addMessage: (chatId, message) => set((state) => ({
-                chats: {
-                    ...state.chats,
-                    [chatId]: {
-                        ...state.chats[chatId],
-                        messages: [...(state.chats[chatId]?.messages || []), message],
+            addMessage: (threadId, message) => set((state) => ({
+                threads: {
+                    ...state.threads,
+                    [threadId]: {
+                        ...state.threads[threadId],
+                        messages: [...(state.threads[threadId]?.messages || []), message],
                     },
                 },
             })),
 
-            setMessages: (chatId, messages) => set((state) => ({
-                chats: {
-                    ...state.chats,
-                    [chatId]: {
-                        ...state.chats[chatId],
+            setMessages: (threadId, messages) => set((state) => ({
+                threads: {
+                    ...state.threads,
+                    [threadId]: {
+                        ...state.threads[threadId],
                         messages,
                     },
                 },
             })),
 
-            setInput: (chatId, input) => set((state) => ({
-                chats: {
-                    ...state.chats,
-                    [chatId]: {
-                        ...state.chats[chatId],
+            setInput: (threadId, input) => set((state) => ({
+                threads: {
+                    ...state.threads,
+                    [threadId]: {
+                        ...state.threads[threadId],
                         input,
                     },
                 },
             })),
 
-            setCurrentChatId: (id) => set({ currentChatId: id }),
+            setCurrentThreadId: (id) => set({ currentThreadId: id }),
 
             setUser: (user) => set({ user }),
 
-            getChatData: (chatId) => {
+            getThreadData: (threadId) => {
                 const state = get();
-                return state.chats[chatId] || { messages: [], input: '' };
+                return state.threads[threadId] || { messages: [], input: '' };
             },
         }),
         {
