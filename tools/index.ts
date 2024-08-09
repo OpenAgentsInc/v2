@@ -23,10 +23,12 @@ const allTools = {
     create_pull_request: createPullRequestTool,
     create_branch: createBranchTool,
     search_codebase: searchCodebaseTool
-};
+} as const;
 
-export const getTools = (context: ToolContext, toolNames: string[]) => {
-    const tools = {};
+type ToolName = keyof typeof allTools;
+
+export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
+    const tools: Partial<Record<ToolName, ReturnType<typeof allTools[ToolName]>>> = {};
     toolNames.forEach(toolName => {
         if (allTools[toolName]) {
             tools[toolName] = allTools[toolName](context);

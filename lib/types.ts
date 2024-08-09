@@ -24,10 +24,9 @@ export interface Chat extends Record<string, any> {
     sharePath?: string
 }
 
-export type ServerActionResult<T> = Promise<
+export type ServerActionResult<T> =
     | { success: true; data: T }
     | { success: false; error: string }
->
 
 export interface Session {
     user: {

@@ -37,9 +37,9 @@ export const listReposTool = (context: ToolContext): CoreTool<typeof params, Res
         try {
             const repos = await githubListUserRepos({
                 token: context.gitHubToken,
-                perPage,
-                sort,
-                direction
+                ...(perPage !== undefined && { perPage }),
+                ...(sort !== undefined && { sort }),
+                ...(direction !== undefined && { direction })
             });
 
             return {

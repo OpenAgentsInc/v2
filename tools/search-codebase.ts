@@ -34,7 +34,6 @@ type Result = {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const searchCodebaseTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
-    name: 'search_codebase',
     description: 'Searches the codebase using the Greptile API',
     parameters: params,
     execute: async ({ query, repositories, sessionId }: Params): Promise<Result> => {

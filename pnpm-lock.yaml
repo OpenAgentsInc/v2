@@ -193,6 +193,9 @@ devDependencies:
   '@types/d3-scale':
     specifier: ^4.0.8
     version: 4.0.8
+  '@types/json-schema':
+    specifier: ^7.0.15
+    version: 7.0.15
   '@types/lodash':
     specifier: ^4.17.7
     version: 4.17.7
@@ -1967,6 +1970,10 @@ packages:
     dependencies:
       '@types/unist': 2.0.10
     dev: false
+
+  /@types/json-schema@7.0.15:
+    resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+    dev: true
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}

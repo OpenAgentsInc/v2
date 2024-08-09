@@ -14,7 +14,7 @@ interface PaneProps {
     height: number
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
-    threadId?: string  // Add this line
+    threadId?: string
 }
 
 const useResizeHandlers = (
@@ -28,8 +28,7 @@ const useResizeHandlers = (
     const [size, setSize] = useState(initialSize)
 
     const resizeHandlers = {
-        topleft: useDrag(({ movement: [deltaX, deltaY], memo }) => {
-            if (!memo) memo = { ...position, ...size }
+        topleft: useDrag(({ movement: [deltaX, deltaY], memo = { ...position, ...size } }) => {
             const newX = Math.min(memo.x + deltaX, memo.x + memo.width - 200)
             const newY = Math.min(memo.y + deltaY, memo.y + memo.height - 100)
             const newWidth = Math.max(200, memo.width - deltaX)
@@ -39,9 +38,8 @@ const useResizeHandlers = (
             updatePanePosition(id, newX, newY)
             updatePaneSize(id, newWidth, newHeight)
             return memo
-        }, { memo: null }),
-        top: useDrag(({ movement: [, deltaY], memo }) => {
-            if (!memo) memo = { ...position, ...size }
+        }),
+        top: useDrag(({ movement: [, deltaY], memo = { ...position, ...size } }) => {
             const newY = Math.min(memo.y + deltaY, memo.y + memo.height - 100)
             const newHeight = Math.max(100, memo.height - deltaY)
             setPosition({ ...position, y: newY })
@@ -49,9 +47,8 @@ const useResizeHandlers = (
             updatePanePosition(id, position.x, newY)
             updatePaneSize(id, size.width, newHeight)
             return memo
-        }, { memo: null }),
-        topright: useDrag(({ movement: [deltaX, deltaY], memo }) => {
-            if (!memo) memo = { ...position, ...size }
+        }),
+        topright: useDrag(({ movement: [deltaX, deltaY], memo = { ...position, ...size } }) => {
             const newY = Math.min(memo.y + deltaY, memo.y + memo.height - 100)
             const newWidth = Math.max(200, memo.width + deltaX)
             const newHeight = Math.max(100, memo.height - deltaY)
@@ -60,31 +57,27 @@ const useResizeHandlers = (
             updatePanePosition(id, position.x, newY)
             updatePaneSize(id, newWidth, newHeight)
             return memo
-        }, { memo: null }),
-        right: useDrag(({ movement: [deltaX], memo }) => {
-            if (!memo) memo = { ...size }
+        }),
+        right: useDrag(({ movement: [deltaX], memo = { ...size } }) => {
             const newWidth = Math.max(200, memo.width + deltaX)
             setSize({ ...size, width: newWidth })
             updatePaneSize(id, newWidth, size.height)
             return memo
-        }, { memo: null }),
-        bottomright: useDrag(({ movement: [deltaX, deltaY], memo }) => {
-            if (!memo) memo = { ...size }
+        }),
+        bottomright: useDrag(({ movement: [deltaX, deltaY], memo = { ...size } }) => {
             const newWidth = Math.max(200, memo.width + deltaX)
             const newHeight = Math.max(100, memo.height + deltaY)
             setSize({ width: newWidth, height: newHeight })
             updatePaneSize(id, newWidth, newHeight)
             return memo
-        }, { memo: null }),
-        bottom: useDrag(({ movement: [, deltaY], memo }) => {
-            if (!memo) memo = { ...size }
+        }),
+        bottom: useDrag(({ movement: [, deltaY], memo = { ...size } }) => {
             const newHeight = Math.max(100, memo.height + deltaY)
             setSize({ ...size, height: newHeight })
             updatePaneSize(id, size.width, newHeight)
             return memo
-        }, { memo: null }),
-        bottomleft: useDrag(({ movement: [deltaX, deltaY], memo }) => {
-            if (!memo) memo = { ...position, ...size }
+        }),
+        bottomleft: useDrag(({ movement: [deltaX, deltaY], memo = { ...position, ...size } }) => {
             const newX = Math.min(memo.x + deltaX, memo.x + memo.width - 200)
             const newWidth = Math.max(200, memo.width - deltaX)
             const newHeight = Math.max(100, memo.height + deltaY)
@@ -93,9 +86,8 @@ const useResizeHandlers = (
             updatePanePosition(id, newX, position.y)
             updatePaneSize(id, newWidth, newHeight)
             return memo
-        }, { memo: null }),
-        left: useDrag(({ movement: [deltaX], memo }) => {
-            if (!memo) memo = { ...position, ...size }
+        }),
+        left: useDrag(({ movement: [deltaX], memo = { ...position, ...size } }) => {
             const newX = Math.min(memo.x + deltaX, memo.x + memo.width - 200)
             const newWidth = Math.max(200, memo.width - deltaX)
             setPosition({ ...position, x: newX })
@@ -103,7 +95,7 @@ const useResizeHandlers = (
             updatePanePosition(id, newX, position.y)
             updatePaneSize(id, newWidth, size.height)
             return memo
-        }, { memo: null }),
+        }),
     }
 
     return { position, size, setPosition, setSize, resizeHandlers }
@@ -189,7 +181,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
                 {React.Children.map(children, child =>
                     React.isValidElement(child) && typeof child.type !== 'string'
-                        ? React.cloneElement(child, { threadId: threadId })
+                        ? React.cloneElement(child, { threadId: threadId } as React.Attributes)
                         : child
                 )}
             </div>

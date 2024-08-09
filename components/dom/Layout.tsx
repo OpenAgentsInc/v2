@@ -1,11 +1,15 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
-const Layout = ({ children }) => {
-    const ref = useRef()
+interface LayoutProps {
+    children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
+    const ref = useRef<HTMLDivElement>(null)
 
     return (
         <div
@@ -36,4 +40,3 @@ const Layout = ({ children }) => {
 }
 
 export { Layout }
-

@@ -5,13 +5,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import { SidebarActions } from '@/components/sidebar-actions'
 import { SidebarItem } from '@/components/sidebar-item'
+import { ServerActionResult } from '@/lib/types'
 
-const removeChat = (chat: Chat) => {
-    console.log("Remove chat:", chat)
+const removeChatAsync = async (args: { id: string; path: string }): Promise<ServerActionResult<void>> => {
+    console.log("Remove chat:", args)
+    return { success: true, data: undefined }
 }
 
-const shareChat = (chat: Chat) => {
-    console.log("Share chat:", chat)
+const shareChatAsync = async (id: string): Promise<ServerActionResult<Chat>> => {
+    console.log("Share chat:", id)
+    return { success: false, error: "Not implemented" }
 }
 
 interface SidebarItemsProps {
@@ -36,8 +39,8 @@ export function SidebarItems({ chats }: SidebarItemsProps) {
                             <SidebarItem index={index} chat={chat}>
                                 <SidebarActions
                                     chat={chat}
-                                    removeChat={removeChat}
-                                    shareChat={shareChat}
+                                    removeChat={removeChatAsync}
+                                    shareChat={shareChatAsync}
                                 />
                             </SidebarItem>
                         </motion.div>

@@ -28,9 +28,10 @@ export async function getUserThreads(userId: string) {
 
 export async function saveMessage(threadId: number, clerkUserId: string, message: Message) {
     try {
+        const contentString = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
         const { rows } = await sql`
         INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations)
-        VALUES (${threadId}, ${clerkUserId}, ${message.role}, ${message.content}, ${JSON.stringify(message.toolInvocations)}::jsonb)
+        VALUES (${threadId}, ${clerkUserId}, ${message.role}, ${contentString}, ${JSON.stringify(message.toolInvocations)}::jsonb)
         RETURNING id, created_at as "createdAt"
         `;
         return { ...message, id: rows[0].id, createdAt: rows[0].createdAt };
@@ -57,12 +58,14 @@ export async function getThreadMessages(threadId: number) {
 
 export async function createThread(clerkUserId: string, firstMessage: Message) {
     try {
+        const contentString = typeof firstMessage.content === 'string' ? firstMessage.content : JSON.stringify(firstMessage.content);
+        const title = contentString.substring(0, 100);
         const { rows: [thread] } = await sql`
         INSERT INTO threads (user_id, clerk_user_id, metadata)
         VALUES (
           (SELECT id FROM users WHERE clerk_user_id = ${clerkUserId}),
           ${clerkUserId},
-          ${JSON.stringify({ title: firstMessage.content.substring(0, 100) })}::jsonb
+          ${JSON.stringify({ title })}::jsonb
         )
         RETURNING id
         `;
@@ -119,6 +122,23 @@ export async function getLastMessage(threadId: number) {
         return rows[0];
     } catch (error) {
         console.error('Error in getLastMessage:', error);
+        throw error;
+    }
+}
+
+export async function getSharedChat(chatId: string) {
+    try {
+        const { rows } = await sql`
+        SELECT t.id, t.metadata, t.created_at as "createdAt", t.share_path as "sharePath",
+               json_agg(json_build_object('id', m.id, 'role', m.role, 'content', m.content, 'createdAt', m.created_at, 'toolInvocations', m.tool_invocations)) as messages
+        FROM threads t
+        LEFT JOIN messages m ON t.id = m.thread_id
+        WHERE t.id = ${chatId}
+        GROUP BY t.id
+        `;
+        return rows[0];
+    } catch (error) {
+        console.error('Error in getSharedChat:', error);
         throw error;
     }
 }
