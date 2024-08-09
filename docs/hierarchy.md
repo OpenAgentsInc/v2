@@ -37,7 +37,45 @@
       - Displays file name and content with expandable preview
       - Uses useState for managing open/closed state
   - hud/ - Heads-up display components
+    - hud.tsx - Main HUD component
+      - Uses useHudStore for state management
+      - Renders Pane components
+    - pane.tsx - Pane component for HUD
+      - Implements draggable and resizable panes
+      - Uses useDrag for drag functionality
   - ui/ - Reusable UI components
+    - alert-dialog.tsx - Implements an alert dialog component
+      - Uses Radix UI for dialog primitives
+    - badge.tsx - Badge component for displaying status or labels
+      - Uses class-variance-authority for styling variants
+    - button.tsx - Button component with various styles
+      - Uses class-variance-authority for styling variants
+    - codeblock.tsx - Code block component for syntax highlighting
+      - Uses react-syntax-highlighter for code rendering
+    - dialog.tsx - Dialog component for modal interactions
+      - Uses Radix UI for dialog primitives
+    - dropdown-menu.tsx - Dropdown menu component
+      - Uses Radix UI for dropdown primitives
+    - icons.tsx - Collection of SVG icons
+      - Includes various icons for UI elements
+    - input.tsx - Input component for forms
+      - Uses forwardRef for ref forwarding
+    - label.tsx - Label component for form elements
+      - Uses Radix UI for label primitives
+    - select.tsx - Select component for dropdowns
+      - Uses Radix UI for select primitives
+    - separator.tsx - Separator component for dividing content
+      - Uses Radix UI for separator primitives
+    - sheet.tsx - Sheet component for side panels
+      - Uses Radix UI for sheet primitives
+    - sonner.tsx - Toaster component for notifications
+      - Uses Sonner for toast notifications
+    - switch.tsx - Switch component for toggles
+      - Uses Radix UI for switch primitives
+    - textarea.tsx - Textarea component for multi-line input
+      - Uses forwardRef for ref forwarding
+    - tooltip.tsx - Tooltip component for hints
+      - Uses Radix UI for tooltip primitives
   - button-scroll-to-bottom.tsx - Implements a button to scroll to the bottom of the chat
     - Uses client-side rendering
     - Accepts isAtBottom and scrollToBottom props
