@@ -181,7 +181,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
                 {React.Children.map(children, child =>
                     React.isValidElement(child) && typeof child.type !== 'string'
-                        ? React.cloneElement(child, { threadId: threadId })
+                        ? React.cloneElement(child, { threadId: threadId } as React.Attributes)
                         : child
                 )}
             </div>
