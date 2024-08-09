@@ -27,7 +27,9 @@
   - chat-history.tsx - Renders chat history with a new chat button and sidebar list
     - Uses React.Suspense for loading state
     - Renders NewChatButton and SidebarList components
-  - chat-list.tsx
+  - chat-list.tsx - Renders a list of chat messages with separators
+    - Maps through messages and renders ChatMessage components
+    - Adds Separator component between messages
   - chat-message-actions.tsx
   - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
     - Uses MemoizedReactMarkdown for rendering message content
@@ -41,7 +43,8 @@
   - chat-share-dialog.tsx
   - chat.tsx
   - clear-history.tsx
-  - empty-screen.tsx
+  - empty-screen.tsx - Displays a welcome message and features of OpenAgents
+    - Shows a list of capabilities including chat, code writing, and pull request creation
   - external-link.tsx
   - footer.tsx
   - header.tsx - Implements the application header with user authentication and sidebar toggle
@@ -49,7 +52,9 @@
   - LoadingSpinner.tsx
   - login-button.tsx
   - markdown.tsx
-  - new-chat-button.tsx
+  - new-chat-button.tsx - Implements a button to start a new chat
+    - Uses useHudStore and useChatStore for state management
+    - Adds a new chat pane when clicked
   - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
     - Uses react-textarea-autosize for input
     - Implements "New Chat" button functionality
@@ -70,8 +75,12 @@
   - tailwind-indicator.tsx
   - theme-toggle.tsx - Provides a button to toggle between light and dark themes
   - tool-result.tsx
-  - user-menu.tsx
+  - user-menu.tsx - Implements a dropdown menu for user actions
+    - Displays user initials and email
+    - Provides a sign-out option
   - workspace.tsx - Implements a collapsible workspace component
+    - Uses useState to manage open/closed state
+    - Animates width transition when opening/closing
 - db/ - Database related files
 - docs/ - Documentation files
 - hooks/ - Custom React hooks
