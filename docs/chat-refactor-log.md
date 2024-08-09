@@ -21,11 +21,18 @@
 ### Additional Changes to Address Type Errors
 - Updated `components/chat-panel.tsx`:
   - Modified the `useChat` hook call to parse the `id` prop as a number: `id: id ? parseInt(id, 10) : undefined`
+  - Removed `ChatPanelUI` import and replaced it with a regular `div`
+  - Updated `ChatShareDialog` to use `chat` prop instead of `chatId`
+  - Added `input`, `handleInputChange`, and `handleSubmit` props to `PromptForm`
+  - Added conditional rendering for `ButtonScrollToBottom`
 
 - Updated `components/chat.tsx`:
   - Changed the `useChat` hook call to parse the `propId` as a number: `id: propId ? parseInt(propId, 10) : undefined`
+  - Removed `setInput` prop from `EmptyScreen`
+  - Removed `isLoading` prop from `ChatPanel`
+  - Updated `pane.paneProps?.id` to `pane.id` in the `useHudStore.setState` call
 
 - Updated `components/new-chat-button.tsx`:
-  - Modified the `addPane` function call to convert the `threadId` to a string for the `paneProps.id`: `id: threadId.toString()`
+  - Modified the `addPane` function call to add `id` as a separate property instead of including it in `paneProps`
 
-These changes ensure type consistency across the application, converting string IDs to numbers where necessary and maintaining compatibility with existing components that expect string IDs. The next steps in the refactor should focus on updating any remaining components or API routes that may still be using string-based IDs, and ensuring that all parts of the application are consistently using number-based thread IDs.
+These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on updating any remaining components or API routes that may still be using string-based IDs, and ensuring that all parts of the application are consistently using number-based thread IDs.
