@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { create } from 'zustand';
-import { useChat as useVercelChat, Message } from 'ai/react';
+import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
+import { Message as CustomMessage } from '@/types';
 
 interface User {
     id: string;
@@ -12,7 +13,7 @@ interface User {
 
 interface ThreadData {
     id: number;
-    messages: Message[];
+    messages: CustomMessage[];
     input: string;
     user?: User;
 }
@@ -24,7 +25,7 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: Message[]) => void;
+    setMessages: (id: number, messages: CustomMessage[]) => void;
     setInput: (id: number, input: string) => void;
 }
 
@@ -41,7 +42,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: Message[]) =>
+    setMessages: (id: number, messages: CustomMessage[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -106,14 +107,21 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
+    const adaptMessage = (message: VercelMessage): CustomMessage => ({
+        ...message,
+        id: message.id,
+        toolInvocations: [], // Add any tool invocations if available
+    });
+
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
-        initialMessages: threadData.messages,
+        initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
         onFinish: (message) => {
             if (threadId) {
-                const updatedMessages = [...threadData.messages, message];
+                const adaptedMessage = adaptMessage(message);
+                const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages);
             }
         },
@@ -125,11 +133,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: CustomMessage = { id: Date.now().toString(), content: message, role: 'user', toolInvocations: [] };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
-        return vercelChatProps.append(userMessage);
+        return vercelChatProps.append(userMessage as VercelMessage);
     }, [threadId, vercelChatProps, threadData.messages, setMessages]);
 
     const setInput = (input: string) => {
@@ -139,8 +147,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         vercelChatProps.setInput(input);
     };
 
+    const adaptedMessages = vercelChatProps.messages.map(adaptMessage);
+
     return {
         ...vercelChatProps,
+        messages: adaptedMessages,
         id: threadId,
         threadData,
         user,
