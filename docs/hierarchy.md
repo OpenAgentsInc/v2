@@ -1,7 +1,19 @@
 # Hierarchy of important files & folders
 - app/
   - [[...rest]]/
+  - api/
+    - chat/
+      - onFinish.ts
+      - route.ts
+    - thread/
+      - route.ts
+  - share/
+    - [id]/
+      - page.tsx - Share chat page (unimplemented)
+  - globals.css
+  - layout.tsx
 - components/
+  - 
 - db/ 
 - docs/
 - hooks/
