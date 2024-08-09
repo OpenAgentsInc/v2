@@ -18,7 +18,7 @@ export async function saveChatMessage(threadId: number, clerkUserId: string, mes
     return savedMessage
 }
 
-export async function createNewThread(clerkUserId: string) {
+export async function createNewThread(clerkUserId: string): Promise<{ threadId: number }> {
     try {
         const { rows: [thread] } = await sql`
         INSERT INTO threads (user_id, clerk_user_id, metadata)
@@ -29,7 +29,7 @@ export async function createNewThread(clerkUserId: string) {
         )
         RETURNING id
         `;
-        return { threadId: thread.id };
+        return { threadId: Number(thread.id) };
     } catch (error) {
         console.error('Error in createThread:', error);
         throw error;
@@ -69,7 +69,7 @@ export async function fetchUserThreads(userId: string) {
     }
 }
 
-export async function getLastEmptyThread(clerkUserId: string) {
+export async function getLastEmptyThread(clerkUserId: string): Promise<number | null> {
     try {
         const { rows } = await sql`
             SELECT t.id
@@ -85,7 +85,7 @@ export async function getLastEmptyThread(clerkUserId: string) {
             ) DESC NULLS FIRST
             LIMIT 1
         `;
-        return rows[0] ? rows[0].id : null;
+        return rows[0] ? Number(rows[0].id) : null;
     } catch (error) {
         console.error('Error in getLastEmptyThread:', error);
         throw error;
