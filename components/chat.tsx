@@ -22,7 +22,6 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
         handleSubmit,
     } = useChat({ id: propId })
 
-    // console.log(`useChat hook returned id: ${id}`);
     console.log('Chat id??', id)
     console.log('Chat with propId:', propId)
 
