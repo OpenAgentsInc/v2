@@ -76,7 +76,12 @@
     - Handles thread creation with useThreadCreation hook
     - Renders ChatList or EmptyScreen based on message availability
     - Applies responsive styling for sidebar and workspace
-  - clear-history.tsx
+  - clear-history.tsx - Component for clearing chat history
+    - Uses client-side rendering
+    - Implements an AlertDialog for confirming history deletion
+    - Handles clearing chats with a server action
+    - Shows loading state during deletion process
+    - Uses toast notifications for error messages
   - empty-screen.tsx - Displays a welcome message and features of OpenAgents
     - Shows a list of capabilities including chat, code writing, and pull request creation
   - external-link.tsx
