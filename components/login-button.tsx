@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { signIn } from '@/auth'
+import { signIn } from 'next-auth/react'
 
 import { cn } from '@/lib/utils'
 import { Button, type ButtonProps } from '@/components/ui/button'
@@ -24,7 +24,6 @@ export function LoginButton({
       variant="outline"
       onClick={() => {
         setIsLoading(true)
-        // Use the signIn function from @/auth
         signIn('github', { callbackUrl: `/` })
       }}
       disabled={isLoading}
