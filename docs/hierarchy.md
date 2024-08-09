@@ -22,7 +22,25 @@
   - dom/ - DOM-related utility components
   - github/ - GitHub integration components
   - hud/ - Heads-up display components
+    - hud.tsx - Main HUD component
+    - pane.tsx - HUD pane component
   - ui/ - Reusable UI components
+    - alert-dialog.tsx - Alert dialog component
+    - badge.tsx - Badge component
+    - button.tsx - Button component
+    - codeblock.tsx - Code block component
+    - dialog.tsx - Dialog component
+    - dropdown-menu.tsx - Dropdown menu component
+    - icons.tsx - Icon components
+    - input.tsx - Input component
+    - label.tsx - Label component
+    - select.tsx - Select component
+    - separator.tsx - Separator component
+    - sheet.tsx - Sheet component
+    - sonner.tsx - Sonner component (possibly for notifications)
+    - switch.tsx - Switch component
+    - textarea.tsx - Textarea component
+    - tooltip.tsx - Tooltip component
   - LoadingSpinner.tsx - Loading indicator component
   - button-scroll-to-bottom.tsx - Button to scroll chat to bottom
   - chat-history.tsx - Chat history component
