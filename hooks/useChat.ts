@@ -77,7 +77,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId || null);
+    const [threadId, setThreadId] = useState<string | undefined>(propsId || currentThreadId);
 
     const { threadId: createdThreadId, createNewThread } = useThreadCreation(threadId);
 
