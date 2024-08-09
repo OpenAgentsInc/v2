@@ -25,6 +25,8 @@
   - ui/ - Reusable UI components
   - button-scroll-to-bottom.tsx
   - chat-history.tsx - Renders chat history with a new chat button and sidebar list
+    - Uses React.Suspense for loading state
+    - Renders NewChatButton and SidebarList components
   - chat-list.tsx
   - chat-message-actions.tsx
   - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
@@ -32,7 +34,10 @@
     - Supports code highlighting and inline code
     - Renders tool invocations using ToolResult component
     - Displays user/AI icons based on message role
-  - chat-panel.tsx - Renders the chat input area and share functionality
+  - chat-panel.tsx - Renders the chat input area, share functionality, and scroll-to-bottom button
+    - Implements share chat functionality (currently not implemented)
+    - Renders PromptForm component for user input
+    - Displays share button when chat has at least two messages
   - chat-share-dialog.tsx
   - chat.tsx
   - clear-history.tsx
@@ -46,6 +51,9 @@
   - markdown.tsx
   - new-chat-button.tsx
   - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
+    - Uses react-textarea-autosize for input
+    - Implements "New Chat" button functionality
+    - Handles form submission and input changes
   - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
   - sidebar-actions.tsx
   - sidebar-desktop.tsx
@@ -56,6 +64,8 @@
   - sidebar-mobile.tsx
   - sidebar-toggle.tsx
   - sidebar.tsx - Implements the main sidebar component with open/closed state management
+    - Uses useSidebar hook for managing sidebar state
+    - Renders children components within the sidebar
   - single-mount-wrapper.tsx
   - tailwind-indicator.tsx
   - theme-toggle.tsx - Provides a button to toggle between light and dark themes
