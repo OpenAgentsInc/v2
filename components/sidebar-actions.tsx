@@ -26,8 +26,8 @@ import {
 
 interface SidebarActionsProps {
   chat: Chat
-  removeChat: (args: { id: string; path: string }) => ServerActionResult<void>
-  shareChat: (id: string) => ServerActionResult<Chat>
+  removeChat: (args: { id: string; path: string }) => Promise<ServerActionResult<void>>
+  shareChat: (id: string) => Promise<ServerActionResult<Chat>>
 }
 
 export function SidebarActions({
@@ -39,6 +39,40 @@ export function SidebarActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
+  const [isSharePending, startShareTransition] = React.useTransition()
+
+  const handleRemoveChat = React.useCallback(async () => {
+    startRemoveTransition(async () => {
+      const result = await removeChat({
+        id: chat.id,
+        path: chat.path
+      })
+
+      if (result.success === false) {
+        toast.error(result.error)
+        return
+      }
+
+      setDeleteDialogOpen(false)
+      router.refresh()
+      router.push('/')
+      toast.success('Chat deleted')
+    })
+  }, [chat.id, chat.path, removeChat, router])
+
+  const handleShareChat = React.useCallback(async () => {
+    startShareTransition(async () => {
+      const result = await shareChat(chat.id)
+
+      if (result.success === false) {
+        toast.error(result.error)
+        return
+      }
+
+      setShareDialogOpen(false)
+      toast.success('Chat shared')
+    })
+  }, [chat.id, shareChat])
 
   return (
     <>
@@ -49,8 +83,9 @@ export function SidebarActions({
               variant="ghost"
               className="size-7 p-0 hover:bg-background"
               onClick={() => setShareDialogOpen(true)}
+              disabled={isSharePending}
             >
-              <IconShare />
+              {isSharePending ? <IconSpinner className="animate-spin" /> : <IconShare />}
               <span className="sr-only">Share</span>
             </Button>
           </TooltipTrigger>
@@ -73,7 +108,7 @@ export function SidebarActions({
       </div>
       <ChatShareDialog
         chat={chat}
-        shareChat={shareChat}
+        shareChat={handleShareChat}
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
         onCopy={() => setShareDialogOpen(false)}
@@ -95,23 +130,7 @@ export function SidebarActions({
               disabled={isRemovePending}
               onClick={event => {
                 event.preventDefault()
-                // @ts-ignore
-                startRemoveTransition(async () => {
-                  const result = await removeChat({
-                    id: chat.id,
-                    path: chat.path
-                  })
-
-                  if (result && 'error' in result) {
-                    toast.error(result.error)
-                    return
-                  }
-
-                  setDeleteDialogOpen(false)
-                  router.refresh()
-                  router.push('/')
-                  toast.success('Chat deleted')
-                })
+                handleRemoveChat()
               }}
             >
               {isRemovePending && <IconSpinner className="mr-2 animate-spin" />}
