@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { getUserData, getUserThreads } from '@/lib/db/queries';
+import { getUserData, getUserThreads } from '@/db/queries';
 import { useUserStore } from '@/lib/store/userStore';
 import { useUser } from "@clerk/nextjs";
 
