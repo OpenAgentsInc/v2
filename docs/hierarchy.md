@@ -172,8 +172,20 @@
   - tool-result.tsx - Renders the result of a tool invocation
     - Uses state to manage tool invocation state and result
 - db/ - Database related files
+  - actions.ts - Database actions for saving and fetching chat messages and threads
+  - init-db.ts - Initializes the database and seeds initial data
+  - queries.ts - SQL queries for interacting with the database
+  - seed.ts - Seeds the database with initial data
 - docs/ - Documentation files
+  - hud.md - Describes the HUD overlay and its components
+  - journal.md - Development journal for tracking progress and reflections
+  - pull-request-flow.md - Details the pull request workflow and tools
+  - request-lifecycle.md - Documents the lifecycle of core requests
 - hooks/ - Custom React hooks
+  - useCameraAnimation.ts - Hook for animating the camera in a 3D scene
+  - useChat.ts - Hook for managing chat state and interactions
+  - usePostprocess.jsx - Hook for applying post-processing effects in a 3D scene
+  - useThreadCreation.ts - Hook for creating new chat threads
 - lib/ - Utility functions and modules
   - chat/ - Chat-related utilities
   - github/ - GitHub integration utilities
