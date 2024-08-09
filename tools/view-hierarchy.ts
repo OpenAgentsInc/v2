@@ -39,7 +39,7 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
                 branch: context.repo.branch
             });
 
-            const result = items.map(item => `- ${item}`).join('\n');
+            const result = items.map((item: string) => `- ${item}`).join('\n');
 
             return {
                 success: true,
