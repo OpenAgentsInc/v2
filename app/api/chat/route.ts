@@ -1,6 +1,7 @@
 import { convertToCoreMessages, streamText } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
+import { onFinish } from './onFinish';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -14,7 +15,8 @@ export async function POST(req: Request) {
         messages: convertToCoreMessages(body.messages),
         model: toolContext.model,
         system: getSystemPrompt(toolContext),
-        tools
+        tools,
+        onFinish,
     });
 
     return result.toAIStreamResponse();

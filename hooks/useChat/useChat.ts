@@ -98,6 +98,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         onFinish: (message) => {
             const updatedMessages = [...threadData.messages, message];
             setMessages(id, updatedMessages);
+            console.log("useVercelChat onFinish with message:", message);
         },
     });
 
