@@ -11,8 +11,8 @@ export function NewChatButton() {
     const { setCurrentThreadId, setMessages } = useChatStore()
 
     const handleNewChat = () => {
-        setCurrentThreadId(null)
-        setMessages(null, [])
+        setCurrentThreadId(undefined)
+        setMessages(undefined, [])
         addPane({
             type: 'chat',
             title: 'New Chat',
