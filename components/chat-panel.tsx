@@ -7,19 +7,26 @@ import { useHudStore } from '@/store/hud'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
+import { Message } from '@/types'
 
 export interface ChatPanelProps {
-  id?: string
+  id?: number
   className?: string
   isAtBottom?: boolean
   scrollToBottom?: () => void
+  input: string
+  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
 export function ChatPanel({
   id,
   className,
   isAtBottom,
-  scrollToBottom
+  scrollToBottom,
+  input,
+  handleInputChange,
+  handleSubmit
 }: ChatPanelProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const { removePane } = useHudStore()
@@ -31,13 +38,13 @@ export function ChatPanel({
     if (id) {
       useHudStore.setState((state) => ({
         panes: state.panes.map((pane) =>
-          pane.id === id ? { ...pane, title: 'Chat' } : pane
+          pane.id === id.toString() ? { ...pane, title: 'Chat' } : pane
         )
       }))
     }
   }, [id])
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat({ id: id ? parseInt(id, 10) : undefined })
+  const { messages } = useChat({ id })
 
   return (
     <div className={className}>
@@ -54,7 +61,7 @@ export function ChatPanel({
       <ChatShareDialog
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
-        chat={{ id: id || '', title: 'Chat', messages }}
+        chat={{ id: id?.toString() || '', title: 'Chat', messages: messages as Message[] }}
       />
       <div className="p-4 pb-20">
         <PromptForm
