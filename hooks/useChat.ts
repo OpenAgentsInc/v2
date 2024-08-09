@@ -59,13 +59,9 @@ const useChatStore = create<ChatStore>((set, get) => ({
 }));
 
 interface UseChatProps {
-    id?: string;
+    id?: string | number;
 }
 
-/**
- * @file hooks/useChat/useChat.ts
- * @description Chat hook with streaming support. Import as { useChat } from "@/hooks/useChat"
- */
 export function useChat({ id: propsId }: UseChatProps = {}) {
     const model = useModelStore((state) => state.model);
     const repo = useRepoStore((state) => state.repo);
@@ -81,30 +77,39 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId || null);
+    const [threadId, setThreadId] = useState<string | null>(
+        typeof propsId === 'string' ? propsId : currentThreadId || null
+    );
+
+    const { threadId: createdThreadId, createNewThread } = useThreadCreation(
+        typeof propsId === 'string' ? propsId : undefined
+    );
 
     useEffect(() => {
-        if (propsId) {
-            setThreadId(propsId);
-            setCurrentThreadId(propsId);
-        } else if (!threadId) {
-            const createNewThread = async () => {
-                try {
-                    const response = await fetch('/api/thread', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                    });
-                    if (!response.ok) throw new Error('Failed to create thread');
-                    const { threadId: newThreadId } = await response.json();
+        const initializeThread = async () => {
+            if (typeof propsId === 'number') {
+                // If propsId is a number, use it directly
+                setThreadId(propsId.toString());
+                setCurrentThreadId(propsId.toString());
+            } else if (!threadId) {
+                // If no threadId, create a new one
+                const newThreadId = await createNewThread();
+                if (newThreadId) {
                     setThreadId(newThreadId);
                     setCurrentThreadId(newThreadId);
-                } catch (error) {
-                    console.error('Error creating new thread:', error);
                 }
-            };
-            createNewThread();
+            }
+        };
+
+        initializeThread();
+    }, [propsId, threadId, setCurrentThreadId, createNewThread]);
+
+    useEffect(() => {
+        if (createdThreadId && !threadId) {
+            setThreadId(createdThreadId);
+            setCurrentThreadId(createdThreadId);
         }
-    }, [propsId, threadId, setCurrentThreadId]);
+    }, [createdThreadId, threadId, setCurrentThreadId]);
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
