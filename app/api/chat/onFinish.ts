@@ -12,10 +12,7 @@ export async function onFinish(result: ThreadOnFinishResult) {
     const assistantMessage: Message = {
         role: 'assistant',
         content: result.text,
-        toolInvocations: result.toolCalls ? {
-            toolCalls: result.toolCalls,
-            toolResults: result.toolResults
-        } : undefined
+        toolInvocations: result.toolCalls ? result.toolCalls : undefined
     };
 
     const savedAssistantMessage = await saveChatMessage(result.threadId, result.clerkUserId, assistantMessage);
@@ -35,8 +32,8 @@ export interface OnFinishResult {
     finishReason: FinishReason;
     usage: CompletionTokenUsage;
     text: string;
-    toolCalls?: any;
-    toolResults?: any;
+    toolCalls?: any[];
+    toolResults?: any[];
 }
 
 export interface ThreadOnFinishResult extends OnFinishResult {
