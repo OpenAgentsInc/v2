@@ -14,16 +14,6 @@ const removeChatAsync = async (args: { id: string; path: string }): Promise<Serv
 
 const shareChatAsync = async (id: string): Promise<ServerActionResult<Chat>> => {
     console.log("Share chat:", id)
-    throw new Error("Not implemented")
-}
-
-const removeChat = (args: { id: string; path: string }): ServerActionResult<void> => {
-    removeChatAsync(args) // Note: This is still not waiting for the async operation to complete
-    return { success: true, data: undefined }
-}
-
-const shareChat = (id: string): ServerActionResult<Chat> => {
-    shareChatAsync(id) // Note: This is still not waiting for the async operation to complete
     return { success: false, error: "Not implemented" }
 }
 
@@ -49,8 +39,8 @@ export function SidebarItems({ chats }: SidebarItemsProps) {
                             <SidebarItem index={index} chat={chat}>
                                 <SidebarActions
                                     chat={chat}
-                                    removeChat={removeChat}
-                                    shareChat={shareChat}
+                                    removeChat={removeChatAsync}
+                                    shareChat={shareChatAsync}
                                 />
                             </SidebarItem>
                         </motion.div>
