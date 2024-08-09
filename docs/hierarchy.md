@@ -15,10 +15,16 @@
   - layout.tsx - Main application layout
   - signup/ - Signup page
 - components/ - React components
-  - LoadingSpinner.tsx - Loading indicator component
   - auth/ - Authentication-related components
-  - button-scroll-to-bottom.tsx - Button to scroll chat to bottom
   - canvas/ - Canvas-related components
+  - dashboard/ - Dashboard-related components
+  - db/ - Database-related components
+  - dom/ - DOM-related utility components
+  - github/ - GitHub integration components
+  - hud/ - Heads-up display components
+  - ui/ - Reusable UI components
+  - LoadingSpinner.tsx - Loading indicator component
+  - button-scroll-to-bottom.tsx - Button to scroll chat to bottom
   - chat-history.tsx - Chat history component
   - chat-list.tsx - List of chats component
   - chat-message-actions.tsx - Actions for chat messages
@@ -27,15 +33,10 @@
   - chat-share-dialog.tsx - Dialog for sharing chats
   - chat.tsx - Main chat component
   - clear-history.tsx - Component to clear chat history
-  - dashboard/ - Dashboard-related components
-  - db/ - Database-related components
-  - dom/ - DOM-related utility components
   - empty-screen.tsx - Empty state screen component
   - external-link.tsx - External link component
   - footer.tsx - Footer component
-  - github/ - GitHub integration components
   - header.tsx - Application header component
-  - hud/ - Heads-up display components
   - layout-content.tsx - Layout content component
   - login-button.tsx - Login button component
   - markdown.tsx - Markdown rendering component
@@ -55,7 +56,6 @@
   - tailwind-indicator.tsx - Tailwind CSS breakpoint indicator
   - theme-toggle.tsx - Theme toggle component
   - tool-result.tsx - Component to display tool results
-  - ui/ - Reusable UI components
   - user-menu.tsx - User menu component
   - workspace.tsx - Workspace component
 - db/ - Database related files
