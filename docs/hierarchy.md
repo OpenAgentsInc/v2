@@ -23,41 +23,41 @@
   - github/ - GitHub integration components
   - hud/ - Heads-up display components
   - ui/ - Reusable UI components
-  - header.tsx - Implements the application header with user authentication and sidebar toggle
-  - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
-  - chat-panel.tsx - Renders the chat input area and share functionality
-  - workspace.tsx - Implements a collapsible workspace component
-  - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
-  - LoadingSpinner.tsx
   - button-scroll-to-bottom.tsx
-  - chat-history.tsx
+  - chat-history.tsx - Renders chat history with a new chat button and sidebar list
   - chat-list.tsx
   - chat-message-actions.tsx
-  - chat-message.tsx
+  - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
+  - chat-panel.tsx - Renders the chat input area and share functionality
   - chat-share-dialog.tsx
   - chat.tsx
   - clear-history.tsx
   - empty-screen.tsx
   - external-link.tsx
   - footer.tsx
+  - header.tsx - Implements the application header with user authentication and sidebar toggle
   - layout-content.tsx
+  - LoadingSpinner.tsx
   - login-button.tsx
   - markdown.tsx
   - new-chat-button.tsx
-  - prompt-form.tsx
+  - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
+  - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
   - sidebar-actions.tsx
   - sidebar-desktop.tsx
   - sidebar-footer.tsx
   - sidebar-item.tsx
+  - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
   - sidebar-list.tsx
   - sidebar-mobile.tsx
   - sidebar-toggle.tsx
-  - sidebar.tsx
+  - sidebar.tsx - Implements the main sidebar component with open/closed state management
   - single-mount-wrapper.tsx
   - tailwind-indicator.tsx
-  - theme-toggle.tsx
+  - theme-toggle.tsx - Provides a button to toggle between light and dark themes
   - tool-result.tsx
   - user-menu.tsx
+  - workspace.tsx - Implements a collapsible workspace component
 - db/ - Database related files
 - docs/ - Documentation files
 - hooks/ - Custom React hooks
