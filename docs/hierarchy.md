@@ -1,19 +1,34 @@
 # Hierarchy of important files & folders
 
 - app/
-  - [[...rest]]/ - Catch-all route for main application pages
-  - api/ - API routes
+  - [[...rest]]/
+    - page.tsx - Main application page
+      - Renders `HomeUnauthed` for unauthenticated users
+      - Renders `HomeDashboard` for authenticated users
+  - api/
     - chat/
       - onFinish.ts - Handles chat completion
+        - Saves user and assistant messages to the database
+        - Logs token usage and handles potential credit deductions
       - route.ts - Chat API route
+        - Validates and processes chat messages
+        - Streams AI responses and handles tool invocations
+        - Uses `onFinish` to save messages and manage state
     - thread/
       - route.ts - Thread API route
+        - Authenticates user and manages thread creation
+        - Returns existing empty thread or creates a new one
   - share/
     - [id]/
       - page.tsx - Share chat page (unimplemented)
+        - Fetches shared chat data and displays chat title and messages
+        - Uses `ChatList` and `FooterText` components
   - globals.css - Global CSS styles
   - layout.tsx - Main application layout
-  - signup/ - Signup page
+  - signup/
+    - page.tsx - Signup page
+      - Renders `SignUp` component for new users
+      - Displays `UserButton` for authenticated users
 - components/ - React components
   - auth/ - Authentication-related components
     - HomeUnauthed.tsx - Renders the unauthenticated home page with a sign-in form
