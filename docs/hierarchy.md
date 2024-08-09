@@ -84,7 +84,11 @@
     - Uses toast notifications for error messages
   - empty-screen.tsx - Displays a welcome message and features of OpenAgents
     - Shows a list of capabilities including chat, code writing, and pull request creation
-  - external-link.tsx
+  - external-link.tsx - Reusable component for rendering external links
+    - Accepts href and children props
+    - Renders an anchor tag with target="_blank"
+    - Includes an SVG icon to indicate external link
+    - Applies hover underline effect
   - footer.tsx
   - header.tsx - Implements the application header with user authentication and sidebar toggle
   - layout-content.tsx
