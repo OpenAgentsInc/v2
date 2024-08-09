@@ -4,6 +4,7 @@ import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { useEffect, useRef } from 'react'
 import { useHudStore } from '@/store/hud'
+import { Message } from '@/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   id?: string
@@ -42,13 +43,13 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     <>
       <div className={`flex-1 overflow-hidden ${className}`} ref={chatContainerRef}>
         {messages.length ? (
-          <ChatList messages={messages} />
+          <ChatList messages={messages as Message[]} />
         ) : (
           <EmptyScreen />
         )}
       </div>
       <ChatPanel
-        id={propId}
+        id={id}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
