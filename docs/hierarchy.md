@@ -63,7 +63,12 @@
     - Implements share chat functionality (currently not implemented)
     - Renders PromptForm component for user input
     - Displays share button when chat has at least two messages
-  - chat-share-dialog.tsx
+  - chat-share-dialog.tsx - Implements a dialog for sharing chat links
+    - Uses client-side rendering
+    - Displays chat title and message count
+    - Implements copy-to-clipboard functionality for share links
+    - Shows loading state while generating share link
+    - Uses toast notifications for success and error messages
   - chat.tsx
   - clear-history.tsx
   - empty-screen.tsx - Displays a welcome message and features of OpenAgents
