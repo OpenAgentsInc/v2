@@ -31,7 +31,6 @@ type Result = {
 };
 
 export const scrapeWebpageTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
-    name: 'scrape_webpage',
     description: 'Scrapes a webpage using Firecrawl and returns the content in markdown format',
     parameters: params,
     execute: async ({ url, pageOptions }: Params): Promise<Result> => {
