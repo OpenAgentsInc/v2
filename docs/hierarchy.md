@@ -1,5 +1,6 @@
 # Hierarchy of important files & folders
 - app/
+  - [[...rest]]/
 - components/
 - db/ 
 - docs/
