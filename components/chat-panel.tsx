@@ -34,7 +34,7 @@ export function ChatPanel({
     handleSubmit
 }: ChatPanelProps) {
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
-    const { messages } = useChat({ id })
+    const { messages } = useChat({ id: id || undefined })
 
     return (
         <div className="w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% dark:from-background/10 dark:from-10% dark:to-background/80">
