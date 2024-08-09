@@ -69,7 +69,13 @@
     - Implements copy-to-clipboard functionality for share links
     - Shows loading state while generating share link
     - Uses toast notifications for success and error messages
-  - chat.tsx
+  - chat.tsx - Main chat component that combines ChatList, ChatPanel, and EmptyScreen
+    - Uses client-side rendering
+    - Implements scroll-to-bottom functionality with debounce
+    - Manages chat state using useChat hook
+    - Handles thread creation with useThreadCreation hook
+    - Renders ChatList or EmptyScreen based on message availability
+    - Applies responsive styling for sidebar and workspace
   - clear-history.tsx
   - empty-screen.tsx - Displays a welcome message and features of OpenAgents
     - Shows a list of capabilities including chat, code writing, and pull request creation
