@@ -16,6 +16,9 @@
   - signup/ - Signup page
 - components/ - React components
   - auth/ - Authentication-related components
+    - HomeUnauthed.tsx - Renders the unauthenticated home page with a sign-in form
+      - Uses Clerk's SignIn component
+      - Applies custom font and styling
   - canvas/ - Canvas-related components
   - dashboard/ - Dashboard-related components
   - db/ - Database-related components
