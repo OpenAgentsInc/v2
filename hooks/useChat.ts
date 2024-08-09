@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message as CustomMessage } from '@/lib/types';
+import { Message as CustomMessage, ToolContent } from '@/lib/types';
 
 interface User {
     id: string;
@@ -112,7 +112,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         if (role === 'tool') {
             return {
                 id: message.id,
-                content: message.content,
+                content: message.content as ToolContent,
                 role: role,
                 toolInvocations: [],
             };
