@@ -11,7 +11,6 @@ export function useThreadCreation(initialId?: string) {
             return threadId;
         }
 
-        console.log("Attempting to create new thread...");
         isCreatingThread.current = true;
 
         try {

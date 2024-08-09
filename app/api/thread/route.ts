@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createNewThread } from '@/db/actions';
+import { createNewThread, getLastEmptyThread } from '@/db/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,13 +12,29 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Create a new thread
+        let existingEmptyThreadId = null;
+
+        // Try to get the last empty thread, but don't fail if there's an error
+        try {
+            existingEmptyThreadId = await getLastEmptyThread(userId);
+        } catch (error) {
+            console.error('Error fetching last empty thread:', error);
+            // Continue execution even if this fails
+        }
+
+        if (existingEmptyThreadId) {
+            console.log(`Reusing existing empty thread: ${existingEmptyThreadId}`);
+            return NextResponse.json({ threadId: existingEmptyThreadId }, { status: 200 });
+        }
+
+        // If no empty thread exists or there was an error fetching it, create a new one
+        console.log('Creating new thread');
         const result = await createNewThread(userId);
 
-        // Return the new thread ID
+        // Return the thread ID
         return NextResponse.json({ threadId: result.threadId }, { status: 201 });
     } catch (error) {
-        console.error('Error creating new thread:', error);
+        console.error('Error handling thread request:', error);
         return NextResponse.json(
             { error: 'Internal Server Error', details: (error as Error).message },
             { status: 500 }
