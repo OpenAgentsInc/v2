@@ -60,19 +60,20 @@ export function SidebarActions({
     })
   }, [chat.id, chat.path, removeChat, router])
 
-  const handleShareChat = React.useCallback(async () => {
-    startShareTransition(async () => {
-      const result = await shareChat(chat.id)
-
-      if (result.success === false) {
-        toast.error(result.error)
-        return
-      }
-
-      setShareDialogOpen(false)
-      toast.success('Chat shared')
+  const handleShareChat = React.useCallback((id: string) => {
+    return new Promise<ServerActionResult<Chat>>(async (resolve) => {
+      startShareTransition(async () => {
+        const result = await shareChat(id)
+        if (result.success === false) {
+          toast.error(result.error)
+        } else {
+          setShareDialogOpen(false)
+          toast.success('Chat shared')
+        }
+        resolve(result)
+      })
     })
-  }, [chat.id, shareChat])
+  }, [shareChat])
 
   return (
     <>
