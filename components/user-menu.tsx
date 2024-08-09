@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { signOut } from '@/lib/auth'
+import { signOut } from 'next-auth/react'
 
 export interface UserMenuProps {
   user: Session['user']
