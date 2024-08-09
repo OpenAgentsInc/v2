@@ -1,82 +1,69 @@
-import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
+import { useChat } from '@/hooks/useChat'
+import { ChatPanel as ChatPanelUI } from '@/components/ui/chat-panel'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { IconShare } from '@/components/ui/icons'
-import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
-import { useChat } from '@/hooks/useChat'
-import { Message, Chat } from '@/lib/types'
-import { ServerActionResult } from '@/lib/types'
-
-const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
-    console.log("Not implemented")
-    throw new Error("Not implemented")
-}
+import { useEffect, useState } from 'react'
+import { useHudStore } from '@/store/hud'
+import { useRepoStore } from '@/store/repo'
+import { useModelStore } from '@/store/models'
+import { useToolStore } from '@/store/tools'
 
 export interface ChatPanelProps {
-    id?: string
-    title?: string
-    isAtBottom: boolean
-    scrollToBottom: () => void
-    input: string
-    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  id?: string
+  className?: string
+  isAtBottom?: boolean
+  scrollToBottom?: () => void
 }
 
 export function ChatPanel({
-    id,
-    title,
-    isAtBottom,
-    scrollToBottom,
-    input,
-    handleInputChange,
-    handleSubmit
+  id,
+  className,
+  isAtBottom,
+  scrollToBottom
 }: ChatPanelProps) {
-    const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
-    const { messages } = useChat({ id })
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const { removePane } = useHudStore()
+  const repo = useRepoStore((state) => state.repo)
+  const model = useModelStore((state) => state.model)
+  const tools = useToolStore((state) => state.tools)
 
-    return (
-        <div className="w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% dark:from-background/10 dark:from-10% dark:to-background/80">
-            <ButtonScrollToBottom
-                isAtBottom={isAtBottom}
-                scrollToBottom={scrollToBottom}
-            />
+  useEffect(() => {
+    if (id) {
+      useHudStore.setState((state) => ({
+        panes: state.panes.map((pane) =>
+          pane.paneProps?.id === id ? { ...pane, title: 'Chat' } : pane
+        )
+      }))
+    }
+  }, [id])
 
-            <div className="mx-auto sm:max-w-2xl sm:px-4">
-                {messages?.length >= 2 && id && title ? (
-                    <div className="flex h-10 items-center justify-center">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShareDialogOpen(true)}
-                        >
-                            <IconShare className="mr-2" />
-                            Share
-                        </Button>
-                        <ChatShareDialog
-                            open={shareDialogOpen}
-                            onOpenChange={setShareDialogOpen}
-                            onCopy={() => setShareDialogOpen(false)}
-                            shareChat={shareChat}
-                            chat={{
-                                id,
-                                title,
-                                messages: messages as Message[]
-                            }}
-                        />
-                    </div>
-                ) : null}
+  const { messages } = useChat({ id: id ? parseInt(id, 10) : undefined })
 
-                <div className="space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:rounded-t-xl sm:border">
-                    <PromptForm
-                        input={input}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={handleSubmit}
-                    />
-                    <FooterText className="hidden sm:block" />
-                </div>
-            </div>
+  return (
+    <ChatPanelUI className={className}>
+      {messages.length > 1 && (
+        <div className="flex items-center justify-end p-4">
+          <button
+            onClick={() => setShareDialogOpen(true)}
+            className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
+          >
+            Share
+          </button>
         </div>
-    )
+      )}
+      <ChatShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        chatId={id}
+      />
+      <div className="p-4 pb-20">
+        <PromptForm />
+      </div>
+      <ButtonScrollToBottom
+        isAtBottom={isAtBottom}
+        scrollToBottom={scrollToBottom}
+      />
+    </ChatPanelUI>
+  )
 }
