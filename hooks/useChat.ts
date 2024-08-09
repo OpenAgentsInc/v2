@@ -4,7 +4,6 @@ import { useChat as useVercelChat, Message } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { useThreadCreation } from './useThreadCreation';
 
 interface User {
     id: string;
@@ -12,44 +11,44 @@ interface User {
 }
 
 interface ThreadData {
-    id: string;
+    id: number;
     messages: Message[];
     input: string;
     user?: User;
 }
 
 interface ChatStore {
-    currentThreadId: string | undefined;
+    currentThreadId: number | null;
     user: User | undefined;
-    threads: Record<string, ThreadData>;
-    setCurrentThreadId: (id: string) => void;
+    threads: Record<number, ThreadData>;
+    setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
-    getThreadData: (id: string) => ThreadData;
-    setMessages: (id: string, messages: Message[]) => void;
-    setInput: (id: string, input: string) => void;
+    getThreadData: (id: number) => ThreadData;
+    setMessages: (id: number, messages: Message[]) => void;
+    setInput: (id: number, input: string) => void;
 }
 
 const useChatStore = create<ChatStore>((set, get) => ({
-    currentThreadId: undefined,
+    currentThreadId: null,
     user: undefined,
     threads: {},
-    setCurrentThreadId: (id: string) => set({ currentThreadId: id }),
+    setCurrentThreadId: (id: number) => set({ currentThreadId: id }),
     setUser: (user: User) => set({ user }),
-    getThreadData: (id: string) => {
+    getThreadData: (id: number) => {
         const { threads } = get();
         if (!threads[id]) {
             threads[id] = { id, messages: [], input: '' };
         }
         return threads[id];
     },
-    setMessages: (id: string, messages: Message[]) =>
+    setMessages: (id: number, messages: Message[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
                 [id]: { ...state.threads[id], messages }
             }
         })),
-    setInput: (id: string, input: string) =>
+    setInput: (id: number, input: string) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -59,7 +58,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
 }));
 
 interface UseChatProps {
-    id?: string;
+    id?: number;
 }
 
 export function useChat({ id: propsId }: UseChatProps = {}) {
@@ -77,25 +76,26 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const [threadId, setThreadId] = useState<string | undefined>(propsId || currentThreadId);
-
-    const { threadId: createdThreadId, createNewThread } = useThreadCreation(threadId);
+    const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId);
 
     useEffect(() => {
         if (propsId) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
         } else if (!threadId) {
-            createNewThread();
+            // Create a new thread
+            fetch('/api/thread', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(({ threadId: newThreadId }) => {
+                setThreadId(newThreadId);
+                setCurrentThreadId(newThreadId);
+            })
+            .catch(error => console.error('Error creating new thread:', error));
         }
-    }, [propsId, threadId, setCurrentThreadId, createNewThread]);
-
-    useEffect(() => {
-        if (createdThreadId && !threadId) {
-            setThreadId(createdThreadId);
-            setCurrentThreadId(createdThreadId);
-        }
-    }, [createdThreadId, threadId, setCurrentThreadId]);
+    }, [propsId, threadId, setCurrentThreadId]);
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
@@ -107,7 +107,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const vercelChatProps = useVercelChat({
-        id: threadId,
+        id: threadId?.toString(),
         initialMessages: threadData.messages,
         body,
         maxToolRoundtrips: 20,
