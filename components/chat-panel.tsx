@@ -51,7 +51,18 @@ export function ChatPanel({
     // Implement the shareChat functionality here
     // This is a placeholder implementation
     console.log('Sharing chat with id:', id)
-    return { success: true, data: { id, title: 'Chat', messages: [], sharePath: `/share/${id}` } }
+    return { 
+      success: true, 
+      data: { 
+        id, 
+        title: 'Chat', 
+        messages: [], 
+        sharePath: `/share/${id}`,
+        createdAt: new Date(),
+        userId: 'placeholder-user-id',
+        path: `/chat/${id}`
+      } 
+    }
   }
 
   return (
@@ -72,7 +83,7 @@ export function ChatPanel({
         chat={{
           id: id?.toString() || '',
           title: 'Chat',
-          messages: messages
+          messages: messages as Message[]
         }}
         shareChat={shareChat}
         onCopy={() => {
