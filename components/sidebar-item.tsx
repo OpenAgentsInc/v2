@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { nanoid } from 'lib/utils'
 
 import { motion } from 'framer-motion'
 
@@ -34,12 +35,12 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
         const newPane = {
-            id: chat.id,
+            id: nanoid(),
             title: chat.title,
             type: 'chat' as const,
             content: { oldContent: chat.messages?.join('\n') }
         }
-        
+
         // Use tiling (true) if Command/Ctrl is pressed, otherwise false
         addPane(newPane, e.metaKey || e.ctrlKey)
         setChatOpen(true)

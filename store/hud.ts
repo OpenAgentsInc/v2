@@ -1,3 +1,4 @@
+import { nanoid } from "lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -16,7 +17,8 @@ export type Pane = {
     isActive?: boolean
 }
 
-type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height'> & {
+type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
+    id?: string;
     paneProps?: {
         x: number
         y: number
@@ -66,15 +68,16 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane, shouldTile = false) => set((state) => {
+                const paneId = nanoid(); // Generate a new ID for every new pane
                 let updatedPanes: Pane[]
                 let panePosition
 
-                const existingPane = state.panes.find(pane => pane.id === newPane.id)
+                const existingPane = state.panes.find(pane => pane.id === paneId)
                 if (existingPane) {
-                    // If the pane already exists, bring it to the front
+                    // This case should now be extremely rare due to the new ID generation
                     return {
                         panes: [
-                            ...state.panes.filter(pane => pane.id !== newPane.id).map(pane => ({ ...pane, isActive: false })),
+                            ...state.panes.filter(pane => pane.id !== paneId).map(pane => ({ ...pane, isActive: false })),
                             { ...existingPane, isActive: true }
                         ],
                         isChatOpen: true,
@@ -126,6 +129,7 @@ export const useHudStore = create<HudStore>()(
 
                 const newPaneWithPosition: Pane = {
                     ...newPane,
+                    id: paneId,
                     ...adjustedPosition,
                     isActive: true
                 }
@@ -182,7 +186,8 @@ export const useHudStore = create<HudStore>()(
                     y: panePosition.y,
                     width: panePosition.width,
                     height: panePosition.height,
-                    isActive: true
+                    isActive: true,
+                    id: nanoid()
                 }
                 return {
                     panes: [
@@ -212,7 +217,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-152',
+            name: 'openagents-hud-storage-1521',
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )

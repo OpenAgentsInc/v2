@@ -1,6 +1,5 @@
 'use client'
-
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
@@ -13,7 +12,9 @@ export interface ChatProps extends React.ComponentProps<'div'> {
     id?: string
 }
 
-export function Chat({ className, id: propId }: ChatProps) {
+export const Chat = React.memo(function Chat({ className, id: propId }: ChatProps) {
+    console.log(`Chat component rendered with propId: ${propId}`);
+
     const {
         messages,
         input,
@@ -22,11 +23,16 @@ export function Chat({ className, id: propId }: ChatProps) {
         handleSubmit,
     } = useChat({ id: propId })
 
+    console.log(`useChat hook returned id: ${id}`);
+
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
 
     // Debounce the scrollToBottom function
-    const debouncedScrollToBottom = useCallback(debounce(scrollToBottom, 100), [scrollToBottom])
+    const debouncedScrollToBottom = useMemo(
+        () => debounce(scrollToBottom, 100),
+        [scrollToBottom]
+    )
 
     // Ensure scroll to bottom on new messages
     useEffect(() => {
@@ -34,6 +40,15 @@ export function Chat({ className, id: propId }: ChatProps) {
             debouncedScrollToBottom()
         }
     }, [messages, debouncedScrollToBottom])
+
+    const chatPanelProps = useMemo(() => ({
+        id,
+        isAtBottom,
+        scrollToBottom: debouncedScrollToBottom,
+        input,
+        handleInputChange,
+        handleSubmit,
+    }), [id, isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
 
     return (
         <div
@@ -55,14 +70,7 @@ export function Chat({ className, id: propId }: ChatProps) {
                     <div className="h-px" ref={visibilityRef} />
                 </div>
             </div>
-            <ChatPanel
-                id={id}
-                isAtBottom={isAtBottom}
-                scrollToBottom={debouncedScrollToBottom}
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={handleSubmit}
-            />
+            <ChatPanel {...chatPanelProps} />
         </div>
     )
-}
+})

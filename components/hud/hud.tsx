@@ -3,6 +3,7 @@
 import { useHudStore } from '@/store/hud'
 import { Pane } from '@/components/hud/pane'
 import { Chat } from '@/components/chat'
+import { SingleMountWrapper } from '@/components/single-mount-wrapper'
 
 export const HUD = () => {
     const { panes } = useHudStore()
@@ -19,7 +20,9 @@ export const HUD = () => {
                     height={pane.height}
                     width={pane.width}
                 >
-                    {pane.type === 'chat' && <Chat id={pane.id} />}
+                    <SingleMountWrapper>
+                        {pane.type === 'chat' && <Chat id={pane.id} />}
+                    </SingleMountWrapper>
                 </Pane>
             ))}
         </>
