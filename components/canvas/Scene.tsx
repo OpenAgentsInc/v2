@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, MutableRefObject } from 'react'
 import { Canvas, addEffect } from '@react-three/fiber'
 import { Preload, View } from '@react-three/drei'
 import Lenis from '@studio-freight/lenis'
@@ -11,7 +11,7 @@ interface SceneProps {
 }
 
 export default function Scene(props: SceneProps) {
-    const viewRef = useRef<HTMLDivElement>(null);
+    const viewRef = useRef<HTMLElement>(null) as MutableRefObject<HTMLElement>;
 
     // Use lenis to control scrolling
     useEffect(() => {
