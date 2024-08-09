@@ -16,10 +16,13 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
     const {
         messages,
         input,
-        id,
+        // id,
         handleInputChange,
         handleSubmit,
     } = useChat({ id: propId })
+
+    // console.log(`useChat hook returned id: ${id}`);
+    console.log('Chat with propId:', propId)
 
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
@@ -38,13 +41,12 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
     }, [messages, debouncedScrollToBottom])
 
     const chatPanelProps = useMemo(() => ({
-        id,
         isAtBottom,
         scrollToBottom: debouncedScrollToBottom,
         input,
         handleInputChange,
         handleSubmit,
-    }), [id, isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
+    }), [isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
 
     return (
         <div

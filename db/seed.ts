@@ -37,14 +37,13 @@ export async function seed(dropTables = false) {
     );
     `);
 
-    // Create threads table
+    // Create threads table (removed first_message_id)
     await executeSQL(`
     CREATE TABLE IF NOT EXISTS threads (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL,
       clerk_user_id VARCHAR(255) NOT NULL,
       metadata JSONB,
-      first_message_id INTEGER,
       "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
     `);
@@ -68,14 +67,10 @@ export async function seed(dropTables = false) {
     await executeSQL('ALTER TABLE messages ADD CONSTRAINT fk_messages_thread_id FOREIGN KEY (thread_id) REFERENCES threads(id);');
     await executeSQL('ALTER TABLE messages ADD CONSTRAINT fk_messages_clerk_user_id FOREIGN KEY (clerk_user_id) REFERENCES users(clerk_user_id);');
 
-    // We'll add this constraint after inserting the first message
-    // await executeSQL('ALTER TABLE threads ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);');
-
     // Create indexes
     await executeSQL('CREATE INDEX IF NOT EXISTS idx_users_clerk_user_id ON users(clerk_user_id);');
     await executeSQL('CREATE INDEX IF NOT EXISTS idx_threads_user_id ON threads(user_id);');
     await executeSQL('CREATE INDEX IF NOT EXISTS idx_threads_clerk_user_id ON threads(clerk_user_id);');
-    await executeSQL('CREATE INDEX IF NOT EXISTS idx_threads_first_message_id ON threads(first_message_id);');
     await executeSQL('CREATE INDEX IF NOT EXISTS idx_messages_thread_id ON messages(thread_id);');
     await executeSQL('CREATE INDEX IF NOT EXISTS idx_messages_clerk_user_id ON messages(clerk_user_id);');
 
@@ -111,29 +106,17 @@ export async function seed(dropTables = false) {
                 const threadId = insertedThread.rows[0].id;
 
                 // Insert user message
-                const userMessage = await sql`
+                await sql`
                     INSERT INTO messages (thread_id, clerk_user_id, role, content)
-                    VALUES (${threadId}, ${clerkUserId}, 'user', ${`Tell me about ${threadTitles[i].toLowerCase()}`})
-                    RETURNING id;
+                    VALUES (${threadId}, ${clerkUserId}, 'user', ${`Tell me about ${threadTitles[i].toLowerCase()}`});
                 `;
 
                 // Insert AI response
-                const aiMessage = await sql`
-                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
-                    VALUES (${threadId}, ${clerkUserId}, 'assistant', ${`Here's some information about ${threadTitles[i].toLowerCase()}...`})
-                    RETURNING id;
-                `;
-
-                // Update the thread with the first_message_id
                 await sql`
-                    UPDATE threads
-                    SET first_message_id = ${userMessage.rows[0].id}
-                    WHERE id = ${threadId};
+                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
+                    VALUES (${threadId}, ${clerkUserId}, 'assistant', ${`Here's some information about ${threadTitles[i].toLowerCase()}...`});
                 `;
             }
-
-            // Now add the constraint for first_message_id
-            await executeSQL('ALTER TABLE threads ADD CONSTRAINT fk_threads_first_message_id FOREIGN KEY (first_message_id) REFERENCES messages(id);');
 
             console.log(`Inserted sample threads and messages`);
         } catch (error) {

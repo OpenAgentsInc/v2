@@ -34,11 +34,12 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
+        console.log('Clicked chat:', chat)
         const newPane = {
-            id: nanoid(),
+            id: chat.id,
             title: chat.title,
             type: 'chat' as const,
-            content: { oldContent: chat.messages?.join('\n') }
+            content: { id: chat.id, oldContent: chat.messages?.join('\n') }
         }
 
         // Use tiling (true) if Command/Ctrl is pressed, otherwise false

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message } from 'ai/react';
 import { useModelStore } from '@/store/models';
@@ -81,12 +81,33 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const { threadId, createNewThread } = useThreadCreation(propsId || currentThreadId);
+    const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId || null);
+
+    useEffect(() => {
+        if (propsId) {
+            setThreadId(propsId);
+            setCurrentThreadId(propsId);
+        } else if (!threadId) {
+            const createNewThread = async () => {
+                try {
+                    const response = await fetch('/api/thread', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                    if (!response.ok) throw new Error('Failed to create thread');
+                    const { threadId: newThreadId } = await response.json();
+                    setThreadId(newThreadId);
+                    setCurrentThreadId(newThreadId);
+                } catch (error) {
+                    console.error('Error creating new thread:', error);
+                }
+            };
+            createNewThread();
+        }
+    }, [propsId, threadId, setCurrentThreadId]);
+
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
-    // console.log(`useChat initialized with propsId: ${propsId}, currentThreadId: ${currentThreadId}, threadId: ${threadId}`);
-
-    // Build the body object with model, repo (if it exists), and tools
     const body: any = { model, tools, threadId };
     if (repo) {
         body.repoOwner = repo.owner;
@@ -103,27 +124,22 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             if (threadId) {
                 const updatedMessages = [...threadData.messages, message];
                 setMessages(threadId, updatedMessages);
-                console.log("useVercelChat onFinish with message:", message);
             }
         },
     });
 
     const sendMessage = useCallback(async (message: string) => {
-        let currentThreadId = threadId;
-        if (!currentThreadId) {
-            currentThreadId = await createNewThread();
+        if (!threadId) {
+            console.error('No thread ID available');
+            return;
         }
 
-        // Update local state first
         const userMessage = { content: message, role: 'user' as const };
-        if (currentThreadId) {
-            const updatedMessages = [...threadData.messages, userMessage];
-            setMessages(currentThreadId, updatedMessages);
-        }
+        const updatedMessages = [...threadData.messages, userMessage];
+        setMessages(threadId, updatedMessages);
 
-        // Then use vercelChatProps.append
         return vercelChatProps.append(userMessage);
-    }, [threadId, createNewThread, vercelChatProps, threadData.messages, setMessages]);
+    }, [threadId, vercelChatProps, threadData.messages, setMessages]);
 
     const setInput = (input: string) => {
         if (threadId) {
@@ -141,6 +157,5 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setUser,
         setInput,
         sendMessage,
-        createNewThread,
     };
 }

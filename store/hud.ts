@@ -68,13 +68,12 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane, shouldTile = false) => set((state) => {
-                const paneId = nanoid(); // Generate a new ID for every new pane
+                const paneId = newPane.id || nanoid(); // Use existing ID if provided, otherwise generate new
                 let updatedPanes: Pane[]
                 let panePosition
 
                 const existingPane = state.panes.find(pane => pane.id === paneId)
                 if (existingPane) {
-                    // This case should now be extremely rare due to the new ID generation
                     return {
                         panes: [
                             ...state.panes.filter(pane => pane.id !== paneId).map(pane => ({ ...pane, isActive: false })),
@@ -129,7 +128,7 @@ export const useHudStore = create<HudStore>()(
 
                 const newPaneWithPosition: Pane = {
                     ...newPane,
-                    id: paneId,
+                    id: paneId, // Use the paneId we determined earlier
                     ...adjustedPosition,
                     isActive: true
                 }
@@ -217,7 +216,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-1521',
+            name: 'openagents-hud-storage-1522',
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )
