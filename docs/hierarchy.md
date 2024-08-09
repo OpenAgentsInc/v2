@@ -187,14 +187,23 @@
   - usePostprocess.jsx - Hook for applying post-processing effects in a 3D scene
   - useThreadCreation.ts - Hook for creating new chat threads
 - lib/ - Utility functions and modules
-  - chat/ - Chat-related utilities
+  - fonts.ts - Configures and exports the JetBrains Mono font
   - github/ - GitHub integration utilities
-  - store/ - State management
-  - utils.ts - General utility functions
+  - githubUtils.ts - (still needs to be summarized)
+  - models.ts - Defines and exports available models
+  - systemPrompt.ts - Generates system prompts based on user context
   - types.ts - TypeScript type definitions
+  - utils.ts - General utility functions
 - public/ - Public assets
 - scripts/ - Build and maintenance scripts
 - store/ - State management
+  - chat.ts - Zustand store for managing chat state
+  - hud.ts - Zustand store for managing HUD state
+  - models.ts - Zustand store for managing model state
+  - repo.ts - Zustand store for managing repository state
+  - sidebar.ts - Zustand store for managing sidebar state
+  - tools.ts - Zustand store for managing tools state
+  - user.ts - Zustand store for managing user state
 - tools/ - Custom tools and integrations
 - types/ - TypeScript type definitions
 
