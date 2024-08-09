@@ -45,7 +45,7 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
     }, [messages, debouncedScrollToBottom])
 
     const chatPanelProps = useMemo(() => ({
-        id: threadId,
+        id: threadId || undefined,
         isAtBottom,
         scrollToBottom: debouncedScrollToBottom,
         input,
