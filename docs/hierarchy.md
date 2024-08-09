@@ -89,7 +89,12 @@
     - Renders an anchor tag with target="_blank"
     - Includes an SVG icon to indicate external link
     - Applies hover underline effect
-  - footer.tsx
+  - footer.tsx - Implements the footer component with model selection, tools, and repository information
+    - Uses various stores (useRepoStore, useModelStore, useToolStore) for state management
+    - Implements dropdown for model selection
+    - Provides a popover for tool selection
+    - Displays and allows editing of repository information
+    - Utilizes Radix UI components for dropdowns and popovers
   - header.tsx - Implements the application header with user authentication and sidebar toggle
   - layout-content.tsx
   - LoadingSpinner.tsx
