@@ -7,11 +7,12 @@ import { IconShare } from '@/components/ui/icons'
 import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
 import { useChat } from '@/hooks/useChat'
-import { Message } from '@/lib/types'
+import { Message, Chat } from '@/lib/types'
+import { ServerActionResult } from '@/lib/types'
 
-const shareChat = async (chat: { id: string; title: string; messages: Message[] }) => {
+const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
     console.log("Not implemented")
-    return
+    throw new Error("Not implemented")
 }
 
 export interface ChatPanelProps {
@@ -61,7 +62,7 @@ export function ChatPanel({
                             chat={{
                                 id,
                                 title,
-                                messages
+                                messages: messages as Message[]
                             }}
                         />
                     </div>
