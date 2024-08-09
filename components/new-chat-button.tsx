@@ -28,8 +28,8 @@ export function NewChatButton() {
                     y: 20,
                     width: 600,
                     height: 400,
-                    id: threadId.toString() // Convert to string as paneProps expects string
-                }
+                },
+                id: threadId.toString() // Add id as a separate property
             })
         } catch (error) {
             console.error('Error creating new chat:', error)
