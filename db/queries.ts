@@ -122,3 +122,20 @@ export async function getLastMessage(threadId: number) {
         throw error;
     }
 }
+
+export async function getSharedChat(chatId: string) {
+    try {
+        const { rows } = await sql`
+        SELECT t.id, t.metadata, t.created_at as "createdAt", t.share_path as "sharePath",
+               json_agg(json_build_object('id', m.id, 'role', m.role, 'content', m.content, 'createdAt', m.created_at, 'toolInvocations', m.tool_invocations)) as messages
+        FROM threads t
+        LEFT JOIN messages m ON t.id = m.thread_id
+        WHERE t.id = ${chatId}
+        GROUP BY t.id
+        `;
+        return rows[0];
+    } catch (error) {
+        console.error('Error in getSharedChat:', error);
+        throw error;
+    }
+}
