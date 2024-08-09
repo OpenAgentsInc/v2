@@ -8,6 +8,7 @@ import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { useChat } from '@/hooks/useChat'
 import { debounce } from 'lodash'
 import { useThreadCreation } from '@/hooks/useThreadCreation'
+import { Message } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     id?: string
@@ -65,7 +66,7 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
             <div className="flex-grow overflow-auto" ref={scrollRef}>
                 <div className="relative min-h-full" ref={messagesRef}>
                     {messages.length ? (
-                        <ChatList messages={messages} isShared={false} />
+                        <ChatList messages={messages as Message[]} isShared={false} />
                     ) : (
                         <EmptyScreen />
                     )}
