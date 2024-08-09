@@ -25,6 +25,11 @@
   - Updated `ChatShareDialog` to use `chat` prop instead of `chatId`
   - Added `input`, `handleInputChange`, and `handleSubmit` props to `PromptForm`
   - Added conditional rendering for `ButtonScrollToBottom`
+  - Changed `id` prop type from `string` to `number`
+  - Updated the `useHudStore.setState` call to use `id.toString()` for comparison
+  - Modified the `ChatShareDialog` props to use the correct types
+  - Added a placeholder `shareChat` function for the `ChatShareDialog` component
+  - Fixed import paths for types (Message from '@/types', ServerActionResult and Chat from '@/lib/types')
 
 - Updated `components/chat.tsx`:
   - Changed the `useChat` hook call to parse the `propId` as a number: `id: propId ? parseInt(propId, 10) : undefined`
@@ -39,17 +44,6 @@
 - Updated `hooks/useChat.ts`:
   - Added a function to adapt Vercel AI SDK Message type to our custom Message type
   - Modified the return value of `useChat` to include the adapted messages
-
-- Updated `components/chat.tsx`:
-  - Updated the `ChatList` component to use the correct Message type
-  - Modified the `ChatPanel` component to receive the correct props
-
-- Updated `components/chat-panel.tsx`:
-  - Updated the component to accept and use the correct props (id, input, handleInputChange, handleSubmit)
-  - Changed `id` prop type from `string` to `number`
-  - Updated the `useHudStore.setState` call to use `id.toString()` for comparison
-  - Modified the `ChatShareDialog` props to use the correct types
-  - Added a placeholder `shareChat` function for the `ChatShareDialog` component
 
 - Updated `components/chat-share-dialog.tsx`:
   - Modified the `ChatShareDialogProps` interface to use the correct types for `chat` prop
