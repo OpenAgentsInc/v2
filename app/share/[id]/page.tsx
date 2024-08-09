@@ -2,7 +2,7 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { formatDate } from '@/lib/utils'
-import { getSharedChat } from '@/lib/db/queries'
+import { getSharedChat } from '@/db/queries' // Updated import path
 import { ChatList } from '@/components/chat-list'
 import { FooterText } from '@/components/footer'
 
