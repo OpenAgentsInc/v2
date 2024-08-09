@@ -12,7 +12,7 @@ export function NewChatButton() {
 
     const handleNewChat = () => {
         setCurrentThreadId(undefined)
-        setMessages(undefined, [])
+        setMessages([])  // Changed this line
         addPane({
             type: 'chat',
             title: 'New Chat',
