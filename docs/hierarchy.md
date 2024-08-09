@@ -22,60 +22,42 @@
   - dom/ - DOM-related utility components
   - github/ - GitHub integration components
   - hud/ - Heads-up display components
-    - hud.tsx - Main HUD component
-    - pane.tsx - HUD pane component
   - ui/ - Reusable UI components
-    - alert-dialog.tsx - Alert dialog component
-    - badge.tsx - Badge component
-    - button.tsx - Button component
-    - codeblock.tsx - Code block component
-    - dialog.tsx - Dialog component
-    - dropdown-menu.tsx - Dropdown menu component
-    - icons.tsx - Icon components
-    - input.tsx - Input component
-    - label.tsx - Label component
-    - select.tsx - Select component
-    - separator.tsx - Separator component
-    - sheet.tsx - Sheet component
-    - sonner.tsx - Sonner component (possibly for notifications)
-    - switch.tsx - Switch component
-    - textarea.tsx - Textarea component
-    - tooltip.tsx - Tooltip component
-  - LoadingSpinner.tsx - Loading indicator component
-  - button-scroll-to-bottom.tsx - Button to scroll chat to bottom
-  - chat-history.tsx - Chat history component
-  - chat-list.tsx - List of chats component
-  - chat-message-actions.tsx - Actions for chat messages
-  - chat-message.tsx - Individual chat message component
-  - chat-panel.tsx - Chat panel component
-  - chat-share-dialog.tsx - Dialog for sharing chats
-  - chat.tsx - Main chat component
-  - clear-history.tsx - Component to clear chat history
-  - empty-screen.tsx - Empty state screen component
-  - external-link.tsx - External link component
-  - footer.tsx - Footer component
-  - header.tsx - Application header component
-  - layout-content.tsx - Layout content component
-  - login-button.tsx - Login button component
-  - markdown.tsx - Markdown rendering component
-  - new-chat-button.tsx - New chat button component
-  - prompt-form.tsx - Form for entering prompts
-  - providers.tsx - React context providers
-  - sidebar-actions.tsx - Sidebar action components
-  - sidebar-desktop.tsx - Desktop sidebar component
-  - sidebar-footer.tsx - Sidebar footer component
-  - sidebar-item.tsx - Individual sidebar item component
-  - sidebar-items.tsx - Collection of sidebar items
-  - sidebar-list.tsx - Sidebar list component
-  - sidebar-mobile.tsx - Mobile sidebar component
-  - sidebar-toggle.tsx - Sidebar toggle component
-  - sidebar.tsx - Main sidebar component
-  - single-mount-wrapper.tsx - Wrapper for single-mount components
-  - tailwind-indicator.tsx - Tailwind CSS breakpoint indicator
-  - theme-toggle.tsx - Theme toggle component
-  - tool-result.tsx - Component to display tool results
-  - user-menu.tsx - User menu component
-  - workspace.tsx - Workspace component
+  - header.tsx - Implements the application header with user authentication and sidebar toggle
+  - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
+  - chat-panel.tsx - Renders the chat input area and share functionality
+  - workspace.tsx - Implements a collapsible workspace component
+  - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
+  - LoadingSpinner.tsx
+  - button-scroll-to-bottom.tsx
+  - chat-history.tsx
+  - chat-list.tsx
+  - chat-message-actions.tsx
+  - chat-message.tsx
+  - chat-share-dialog.tsx
+  - chat.tsx
+  - clear-history.tsx
+  - empty-screen.tsx
+  - external-link.tsx
+  - footer.tsx
+  - layout-content.tsx
+  - login-button.tsx
+  - markdown.tsx
+  - new-chat-button.tsx
+  - prompt-form.tsx
+  - sidebar-actions.tsx
+  - sidebar-desktop.tsx
+  - sidebar-footer.tsx
+  - sidebar-item.tsx
+  - sidebar-list.tsx
+  - sidebar-mobile.tsx
+  - sidebar-toggle.tsx
+  - sidebar.tsx
+  - single-mount-wrapper.tsx
+  - tailwind-indicator.tsx
+  - theme-toggle.tsx
+  - tool-result.tsx
+  - user-menu.tsx
 - db/ - Database related files
 - docs/ - Documentation files
 - hooks/ - Custom React hooks
