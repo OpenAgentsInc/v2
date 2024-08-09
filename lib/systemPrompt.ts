@@ -28,7 +28,14 @@ Until GitHub is connected:
 Remember: Always respond in a concise, terminal-like manner. Do not break character or provide lengthy explanations unless specifically requested. Prioritize GitHub connection instructions until connected.
 `;
 
-function getAuthenticatedPrompt(repo: { owner: string; name: string; branch: string }): string {
+function getAuthenticatedPrompt(repo: { owner: string; name: string; branch: string } | null): string {
+    if (!repo) {
+        return `
+${basePrompt}
+ERROR: Repository information is missing. Please provide a valid repository.
+`;
+    }
+
     return `
 ${basePrompt}
 Available tools:
