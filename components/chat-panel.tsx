@@ -47,20 +47,27 @@ export function ChatPanel({
   const { messages } = useChat({ id })
 
   const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
-    // Implement the shareChat functionality here
-    // This is a placeholder implementation
-    console.log('Sharing chat with id:', id)
-    return { 
-      success: true, 
-      data: { 
-        id, 
-        title: 'Chat', 
-        messages: [], 
-        sharePath: `/share/${id}`,
-        createdAt: new Date(),
-        userId: 'placeholder-user-id',
-        path: `/chat/${id}`
-      } 
+    try {
+      const response = await fetch('/api/share-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to share chat');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error sharing chat:', error);
+      return {
+        success: false,
+        error: 'Failed to share chat',
+      };
     }
   }
 
