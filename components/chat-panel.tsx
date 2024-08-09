@@ -46,6 +46,13 @@ export function ChatPanel({
 
   const { messages } = useChat({ id })
 
+  const shareChat = async (id: string) => {
+    // Implement the shareChat functionality here
+    // This is a placeholder implementation
+    console.log('Sharing chat with id:', id)
+    return { success: true, data: { sharePath: `/share/${id}` } }
+  }
+
   return (
     <div className={className}>
       {messages.length > 1 && (
@@ -61,7 +68,15 @@ export function ChatPanel({
       <ChatShareDialog
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
-        chat={{ id: id?.toString() || '', title: 'Chat', messages: messages as Message[] }}
+        chat={{
+          id: id?.toString() || '',
+          title: 'Chat',
+          messages: messages as Message[]
+        }}
+        shareChat={shareChat}
+        onCopy={() => {
+          console.log('Chat link copied')
+        }}
       />
       <div className="p-4 pb-20">
         <PromptForm
