@@ -84,7 +84,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const { threadId, createNewThread } = useThreadCreation(propsId || currentThreadId);
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
-    console.log(`useChat initialized with propsId: ${propsId}, currentThreadId: ${currentThreadId}, threadId: ${threadId}`);
+    // console.log(`useChat initialized with propsId: ${propsId}, currentThreadId: ${currentThreadId}, threadId: ${threadId}`);
 
     // Build the body object with model, repo (if it exists), and tools
     const body: any = { model, tools, threadId };

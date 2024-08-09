@@ -23,12 +23,10 @@ export async function POST(request: NextRequest) {
         }
 
         if (existingEmptyThreadId) {
-            console.log(`Reusing existing empty thread: ${existingEmptyThreadId}`);
             return NextResponse.json({ threadId: existingEmptyThreadId }, { status: 200 });
         }
 
         // If no empty thread exists or there was an error fetching it, create a new one
-        console.log('Creating new thread');
         const result = await createNewThread(userId);
 
         // Return the thread ID

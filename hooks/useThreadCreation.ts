@@ -20,7 +20,7 @@ export function useThreadCreation(initialId?: string) {
             });
             if (!response.ok) throw new Error('Failed to create thread');
             const { threadId: newThreadId } = await response.json();
-            console.log(`New thread created with id: ${newThreadId}`);
+            console.log(`Using thread id: ${newThreadId}`);
             setThreadId(newThreadId);
             return newThreadId;
         } catch (error) {
@@ -35,7 +35,6 @@ export function useThreadCreation(initialId?: string) {
         if (!hasInitialized.current) {
             hasInitialized.current = true;
             if (!threadId && !isCreatingThread.current) {
-                console.log("No thread id found, creating new thread...");
                 createNewThread();
             }
         }

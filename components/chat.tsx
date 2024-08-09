@@ -13,8 +13,6 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export const Chat = React.memo(function Chat({ className, id: propId }: ChatProps) {
-    console.log(`Chat component rendered with propId: ${propId}`);
-
     const {
         messages,
         input,
@@ -22,8 +20,6 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
         handleInputChange,
         handleSubmit,
     } = useChat({ id: propId })
-
-    console.log(`useChat hook returned id: ${id}`);
 
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
