@@ -1,5 +1,4 @@
 import { useChat } from '@/hooks/useChat'
-import { ChatPanel as ChatPanelUI } from '@/components/ui/chat-panel'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
@@ -32,16 +31,16 @@ export function ChatPanel({
     if (id) {
       useHudStore.setState((state) => ({
         panes: state.panes.map((pane) =>
-          pane.paneProps?.id === id ? { ...pane, title: 'Chat' } : pane
+          pane.id === id ? { ...pane, title: 'Chat' } : pane
         )
       }))
     }
   }, [id])
 
-  const { messages } = useChat({ id: id ? parseInt(id, 10) : undefined })
+  const { messages, input, handleInputChange, handleSubmit } = useChat({ id: id ? parseInt(id, 10) : undefined })
 
   return (
-    <ChatPanelUI className={className}>
+    <div className={className}>
       {messages.length > 1 && (
         <div className="flex items-center justify-end p-4">
           <button
@@ -55,15 +54,21 @@ export function ChatPanel({
       <ChatShareDialog
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
-        chatId={id}
+        chat={{ id: id || '', title: 'Chat', messages }}
       />
       <div className="p-4 pb-20">
-        <PromptForm />
+        <PromptForm
+          input={input}
+          handleInputChange={handleInputChange}
+          handleSubmit={handleSubmit}
+        />
       </div>
-      <ButtonScrollToBottom
-        isAtBottom={isAtBottom}
-        scrollToBottom={scrollToBottom}
-      />
-    </ChatPanelUI>
+      {isAtBottom !== undefined && scrollToBottom && (
+        <ButtonScrollToBottom
+          isAtBottom={isAtBottom}
+          scrollToBottom={scrollToBottom}
+        />
+      )}
+    </div>
   )
 }
