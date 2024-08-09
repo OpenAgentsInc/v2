@@ -14,7 +14,7 @@ interface PaneProps {
     height: number
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
-    threadId?: string  // Add this line
+    threadId?: number  // Changed to number
 }
 
 const useResizeHandlers = (
