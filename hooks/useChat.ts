@@ -79,7 +79,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId || null);
 
-    const { threadId: createdThreadId, createNewThread } = useThreadCreation(threadId);
+    const { threadId: createdThreadId, createNewThread } = useThreadCreation(threadId?.toString());
 
     useEffect(() => {
         if (propsId) {
@@ -92,8 +92,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     useEffect(() => {
         if (createdThreadId && !threadId) {
-            setThreadId(createdThreadId);
-            setCurrentThreadId(createdThreadId);
+            const newThreadId = parseInt(createdThreadId, 10);
+            if (!isNaN(newThreadId)) {
+                setThreadId(newThreadId);
+                setCurrentThreadId(newThreadId);
+            }
         }
     }, [createdThreadId, threadId, setCurrentThreadId]);
 
@@ -125,7 +128,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage = { content: message, role: 'user' as const };
+        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
