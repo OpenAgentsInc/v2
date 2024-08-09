@@ -7,7 +7,8 @@ import { useHudStore } from '@/store/hud'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
-import { Message, ServerActionResult, Chat } from '@/lib/types'
+import { Message } from '@/types'
+import { ServerActionResult, Chat } from '@/lib/types'
 
 export interface ChatPanelProps {
   id?: number
