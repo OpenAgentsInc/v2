@@ -7,7 +7,7 @@ import { useHudStore } from '@/store/hud'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
-import { Message } from '@/types'
+import { Message, ServerActionResult, Chat } from '@/lib/types'
 
 export interface ChatPanelProps {
   id?: number
@@ -46,11 +46,11 @@ export function ChatPanel({
 
   const { messages } = useChat({ id })
 
-  const shareChat = async (id: string) => {
+  const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
     // Implement the shareChat functionality here
     // This is a placeholder implementation
     console.log('Sharing chat with id:', id)
-    return { success: true, data: { sharePath: `/share/${id}` } }
+    return { success: true, data: { id, title: 'Chat', messages: [], sharePath: `/share/${id}` } }
   }
 
   return (
@@ -71,7 +71,7 @@ export function ChatPanel({
         chat={{
           id: id?.toString() || '',
           title: 'Chat',
-          messages: messages as Message[]
+          messages: messages
         }}
         shareChat={shareChat}
         onCopy={() => {
