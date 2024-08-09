@@ -1,4 +1,4 @@
-import { seed } from './db/seed';
+import { seed } from './seed';
 
 let isInitialized = false;
 

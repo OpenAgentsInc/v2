@@ -1,6 +1,6 @@
 import { SidebarItems } from '@/components/sidebar-items'
 import { cache } from 'react'
-import { fetchUserThreads } from '@/app/actions'
+import { fetchUserThreads } from '@/db/actions'
 import { Chat } from '@/lib/types'
 
 interface SidebarListProps {

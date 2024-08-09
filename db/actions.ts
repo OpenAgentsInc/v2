@@ -1,6 +1,6 @@
 'use server'
 
-import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from '@/lib/db/queries'
+import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from './queries'
 import { Message } from '@/lib/types'
 
 export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
