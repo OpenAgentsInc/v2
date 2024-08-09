@@ -46,6 +46,9 @@
 
 - Updated `components/chat-panel.tsx`:
   - Updated the component to accept and use the correct props (id, input, handleInputChange, handleSubmit)
+  - Changed `id` prop type from `string` to `number`
+  - Updated the `useHudStore.setState` call to use `id.toString()` for comparison
+  - Modified the `ChatShareDialog` props to use the correct types
 
 These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on:
 
