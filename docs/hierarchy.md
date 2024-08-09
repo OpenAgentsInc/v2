@@ -49,7 +49,11 @@
   - chat-list.tsx - Renders a list of chat messages with separators
     - Maps through messages and renders ChatMessage components
     - Adds Separator component between messages
-  - chat-message-actions.tsx
+  - chat-message-actions.tsx - Implements copy-to-clipboard functionality for chat messages
+    - Uses client-side rendering
+    - Renders a copy button that changes to a check icon when clicked
+    - Uses useCopyToClipboard hook for clipboard operations
+    - Applies responsive styling for desktop and mobile views
   - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
     - Uses MemoizedReactMarkdown for rendering message content
     - Supports code highlighting and inline code
