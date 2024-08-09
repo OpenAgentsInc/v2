@@ -1,7 +1,3 @@
-// When streamText is done, we:
-//   - Save the message and usage to database
-//   - Deduct credits from the user's balance
-
 import { CompletionTokenUsage, FinishReason } from 'ai';
 import { saveChatMessage } from "@/db/actions";
 import { Message } from '@/lib/types';
@@ -35,7 +31,6 @@ export async function onFinish(result: ThreadOnFinishResult) {
     // await deductUserCredits(result.clerkUserId, result.usage);
 }
 
-
 export interface OnFinishResult {
     finishReason: FinishReason;
     usage: CompletionTokenUsage;
@@ -45,7 +40,7 @@ export interface OnFinishResult {
 }
 
 export interface ThreadOnFinishResult extends OnFinishResult {
-    threadId?: string;
+    threadId: number;
     clerkUserId: string;
     userMessage: Message;
 }

@@ -1,29 +1,21 @@
 'use server'
-
 import { sql } from '@vercel/postgres'
 import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from './queries'
 import { Message } from '@/lib/types'
 
-export async function saveChatMessage(threadId: string, clerkUserId: string, message: Message) {
-    // console.log('Saving chat message:', { threadId, clerkUserId, messageContent: message.content })
-    if (threadId) {
-        const threadIdInt = parseInt(threadId)
-        if (isNaN(threadIdInt)) {
-            console.error("Invalid threadId:", threadId)
-            return null
-        }
-
-        const lastMessage = await getLastMessage(threadIdInt)
-        if (lastMessage && lastMessage.content === message.content) {
-            console.log("Duplicate message, not saving:", message.content)
-            return null
-        }
-
-        const savedMessage = await saveMessage(threadIdInt, clerkUserId, message)
-        console.log('Message saved:', savedMessage)
-        return savedMessage
+export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
+    if (isNaN(threadId)) {
+        console.error("Invalid threadId:", threadId)
+        return null
     }
-    return null
+    const lastMessage = await getLastMessage(threadId)
+    if (lastMessage && lastMessage.content === message.content) {
+        console.log("Duplicate message, not saving:", message.content)
+        return null
+    }
+    const savedMessage = await saveMessage(threadId, clerkUserId, message)
+    console.log('Message saved:', savedMessage)
+    return savedMessage
 }
 
 export async function createNewThread(clerkUserId: string) {
@@ -37,7 +29,6 @@ export async function createNewThread(clerkUserId: string) {
         )
         RETURNING id
         `;
-
         return { threadId: thread.id };
     } catch (error) {
         console.error('Error in createThread:', error);
@@ -45,26 +36,24 @@ export async function createNewThread(clerkUserId: string) {
     }
 }
 
-export async function fetchThreadMessages(threadId: string) {
+export async function fetchThreadMessages(threadId: number) {
     console.log('Fetching messages for thread:', threadId)
-    const threadIdInt = parseInt(threadId)
-    if (isNaN(threadIdInt)) {
+    if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return []
     }
-    const messages = await getThreadMessages(threadIdInt)
+    const messages = await getThreadMessages(threadId)
     console.log('Fetched messages:', messages.length)
     return messages
 }
 
-export async function updateThreadData(threadId: string, metadata: any) {
+export async function updateThreadData(threadId: number, metadata: any) {
     console.log('Updating thread data:', { threadId, metadata })
-    const threadIdInt = parseInt(threadId)
-    if (isNaN(threadIdInt)) {
+    if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return null
     }
-    const updatedThread = await updateThread(threadIdInt, { metadata })
+    const updatedThread = await updateThread(threadId, { metadata })
     console.log('Thread updated:', updatedThread)
     return updatedThread
 }
@@ -80,7 +69,6 @@ export async function fetchUserThreads(userId: string) {
     }
 }
 
-// https://claude.ai/chat/cf853be3-3f92-4549-9699-5833cec937ec
 export async function getLastEmptyThread(clerkUserId: string) {
     try {
         const { rows } = await sql`
@@ -97,7 +85,6 @@ export async function getLastEmptyThread(clerkUserId: string) {
             ) DESC NULLS FIRST
             LIMIT 1
         `;
-
         return rows[0] ? rows[0].id : null;
     } catch (error) {
         console.error('Error in getLastEmptyThread:', error);

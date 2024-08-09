@@ -7,6 +7,7 @@ import { EmptyScreen } from '@/components/empty-screen'
 import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
 import { useChat } from '@/hooks/useChat'
 import { debounce } from 'lodash'
+import { useThreadCreation } from '@/hooks/useThreadCreation'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     id?: string
@@ -16,13 +17,16 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
     const {
         messages,
         input,
-        // id,
+        id,
         handleInputChange,
         handleSubmit,
     } = useChat({ id: propId })
 
     // console.log(`useChat hook returned id: ${id}`);
+    console.log('Chat id??', id)
     console.log('Chat with propId:', propId)
+
+    const { threadId } = useThreadCreation(propId)
 
     const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
         useScrollAnchor()
@@ -41,12 +45,13 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
     }, [messages, debouncedScrollToBottom])
 
     const chatPanelProps = useMemo(() => ({
+        id: threadId,
         isAtBottom,
         scrollToBottom: debouncedScrollToBottom,
         input,
         handleInputChange,
         handleSubmit,
-    }), [isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
+    }), [threadId, isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
 
     return (
         <div

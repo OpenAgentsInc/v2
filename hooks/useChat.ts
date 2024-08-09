@@ -12,44 +12,44 @@ interface User {
 }
 
 interface ThreadData {
-    id: string;
+    id: number;
     messages: Message[];
     input: string;
     user?: User;
 }
 
 interface ChatStore {
-    currentThreadId: string | undefined;
+    currentThreadId: number | undefined;
     user: User | undefined;
-    threads: Record<string, ThreadData>;
-    setCurrentThreadId: (id: string) => void;
+    threads: Record<number, ThreadData>;
+    setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
-    getThreadData: (id: string) => ThreadData;
-    setMessages: (id: string, messages: Message[]) => void;
-    setInput: (id: string, input: string) => void;
+    getThreadData: (id: number) => ThreadData;
+    setMessages: (id: number, messages: Message[]) => void;
+    setInput: (id: number, input: string) => void;
 }
 
 const useChatStore = create<ChatStore>((set, get) => ({
     currentThreadId: undefined,
     user: undefined,
     threads: {},
-    setCurrentThreadId: (id: string) => set({ currentThreadId: id }),
+    setCurrentThreadId: (id: number) => set({ currentThreadId: id }),
     setUser: (user: User) => set({ user }),
-    getThreadData: (id: string) => {
+    getThreadData: (id: number) => {
         const { threads } = get();
         if (!threads[id]) {
             threads[id] = { id, messages: [], input: '' };
         }
         return threads[id];
     },
-    setMessages: (id: string, messages: Message[]) =>
+    setMessages: (id: number, messages: Message[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
                 [id]: { ...state.threads[id], messages }
             }
         })),
-    setInput: (id: string, input: string) =>
+    setInput: (id: number, input: string) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -59,7 +59,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
 }));
 
 interface UseChatProps {
-    id?: string | number;
+    id?: number;
 }
 
 export function useChat({ id: propsId }: UseChatProps = {}) {
@@ -77,31 +77,17 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const [threadId, setThreadId] = useState<string | null>(
-        typeof propsId === 'string' ? propsId : currentThreadId || null
-    );
+    const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId || null);
 
-    const { threadId: createdThreadId, createNewThread } = useThreadCreation(
-        typeof propsId === 'string' ? propsId : undefined
-    );
+    const { threadId: createdThreadId, createNewThread } = useThreadCreation(threadId);
 
     useEffect(() => {
-        const initializeThread = async () => {
-            if (typeof propsId === 'number') {
-                // If propsId is a number, use it directly
-                setThreadId(propsId.toString());
-                setCurrentThreadId(propsId.toString());
-            } else if (!threadId) {
-                // If no threadId, create a new one
-                const newThreadId = await createNewThread();
-                if (newThreadId) {
-                    setThreadId(newThreadId);
-                    setCurrentThreadId(newThreadId);
-                }
-            }
-        };
-
-        initializeThread();
+        if (propsId) {
+            setThreadId(propsId);
+            setCurrentThreadId(propsId);
+        } else if (!threadId) {
+            createNewThread();
+        }
     }, [propsId, threadId, setCurrentThreadId, createNewThread]);
 
     useEffect(() => {
@@ -121,7 +107,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const vercelChatProps = useVercelChat({
-        id: threadId,
+        id: threadId?.toString(),
         initialMessages: threadData.messages,
         body,
         maxToolRoundtrips: 20,

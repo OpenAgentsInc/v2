@@ -11,8 +11,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { threadId } = body;
 
-    if (!threadId) {
-        return new Response('threadId is required', { status: 400 });
+    if (typeof threadId !== 'number' || isNaN(threadId)) {
+        return new Response('Invalid threadId', { status: 400 });
     }
 
     const toolContext = await getToolContext(body);
