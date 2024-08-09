@@ -205,6 +205,23 @@
   - tools.ts - Zustand store for managing tools state
   - user.ts - Zustand store for managing user state
 - tools/ - Custom tools and integrations
+  - create-branch.ts - Tool for creating a new branch in the repository
+  - create-file.ts - Tool for creating a new file in the repository
+  - create-pull-request.ts - Tool for creating a new pull request
+  - index.ts - Exports all tools and provides context setup
+  - list-repos.ts - Tool for listing repositories of the authenticated user
+  - rewrite-file.ts - Tool for rewriting the contents of a file
+  - scrape-webpage.ts - Tool for scraping a webpage and returning content in markdown format
+  - search-codebase.ts - Tool for searching the codebase using the Greptile API
+  - view-file.ts - Tool for viewing file contents
+  - view-hierarchy.ts - Tool for viewing file/folder hierarchy
 - types/ - TypeScript type definitions
+  - index.ts - Exports all type definitions
+  - message.ts - Defines the Message interface for chat messages
+  - misc.ts - Defines the JSONValue type for JSON serialization
+  - repo.ts - Defines the Repo interface for repository information
+  - schema.ts - Defines schema utilities for validation
+  - tools.ts - Defines types for tools and their context
+  - user.ts - Defines the User interface for user information
 
 This hierarchy provides an overview of the main folders and files in the project, focusing on the most important and frequently accessed components. It omits less relevant files such as images and fonts.
