@@ -28,7 +28,7 @@ export function NewChatButton() {
                     y: 20,
                     width: 600,
                     height: 400,
-                    id: threadId
+                    id: threadId.toString() // Convert to string as paneProps expects string
                 }
             })
         } catch (error) {
