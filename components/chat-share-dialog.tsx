@@ -19,7 +19,7 @@ import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
 
 interface ChatShareDialogProps extends DialogProps {
   chat: Pick<Chat, 'id' | 'title' | 'messages'>
-  shareChat: (id: string) => ServerActionResult<Chat>
+  shareChat: (id: string) => Promise<ServerActionResult<Chat>>
   onCopy: () => void
 }
 
@@ -34,7 +34,7 @@ export function ChatShareDialog({
 
   const copyShareLink = React.useCallback(
     async (result: ServerActionResult<Chat>) => {
-      if ('error' in result || !result.data || !result.data.sharePath) {
+      if (!result.success || !result.data || !result.data.sharePath) {
         return toast.error('Could not copy share link to clipboard')
       }
 
@@ -69,7 +69,7 @@ export function ChatShareDialog({
               startShareTransition(async () => {
                 const result = await shareChat(chat.id)
 
-                if ('error' in result) {
+                if (!result.success) {
                   toast.error(result.error)
                   return
                 }
