@@ -43,7 +43,7 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     <>
       <div className={`flex-1 overflow-hidden ${className}`} ref={chatContainerRef}>
         {messages.length ? (
-          <ChatList messages={messages} />
+          <ChatList messages={messages} isShared={false} />
         ) : (
           <EmptyScreen />
         )}
