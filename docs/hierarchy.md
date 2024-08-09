@@ -1,25 +1,42 @@
 # Hierarchy of important files & folders
+
 - app/
-  - [[...rest]]/
-  - api/
+  - [[...rest]]/ - Catch-all route for main application pages
+  - api/ - API routes
     - chat/
-      - onFinish.ts
-      - route.ts
+      - onFinish.ts - Handles chat completion
+      - route.ts - Chat API route
     - thread/
-      - route.ts
+      - route.ts - Thread API route
   - share/
     - [id]/
       - page.tsx - Share chat page (unimplemented)
-  - globals.css
-  - layout.tsx
-- components/
-  - 
-- db/ 
-- docs/
-- hooks/
-- lib/
-- public/
-- scripts/
-- store/
-- tools/
-- types/
+  - globals.css - Global CSS styles
+  - layout.tsx - Main application layout
+  - signup/ - Signup page
+- components/ - React components
+  - LoadingSpinner.tsx - Loading indicator component
+  - chat-history.tsx - Chat history component
+  - chat-list.tsx - List of chats component
+  - chat-message.tsx - Individual chat message component
+  - chat-panel.tsx - Chat panel component
+  - chat.tsx - Main chat component
+  - header.tsx - Application header component
+  - sidebar.tsx - Sidebar component
+  - workspace.tsx - Workspace component
+- db/ - Database related files
+- docs/ - Documentation files
+- hooks/ - Custom React hooks
+- lib/ - Utility functions and modules
+  - chat/ - Chat-related utilities
+  - github/ - GitHub integration utilities
+  - store/ - State management
+  - utils.ts - General utility functions
+  - types.ts - TypeScript type definitions
+- public/ - Public assets
+- scripts/ - Build and maintenance scripts
+- store/ - State management
+- tools/ - Custom tools and integrations
+- types/ - TypeScript type definitions
+
+This hierarchy provides an overview of the main folders and files in the project, focusing on the most important and frequently accessed components. It omits less relevant files such as images and fonts.
