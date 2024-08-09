@@ -20,7 +20,7 @@ export const Chat = React.memo(function Chat({ className, id: propId }: ChatProp
         id,
         handleInputChange,
         handleSubmit,
-    } = useChat({ id: propId })
+    } = useChat({ id: propId || undefined })
 
     console.log('Chat id??', id)
     console.log('Chat with propId:', propId)
