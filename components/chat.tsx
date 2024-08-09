@@ -18,7 +18,6 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     input,
     handleInputChange,
     handleSubmit,
-    isLoading,
     id,
     setCurrentThreadId
   } = useChat({ id: propId ? parseInt(propId, 10) : undefined })
@@ -33,7 +32,7 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     if (propId) {
       useHudStore.setState((state) => ({
         panes: state.panes.map((pane) =>
-          pane.paneProps?.id === propId ? { ...pane, title: 'Chat' } : pane
+          pane.id === propId ? { ...pane, title: 'Chat' } : pane
         )
       }))
     }
@@ -45,12 +44,11 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
         {messages.length ? (
           <ChatList messages={messages} />
         ) : (
-          <EmptyScreen setInput={handleInputChange} />
+          <EmptyScreen />
         )}
       </div>
       <ChatPanel
         id={propId}
-        isLoading={isLoading}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
