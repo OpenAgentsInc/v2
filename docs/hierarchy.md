@@ -28,6 +28,10 @@
   - chat-list.tsx
   - chat-message-actions.tsx
   - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
+    - Uses MemoizedReactMarkdown for rendering message content
+    - Supports code highlighting and inline code
+    - Renders tool invocations using ToolResult component
+    - Displays user/AI icons based on message role
   - chat-panel.tsx - Renders the chat input area and share functionality
   - chat-share-dialog.tsx
   - chat.tsx
