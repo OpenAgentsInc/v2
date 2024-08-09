@@ -11,7 +11,7 @@ interface SceneProps {
 }
 
 export default function Scene(props: SceneProps) {
-    const viewRef = useRef<HTMLElement>(null) as MutableRefObject<HTMLElement>;
+    const viewRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
 
     // Use lenis to control scrolling
     useEffect(() => {
