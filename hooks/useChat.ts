@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message as CustomMessage, ToolContent } from '@/lib/types';
+import { Message as CustomMessage } from '@/lib/types';
 
 interface User {
     id: string;
@@ -109,19 +109,19 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     const adaptMessage = (message: VercelMessage): CustomMessage => {
         const role = message.role === 'data' || message.role === 'function' ? 'system' : message.role;
+        const baseMessage = {
+            id: message.id,
+            content: message.content,
+            role: role as 'user' | 'system' | 'assistant' | 'tool',
+        };
+
         if (role === 'tool') {
             return {
-                id: message.id,
-                content: message.content as ToolContent,
-                role: role,
+                ...baseMessage,
                 toolInvocations: [],
-            };
+            } as CustomMessage;
         } else {
-            return {
-                id: message.id,
-                content: message.content,
-                role: role as 'user' | 'system' | 'assistant',
-            };
+            return baseMessage as CustomMessage;
         }
     };
 
