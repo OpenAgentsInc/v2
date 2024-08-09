@@ -10,7 +10,7 @@ import { UserMessage } from './stocks/message'
 import { useChat } from '@/hooks/useChat'
 import { Message } from '@/lib/types'
 
-const shareChat = async (chat: { id: string; title: string; messages: Message[] }) => {
+const shareChat = async (chat: { id: number; title: string; messages: Message[] }) => {
     console.log("Not implemented")
     return
     const url = new URL(`/chat/${chat.id}`, window.location.href)
@@ -26,7 +26,7 @@ const shareChat = async (chat: { id: string; title: string; messages: Message[] 
 }
 
 export interface ChatPanelProps {
-    id?: string
+    id?: number
     title?: string
     isAtBottom: boolean
     scrollToBottom: () => void
@@ -45,7 +45,7 @@ export function ChatPanel({
     handleSubmit
 }: ChatPanelProps) {
     const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
-    const { messages } = useChat({ initialId: id })
+    const { messages } = useChat({ id })
 
     return (
         <div className="w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% dark:from-background/10 dark:from-10% dark:to-background/80">
