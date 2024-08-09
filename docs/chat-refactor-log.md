@@ -35,4 +35,32 @@
 - Updated `components/new-chat-button.tsx`:
   - Modified the `addPane` function call to add `id` as a separate property instead of including it in `paneProps`
 
-These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on updating any remaining components or API routes that may still be using string-based IDs, and ensuring that all parts of the application are consistently using number-based thread IDs.
+### Step 3: Fix Type Mismatches and Prop Issues
+- Updated `hooks/useChat.ts`:
+  - Added a function to adapt Vercel AI SDK Message type to our custom Message type
+  - Modified the return value of `useChat` to include the adapted messages
+
+- Updated `components/chat.tsx`:
+  - Updated the `ChatList` component to use the correct Message type
+  - Modified the `ChatPanel` component to receive the correct props
+
+- Updated `components/chat-panel.tsx`:
+  - Updated the component to accept and use the correct props (id, input, handleInputChange, handleSubmit)
+
+These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on:
+
+1. Updating any remaining components or API routes that may still be using string-based IDs
+2. Ensuring that all parts of the application are consistently using number-based thread IDs
+3. Thoroughly testing the chat functionality to ensure it works as expected with the new integer-based thread ID system
+4. Implementing additional error handling and user feedback throughout the chat system
+5. Optimizing database queries related to thread and message retrieval
+6. Implementing a caching mechanism for thread data to improve performance
+
+Remember to test the following scenarios:
+- Creating new chat threads
+- Loading existing threads
+- Sending and receiving messages within threads
+- Switching between multiple open threads
+- Handling error cases (e.g., network errors, invalid thread IDs)
+
+By implementing these changes and following up with thorough testing and optimization, the chat system will become more robust, consistent, and easier to maintain.
