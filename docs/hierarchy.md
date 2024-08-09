@@ -20,10 +20,22 @@
       - Uses Clerk's SignIn component
       - Applies custom font and styling
   - canvas/ - Canvas-related components
+    - Scene.tsx - Main scene component for 3D rendering
+      - Uses react-three/fiber for 3D rendering
+      - Implements smooth scrolling with Lenis
+      - Renders GridScene component
   - dashboard/ - Dashboard-related components
-  - db/ - Database-related components
+    - HomeDashboard.tsx - Main dashboard component for authenticated users
+      - Renders UserButton, ChatHistory, and HUD components
+      - Uses server-side authentication check
   - dom/ - DOM-related utility components
+    - Layout.tsx - Main layout component
+      - Dynamically imports and renders the Scene component
+      - Wraps children with a container div
   - github/ - GitHub integration components
+    - file-viewer.tsx - Component for viewing file contents
+      - Displays file name and content with expandable preview
+      - Uses useState for managing open/closed state
   - hud/ - Heads-up display components
   - ui/ - Reusable UI components
   - button-scroll-to-bottom.tsx
