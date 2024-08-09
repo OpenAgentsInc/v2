@@ -1,5 +1,6 @@
 'use server'
 
+import { sql } from '@vercel/postgres'
 import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from './queries'
 import { Message } from '@/lib/types'
 
@@ -25,15 +26,22 @@ export async function saveChatMessage(threadId: string, clerkUserId: string, mes
     return null
 }
 
-export async function createNewThread(clerkUserId: string, firstMessage: Message) {
+export async function createNewThread(clerkUserId: string) {
     try {
-        console.log('Creating new thread for user:', clerkUserId)
-        const result = await createThread(clerkUserId, firstMessage)
-        console.log('New thread created:', result)
-        return { threadId: result.threadId, message: result.message }
+        const { rows: [thread] } = await sql`
+        INSERT INTO threads (user_id, clerk_user_id, metadata)
+        VALUES (
+          (SELECT id FROM users WHERE clerk_user_id = ${clerkUserId}),
+          ${clerkUserId},
+          ${JSON.stringify({})}::jsonb
+        )
+        RETURNING id
+        `;
+
+        return { threadId: thread.id };
     } catch (error) {
-        console.error('Error creating new thread:', error)
-        throw error
+        console.error('Error in createThread:', error);
+        throw error;
     }
 }
 

@@ -9,6 +9,12 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
     const body = await req.json();
+    const { threadId } = body;
+
+    if (!threadId) {
+        return new Response('threadId is required', { status: 400 });
+    }
+
     const toolContext = await getToolContext(body);
     const tools = getTools(toolContext, body.tools);
 
@@ -31,7 +37,7 @@ export async function POST(req: Request) {
         tools,
         onFinish: (finishResult) => onFinish({
             ...finishResult,
-            threadId: body.threadId,
+            threadId,
             clerkUserId: userId,
             userMessage
         }),
