@@ -1,6 +1,19 @@
 import { z } from "zod"
 
-// ... (previous code remains unchanged)
+async function githubApiRequest(url: string, token: string): Promise<any> {
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `token ${token}`,
+            Accept: 'application/vnd.github.v3+json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`GitHub API request failed: ${response.statusText}`);
+    }
+
+    return response.json();
+}
 
 const githubListUserReposArgsSchema = z.object({
     token: z.string(),
@@ -36,15 +49,30 @@ export async function githubListUserRepos(args: z.infer<typeof githubListUserRep
     }));
 }
 
-// Add these exports
 export async function githubReadFile(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string> {
-    // Implementation details
-    return "File contents";
+    const { path, token, repoOwner, repoName, branch } = args;
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}${branch ? `?ref=${branch}` : ''}`;
+    
+    const data = await githubApiRequest(url, token);
+    
+    if (data.type !== 'file') {
+        throw new Error('The path does not point to a file');
+    }
+    
+    return Buffer.from(data.content, 'base64').toString('utf-8');
 }
 
 export async function githubListContents(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string[]> {
-    // Implementation details
-    return ["file1", "file2", "directory1"];
+    const { path, token, repoOwner, repoName, branch } = args;
+    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}${branch ? `?ref=${branch}` : ''}`;
+    
+    const data = await githubApiRequest(url, token);
+    
+    if (!Array.isArray(data)) {
+        throw new Error('The path does not point to a directory');
+    }
+    
+    return data.map((item: any) => item.name);
 }
 
 // ... (rest of the file remains unchanged)
