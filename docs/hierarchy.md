@@ -134,10 +134,8 @@
     - Displays and allows editing of repository information
     - Utilizes Radix UI components for dropdowns and popovers
   - header.tsx - Implements the application header with user authentication and sidebar toggle
-  - layout-content.tsx
-  - LoadingSpinner.tsx
-  - login-button.tsx
-  - markdown.tsx
+  - layout-content.tsx - Wraps children with a flex container that adjusts based on sidebar state
+  - markdown.tsx - Memoized ReactMarkdown component for rendering markdown content
   - new-chat-button.tsx - Implements a button to start a new chat
     - Uses useHudStore and useChatStore for state management
     - Adds a new chat pane when clicked
@@ -146,27 +144,33 @@
     - Implements "New Chat" button functionality
     - Handles form submission and input changes
   - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
-  - sidebar-actions.tsx
-  - sidebar-desktop.tsx
-  - sidebar-footer.tsx
-  - sidebar-item.tsx
+  - sidebar-actions.tsx - Provides actions for sharing and deleting chats
+    - Uses AlertDialog for delete confirmation
+    - Uses ChatShareDialog for sharing chats
+  - sidebar-desktop.tsx - Renders the sidebar for desktop view
+    - Uses server-side authentication check
+  - sidebar-footer.tsx - Renders the footer of the sidebar
+    - Uses cn utility for class names
+  - sidebar-item.tsx - Renders individual sidebar items with animations
+    - Uses framer-motion for animations
+    - Handles click events to open chat panes
   - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
-  - sidebar-list.tsx
-  - sidebar-mobile.tsx
-  - sidebar-toggle.tsx
+  - sidebar-list.tsx - Fetches and displays a list of user threads in the sidebar
+    - Uses fetchUserThreads for fetching threads
+  - sidebar-mobile.tsx - Renders the sidebar for mobile view
+    - Uses Radix UI Sheet for mobile sidebar
+  - sidebar-toggle.tsx - Provides a button to toggle the sidebar
+    - Uses useSidebar hook for toggling
   - sidebar.tsx - Implements the main sidebar component with open/closed state management
     - Uses useSidebar hook for managing sidebar state
     - Renders children components within the sidebar
-  - single-mount-wrapper.tsx
-  - tailwind-indicator.tsx
+  - single-mount-wrapper.tsx - Ensures children are only rendered once
+    - Uses useRef and useState for rendering control
+  - tailwind-indicator.tsx - Displays the current Tailwind CSS breakpoint
+    - Only renders in development mode
   - theme-toggle.tsx - Provides a button to toggle between light and dark themes
-  - tool-result.tsx
-  - user-menu.tsx - Implements a dropdown menu for user actions
-    - Displays user initials and email
-    - Provides a sign-out option
-  - workspace.tsx - Implements a collapsible workspace component
-    - Uses useState to manage open/closed state
-    - Animates width transition when opening/closing
+  - tool-result.tsx - Renders the result of a tool invocation
+    - Uses state to manage tool invocation state and result
 - db/ - Database related files
 - docs/ - Documentation files
 - hooks/ - Custom React hooks
