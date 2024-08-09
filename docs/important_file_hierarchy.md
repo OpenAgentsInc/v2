@@ -1,0 +1,12 @@
+# Hierarchy of important files & folders
+- app/
+- components/
+- db/ 
+- docs/
+- hooks/
+- lib/
+- public/
+- scripts/
+- store/
+- tools/
+- types/
