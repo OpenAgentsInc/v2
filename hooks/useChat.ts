@@ -111,7 +111,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         ...message,
         id: message.id,
         toolInvocations: [], // Add any tool invocations if available
-        role: message.role as 'user' | 'assistant' | 'system' | 'data',
+        role: message.role === 'data' ? 'system' : message.role,
     });
 
     const vercelChatProps = useVercelChat({
