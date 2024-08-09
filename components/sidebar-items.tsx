@@ -7,14 +7,14 @@ import { SidebarActions } from '@/components/sidebar-actions'
 import { SidebarItem } from '@/components/sidebar-item'
 import { ServerActionResult } from '@/lib/types'
 
-const removeChat = (args: { id: string; path: string }): ServerActionResult<void> => {
+const removeChat = async (args: { id: string; path: string }): Promise<ServerActionResult<void>> => {
     console.log("Remove chat:", args)
-    return { success: true, data: undefined }
+    return Promise.resolve({ success: true, data: undefined })
 }
 
-const shareChat = (id: string): ServerActionResult<Chat> => {
+const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
     console.log("Share chat:", id)
-    throw new Error("Not implemented")
+    return Promise.reject({ success: false, error: "Not implemented" })
 }
 
 interface SidebarItemsProps {
