@@ -107,12 +107,23 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): CustomMessage => ({
-        ...message,
-        id: message.id,
-        toolInvocations: [], // Add any tool invocations if available
-        role: message.role === 'data' || message.role === 'function' ? 'system' : message.role,
-    });
+    const adaptMessage = (message: VercelMessage): CustomMessage => {
+        const role = message.role === 'data' || message.role === 'function' ? 'system' : message.role;
+        if (role === 'tool') {
+            return {
+                id: message.id,
+                content: message.content,
+                role: role,
+                toolInvocations: [],
+            };
+        } else {
+            return {
+                id: message.id,
+                content: message.content,
+                role: role as 'user' | 'system' | 'assistant',
+            };
+        }
+    };
 
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
@@ -134,7 +145,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage: CustomMessage = { id: Date.now().toString(), content: message, role: 'user', toolInvocations: [] };
+        const userMessage: CustomMessage = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
