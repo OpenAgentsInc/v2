@@ -16,13 +16,47 @@
   - signup/ - Signup page
 - components/ - React components
   - LoadingSpinner.tsx - Loading indicator component
+  - auth/ - Authentication-related components
+  - button-scroll-to-bottom.tsx - Button to scroll chat to bottom
+  - canvas/ - Canvas-related components
   - chat-history.tsx - Chat history component
   - chat-list.tsx - List of chats component
+  - chat-message-actions.tsx - Actions for chat messages
   - chat-message.tsx - Individual chat message component
   - chat-panel.tsx - Chat panel component
+  - chat-share-dialog.tsx - Dialog for sharing chats
   - chat.tsx - Main chat component
+  - clear-history.tsx - Component to clear chat history
+  - dashboard/ - Dashboard-related components
+  - db/ - Database-related components
+  - dom/ - DOM-related utility components
+  - empty-screen.tsx - Empty state screen component
+  - external-link.tsx - External link component
+  - footer.tsx - Footer component
+  - github/ - GitHub integration components
   - header.tsx - Application header component
-  - sidebar.tsx - Sidebar component
+  - hud/ - Heads-up display components
+  - layout-content.tsx - Layout content component
+  - login-button.tsx - Login button component
+  - markdown.tsx - Markdown rendering component
+  - new-chat-button.tsx - New chat button component
+  - prompt-form.tsx - Form for entering prompts
+  - providers.tsx - React context providers
+  - sidebar-actions.tsx - Sidebar action components
+  - sidebar-desktop.tsx - Desktop sidebar component
+  - sidebar-footer.tsx - Sidebar footer component
+  - sidebar-item.tsx - Individual sidebar item component
+  - sidebar-items.tsx - Collection of sidebar items
+  - sidebar-list.tsx - Sidebar list component
+  - sidebar-mobile.tsx - Mobile sidebar component
+  - sidebar-toggle.tsx - Sidebar toggle component
+  - sidebar.tsx - Main sidebar component
+  - single-mount-wrapper.tsx - Wrapper for single-mount components
+  - tailwind-indicator.tsx - Tailwind CSS breakpoint indicator
+  - theme-toggle.tsx - Theme toggle component
+  - tool-result.tsx - Component to display tool results
+  - ui/ - Reusable UI components
+  - user-menu.tsx - User menu component
   - workspace.tsx - Workspace component
 - db/ - Database related files
 - docs/ - Documentation files
