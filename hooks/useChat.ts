@@ -107,7 +107,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const vercelChatProps = useVercelChat({
-        id: threadId?.toString(),
+        id: threadId ? threadId.toString() : undefined,
         initialMessages: threadData.messages,
         body,
         maxToolRoundtrips: 20,
