@@ -10,6 +10,7 @@ export async function onFinish(result: ThreadOnFinishResult) {
 
     // Save the assistant's message
     const assistantMessage: Message = {
+        id: Date.now().toString(), // Add a unique id
         role: 'assistant',
         content: result.text,
         toolInvocations: result.toolCalls ? result.toolCalls : undefined
