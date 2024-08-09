@@ -9,12 +9,12 @@ import { ServerActionResult } from '@/lib/types'
 
 const removeChatAsync = async (args: { id: string; path: string }): Promise<ServerActionResult<void>> => {
     console.log("Remove chat:", args)
-    return { success: true, data: undefined }
+    return Promise.resolve({ success: true, data: undefined })
 }
 
 const shareChatAsync = async (id: string): Promise<ServerActionResult<Chat>> => {
     console.log("Share chat:", id)
-    return { success: false, error: "Not implemented" }
+    return Promise.reject({ success: false, error: "Not implemented" })
 }
 
 const removeChat = (args: { id: string; path: string }): ServerActionResult<void> => {
