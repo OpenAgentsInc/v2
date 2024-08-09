@@ -28,9 +28,10 @@ export async function getUserThreads(userId: string) {
 
 export async function saveMessage(threadId: number, clerkUserId: string, message: Message) {
     try {
+        const contentString = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
         const { rows } = await sql`
         INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations)
-        VALUES (${threadId}, ${clerkUserId}, ${message.role}, ${message.content}, ${JSON.stringify(message.toolInvocations)}::jsonb)
+        VALUES (${threadId}, ${clerkUserId}, ${message.role}, ${contentString}, ${JSON.stringify(message.toolInvocations)}::jsonb)
         RETURNING id, created_at as "createdAt"
         `;
         return { ...message, id: rows[0].id, createdAt: rows[0].createdAt };
@@ -57,12 +58,14 @@ export async function getThreadMessages(threadId: number) {
 
 export async function createThread(clerkUserId: string, firstMessage: Message) {
     try {
+        const contentString = typeof firstMessage.content === 'string' ? firstMessage.content : JSON.stringify(firstMessage.content);
+        const title = contentString.substring(0, 100);
         const { rows: [thread] } = await sql`
         INSERT INTO threads (user_id, clerk_user_id, metadata)
         VALUES (
           (SELECT id FROM users WHERE clerk_user_id = ${clerkUserId}),
           ${clerkUserId},
-          ${JSON.stringify({ title: firstMessage.content.substring(0, 100) })}::jsonb
+          ${JSON.stringify({ title })}::jsonb
         )
         RETURNING id
         `;
