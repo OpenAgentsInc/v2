@@ -3,6 +3,7 @@ import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { onFinish } from './onFinish';
 import { auth } from '@clerk/nextjs/server';
+import { Message } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
     }
 
     const messages = convertToCoreMessages(body.messages);
-    const userMessage = messages[messages.length - 1];
+    const userMessage = messages[messages.length - 1] as Message;
 
     if (userMessage.role !== 'user') {
         return new Response('Last message must be from user', { status: 400 });
