@@ -3,7 +3,7 @@ import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import '@/app/globals.css'
 import { Providers } from '@/components/providers'
-import { initializeDatabase } from '@/lib/init-db'
+import { initializeDatabase } from '@/lib/db/init-db'
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
