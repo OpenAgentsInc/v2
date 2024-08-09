@@ -94,7 +94,11 @@ const githubListUserReposArgsSchema = z.object({
 
 export async function githubListUserRepos(args: z.infer<typeof githubListUserReposArgsSchema>): Promise<any[]> {
     const { token, perPage, sort, direction } = githubListUserReposArgsSchema.parse(args);
-    const url = `https://api.github.com/user/repos?per_page=${perPage}&sort=${sort}&direction=${direction}`;
+    const url = `https://api.github.com/user/repos?${new URLSearchParams({
+        per_page: perPage.toString(),
+        sort,
+        direction
+    })}`;
 
     const data = await githubApiRequest(url, token);
 
