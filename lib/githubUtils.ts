@@ -36,4 +36,15 @@ export async function githubListUserRepos(args: z.infer<typeof githubListUserRep
     }));
 }
 
+// Add these exports
+export async function githubReadFile(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string> {
+    // Implementation details
+    return "File contents";
+}
+
+export async function githubListContents(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string[]> {
+    // Implementation details
+    return ["file1", "file2", "directory1"];
+}
+
 // ... (rest of the file remains unchanged)
