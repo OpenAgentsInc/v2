@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db'
+import { shareChat, getChatById } from '@/db/actions'
 import { ServerActionResult, Chat } from '@/lib/types'
 
 export async function POST(req: NextRequest): Promise<NextResponse<ServerActionResult<Chat>>> {
@@ -13,37 +13,10 @@ export async function POST(req: NextRequest): Promise<NextResponse<ServerActionR
         const { id } = await req.json()
 
         // Verify that the chat belongs to the user
-        const chatResult = await db.query(
-            'SELECT * FROM threads WHERE id = $1 AND user_id = $2',
-            [id, userId]
-        )
+        const chat = await getChatById(id, userId)
 
-        if (chatResult.rows.length === 0) {
-            return NextResponse.json({ success: false, error: 'Chat not found' }, { status: 404 })
-        }
-
-        const chat = chatResult.rows[0]
-
-        // Generate a unique share link
-        const shareId = Math.random().toString(36).substring(2, 15)
-        const sharePath = `/share/${shareId}`
-
-        // Save the share information
-        await db.query(
-            'INSERT INTO shared_chats (thread_id, share_id) VALUES ($1, $2)',
-            [id, shareId]
-        )
-
-        // Return the chat data with the share path
-        const sharedChat: Chat = {
-            id: chat.id,
-            title: chat.title || 'Shared Chat',
-            messages: [], // We don't need to send messages here
-            sharePath,
-            createdAt: chat.created_at,
-            userId: chat.user_id,
-            path: `/chat/${chat.id}`
-        }
+        // Generate a unique share link and save the share information
+        const sharedChat = await shareChat(id, userId)
 
         return NextResponse.json({ success: true, data: sharedChat })
     } catch (error) {
