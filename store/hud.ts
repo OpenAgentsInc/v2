@@ -129,7 +129,8 @@ export const useHudStore = create<HudStore>()(
                     ...newPane,
                     id: paneId,
                     ...adjustedPosition,
-                    isActive: true
+                    isActive: true,
+                    title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
 
                 return {
@@ -178,6 +179,7 @@ export const useHudStore = create<HudStore>()(
             setRepoInputOpen: (isOpen) => set({ isRepoInputOpen: isOpen }),
             openChatPane: (newPane) => set((state) => {
                 const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                const paneId = Math.max(0, ...state.panes.map(p => p.id)) + 1
                 const newPaneWithPosition: Pane = {
                     ...newPane,
                     x: panePosition.x,
@@ -185,7 +187,8 @@ export const useHudStore = create<HudStore>()(
                     width: panePosition.width,
                     height: panePosition.height,
                     isActive: true,
-                    id: Math.max(0, ...state.panes.map(p => p.id)) + 1
+                    id: paneId,
+                    title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
                 return {
                     panes: [
