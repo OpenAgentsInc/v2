@@ -7,10 +7,10 @@ import { useHudStore } from '@/store/hud'
 import { Message } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-  id?: string | number
+  chatId?: string | number
 }
 
-export const Chat = ({ id: propId, className }: ChatProps) => {
+export const Chat = ({ chatId: propId, className }: ChatProps) => {
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const { removePane } = useHudStore()
 
