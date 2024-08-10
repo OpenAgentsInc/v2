@@ -164,13 +164,13 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message) => {
-            if (threadId) {
+            if (threadId && user) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages, threadData.hasMore);
                 
                 try {
-                    await saveMessage(threadId, adaptedMessage);
+                    await saveMessage(threadId, user.id, adaptedMessage);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
@@ -180,8 +180,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     });
 
     const sendMessage = useCallback(async (message: string) => {
-        if (!threadId) {
-            console.error('No thread ID available');
+        if (!threadId || !user) {
+            console.error('No thread ID or user available');
             return;
         }
 
@@ -194,14 +194,14 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             vercelChatProps.append(userMessage as VercelMessage);
 
             // Save the message to the database
-            await saveMessage(threadId, userMessage);
+            await saveMessage(threadId, user.id, userMessage);
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
             // Revert the optimistic update
             setMessages(threadId, threadData.messages, threadData.hasMore);
         }
-    }, [threadId, vercelChatProps, threadData.messages, threadData.hasMore, setMessages]);
+    }, [threadId, user, vercelChatProps, threadData.messages, threadData.hasMore, setMessages]);
 
     const setInput = (input: string) => {
         if (threadId) {
