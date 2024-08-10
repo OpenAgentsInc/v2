@@ -14,7 +14,7 @@ export function ChatList({ messages, user, isShared }: ChatListProps) {
     }
 
     return (
-        <div className="overflow-y-scroll pt-6 relative mx-auto w-full px-4">
+        <div className="overflow-y-scroll pt-6 px-20 w-full">
             {messages.map((message, index) => (
                 <div key={message.id}>
                     <ChatMessage message={message as any} />
