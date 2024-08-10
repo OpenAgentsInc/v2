@@ -84,20 +84,13 @@ export function ChatPanel({
             </div>
             <div className="flex-shrink-0 w-full">
                 <FooterText className="px-4 py-2" />
-                <div className="w-full h-px bg-white" /> {/* White border */}
-                <div className="p-4 w-full">
+                <div className="w-full h-px bg-white" />
+                <div className="sticky bottom-0 w-full h-[60px]">
                     <InputBar
-                        onSubmit={(e) => {
-                            handleSubmit(e)
-                        }}
-                    />
-                    {/*
-                    <PromptForm
                         input={input}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={handleSubmit}
+                        onInputChange={handleInputChange}
+                        onSubmit={handleSubmit}
                     />
-                */}
                 </div>
             </div>
         </div>

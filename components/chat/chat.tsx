@@ -1,11 +1,10 @@
 "use client"
-
 import { useChat } from '@/hooks/useChat'
 import { ChatList } from './chat-list'
-import { ChatPanel } from './chat-panel'
 import { EmptyScreen } from './empty-screen'
 import { useEffect, useRef } from 'react'
 import { useHudStore } from '@/store/hud'
+import { InputBar } from '@/components/input/InputBar'  // Make sure this import is correct
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     chatId?: string | number
@@ -13,8 +12,6 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 
 export const Chat = ({ chatId: propId, className }: ChatProps) => {
     const chatContainerRef = useRef<HTMLDivElement>(null)
-    const { removePane } = useHudStore()
-
     const {
         messages,
         input,
@@ -41,20 +38,23 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
     }, [propId])
 
     return (
-        <>
-            <div className={`flex-1 overflow-hidden ${className}`} ref={chatContainerRef}>
+        <div className={`flex flex-col h-full ${className}`}>
+            <div className="flex-1 overflow-auto" ref={chatContainerRef}>
                 {messages.length ? (
                     <ChatList messages={messages} isShared={false} />
                 ) : (
                     <EmptyScreen />
                 )}
             </div>
-            <ChatPanel
-                id={id || undefined}
-                input={input}
-                handleInputChange={handleInputChange}
-                handleSubmit={handleSubmit}
-            />
-        </>
+            <div className="flex-shrink-0 w-full">
+                <div className="sticky bottom-0 w-full">
+                    <InputBar
+                        input={input}
+                        onInputChange={handleInputChange}
+                        onSubmit={handleSubmit}
+                    />
+                </div>
+            </div>
+        </div>
     )
 }

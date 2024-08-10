@@ -101,7 +101,7 @@ export const InputBar: React.FC<InputBarProps> = ({ onSubmit }) => {
             )}
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="w-full">
                 <fieldset className="flex w-full min-w-0 flex-col-reverse">
-                    <div className="flex flex-col bg-white dark:bg-black gap-1.5 border-t border-r border-l border-white dark:border-white pl-4 pt-2.5 pr-2.5 pb-2.5 items-stretch transition-all duration-200 relative shadow-sm hover:border-white dark:hover:border-white focus-within:border-white dark:focus-within:border-white cursor-text z-10 rounded-t-xl">
+                    <div className="flex flex-col bg-white dark:bg-black gap-1.5 border-t border-r border-l border-white dark:border-white pl-4 pt-2.5 pr-2.5 pb-2.5 items-stretch transition-all duration-200 relative shadow-sm hover:border-white dark:hover:border-white focus-within:border-white dark:focus-within:border-white cursor-text z-10">
                         <div className="flex gap-2 w-full">
                             <div
                                 aria-label="Write your prompt"
