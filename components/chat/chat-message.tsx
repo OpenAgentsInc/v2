@@ -1,6 +1,7 @@
 // components/chat-message.tsx
 "use client"
 
+import { useMemo } from 'react'
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -13,11 +14,12 @@ import { FileViewer } from '@/components/github/file-viewer'
 import { ToolResult } from './tool-result'
 
 export interface ChatMessageProps {
-    message: Message & { toolInvocations?: any[] }
+    message: Message
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
     const renderToolInvocation = (toolInvocation: any) => {
+        console.log('Tool Invocation:', toolInvocation)
         return (
             <ToolResult
                 key={toolInvocation.toolCallId}
