@@ -5,6 +5,8 @@ import { Message, User } from '@/lib/types'
 interface ThreadData {
     messages: Message[];
     input: string;
+    hasMore: boolean;
+    currentPage: number;
 }
 
 interface ChatState {
@@ -12,11 +14,12 @@ interface ChatState {
     currentThreadId: string | undefined;
     user: User | undefined;
     addMessage: (threadId: string, message: Message) => void;
-    setMessages: (threadId: string, messages: Message[]) => void;
+    setMessages: (threadId: string, messages: Message[], hasMore: boolean, append?: boolean) => void;
     setInput: (threadId: string, input: string) => void;
     setCurrentThreadId: (id: string | undefined) => void;
     setUser: (user: User | undefined) => void;
     getThreadData: (threadId: string) => ThreadData;
+    incrementPage: (threadId: string) => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -36,12 +39,14 @@ export const useChatStore = create<ChatState>()(
                 },
             })),
 
-            setMessages: (threadId, messages) => set((state) => ({
+            setMessages: (threadId, messages, hasMore, append = false) => set((state) => ({
                 threads: {
                     ...state.threads,
                     [threadId]: {
                         ...state.threads[threadId],
-                        messages,
+                        messages: append ? [...(state.threads[threadId]?.messages || []), ...messages] : messages,
+                        hasMore,
+                        currentPage: append ? (state.threads[threadId]?.currentPage || 1) : 1,
                     },
                 },
             })),
@@ -62,8 +67,18 @@ export const useChatStore = create<ChatState>()(
 
             getThreadData: (threadId) => {
                 const state = get();
-                return state.threads[threadId] || { messages: [], input: '' };
+                return state.threads[threadId] || { messages: [], input: '', hasMore: true, currentPage: 1 };
             },
+
+            incrementPage: (threadId) => set((state) => ({
+                threads: {
+                    ...state.threads,
+                    [threadId]: {
+                        ...state.threads[threadId],
+                        currentPage: (state.threads[threadId]?.currentPage || 1) + 1,
+                    },
+                },
+            })),
         }),
         {
             name: 'chat-storage',
