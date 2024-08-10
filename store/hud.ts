@@ -215,7 +215,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-1523',
+            name: 'openagents-hud-storage-1524',
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )
