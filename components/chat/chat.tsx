@@ -47,8 +47,6 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
             <div className="flex-shrink-0 w-full">
                 <div className="sticky bottom-0 w-full">
                     <InputBar
-                        input={input}
-                        onInputChange={handleInputChange}
                         onSubmit={sendMessage}
                     />
                 </div>
