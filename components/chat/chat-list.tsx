@@ -1,14 +1,12 @@
 import { Separator } from '@/components/ui/separator'
-import { Message, User } from '@/lib/types'
+import { Message } from '@/lib/types'
 import { ChatMessage } from './chat-message'
 
 export interface ChatListProps {
     messages: Message[]
-    user?: User
-    isShared: boolean
 }
 
-export function ChatList({ messages, user, isShared }: ChatListProps) {
+export function ChatList({ messages }: ChatListProps) {
     if (!messages.length) {
         return null
     }
