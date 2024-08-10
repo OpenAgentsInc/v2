@@ -8,7 +8,7 @@ export const Hud = () => {
     <div>
       {panes.map((pane) => (
         <div key={pane.id}>
-          {pane.type === 'chat' && <Chat id={typeof pane.id === 'string' ? parseInt(pane.id, 10) : pane.id} />}
+          {pane.type === 'chat' && <Chat chatId={pane.id.toString()} />}
         </div>
       ))}
     </div>
