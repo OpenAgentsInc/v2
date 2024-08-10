@@ -9,6 +9,7 @@ import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
 import { Message, ServerActionResult, Chat } from '@/lib/types'
+import { ChatList } from '@/components/chat-list'
 
 export interface ChatPanelProps {
   id?: number
@@ -74,7 +75,10 @@ export function ChatPanel({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-hidden flex flex-col">
+        <div className="flex-grow overflow-auto">
+          <ChatList messages={messages} />
+        </div>
         {messages.length > 1 && (
           <div className="flex items-center justify-end p-4">
             <button
