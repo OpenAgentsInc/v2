@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, ServerMessage, ClientMessage } from '@/lib/types';
+import { Message, ServerMessage, ClientMessage, ChatMessage } from '@/lib/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -16,7 +16,7 @@ interface User {
 
 interface ThreadData {
     id: number;
-    messages: Message[];
+    messages: ChatMessage[];
     input: string;
     user?: User;
 }
@@ -28,7 +28,7 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: Message[]) => void;
+    setMessages: (id: number, messages: ChatMessage[]) => void;
     setInput: (id: number, input: string) => void;
 }
 
@@ -45,7 +45,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: Message[]) =>
+    setMessages: (id: number, messages: ChatMessage[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -121,7 +121,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): Message => {
+    const adaptMessage = (message: VercelMessage): ChatMessage => {
         const baseMessage: Partial<ServerMessage | ClientMessage> = {
             id: message.id,
             content: message.content,
@@ -141,7 +141,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         arguments: typeof message.function_call === 'string' ? '' : message.function_call.arguments || '',
                     },
                 }],
-            } as Message;
+            } as ServerMessage;
         }
 
         if (message.tool_calls) {
@@ -157,10 +157,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         arguments: call.function.arguments,
                     },
                 })),
-            } as Message;
+            } as ServerMessage;
         }
 
-        return baseMessage as Message;
+        return baseMessage as ChatMessage;
     };
 
     const vercelChatProps = useVercelChat({
