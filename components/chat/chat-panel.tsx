@@ -1,13 +1,9 @@
 import { useChat } from '@/hooks/useChat'
 import { PromptForm } from './prompt-form'
-import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
 import { ChatShareDialog } from '@/components/share/chat-share-dialog'
 import { FooterText } from './footer'
 import { useEffect, useState } from 'react'
 import { useHudStore } from '@/store/hud'
-import { useRepoStore } from '@/store/repo'
-import { useModelStore } from '@/store/models'
-import { useToolStore } from '@/store/tools'
 import { ServerActionResult, Chat } from '@/lib/types'
 import { ChatList } from './chat-list'
 
@@ -24,17 +20,11 @@ export interface ChatPanelProps {
 export function ChatPanel({
     id,
     className,
-    isAtBottom,
-    scrollToBottom,
     input,
     handleInputChange,
     handleSubmit
 }: ChatPanelProps) {
     const [shareDialogOpen, setShareDialogOpen] = useState(false)
-    const { removePane } = useHudStore()
-    const repo = useRepoStore((state) => state.repo)
-    const model = useModelStore((state) => state.model)
-    const tools = useToolStore((state) => state.tools)
 
     useEffect(() => {
         if (id) {
@@ -77,18 +67,6 @@ export function ChatPanel({
         <div className={`flex flex-col h-full ${className}`}>
             <div className="flex-grow overflow-auto">
                 <ChatList messages={messages} isShared={false} />
-                {/* Commented out share button
-        {messages.length > 1 && (
-          <div className="flex items-center justify-end p-4">
-            <button
-              onClick={() => setShareDialogOpen(true)}
-              className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
-            >
-              Share
-            </button>
-          </div>
-        )}
-        */}
                 <ChatShareDialog
                     open={shareDialogOpen}
                     onOpenChange={setShareDialogOpen}
@@ -114,12 +92,6 @@ export function ChatPanel({
                     />
                 </div>
             </div>
-            {isAtBottom !== undefined && scrollToBottom && (
-                <ButtonScrollToBottom
-                    isAtBottom={isAtBottom}
-                    scrollToBottom={scrollToBottom}
-                />
-            )}
         </div>
     )
 }
