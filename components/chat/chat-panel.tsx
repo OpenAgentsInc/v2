@@ -1,5 +1,6 @@
 import { useChat } from '@/hooks/useChat'
 import { PromptForm } from './prompt-form'
+import { InputBar } from '@/components/input/InputBar'
 import { ChatShareDialog } from '@/components/share/chat-share-dialog'
 import { FooterText } from './footer'
 import { useEffect, useState } from 'react'
@@ -85,11 +86,18 @@ export function ChatPanel({
                 <FooterText className="px-4 py-2" />
                 <div className="w-full h-px bg-white" /> {/* White border */}
                 <div className="p-4 w-full">
+                    <InputBar
+                        onSubmit={(e) => {
+                            handleSubmit(e)
+                        }}
+                    />
+                    {/*
                     <PromptForm
                         input={input}
                         handleInputChange={handleInputChange}
                         handleSubmit={handleSubmit}
                     />
+                */}
                 </div>
             </div>
         </div>
