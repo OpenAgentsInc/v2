@@ -4,9 +4,10 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message as CustomMessage, ToolInvocation } from '@/lib/types';
+import { Message } from '@/lib/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
+import { useUser } from '@clerk/nextjs';
 
 interface User {
     id: string;
@@ -15,7 +16,7 @@ interface User {
 
 interface ThreadData {
     id: number;
-    messages: CustomMessage[];
+    messages: Message[];
     input: string;
     user?: User;
 }
@@ -27,7 +28,7 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: CustomMessage[]) => void;
+    setMessages: (id: number, messages: Message[]) => void;
     setInput: (id: number, input: string) => void;
 }
 
@@ -44,7 +45,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: CustomMessage[]) =>
+    setMessages: (id: number, messages: Message[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -68,10 +69,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const model = useModelStore((state) => state.model);
     const repo = useRepoStore((state) => state.repo);
     const tools = useToolStore((state) => state.tools);
+    const { user } = useUser();
 
     const {
         currentThreadId,
-        user,
         setCurrentThreadId,
         setUser,
         getThreadData,
@@ -85,9 +86,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         if (propsId) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
-        } else if (!threadId) {
-            createNewThread()
-                .then((newThreadId) => {
+        } else if (!threadId && user) {
+            createNewThread(user.id)
+                .then(({ threadId: newThreadId }) => {
                     setThreadId(newThreadId);
                     setCurrentThreadId(newThreadId);
                 })
@@ -96,7 +97,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                     toast.error('Failed to create a new chat thread. Please try again.');
                 });
         }
-    }, [propsId, threadId, setCurrentThreadId]);
+    }, [propsId, threadId, setCurrentThreadId, user]);
 
     useEffect(() => {
         if (threadId) {
@@ -120,36 +121,13 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): CustomMessage => {
-        const baseMessage: CustomMessage = {
+    const adaptMessage = (message: VercelMessage): Message => {
+        const baseMessage: Message = {
             id: message.id,
             content: message.content,
             role: message.role as 'user' | 'system' | 'assistant' | 'data',
         };
 
-        if (message.toolInvocations) {
-            return {
-                ...baseMessage,
-                toolInvocations: message.toolInvocations.map((invocation): ToolInvocation => {
-                    if ('state' in invocation) {
-                        return invocation as ToolInvocation;
-                    } else {
-                        // Convert legacy tool calls to the new format
-                        return {
-                            state: 'call',
-                            id: invocation.id,
-                            type: invocation.type,
-                            function: {
-                                name: invocation.function.name,
-                                arguments: invocation.function.arguments,
-                            },
-                        } as ToolInvocation;
-                    }
-                }),
-            };
-        }
-
-        // Handle deprecated function_call and tool_calls
         if (message.function_call) {
             console.warn('Deprecated: function_call is no longer supported. Use toolInvocations instead.');
             return {
@@ -212,7 +190,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage: CustomMessage = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
