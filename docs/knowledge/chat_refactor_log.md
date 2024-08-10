@@ -4,13 +4,22 @@ This document logs the actions taken to refactor the chat implementation, incorp
 
 ## Date: [Current Date]
 
-### 1. Created Server Actions (db/actions.ts)
+### 1. Updated Server Actions (db/actions.ts)
 
-Added new server actions to handle database operations:
+Initially, we mistakenly replaced the existing actions in `db/actions.ts`. This has been corrected, and we have now merged the new actions with the existing ones:
 
-- `createNewThread`: Creates a new chat thread in the database
-- `fetchThreadMessages`: Retrieves messages for a specific thread
-- `saveMessage`: Saves a new message to the database
+- Retained all existing functions:
+  - `saveChatMessage`
+  - `createNewThread` (kept existing implementation)
+  - `fetchThreadMessages` (kept existing implementation)
+  - `updateThreadData`
+  - `fetchUserThreads`
+  - `getLastEmptyThread`
+  - `shareChat`
+  - `getChatById`
+
+- Added new function:
+  - `saveMessage`: Saves a new message to the database
 
 ### 2. Updated useChat Hook (hooks/useChat.ts)
 
@@ -27,8 +36,8 @@ Modified the `useChat` hook to incorporate server actions and improve functional
 
 1. Thread Creation:
    ```typescript
-   createNewThread()
-     .then((newThreadId) => {
+   createNewThread(user.id) // Assuming user.id is the clerkUserId
+     .then(({ threadId: newThreadId }) => {
        setThreadId(newThreadId);
        setCurrentThreadId(newThreadId);
      })
@@ -111,3 +120,10 @@ Modified the `useChat` hook to incorporate server actions and improve functional
 8. Implement message search functionality within threads
 
 This refactor improves the chat functionality by ensuring proper data persistence, error handling, and user feedback. It also sets the foundation for further enhancements to the chat system.
+
+### Lessons Learned
+
+- Always review existing code thoroughly before making changes
+- When refactoring, aim to enhance and extend functionality rather than replace it
+- Maintain clear documentation of changes and their rationale
+- Test thoroughly after making changes to ensure all existing functionality is preserved
