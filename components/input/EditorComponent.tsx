@@ -112,7 +112,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = ({ content, onCha
         if (editorViewRef.current && content !== editorViewRef.current.state.doc.textContent.trim()) {
             const transaction = editorViewRef.current.state.tr
                 .setSelection(editorViewRef.current.state.selection)
-                .clearContent()
+                .deleteSelection()
                 .insertText(content);
             editorViewRef.current.dispatch(transaction);
         }
