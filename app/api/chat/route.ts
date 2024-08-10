@@ -1,4 +1,4 @@
-import { convertToCoreMessages, streamText, Message as AIMessage } from 'ai';
+import { streamText, Message as AIMessage } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { onFinish } from './onFinish';
@@ -29,7 +29,11 @@ export async function POST(req: Request) {
     // Fetch paginated messages
     const { messages: dbMessages, hasMore } = await fetchThreadMessages(threadId, page, limit);
 
-    const messages = convertToCoreMessages(dbMessages as AIMessage[]);
+    const messages = dbMessages.map(msg => ({
+        role: msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system' ? msg.role : 'user',
+        content: msg.content,
+    })) as AIMessage[];
+
     const userMessage = messages[messages.length - 1] as Message;
     const result = await streamText({
         messages,
