@@ -1,41 +1,51 @@
-import { convertToCoreMessages, streamText } from 'ai';
-import { getSystemPrompt } from '@/lib/systemPrompt';
-import { getTools, getToolContext } from '@/tools';
-import { onFinish } from './onFinish';
-import { auth } from '@clerk/nextjs/server';
-import { Message } from '@/lib/types';
+import { StreamingTextResponse, LangChainStream, Message } from 'ai'
+import { ChatOpenAI } from 'langchain/chat_models/openai'
+import { AIMessage, HumanMessage } from 'langchain/schema'
+import { onFinish } from './onFinish'
+import { createNewThread } from '@/db/actions'
+import { auth } from '@clerk/nextjs'
 
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const runtime = 'edge'
 
 export async function POST(req: Request) {
-    const body = await req.json();
-    const threadId = Number(body.threadId);
+  const { messages, threadId, model } = await req.json()
+  const { userId } = auth()
 
-    if (isNaN(threadId)) {
-        return new Response('Invalid threadId', { status: 400 });
+  if (!userId) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  const { stream, handlers } = LangChainStream()
+
+  const llm = new ChatOpenAI({
+    modelName: model,
+    streaming: true,
+  })
+
+  const newThreadId = threadId || (await createNewThread(userId)).threadId
+
+  llm.call(
+    messages.map((m: Message) => (m.role === 'user' ? new HumanMessage(m.content) : new AIMessage(m.content))),
+    {},
+    [handlers]
+  ).catch(console.error)
+
+  const userMessage = messages[messages.length - 1]
+
+  handlers.handleChainEnd = (finishResult) => {
+    const assistantMessage = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: finishResult.generations[0][0].text,
     }
+    onFinish({
+      ...finishResult,
+      threadId: newThreadId,
+      clerkUserId: userId,
+      userMessage,
+      assistantMessage,
+    })
+  }
 
-    const toolContext = await getToolContext(body);
-    const tools = getTools(toolContext, body.tools);
-    const { userId } = auth();
-    if (!userId) {
-        return new Response('Unauthorized', { status: 401 });
-    }
-
-    const messages = convertToCoreMessages(body.messages);
-    const userMessage = messages[messages.length - 1] as Message;
-    const result = await streamText({
-        messages,
-        model: toolContext.model,
-        system: getSystemPrompt(toolContext),
-        tools,
-        onFinish: (finishResult) => onFinish({
-            ...finishResult,
-            threadId,
-            clerkUserId: userId,
-            userMessage
-        }),
-    });
-    return result.toAIStreamResponse();
+  return new StreamingTextResponse(stream)
 }
