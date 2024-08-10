@@ -1,21 +1,21 @@
 "use client"
 
-import { useRef } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { InputBar } from '@/components/input/InputBar'
 import { ChatList } from './chat-list'
+import { useChatScroll } from '@/hooks/useChatScroll';
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     threadId: number
 }
 
 export const Chat = ({ threadId, className }: ChatProps) => {
-    const chatContainerRef = useRef<HTMLDivElement>(null)
     const {
         messages,
         sendMessage,
         isLoading
     } = useChat({ id: threadId })
+    const chatContainerRef = useChatScroll(messages);
 
     return (
         <div className={`flex flex-col h-full ${className}`}>
