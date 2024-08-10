@@ -1,82 +1,125 @@
-import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
+import { useChat } from '@/hooks/useChat'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { IconShare } from '@/components/ui/icons'
-import { FooterText } from '@/components/footer'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
-import { useChat } from '@/hooks/useChat'
-import { Message, Chat } from '@/lib/types'
-import { ServerActionResult } from '@/lib/types'
-
-const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
-    console.log("Not implemented")
-    throw new Error("Not implemented")
-}
+import { FooterText } from '@/components/footer'
+import { useEffect, useState } from 'react'
+import { useHudStore } from '@/store/hud'
+import { useRepoStore } from '@/store/repo'
+import { useModelStore } from '@/store/models'
+import { useToolStore } from '@/store/tools'
+import { Message, ServerActionResult, Chat } from '@/lib/types'
+import { ChatList } from '@/components/chat-list'
 
 export interface ChatPanelProps {
-    id?: string
-    title?: string
-    isAtBottom: boolean
-    scrollToBottom: () => void
-    input: string
-    handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  id?: number
+  className?: string
+  isAtBottom?: boolean
+  scrollToBottom?: () => void
+  input: string
+  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
 export function ChatPanel({
-    id,
-    title,
-    isAtBottom,
-    scrollToBottom,
-    input,
-    handleInputChange,
-    handleSubmit
+  id,
+  className,
+  isAtBottom,
+  scrollToBottom,
+  input,
+  handleInputChange,
+  handleSubmit
 }: ChatPanelProps) {
-    const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
-    const { messages } = useChat({ id })
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const { removePane } = useHudStore()
+  const repo = useRepoStore((state) => state.repo)
+  const model = useModelStore((state) => state.model)
+  const tools = useToolStore((state) => state.tools)
 
-    return (
-        <div className="w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% dark:from-background/10 dark:from-10% dark:to-background/80">
-            <ButtonScrollToBottom
-                isAtBottom={isAtBottom}
-                scrollToBottom={scrollToBottom}
-            />
+  useEffect(() => {
+    if (id) {
+      useHudStore.setState((state) => ({
+        panes: state.panes.map((pane) =>
+          pane.id === id.toString() ? { ...pane, title: 'Chat' } : pane
+        )
+      }))
+    }
+  }, [id])
 
-            <div className="mx-auto sm:max-w-2xl sm:px-4">
-                {messages?.length >= 2 && id && title ? (
-                    <div className="flex h-10 items-center justify-center">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShareDialogOpen(true)}
-                        >
-                            <IconShare className="mr-2" />
-                            Share
-                        </Button>
-                        <ChatShareDialog
-                            open={shareDialogOpen}
-                            onOpenChange={setShareDialogOpen}
-                            onCopy={() => setShareDialogOpen(false)}
-                            shareChat={shareChat}
-                            chat={{
-                                id,
-                                title,
-                                messages: messages as Message[]
-                            }}
-                        />
-                    </div>
-                ) : null}
+  const { messages } = useChat({ id })
 
-                <div className="space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:rounded-t-xl sm:border">
-                    <PromptForm
-                        input={input}
-                        handleInputChange={handleInputChange}
-                        handleSubmit={handleSubmit}
-                    />
-                    <FooterText className="hidden sm:block" />
-                </div>
-            </div>
+  const shareChat = async (id: number): Promise<ServerActionResult<Chat>> => {
+    try {
+      const response = await fetch('/api/share-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to share chat');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error sharing chat:', error);
+      return {
+        success: false,
+        error: 'Failed to share chat',
+      };
+    }
+  }
+
+  return (
+    <div className={`flex flex-col h-full ${className}`}>
+      <div className="flex-grow overflow-auto">
+        <ChatList messages={messages} isShared={false} />
+        {/* Commented out share button
+        {messages.length > 1 && (
+          <div className="flex items-center justify-end p-4">
+            <button
+              onClick={() => setShareDialogOpen(true)}
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
+            >
+              Share
+            </button>
+          </div>
+        )}
+        */}
+        <ChatShareDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          chat={{
+            id: id || 0,
+            title: 'Chat',
+            messages: messages
+          }}
+          shareChat={shareChat}
+          onCopy={() => {
+            console.log('Chat link copied')
+          }}
+        />
+      </div>
+      <div className="flex-shrink-0 w-full">
+        <FooterText className="px-4 py-2" />
+        <div className="w-full h-px bg-white" /> {/* White border */}
+        <div className="p-4 w-full">
+          <PromptForm
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+          />
         </div>
-    )
+      </div>
+      {isAtBottom !== undefined && scrollToBottom && (
+        <ButtonScrollToBottom
+          isAtBottom={isAtBottom}
+          scrollToBottom={scrollToBottom}
+        />
+      )}
+    </div>
+  )
 }

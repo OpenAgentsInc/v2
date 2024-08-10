@@ -1,79 +1,60 @@
-'use client'
-import React, { useEffect, useCallback, useMemo } from 'react'
-import { cn } from '@/lib/utils'
+"use client"
+
+import { useChat } from '@/hooks/useChat'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
-import { useScrollAnchor } from '@/lib/hooks/use-scroll-anchor'
-import { useChat } from '@/hooks/useChat'
-import { debounce } from 'lodash'
-import { useThreadCreation } from '@/hooks/useThreadCreation'
-import { Message } from '@/lib/types'
+import { useEffect, useRef } from 'react'
+import { useHudStore } from '@/store/hud'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-    id?: string
+    chatId?: string | number
 }
 
-export const Chat = React.memo(function Chat({ className, id: propId }: ChatProps) {
+export const Chat = ({ chatId: propId, className }: ChatProps) => {
+    const chatContainerRef = useRef<HTMLDivElement>(null)
+    const { removePane } = useHudStore()
+
     const {
         messages,
         input,
+        handleInputChange,
+        handleSubmit,
         id,
-        handleInputChange,
-        handleSubmit,
-    } = useChat({ id: propId })
+        setCurrentThreadId
+    } = useChat({ id: typeof propId === 'string' ? parseInt(propId, 10) : propId })
 
-    console.log('Chat id??', id)
-    console.log('Chat with propId:', propId)
-
-    const { threadId } = useThreadCreation(propId)
-
-    const { messagesRef, scrollRef, visibilityRef, isAtBottom, scrollToBottom } =
-        useScrollAnchor()
-
-    // Debounce the scrollToBottom function
-    const debouncedScrollToBottom = useMemo(
-        () => debounce(scrollToBottom, 100),
-        [scrollToBottom]
-    )
-
-    // Ensure scroll to bottom on new messages
     useEffect(() => {
-        if (messages.length > 0) {
-            debouncedScrollToBottom()
+        if (id) {
+            setCurrentThreadId(id)
         }
-    }, [messages, debouncedScrollToBottom])
+    }, [id, setCurrentThreadId])
 
-    const chatPanelProps = useMemo(() => ({
-        id: threadId || undefined,
-        isAtBottom,
-        scrollToBottom: debouncedScrollToBottom,
-        input,
-        handleInputChange,
-        handleSubmit,
-    }), [threadId, isAtBottom, debouncedScrollToBottom, input, handleInputChange, handleSubmit])
+    useEffect(() => {
+        if (propId) {
+            useHudStore.setState((state) => ({
+                panes: state.panes.map((pane) =>
+                    pane.id === propId.toString() ? { ...pane, title: 'Chat' } : pane
+                )
+            }))
+        }
+    }, [propId])
 
     return (
-        <div
-            className={cn(
-                "flex flex-col h-full bg-white dark:bg-black group w-full",
-                "transition-[padding,width] duration-300 ease-in-out",
-                "pl-0 peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]",
-                "peer-[[data-workspace-open=true]]:w-3/5",
-                className
-            )}
-        >
-            <div className="flex-grow overflow-auto" ref={scrollRef}>
-                <div className="relative min-h-full" ref={messagesRef}>
-                    {messages.length ? (
-                        <ChatList messages={messages as Message[]} isShared={false} />
-                    ) : (
-                        <EmptyScreen />
-                    )}
-                    <div className="h-px" ref={visibilityRef} />
-                </div>
+        <>
+            <div className={`flex-1 overflow-hidden ${className}`} ref={chatContainerRef}>
+                {messages.length ? (
+                    <ChatList messages={messages} isShared={false} />
+                ) : (
+                    <EmptyScreen />
+                )}
             </div>
-            <ChatPanel {...chatPanelProps} />
-        </div>
+            <ChatPanel
+                id={id || undefined}
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+            />
+        </>
     )
-})
+}

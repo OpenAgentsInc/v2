@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { Pane } from '@/components/hud/pane'
 import { ChatHistory } from '@/components/chat-history'
-import { HUD } from '@/components/hud/hud'
+import { Hud } from '@/components/hud/hud'
 
 export const HomeDashboard = async () => {
     const userId = auth().userId
@@ -19,7 +19,7 @@ export const HomeDashboard = async () => {
             <Pane title="Chat History" id="sidebar" x={20} y={20} height={450} width={260}>
                 <ChatHistory userId={userId} />
             </Pane>
-            <HUD />
+            <Hud />
         </main>
     )
 }

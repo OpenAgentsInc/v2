@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useRef, MutableRefObject } from 'react'
-import { Canvas, addEffect } from '@react-three/fiber'
+import { useRef, MutableRefObject } from 'react'
+import { Canvas } from '@react-three/fiber'
 import { Preload, View } from '@react-three/drei'
-import Lenis from '@studio-freight/lenis'
 import { GridScene } from './GridScene'
 
 interface SceneProps {
@@ -12,16 +11,6 @@ interface SceneProps {
 
 export default function Scene(props: SceneProps) {
     const viewRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
-
-    // Use lenis to control scrolling
-    useEffect(() => {
-        const lenis = new Lenis({ smoothWheel: true, syncTouch: true })
-        const removeEffect = addEffect((time) => lenis.raf(time))
-        return () => {
-            lenis.destroy()
-            removeEffect()
-        }
-    }, [])
 
     // Everything defined in here will persist between route changes, only children are swapped
     return (
