@@ -88,6 +88,38 @@
     }, [shareChat])
     ```
 
+### Step 7: Update ChatShareDialog Component
+- Updated `components/chat-share-dialog.tsx`:
+  - Changed the `chat` prop type to use `number` for `id`:
+    ```typescript
+    interface ChatShareDialogProps extends DialogProps {
+      chat: {
+        id: number
+        title: string
+        messages: Message[]
+      }
+      shareChat: (id: number) => Promise<ServerActionResult<Chat>>
+      onCopy: () => void
+    }
+    ```
+
+### Step 8: Update SidebarItem Component
+- Updated `components/sidebar-item.tsx`:
+  - Modified `isActive` and `isOpen` checks to compare `pane.id` with `chat.id.toString()`:
+    ```typescript
+    const isActive = panes.some(pane => pane.id === chat.id.toString() && pane.type === 'chat' && pane.isActive)
+    const isOpen = panes.some(pane => pane.id === chat.id.toString() && pane.type === 'chat')
+    ```
+  - Updated the `newPane` object in the `handleClick` function to use `chat.id.toString()`:
+    ```typescript
+    const newPane = {
+      id: chat.id.toString(),
+      title: chat.title,
+      type: 'chat' as const,
+      content: { id: chat.id, oldContent: chat.messages?.join('\n') }
+    }
+    ```
+
 These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on:
 
 1. Ensuring that all parts of the application are consistently using number-based thread IDs
