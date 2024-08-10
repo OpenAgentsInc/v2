@@ -5,6 +5,8 @@ import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
 import { Message as CustomMessage, ToolInvocation } from '@/lib/types';
+import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
+import { toast } from 'sonner';
 
 interface User {
     id: string;
@@ -84,19 +86,30 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
         } else if (!threadId) {
-            // Create a new thread
-            fetch('/api/thread', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            })
-                .then(response => response.json())
-                .then(({ threadId: newThreadId }) => {
+            createNewThread()
+                .then((newThreadId) => {
                     setThreadId(newThreadId);
                     setCurrentThreadId(newThreadId);
                 })
-                .catch(error => console.error('Error creating new thread:', error));
+                .catch(error => {
+                    console.error('Error creating new thread:', error);
+                    toast.error('Failed to create a new chat thread. Please try again.');
+                });
         }
     }, [propsId, threadId, setCurrentThreadId]);
+
+    useEffect(() => {
+        if (threadId) {
+            fetchThreadMessages(threadId)
+                .then((messages) => {
+                    setMessages(threadId, messages);
+                })
+                .catch(error => {
+                    console.error('Error fetching thread messages:', error);
+                    toast.error('Failed to load chat messages. Please try refreshing the page.');
+                });
+        }
+    }, [threadId, setMessages]);
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
@@ -177,11 +190,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
-        onFinish: (message) => {
+        onFinish: async (message) => {
             if (threadId) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages);
+                
+                try {
+                    await saveMessage(threadId, adaptedMessage);
+                } catch (error) {
+                    console.error('Error saving AI message:', error);
+                    toast.error('Failed to save AI response. Some messages may be missing.');
+                }
             }
         },
     });
@@ -196,7 +216,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
-        return vercelChatProps.append(userMessage as VercelMessage);
+        try {
+            // Optimistically update the UI
+            vercelChatProps.append(userMessage as VercelMessage);
+
+            // Save the message to the database
+            await saveMessage(threadId, userMessage);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Failed to send message. Please try again.');
+            // Revert the optimistic update
+            setMessages(threadId, threadData.messages);
+        }
     }, [threadId, vercelChatProps, threadData.messages, setMessages]);
 
     const setInput = (input: string) => {
