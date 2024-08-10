@@ -75,15 +75,38 @@ export function ChatPanel({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#888 #f1f1f1' }}>
-          <ChatList messages={messages} isShared={false} />
-        </div>
+      <div className="flex-grow overflow-auto">
+        <ChatList messages={messages} isShared={false} />
+        {/* Commented out share button
+        {messages.length > 1 && (
+          <div className="flex items-center justify-end p-4">
+            <button
+              onClick={() => setShareDialogOpen(true)}
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
+            >
+              Share
+            </button>
+          </div>
+        )}
+        */}
+        <ChatShareDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          chat={{
+            id: id || 0,
+            title: 'Chat',
+            messages: messages
+          }}
+          shareChat={shareChat}
+          onCopy={() => {
+            console.log('Chat link copied')
+          }}
+        />
       </div>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 w-full">
         <FooterText className="px-4 py-2" />
         <div className="w-full h-px bg-white" /> {/* White border */}
-        <div className="p-4">
+        <div className="p-4 w-full">
           <PromptForm
             input={input}
             handleInputChange={handleInputChange}
@@ -97,19 +120,6 @@ export function ChatPanel({
           scrollToBottom={scrollToBottom}
         />
       )}
-      <ChatShareDialog
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        chat={{
-          id: id || 0,
-          title: 'Chat',
-          messages: messages
-        }}
-        shareChat={shareChat}
-        onCopy={() => {
-          console.log('Chat link copied')
-        }}
-      />
     </div>
   )
 }
