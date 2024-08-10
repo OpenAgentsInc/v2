@@ -73,36 +73,42 @@ export function ChatPanel({
   }
 
   return (
-    <div className={className}>
-      {messages.length > 1 && (
-        <div className="flex items-center justify-end p-4">
-          <button
-            onClick={() => setShareDialogOpen(true)}
-            className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
-          >
-            Share
-          </button>
-        </div>
-      )}
-      <ChatShareDialog
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        chat={{
-          id: id || 0,
-          title: 'Chat',
-          messages: messages
-        }}
-        shareChat={shareChat}
-        onCopy={() => {
-          console.log('Chat link copied')
-        }}
-      />
-      <div className="p-4 pb-20">
-        <PromptForm
-          input={input}
-          handleInputChange={handleInputChange}
-          handleSubmit={handleSubmit}
+    <div className={`flex flex-col ${className}`}>
+      <div className="flex-grow overflow-auto">
+        {messages.length > 1 && (
+          <div className="flex items-center justify-end p-4">
+            <button
+              onClick={() => setShareDialogOpen(true)}
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:underline"
+            >
+              Share
+            </button>
+          </div>
+        )}
+        <ChatShareDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          chat={{
+            id: id || 0,
+            title: 'Chat',
+            messages: messages
+          }}
+          shareChat={shareChat}
+          onCopy={() => {
+            console.log('Chat link copied')
+          }}
         />
+      </div>
+      <div className="flex flex-col">
+        <FooterText className="px-4 py-2" />
+        <div className="w-full h-px bg-white" /> {/* White border */}
+        <div className="p-4">
+          <PromptForm
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+          />
+        </div>
       </div>
       {isAtBottom !== undefined && scrollToBottom && (
         <ButtonScrollToBottom
@@ -110,7 +116,6 @@ export function ChatPanel({
           scrollToBottom={scrollToBottom}
         />
       )}
-      <FooterText className="absolute bottom-0 left-0 right-0" />
     </div>
   )
 }
