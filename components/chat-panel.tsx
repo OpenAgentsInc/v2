@@ -46,7 +46,7 @@ export function ChatPanel({
 
   const { messages } = useChat({ id })
 
-  const shareChat = async (id: string): Promise<ServerActionResult<Chat>> => {
+  const shareChat = async (id: number): Promise<ServerActionResult<Chat>> => {
     try {
       const response = await fetch('/api/share-chat', {
         method: 'POST',
@@ -87,7 +87,7 @@ export function ChatPanel({
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
         chat={{
-          id: id?.toString() || '',
+          id: id || 0,
           title: 'Chat',
           messages: messages
         }}
