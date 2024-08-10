@@ -49,14 +49,52 @@
 - Updated `app/api/thread/route.ts`:
   - Changed import path for `db` from `@/lib/db` to `db`
 
+### Step 5: Update Chat Type Definition
+- Updated `lib/types.ts`:
+  - Changed the `id` property in the `Chat` interface from `string` to `number`:
+    ```typescript
+    export interface Chat extends Record<string, any> {
+      id: number
+      // ... other properties
+    }
+    ```
+
+### Step 6: Update Components Using Chat Type
+- Updated `components/sidebar-items.tsx`:
+  - Changed `removeChatAsync` and `shareChatAsync` functions to use `number` type for `id`:
+    ```typescript
+    const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
+      // ...
+    }
+
+    const shareChatAsync = async (id: number): Promise<ServerActionResult<Chat>> => {
+      // ...
+    }
+    ```
+
+- Updated `components/sidebar-actions.tsx`:
+  - Updated `SidebarActionsProps` interface to use `number` type for `id`:
+    ```typescript
+    interface SidebarActionsProps {
+      chat: Chat
+      removeChat: (args: { id: number; path: string }) => Promise<ServerActionResult<void>>
+      shareChat: (id: number) => Promise<ServerActionResult<Chat>>
+    }
+    ```
+  - Updated `handleShareChat` function to accept a `number` type for `id`:
+    ```typescript
+    const handleShareChat = React.useCallback((id: number) => {
+      // ...
+    }, [shareChat])
+    ```
+
 These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on:
 
-1. Updating any remaining components or API routes that may still be using string-based IDs
-2. Ensuring that all parts of the application are consistently using number-based thread IDs
-3. Thoroughly testing the chat functionality to ensure it works as expected with the new integer-based thread ID system
-4. Implementing additional error handling and user feedback throughout the chat system
-5. Optimizing database queries related to thread and message retrieval
-6. Implementing a caching mechanism for thread data to improve performance
+1. Ensuring that all parts of the application are consistently using number-based thread IDs
+2. Thoroughly testing the chat functionality to ensure it works as expected with the new integer-based thread ID system
+3. Implementing additional error handling and user feedback throughout the chat system
+4. Optimizing database queries related to thread and message retrieval
+5. Implementing a caching mechanism for thread data to improve performance
 
 Remember to test the following scenarios:
 - Creating new chat threads
