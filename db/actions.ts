@@ -2,9 +2,9 @@
 
 import { sql } from '@vercel/postgres'
 import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { Message, ServerMessage, ClientMessage } from '@/lib/types'
+import { Message, ServerMessage, ClientMessage, ChatMessage } from '@/lib/types'
 
-export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
+export async function saveChatMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return null
@@ -37,7 +37,7 @@ export async function createNewThread(clerkUserId: string) {
     }
 }
 
-export async function fetchThreadMessages(threadId: number): Promise<Message[]> {
+export async function fetchThreadMessages(threadId: number): Promise<ChatMessage[]> {
     console.log('Fetching messages for thread:', threadId)
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
@@ -137,7 +137,7 @@ export async function getChatById(threadId: number, userId: string) {
     return chatResult.rows[0];
 }
 
-export async function saveMessage(threadId: number, message: Message) {
+export async function saveMessage(threadId: number, message: ChatMessage) {
   try {
     await sql`
       INSERT INTO messages (thread_id, content, role, created_at)
