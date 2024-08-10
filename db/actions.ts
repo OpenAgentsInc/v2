@@ -2,7 +2,7 @@
 
 import { sql } from '@vercel/postgres'
 import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { Message, Chat } from '@/lib/types'
+import { Message, ServerMessage, ClientMessage } from '@/lib/types'
 
 export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
     if (isNaN(threadId)) {
@@ -47,7 +47,7 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
     console.log('Fetched messages:', messages.length)
     return messages.map(msg => ({
         id: msg.id.toString(),
-        role: msg.role as 'user' | 'system' | 'assistant' | 'tool',
+        role: msg.role as 'user' | 'system' | 'assistant' | 'function',
         content: msg.content,
     }))
 }
