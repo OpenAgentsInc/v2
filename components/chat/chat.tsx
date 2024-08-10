@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { InputBar } from '@/components/input/InputBar'
-import { useHudStore } from '@/store/hud'
 import { ChatList } from './chat-list'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
@@ -14,27 +13,8 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
     const chatContainerRef = useRef<HTMLDivElement>(null)
     const {
         messages,
-        id,
-        setCurrentThreadId,
         sendMessage
     } = useChat({ id: typeof propId === 'string' ? parseInt(propId, 10) : propId }) // remove?
-
-    // remove?
-    useEffect(() => {
-        if (id) {
-            setCurrentThreadId(id)
-        }
-    }, [id, setCurrentThreadId])
-
-    useEffect(() => {
-        if (propId) {
-            useHudStore.setState((state) => ({
-                panes: state.panes.map((pane) =>
-                    pane.id === propId.toString() ? { ...pane, title: 'Chat' } : pane
-                )
-            }))
-        }
-    }, [propId])
 
     return (
         <div className={`flex flex-col h-full ${className}`}>
