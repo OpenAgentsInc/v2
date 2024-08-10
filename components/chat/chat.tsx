@@ -10,7 +10,6 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export const Chat = ({ threadId, className }: ChatProps) => {
-    console.log('Chat', threadId)
     const chatContainerRef = useRef<HTMLDivElement>(null)
     const {
         messages,
