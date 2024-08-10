@@ -79,6 +79,7 @@ export function ChatPanel({
         <div className="flex-grow overflow-auto">
           <ChatList messages={messages} isShared={false} />
         </div>
+        {/* Commented out share button
         {messages.length > 1 && (
           <div className="flex items-center justify-end p-4">
             <button
@@ -89,6 +90,7 @@ export function ChatPanel({
             </button>
           </div>
         )}
+        */}
         <ChatShareDialog
           open={shareDialogOpen}
           onOpenChange={setShareDialogOpen}
