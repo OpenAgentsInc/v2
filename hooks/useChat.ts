@@ -140,7 +140,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     });
 
     const sendMessage = useCallback(async (message: string) => {
-        console.log("in sendMessage", message);
         if (!threadId) {
             console.error('No thread ID available');
             return;

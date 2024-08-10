@@ -56,7 +56,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         'search_codebase'
     ]
 
-    const buttonClasses = "bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
+    const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
 
     return (
         <div
@@ -71,7 +71,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                             <button className={buttonClasses}>
-                                <span className="opacity-75 text-xs">{model.name}</span>
+                                <span className="text-xs">{model.name}</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" viewBox="0 0 256 256">
                                     <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
                                 </svg>
