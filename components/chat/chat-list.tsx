@@ -39,8 +39,6 @@ export function ChatList({ messages, loadMoreMessages, hasMore, isLoading }: Cha
         return null
     }
 
-    const reversedMessages = [...messages].reverse()
-
     return (
         <div className="overflow-y-scroll pt-6 px-20 w-full">
             {hasMore && (
@@ -48,10 +46,10 @@ export function ChatList({ messages, loadMoreMessages, hasMore, isLoading }: Cha
                     {isLoading ? 'Loading...' : 'Load more'}
                 </div>
             )}
-            {reversedMessages.map((message, index) => (
+            {messages.map((message, index) => (
                 <div key={message.id}>
                     <ChatMessage message={message as any} />
-                    {index < reversedMessages.length - 1 && <Separator className="my-4" />}
+                    {index < messages.length - 1 && <Separator className="my-4" />}
                 </div>
             ))}
         </div>
