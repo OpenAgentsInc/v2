@@ -34,9 +34,18 @@ export async function POST(req: Request) {
         content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
     }));
 
-    const userMessage = dbMessages[dbMessages.length - 1];
+    // Ensure the last message is a user message
+    const userMessage = messages.filter(msg => msg.role === 'user').pop();
+    if (!userMessage) {
+        return new Response('No user message found', { status: 400 });
+    }
+
+    // Remove any assistant messages after the last user message
+    const lastUserIndex = messages.lastIndexOf(userMessage);
+    const filteredMessages = messages.slice(0, lastUserIndex + 1);
+
     const result = await streamText({
-        messages,
+        messages: filteredMessages,
         model: toolContext.model,
         system: getSystemPrompt(toolContext),
         tools,
