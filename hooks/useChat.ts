@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/lib/types';
+import { Message, ServerMessage, ClientMessage } from '@/lib/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -122,10 +122,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): Message => {
-        const baseMessage: Message = {
+        const baseMessage: Partial<ServerMessage | ClientMessage> = {
             id: message.id,
             content: message.content,
-            role: message.role as 'user' | 'system' | 'assistant' | 'tool',
+            role: message.role as 'user' | 'system' | 'assistant' | 'function',
         };
 
         if (message.function_call) {
@@ -141,7 +141,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         arguments: typeof message.function_call === 'string' ? '' : message.function_call.arguments || '',
                     },
                 }],
-            };
+            } as Message;
         }
 
         if (message.tool_calls) {
@@ -157,10 +157,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         arguments: call.function.arguments,
                     },
                 })),
-            };
+            } as Message;
         }
 
-        return baseMessage;
+        return baseMessage as Message;
     };
 
     const vercelChatProps = useVercelChat({
@@ -190,7 +190,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: ClientMessage = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
