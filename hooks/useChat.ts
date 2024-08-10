@@ -19,6 +19,8 @@ interface ThreadData {
     messages: ChatMessage[];
     input: string;
     user?: User;
+    hasMore: boolean;
+    currentPage: number;
 }
 
 interface ChatStore {
@@ -28,8 +30,9 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: ChatMessage[]) => void;
+    setMessages: (id: number, messages: ChatMessage[], hasMore: boolean, append?: boolean) => void;
     setInput: (id: number, input: string) => void;
+    incrementPage: (id: number) => void;
 }
 
 const useChatStore = create<ChatStore>((set, get) => ({
@@ -41,15 +44,20 @@ const useChatStore = create<ChatStore>((set, get) => ({
     getThreadData: (id: number) => {
         const { threads } = get();
         if (!threads[id]) {
-            threads[id] = { id, messages: [], input: '' };
+            threads[id] = { id, messages: [], input: '', hasMore: true, currentPage: 1 };
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: ChatMessage[]) =>
+    setMessages: (id: number, messages: ChatMessage[], hasMore: boolean, append = false) =>
         set(state => ({
             threads: {
                 ...state.threads,
-                [id]: { ...state.threads[id], messages }
+                [id]: {
+                    ...state.threads[id],
+                    messages: append ? [...state.threads[id].messages, ...messages] : messages,
+                    hasMore,
+                    currentPage: append ? state.threads[id].currentPage : 1
+                }
             }
         })),
     setInput: (id: number, input: string) =>
@@ -57,6 +65,13 @@ const useChatStore = create<ChatStore>((set, get) => ({
             threads: {
                 ...state.threads,
                 [id]: { ...state.threads[id], input }
+            }
+        })),
+    incrementPage: (id: number) =>
+        set(state => ({
+            threads: {
+                ...state.threads,
+                [id]: { ...state.threads[id], currentPage: state.threads[id].currentPage + 1 }
             }
         })),
 }));
@@ -77,10 +92,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setUser,
         getThreadData,
         setMessages,
-        setInput: setStoreInput
+        setInput: setStoreInput,
+        incrementPage
     } = useChatStore();
 
     const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (propsId) {
@@ -99,20 +116,27 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         }
     }, [propsId, threadId, setCurrentThreadId, user]);
 
-    useEffect(() => {
-        if (threadId) {
-            fetchThreadMessages(threadId)
-                .then((messages) => {
-                    setMessages(threadId, messages);
-                })
-                .catch(error => {
-                    console.error('Error fetching thread messages:', error);
-                    toast.error('Failed to load chat messages. Please try refreshing the page.');
-                });
+    const fetchMessages = useCallback(async (page = 1, limit = 10) => {
+        if (!threadId) return;
+        setIsLoading(true);
+        try {
+            const { messages, hasMore } = await fetchThreadMessages(threadId, page, limit);
+            setMessages(threadId, messages, hasMore, page > 1);
+        } catch (error) {
+            console.error('Error fetching thread messages:', error);
+            toast.error('Failed to load chat messages. Please try refreshing the page.');
+        } finally {
+            setIsLoading(false);
         }
     }, [threadId, setMessages]);
 
-    const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
+    useEffect(() => {
+        if (threadId) {
+            fetchMessages();
+        }
+    }, [threadId, fetchMessages]);
+
+    const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '', hasMore: false, currentPage: 1 };
 
     const body: any = { model, tools, threadId };
     if (repo) {
@@ -143,7 +167,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             if (threadId) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
-                setMessages(threadId, updatedMessages);
+                setMessages(threadId, updatedMessages, threadData.hasMore);
                 
                 try {
                     await saveMessage(threadId, adaptedMessage);
@@ -163,7 +187,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
         const userMessage: ClientMessage = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
-        setMessages(threadId, updatedMessages);
+        setMessages(threadId, updatedMessages, threadData.hasMore);
 
         try {
             // Optimistically update the UI
@@ -175,9 +199,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
             // Revert the optimistic update
-            setMessages(threadId, threadData.messages);
+            setMessages(threadId, threadData.messages, threadData.hasMore);
         }
-    }, [threadId, vercelChatProps, threadData.messages, setMessages]);
+    }, [threadId, vercelChatProps, threadData.messages, threadData.hasMore, setMessages]);
 
     const setInput = (input: string) => {
         if (threadId) {
@@ -185,6 +209,13 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         }
         vercelChatProps.setInput(input);
     };
+
+    const loadMoreMessages = useCallback(async () => {
+        if (threadId && threadData.hasMore && !isLoading) {
+            incrementPage(threadId);
+            await fetchMessages(threadData.currentPage + 1);
+        }
+    }, [threadId, threadData.hasMore, threadData.currentPage, isLoading, incrementPage, fetchMessages]);
 
     const adaptedMessages = vercelChatProps.messages.map(adaptMessage);
 
@@ -198,5 +229,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setUser,
         setInput,
         sendMessage,
+        loadMoreMessages,
+        isLoading,
     };
 }
