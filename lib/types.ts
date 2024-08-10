@@ -1,4 +1,4 @@
-import { CoreMessage } from 'ai'
+import { CoreMessage, CoreUserMessage, CoreAssistantMessage, CoreSystemMessage } from 'ai'
 import { models } from "@/lib/models"
 
 export type Message = CoreMessage & {
@@ -6,11 +6,15 @@ export type Message = CoreMessage & {
     toolInvocations?: any[]
 }
 
-export type ServerMessage = Message & {
+export type ServerMessage = (CoreSystemMessage | CoreAssistantMessage) & {
+    id: string
+    toolInvocations?: any[]
     role: 'system' | 'assistant' | 'function'
 }
 
-export type ClientMessage = Message & {
+export type ClientMessage = CoreUserMessage & {
+    id: string
+    toolInvocations?: any[]
     role: 'user'
 }
 
