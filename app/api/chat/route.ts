@@ -27,10 +27,6 @@ export async function POST(req: Request) {
     const messages = convertToCoreMessages(body.messages);
     const userMessage = messages[messages.length - 1] as Message;
 
-    if (userMessage.role !== 'user') {
-        return new Response('Last message must be from user', { status: 400 });
-    }
-
     const result = await streamText({
         messages,
         model: toolContext.model,

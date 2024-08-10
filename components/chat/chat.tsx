@@ -1,10 +1,10 @@
 "use client"
-import { useChat } from '@/hooks/useChat'
-import { ChatList } from './chat-list'
-import { EmptyScreen } from './empty-screen'
+
 import { useEffect, useRef } from 'react'
+import { useChat } from '@/hooks/useChat'
+import { InputBar } from '@/components/input/InputBar'
 import { useHudStore } from '@/store/hud'
-import { InputBar } from '@/components/input/InputBar'  // Make sure this import is correct
+import { ChatList } from './chat-list'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     chatId?: string | number
@@ -14,9 +14,6 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
     const chatContainerRef = useRef<HTMLDivElement>(null)
     const {
         messages,
-        input,
-        handleInputChange,
-        handleSubmit,
         id,
         setCurrentThreadId,
         sendMessage
@@ -46,11 +43,15 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
             </div>
             <div className="flex-shrink-0 w-full">
                 <div className="sticky bottom-0 w-full">
-                    <InputBar
-                        onSubmit={sendMessage}
-                    />
+                    <InputBar onSubmit={sendMessage} />
                 </div>
             </div>
         </div>
     )
 }
+
+
+
+
+
+
