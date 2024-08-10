@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Loader2, GitCompare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FileViewer } from '@/components/github/file-viewer';
 
 interface ToolResultProps {
     toolName: string;
@@ -34,6 +35,7 @@ const getToolParams = (toolName: string, args: any): string => {
 export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, state }) => {
     const [currentState, setCurrentState] = useState(state);
     const [currentResult, setCurrentResult] = useState(result);
+    const [showOldContent, setShowOldContent] = useState(false);
 
     useEffect(() => {
         setCurrentState(state);
@@ -73,9 +75,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     const showFileContents = toolName === 'rewrite_file' && currentState === 'result' && currentResult?.newContent && currentResult?.oldContent;
 
     const handleViewContents = () => {
-        // Implement the logic to show file contents diff
-        // This might involve using a state management solution or a modal
-        console.log('View contents clicked');
+        setShowOldContent(!showOldContent);
     };
 
     return (
@@ -92,16 +92,23 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
                     <div>
                         <span>{getToolParams(toolName, args)}</span>
                     </div>
-                    <pre className="whitespace-pre-wrap overflow-x-auto mt-1">
-                        {renderResult()}
-                    </pre>
-                    {showFileContents && (
-                        <div className="mt-2 flex space-x-4">
-                            <button onClick={handleViewContents} className="flex items-center text-foreground hover:bg-secondary px-3 py-1 rounded border border-border transition-colors duration-200">
-                                <GitCompare className="w-4 h-4 mr-2" />
-                                View changes
-                            </button>
-                        </div>
+                    {showFileContents ? (
+                        <>
+                            <FileViewer
+                                content={showOldContent ? currentResult.oldContent : currentResult.newContent}
+                                filename={args.path}
+                            />
+                            <div className="mt-2 flex space-x-4">
+                                <button onClick={handleViewContents} className="flex items-center text-foreground hover:bg-secondary px-3 py-1 rounded border border-border transition-colors duration-200">
+                                    <GitCompare className="w-4 h-4 mr-2" />
+                                    {showOldContent ? 'View new content' : 'View old content'}
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <pre className="whitespace-pre-wrap overflow-x-auto mt-1">
+                            {renderResult()}
+                        </pre>
                     )}
                 </div>
             </div>

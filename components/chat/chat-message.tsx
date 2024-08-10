@@ -19,7 +19,6 @@ export interface ChatMessageProps {
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
     const renderToolInvocation = (toolInvocation: any) => {
-        console.log('Tool Invocation:', toolInvocation)
         return (
             <ToolResult
                 key={toolInvocation.toolCallId}
