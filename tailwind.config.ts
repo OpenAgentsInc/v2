@@ -76,10 +76,10 @@ module.exports = {
                 'accordion-up': 'accordion-up 0.2s ease-out'
             },
             typography: {
-                'prose-full-width': {
+                DEFAULT: {
                     css: {
-                        maxWidth: 'none',
-                    },
+                        maxWidth: '100%',
+                    }
                 },
             }
         }

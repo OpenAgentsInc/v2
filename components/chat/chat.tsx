@@ -19,7 +19,7 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
     return (
         <div className={`flex flex-col h-full ${className}`}>
             <div className="flex-1 overflow-auto" ref={chatContainerRef}>
-                {messages.length ? <ChatList messages={messages} isShared={false} /> : <></>}
+                <ChatList messages={messages} isShared={false} /> 
             </div>
             <div className="flex-shrink-0 w-full">
                 <div className="sticky bottom-0 w-full">
