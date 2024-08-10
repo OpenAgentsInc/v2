@@ -15,10 +15,10 @@ interface FileRepresentationProps {
 
 export const FileRepresentation: React.FC<FileRepresentationProps> = ({ representation, onDelete }) => {
     return (
-        <div className="group relative inline-block p-0.5 cursor-pointer" style={{ opacity: 1, transform: 'none' }}>
+        <div className="group relative inline-block p-0.5 pb-2 cursor-pointer" style={{ opacity: 1, transform: 'none' }}>
             <div className="absolute left-1 top-1 z-10">
                 <button
-                    className="border-0.5 border-white text-white bg-black hover:bg-red-600 hover:text-white -translate-x-1/2 -translate-y-1/2 rounded-full p-1 transition hover:scale-105"
+                    className="mt-2 border-0.5 border-white text-white bg-black hover:bg-red-600 hover:text-white -translate-x-1/2 -translate-y-1/2 rounded-full p-1 transition hover:scale-105"
                     onClick={() => onDelete(representation.id)}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 256 256">

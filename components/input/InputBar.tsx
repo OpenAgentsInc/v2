@@ -44,7 +44,6 @@ export const InputBar: React.FC<InputBarProps> = ({ onSubmit }) => {
 
     const handleSubmit = useCallback(() => {
         const content = editorState.doc.textContent;  // Remove trim() here
-        console.log("Submitting with:", content, visualRepresentations);
         if (content || visualRepresentations.length > 0) {
             const fullContent = [
                 ...visualRepresentations.map(vr => vr.content),
@@ -90,7 +89,7 @@ export const InputBar: React.FC<InputBarProps> = ({ onSubmit }) => {
             </div>
             {(visualRepresentations.length > 0 || errorMessage) && (
                 <div className="text-sm flex items-center gap-2 px-4">
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 my-1">
                         {visualRepresentations.length} {visualRepresentations.length === 1 ? 'file' : 'files'} added
                     </span>
                     {errorMessage && (
