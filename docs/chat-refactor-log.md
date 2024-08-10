@@ -36,6 +36,9 @@
   - Removed `setInput` prop from `EmptyScreen`
   - Removed `isLoading` prop from `ChatPanel`
   - Updated `pane.paneProps?.id` to `pane.id` in the `useHudStore.setState` call
+  - Changed `id` prop type in `ChatProps` to `number`
+  - Updated `useChat` hook call to directly use `number` type for `id`
+  - Ensured all `useEffect` hooks and other logic handle `number` type for `id`
 
 - Updated `components/new-chat-button.tsx`:
   - Modified the `addPane` function call to add `id` as a separate property instead of including it in `paneProps`
