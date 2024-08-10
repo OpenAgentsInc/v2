@@ -26,8 +26,8 @@ import {
 
 interface SidebarActionsProps {
   chat: Chat
-  removeChat: (args: { id: string; path: string }) => Promise<ServerActionResult<void>>
-  shareChat: (id: string) => Promise<ServerActionResult<Chat>>
+  removeChat: (args: { id: number; path: string }) => Promise<ServerActionResult<void>>
+  shareChat: (id: number) => Promise<ServerActionResult<Chat>>
 }
 
 export function SidebarActions({
@@ -60,7 +60,7 @@ export function SidebarActions({
     })
   }, [chat.id, chat.path, removeChat, router])
 
-  const handleShareChat = React.useCallback((id: string) => {
+  const handleShareChat = React.useCallback((id: number) => {
     return new Promise<ServerActionResult<Chat>>(async (resolve) => {
       startShareTransition(async () => {
         const result = await shareChat(id)
