@@ -1,7 +1,7 @@
 'use server'
 
 import { sql } from '@vercel/postgres'
-import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
+import { createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
 import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types'
 
 export async function saveChatMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
@@ -14,7 +14,7 @@ export async function saveChatMessage(threadId: number, clerkUserId: string, mes
         console.log("Duplicate message, not saving:", message.content)
         return null
     }
-    const savedMessage = await dbSaveMessage(threadId, clerkUserId, message)
+    const savedMessage = await saveMessage(threadId, clerkUserId, message)
     console.log('Message saved:', savedMessage)
     return savedMessage
 }
@@ -161,6 +161,7 @@ export async function saveMessage(threadId: number, clerkUserId: string, message
       INSERT INTO messages (thread_id, clerk_user_id, content, role, created_at)
       VALUES (${threadId}, ${clerkUserId}, ${message.content.toString()}, ${message.role}, NOW())
     `;
+    return { ...message, id: Date.now().toString(), createdAt: new Date() };
   } catch (error) {
     console.error('Error saving message:', error);
     throw new Error('Failed to save message');
