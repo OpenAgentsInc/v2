@@ -68,9 +68,6 @@ dependencies:
   '@react-three/rapier':
     specifier: ^1.4.0
     version: 1.4.0(@react-three/fiber@8.15.15)(react@18.3.1)(three@0.160.0)
-  '@studio-freight/lenis':
-    specifier: ^1.0.42
-    version: 1.0.42
   '@use-gesture/react':
     specifier: ^10.3.1
     version: 10.3.1(react@18.3.1)
@@ -1910,11 +1907,6 @@ packages:
       react: '>= 16.3.0'
     dependencies:
       react: 18.3.1
-    dev: false
-
-  /@studio-freight/lenis@1.0.42:
-    resolution: {integrity: sha512-HJAGf2DeM+BTvKzHv752z6Z7zy6bA643nZM7W88Ft9tnw2GsJSp6iJ+3cekjyMIWH+cloL2U9X82dKXgdU8kPg==}
-    deprecated: '''@studio-freight/lenis'' has been renamed to just ''lenis'', run ''npx @darkroom.engineering/codemods'' to update your dependecies accordingly.'
     dev: false
 
   /@swc/counter@0.1.3:
