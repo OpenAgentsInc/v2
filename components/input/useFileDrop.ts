@@ -29,7 +29,7 @@ export const useFileDrop = (maxFiles: number) => {
             reader.onload = (event) => {
                 const content = event.target?.result as string;
                 const fileName = file.name.split('.').slice(0, -1).join('.');
-                const fileExtension = file.name.split('.').pop()?.toUpperCase();
+                const fileExtension = file.name.split('.').pop()?.toUpperCase() || '';
                 onFileRead(content, fileName, fileExtension);
             };
             reader.readAsText(file);
