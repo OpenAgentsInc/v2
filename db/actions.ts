@@ -47,7 +47,7 @@ export async function fetchThreadMessages(threadId: number, page: number = 1, li
     const { rows: messages, rowCount } = await sql`
         SELECT * FROM messages
         WHERE thread_id = ${threadId}
-        ORDER BY created_at DESC
+        ORDER BY created_at ASC
         LIMIT ${limit + 1}
         OFFSET ${offset}
     `
