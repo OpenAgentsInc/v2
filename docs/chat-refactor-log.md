@@ -120,13 +120,25 @@
     }
     ```
 
-These changes address the type errors and ensure consistency across the components. The next steps in the refactor should focus on:
+### Step 9: Verify API Routes and Database Actions
+- Reviewed `app/api/chat/route.ts`:
+  - Confirmed that it's correctly handling `threadId` as a number
+  - Includes a check to ensure `threadId` is a valid number
 
-1. Ensuring that all parts of the application are consistently using number-based thread IDs
-2. Thoroughly testing the chat functionality to ensure it works as expected with the new integer-based thread ID system
-3. Implementing additional error handling and user feedback throughout the chat system
-4. Optimizing database queries related to thread and message retrieval
-5. Implementing a caching mechanism for thread data to improve performance
+- Reviewed `app/api/thread/route.ts`:
+  - Confirmed that it's correctly handling thread IDs as numbers
+  - `getLastEmptyThread` and `createNewThread` functions return number-type thread IDs
+
+- Reviewed `db/actions.ts`:
+  - Confirmed that all functions are consistently using number-type thread IDs
+  - Includes checks for `isNaN(threadId)` where appropriate
+
+These changes address the type errors and ensure consistency across the components and API routes. The next steps in the refactor should focus on:
+
+1. Implementing additional error handling and user feedback throughout the chat system
+2. Optimizing database queries related to thread and message retrieval
+3. Implementing a caching mechanism for thread data to improve performance
+4. Conducting thorough testing of all chat functionality to ensure it works as expected with the new integer-based thread ID system
 
 Remember to test the following scenarios:
 - Creating new chat threads
