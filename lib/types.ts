@@ -15,7 +15,7 @@ export type ClientMessage = Message & {
 }
 
 export interface Chat extends Record<string, any> {
-    id: string
+    id: number
     title: string
     createdAt: Date
     userId: string
