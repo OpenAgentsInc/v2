@@ -6,7 +6,7 @@ import { Pane } from '@/components/hud/pane'
 import { ChatHistory } from '@/components/chat-history'
 import { Hud } from '@/components/hud/hud'
 
-export const HomeDashboard = async () => {
+export const HomeAuthed = async () => {
     const userId = auth().userId
     if (!userId) {
         return <></>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Wrench, Github, GitBranch } from 'lucide-react';
-import { useRepoStore } from '../../store/repo';
+import { useRepoStore } from '@/store/repo';
 
 export const InputSettings: React.FC = () => {
     const repo = useRepoStore((state) => state.repo);
