@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from 'react'
 import { useHudStore } from '@/store/hud'
 import { useChatStore } from '@/store/chat'
