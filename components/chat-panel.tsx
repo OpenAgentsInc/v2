@@ -73,7 +73,7 @@ export function ChatPanel({
   }
 
   return (
-    <div className={`flex flex-col ${className}`}>
+    <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-grow overflow-auto">
         {messages.length > 1 && (
           <div className="flex items-center justify-end p-4">
@@ -99,7 +99,7 @@ export function ChatPanel({
           }}
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex-shrink-0">
         <FooterText className="px-4 py-2" />
         <div className="w-full h-px bg-white" /> {/* White border */}
         <div className="p-4">
