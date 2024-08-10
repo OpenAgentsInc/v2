@@ -76,7 +76,7 @@ export function ChatPanel({
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-grow overflow-hidden flex flex-col">
-        <div className="flex-grow overflow-auto">
+        <div className="flex-grow overflow-y-auto">
           <ChatList messages={messages} isShared={false} />
         </div>
         {/* Commented out share button
