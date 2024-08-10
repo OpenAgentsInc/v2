@@ -1,30 +1,16 @@
-"use client"
-
 import { useHudStore } from '@/store/hud'
-import { Pane } from '@/components/hud/pane'
 import { Chat } from '@/components/chat'
-import { SingleMountWrapper } from '@/components/single-mount-wrapper'
 
-export const HUD = () => {
-    const { panes } = useHudStore()
+export const Hud = () => {
+  const { panes } = useHudStore()
 
-    return (
-        <>
-            {panes.map((pane) => (
-                <Pane
-                    key={pane.id}
-                    title={pane.title}
-                    id={pane.id}
-                    x={pane.x}
-                    y={pane.y}
-                    height={pane.height}
-                    width={pane.width}
-                >
-                    <SingleMountWrapper>
-                        {pane.type === 'chat' && <Chat id={pane.id} />}
-                    </SingleMountWrapper>
-                </Pane>
-            ))}
-        </>
-    )
+  return (
+    <div>
+      {panes.map((pane) => (
+        <div key={pane.id}>
+          {pane.type === 'chat' && <Chat id={typeof pane.id === 'string' ? parseInt(pane.id, 10) : pane.id} />}
+        </div>
+      ))}
+    </div>
+  )
 }
