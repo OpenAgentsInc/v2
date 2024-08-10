@@ -19,11 +19,11 @@ import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
 
 interface ChatShareDialogProps extends DialogProps {
   chat: {
-    id: string
+    id: number
     title: string
     messages: Message[]
   }
-  shareChat: (id: string) => Promise<ServerActionResult<Chat>>
+  shareChat: (id: number) => Promise<ServerActionResult<Chat>>
   onCopy: () => void
 }
 
