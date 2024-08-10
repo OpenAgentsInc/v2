@@ -77,7 +77,7 @@ export function ChatPanel({
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-grow overflow-hidden flex flex-col">
         <div className="flex-grow overflow-auto">
-          <ChatList messages={messages} />
+          <ChatList messages={messages} isShared={false} />
         </div>
         {messages.length > 1 && (
           <div className="flex items-center justify-end p-4">
