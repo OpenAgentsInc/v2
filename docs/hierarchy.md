@@ -30,162 +30,63 @@
       - Renders `SignUp` component for new users
       - Displays `UserButton` for authenticated users
 - components/ - React components
-  - auth/ - Authentication-related components
-    - HomeUnauthed.tsx - Renders the unauthenticated home page with a sign-in form
-      - Uses Clerk's SignIn component
-      - Applies custom font and styling
   - canvas/ - Canvas-related components
     - Scene.tsx - Main scene component for 3D rendering
       - Uses react-three/fiber for 3D rendering
       - Implements smooth scrolling with Lenis
       - Renders GridScene component
-  - dashboard/ - Dashboard-related components
-    - HomeDashboard.tsx - Main dashboard component for authenticated users
-      - Renders UserButton, ChatHistory, and HUD components
-      - Uses server-side authentication check
+  - chat/ - Chat-related components
+    - chat-history.tsx - Renders chat history with a new chat button and sidebar list
+    - chat-list.tsx - Renders a list of chat messages with separators
+    - chat-message-actions.tsx - Implements copy-to-clipboard functionality for chat messages
+    - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
+    - chat-panel.tsx - Renders the chat input area, share functionality, and scroll-to-bottom button
+    - chat-share-dialog.tsx - Implements a dialog for sharing chat links
+    - chat.tsx - Main chat component that combines ChatList, ChatPanel, and EmptyScreen
+  - clear-history.tsx - Component for clearing chat history
   - dom/ - DOM-related utility components
     - Layout.tsx - Main layout component
-      - Dynamically imports and renders the Scene component
-      - Wraps children with a container div
+  - external-link.tsx - Reusable component for rendering external links
   - github/ - GitHub integration components
     - file-viewer.tsx - Component for viewing file contents
-      - Displays file name and content with expandable preview
-      - Uses useState for managing open/closed state
+  - home/ - Home-related components
+    - HomeUnauthed.tsx - Renders the unauthenticated home page with a sign-in form
+    - HomeDashboard.tsx - Main dashboard component for authenticated users
   - hud/ - Heads-up display components
     - hud.tsx - Main HUD component
-      - Uses useHudStore for state management
-      - Renders Pane components
     - pane.tsx - Pane component for HUD
-      - Implements draggable and resizable panes
-      - Uses useDrag for drag functionality
+  - input/ - Input-related components
+    - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
+  - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
+  - share/ - Share-related components
+  - sidebar/ - Sidebar-related components
+    - sidebar-actions.tsx - Provides actions for sharing and deleting chats
+    - sidebar-desktop.tsx - Renders the sidebar for desktop view
+    - sidebar-footer.tsx - Renders the footer of the sidebar
+    - sidebar-item.tsx - Renders individual sidebar items with animations
+    - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
+    - sidebar-list.tsx - Fetches and displays a list of user threads in the sidebar
+    - sidebar-mobile.tsx - Renders the sidebar for mobile view
+    - sidebar-toggle.tsx - Provides a button to toggle the sidebar
+    - sidebar.tsx - Implements the main sidebar component with open/closed state management
+  - theme-toggle.tsx - Provides a button to toggle between light and dark themes
   - ui/ - Reusable UI components
     - alert-dialog.tsx - Implements an alert dialog component
-      - Uses Radix UI for dialog primitives
     - badge.tsx - Badge component for displaying status or labels
-      - Uses class-variance-authority for styling variants
     - button.tsx - Button component with various styles
-      - Uses class-variance-authority for styling variants
     - codeblock.tsx - Code block component for syntax highlighting
-      - Uses react-syntax-highlighter for code rendering
     - dialog.tsx - Dialog component for modal interactions
-      - Uses Radix UI for dialog primitives
     - dropdown-menu.tsx - Dropdown menu component
-      - Uses Radix UI for dropdown primitives
     - icons.tsx - Collection of SVG icons
-      - Includes various icons for UI elements
     - input.tsx - Input component for forms
-      - Uses forwardRef for ref forwarding
     - label.tsx - Label component for form elements
-      - Uses Radix UI for label primitives
     - select.tsx - Select component for dropdowns
-      - Uses Radix UI for select primitives
     - separator.tsx - Separator component for dividing content
-      - Uses Radix UI for separator primitives
     - sheet.tsx - Sheet component for side panels
-      - Uses Radix UI for sheet primitives
     - sonner.tsx - Toaster component for notifications
-      - Uses Sonner for toast notifications
     - switch.tsx - Switch component for toggles
-      - Uses Radix UI for switch primitives
     - textarea.tsx - Textarea component for multi-line input
-      - Uses forwardRef for ref forwarding
     - tooltip.tsx - Tooltip component for hints
-      - Uses Radix UI for tooltip primitives
-  - button-scroll-to-bottom.tsx - Implements a button to scroll to the bottom of the chat
-    - Uses client-side rendering
-    - Accepts isAtBottom and scrollToBottom props
-    - Renders a button with an arrow down icon
-    - Toggles opacity based on scroll position
-  - chat-history.tsx - Renders chat history with a new chat button and sidebar list
-    - Uses React.Suspense for loading state
-    - Renders NewChatButton and SidebarList components
-  - chat-list.tsx - Renders a list of chat messages with separators
-    - Maps through messages and renders ChatMessage components
-    - Adds Separator component between messages
-  - chat-message-actions.tsx - Implements copy-to-clipboard functionality for chat messages
-    - Uses client-side rendering
-    - Renders a copy button that changes to a check icon when clicked
-    - Uses useCopyToClipboard hook for clipboard operations
-    - Applies responsive styling for desktop and mobile views
-  - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
-    - Uses MemoizedReactMarkdown for rendering message content
-    - Supports code highlighting and inline code
-    - Renders tool invocations using ToolResult component
-    - Displays user/AI icons based on message role
-  - chat-panel.tsx - Renders the chat input area, share functionality, and scroll-to-bottom button
-    - Implements share chat functionality (currently not implemented)
-    - Renders PromptForm component for user input
-    - Displays share button when chat has at least two messages
-  - chat-share-dialog.tsx - Implements a dialog for sharing chat links
-    - Uses client-side rendering
-    - Displays chat title and message count
-    - Implements copy-to-clipboard functionality for share links
-    - Shows loading state while generating share link
-    - Uses toast notifications for success and error messages
-  - chat.tsx - Main chat component that combines ChatList, ChatPanel, and EmptyScreen
-    - Uses client-side rendering
-    - Implements scroll-to-bottom functionality with debounce
-    - Manages chat state using useChat hook
-    - Handles thread creation with useThreadCreation hook
-    - Renders ChatList or EmptyScreen based on message availability
-    - Applies responsive styling for sidebar and workspace
-  - clear-history.tsx - Component for clearing chat history
-    - Uses client-side rendering
-    - Implements an AlertDialog for confirming history deletion
-    - Handles clearing chats with a server action
-    - Shows loading state during deletion process
-    - Uses toast notifications for error messages
-  - empty-screen.tsx - Displays a welcome message and features of OpenAgents
-    - Shows a list of capabilities including chat, code writing, and pull request creation
-  - external-link.tsx - Reusable component for rendering external links
-    - Accepts href and children props
-    - Renders an anchor tag with target="_blank"
-    - Includes an SVG icon to indicate external link
-    - Applies hover underline effect
-  - footer.tsx - Implements the footer component with model selection, tools, and repository information
-    - Uses various stores (useRepoStore, useModelStore, useToolStore) for state management
-    - Implements dropdown for model selection
-    - Provides a popover for tool selection
-    - Displays and allows editing of repository information
-    - Utilizes Radix UI components for dropdowns and popovers
-  - header.tsx - Implements the application header with user authentication and sidebar toggle
-  - layout-content.tsx - Wraps children with a flex container that adjusts based on sidebar state
-  - markdown.tsx - Memoized ReactMarkdown component for rendering markdown content
-  - new-chat-button.tsx - Implements a button to start a new chat
-    - Uses useHudStore and useChatStore for state management
-    - Adds a new chat pane when clicked
-  - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
-    - Uses react-textarea-autosize for input
-    - Implements "New Chat" button functionality
-    - Handles form submission and input changes
-  - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
-  - sidebar-actions.tsx - Provides actions for sharing and deleting chats
-    - Uses AlertDialog for delete confirmation
-    - Uses ChatShareDialog for sharing chats
-  - sidebar-desktop.tsx - Renders the sidebar for desktop view
-    - Uses server-side authentication check
-  - sidebar-footer.tsx - Renders the footer of the sidebar
-    - Uses cn utility for class names
-  - sidebar-item.tsx - Renders individual sidebar items with animations
-    - Uses framer-motion for animations
-    - Handles click events to open chat panes
-  - sidebar-items.tsx - Renders a list of chat items in the sidebar with animation
-  - sidebar-list.tsx - Fetches and displays a list of user threads in the sidebar
-    - Uses fetchUserThreads for fetching threads
-  - sidebar-mobile.tsx - Renders the sidebar for mobile view
-    - Uses Radix UI Sheet for mobile sidebar
-  - sidebar-toggle.tsx - Provides a button to toggle the sidebar
-    - Uses useSidebar hook for toggling
-  - sidebar.tsx - Implements the main sidebar component with open/closed state management
-    - Uses useSidebar hook for managing sidebar state
-    - Renders children components within the sidebar
-  - single-mount-wrapper.tsx - Ensures children are only rendered once
-    - Uses useRef and useState for rendering control
-  - tailwind-indicator.tsx - Displays the current Tailwind CSS breakpoint
-    - Only renders in development mode
-  - theme-toggle.tsx - Provides a button to toggle between light and dark themes
-  - tool-result.tsx - Renders the result of a tool invocation
-    - Uses state to manage tool invocation state and result
 - db/ - Database related files
   - actions.ts - Database actions for saving and fetching chat messages and threads
   - init-db.ts - Initializes the database and seeds initial data

@@ -1,10 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { nanoid } from 'lib/utils'
-
 import { motion } from 'framer-motion'
-
 import { buttonVariants } from '@/components/ui/button'
 import { IconMessage, IconUsers } from '@/components/ui/icons'
 import {
@@ -25,8 +22,8 @@ interface SidebarItemProps {
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
-    const isActive = panes.some(pane => pane.id === chat.id.toString() && pane.type === 'chat' && pane.isActive)
-    const isOpen = panes.some(pane => pane.id === chat.id.toString() && pane.type === 'chat')
+    const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
+    const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
@@ -36,7 +33,7 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
         e.preventDefault()
         console.log('Clicked chat:', chat)
         const newPane = {
-            id: chat.id.toString(),
+            id: Number(chat.id),
             title: chat.title,
             type: 'chat' as const,
             content: { id: chat.id, oldContent: chat.messages?.join('\n') }

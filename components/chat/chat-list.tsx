@@ -1,20 +1,18 @@
 import { Separator } from '@/components/ui/separator'
-import { Message, User } from '@/lib/types'
-import { ChatMessage } from '@/components/chat-message'
+import { Message } from '@/lib/types'
+import { ChatMessage } from './chat-message'
 
 export interface ChatListProps {
     messages: Message[]
-    user?: User
-    isShared: boolean
 }
 
-export function ChatList({ messages, user, isShared }: ChatListProps) {
+export function ChatList({ messages }: ChatListProps) {
     if (!messages.length) {
         return null
     }
 
     return (
-        <div className="overflow-y-scroll pt-6 relative mx-auto max-w-2xl px-4">
+        <div className="overflow-y-scroll pt-6 px-20 w-full">
             {messages.map((message, index) => (
                 <div key={message.id}>
                     <ChatMessage message={message as any} />

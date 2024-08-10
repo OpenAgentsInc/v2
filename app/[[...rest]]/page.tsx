@@ -1,6 +1,5 @@
 import { SignedIn, SignedOut } from '@clerk/nextjs'
-import { HomeUnauthed } from '@/components/auth/HomeUnauthed'
-import { HomeDashboard } from '@/components/dashboard/HomeDashboard'
+import { HomeAuthed, HomeUnauthed } from '@/components/home'
 
 export default function Page() {
     return (
@@ -9,7 +8,7 @@ export default function Page() {
                 <HomeUnauthed />
             </SignedOut>
             <SignedIn>
-                <HomeDashboard />
+                <HomeAuthed />
             </SignedIn>
         </>
     )

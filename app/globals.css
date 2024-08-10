@@ -1,6 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.prosemirror-editor {
+  outline: none;
+}
+
+.prosemirror-editor ProseMirror {
+  outline: none;
+}
+
+.prosemirror-editor ProseMirror-focused {
+  outline: none;
+}
  
 @layer base {
   :root {

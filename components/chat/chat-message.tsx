@@ -1,19 +1,20 @@
 // components/chat-message.tsx
 "use client"
 
+import { useMemo } from 'react'
 import { Message } from 'ai'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import { cn } from '@/lib/utils'
 import { CodeBlock } from '@/components/ui/codeblock'
-import { MemoizedReactMarkdown } from '@/components/markdown'
+import { MemoizedReactMarkdown } from './markdown'
 import { IconOpenAgents, IconUser } from '@/components/ui/icons'
-import { ChatMessageActions } from '@/components/chat-message-actions'
+import { ChatMessageActions } from './chat-message-actions'
 import { FileViewer } from '@/components/github/file-viewer'
-import { ToolResult } from '@/components/tool-result'
+import { ToolResult } from './tool-result'
 
 export interface ChatMessageProps {
-    message: Message & { toolInvocations?: any[] }
+    message: Message
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {

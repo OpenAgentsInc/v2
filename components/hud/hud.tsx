@@ -19,7 +19,7 @@ export const Hud = () => {
                     height={pane.height}
                     width={pane.width}
                 >
-                    {pane.type === 'chat' && <Chat chatId={pane.id.toString()} />}
+                    {pane.type === 'chat' && <Chat threadId={pane.id} />}
                 </Pane>
             ))}
         </div>

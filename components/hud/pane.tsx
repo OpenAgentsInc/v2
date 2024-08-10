@@ -6,7 +6,7 @@ import { useHudStore } from "@/store/hud"
 import { X } from 'lucide-react'
 
 interface PaneProps {
-    id: string
+    id: number
     title: string
     x: number
     y: number
@@ -14,15 +14,14 @@ interface PaneProps {
     height: number
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
-    threadId?: string
 }
 
 const useResizeHandlers = (
-    id: string,
+    id: number,
     initialPosition: { x: number; y: number },
     initialSize: { width: number; height: number },
-    updatePanePosition: (id: string, x: number, y: number) => void,
-    updatePaneSize: (id: string, width: number, height: number) => void
+    updatePanePosition: (id: number, x: number, y: number) => void,
+    updatePaneSize: (id: number, width: number, height: number) => void
 ) => {
     const [position, setPosition] = useState(initialPosition)
     const [size, setSize] = useState(initialSize)
@@ -101,8 +100,7 @@ const useResizeHandlers = (
     return { position, size, setPosition, setSize, resizeHandlers }
 }
 
-export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons, threadId }) => {
-    console.log('pane with initial id:', id)
+export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons }) => {
     const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
@@ -179,11 +177,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 </div>
             </div>
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
-                {React.Children.map(children, child =>
-                    React.isValidElement(child) && typeof child.type !== 'string'
-                        ? React.cloneElement(child, { threadId: threadId } as React.Attributes)
-                        : child
-                )}
+                {children}
             </div>
             <div className="absolute inset-0 pointer-events-none border border-white rounded-lg opacity-50"></div>
             <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_20px_rgba(255,255,255,0.2)] rounded-lg"></div>

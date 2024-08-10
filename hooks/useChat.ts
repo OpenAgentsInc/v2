@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message as CustomMessage } from '@/lib/types';
+import { Message as CustomMessage, ToolInvocation } from '@/lib/types';
 
 interface User {
     id: string;
@@ -89,12 +89,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             })
-            .then(response => response.json())
-            .then(({ threadId: newThreadId }) => {
-                setThreadId(newThreadId);
-                setCurrentThreadId(newThreadId);
-            })
-            .catch(error => console.error('Error creating new thread:', error));
+                .then(response => response.json())
+                .then(({ threadId: newThreadId }) => {
+                    setThreadId(newThreadId);
+                    setCurrentThreadId(newThreadId);
+                })
+                .catch(error => console.error('Error creating new thread:', error));
         }
     }, [propsId, threadId, setCurrentThreadId]);
 
@@ -108,21 +108,68 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): CustomMessage => {
-        const role = message.role === 'data' || message.role === 'function' ? 'system' : message.role;
-        const baseMessage = {
+        const baseMessage: CustomMessage = {
             id: message.id,
             content: message.content,
-            role: role as 'user' | 'system' | 'assistant' | 'tool',
+            role: message.role as 'user' | 'system' | 'assistant' | 'data',
         };
 
-        if (role === 'tool') {
+        if (message.toolInvocations) {
             return {
                 ...baseMessage,
-                toolInvocations: [],
-            } as CustomMessage;
-        } else {
-            return baseMessage as CustomMessage;
+                toolInvocations: message.toolInvocations.map((invocation): ToolInvocation => {
+                    if ('state' in invocation) {
+                        return invocation as ToolInvocation;
+                    } else {
+                        // Convert legacy tool calls to the new format
+                        return {
+                            state: 'call',
+                            id: invocation.id,
+                            type: invocation.type,
+                            function: {
+                                name: invocation.function.name,
+                                arguments: invocation.function.arguments,
+                            },
+                        } as ToolInvocation;
+                    }
+                }),
+            };
         }
+
+        // Handle deprecated function_call and tool_calls
+        if (message.function_call) {
+            console.warn('Deprecated: function_call is no longer supported. Use toolInvocations instead.');
+            return {
+                ...baseMessage,
+                toolInvocations: [{
+                    state: 'call',
+                    id: Date.now().toString(),
+                    type: 'function',
+                    function: {
+                        name: typeof message.function_call === 'string' ? message.function_call : message.function_call.name || '',
+                        arguments: typeof message.function_call === 'string' ? '' : message.function_call.arguments || '',
+                    },
+                }],
+            };
+        }
+
+        if (message.tool_calls) {
+            console.warn('Deprecated: tool_calls is no longer supported. Use toolInvocations instead.');
+            return {
+                ...baseMessage,
+                toolInvocations: (typeof message.tool_calls === 'string' ? [] : message.tool_calls).map(call => ({
+                    state: 'call',
+                    id: call.id,
+                    type: call.type,
+                    function: {
+                        name: call.function.name,
+                        arguments: call.function.arguments,
+                    },
+                })),
+            };
+        }
+
+        return baseMessage;
     };
 
     const vercelChatProps = useVercelChat({

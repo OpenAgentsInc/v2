@@ -1,7 +1,7 @@
 "use server"
 
-import { Sidebar } from '@/components/sidebar'
-import { ChatHistory } from '@/components/chat-history'
+import { Sidebar } from './sidebar'
+import { ChatHistory } from './chat-history'
 import { auth } from '@clerk/nextjs/server'
 
 export async function SidebarDesktop() {
