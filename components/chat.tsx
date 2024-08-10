@@ -7,7 +7,7 @@ import { useHudStore } from '@/store/hud'
 import { Message } from '@/lib/types'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-  id?: number
+  id?: string | number
 }
 
 export const Chat = ({ id: propId, className }: ChatProps) => {
@@ -21,7 +21,7 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     handleSubmit,
     id,
     setCurrentThreadId
-  } = useChat({ id: propId })
+  } = useChat({ id: typeof propId === 'string' ? parseInt(propId, 10) : propId })
 
   useEffect(() => {
     if (id) {
@@ -33,7 +33,7 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
     if (propId) {
       useHudStore.setState((state) => ({
         panes: state.panes.map((pane) =>
-          pane.id === propId ? { ...pane, title: 'Chat' } : pane
+          pane.id === propId.toString() ? { ...pane, title: 'Chat' } : pane
         )
       }))
     }
@@ -49,7 +49,7 @@ export const Chat = ({ id: propId, className }: ChatProps) => {
         )}
       </div>
       <ChatPanel
-        id={id}
+        id={id || undefined}
         input={input}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
