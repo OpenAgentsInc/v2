@@ -155,11 +155,11 @@ export async function getChatById(threadId: number, userId: string) {
     return chatResult.rows[0];
 }
 
-export async function saveMessage(threadId: number, message: ChatMessage) {
+export async function saveMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
   try {
     await sql`
-      INSERT INTO messages (thread_id, content, role, created_at)
-      VALUES (${threadId}, ${message.content.toString()}, ${message.role}, NOW())
+      INSERT INTO messages (thread_id, clerk_user_id, content, role, created_at)
+      VALUES (${threadId}, ${clerkUserId}, ${message.content.toString()}, ${message.role}, NOW())
     `;
   } catch (error) {
     console.error('Error saving message:', error);
