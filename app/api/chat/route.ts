@@ -29,10 +29,11 @@ export async function POST(req: Request) {
     // Fetch paginated messages
     const { messages: dbMessages, hasMore } = await fetchThreadMessages(threadId, page, limit);
 
-    const messages = dbMessages.map(msg => ({
+    const messages: AIMessage[] = dbMessages.map(msg => ({
         role: msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system' ? msg.role : 'user',
         content: msg.content,
-    })) as AIMessage[];
+        id: msg.id,
+    }));
 
     const userMessage = messages[messages.length - 1] as Message;
     const result = await streamText({
