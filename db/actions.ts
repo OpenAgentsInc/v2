@@ -2,7 +2,7 @@
 
 import { sql } from '@vercel/postgres'
 import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { Message, ServerMessage, ClientMessage, ChatMessage } from '@/lib/types'
+import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types'
 
 export async function saveChatMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
     if (isNaN(threadId)) {
@@ -45,11 +45,17 @@ export async function fetchThreadMessages(threadId: number): Promise<ChatMessage
     }
     const messages = await getThreadMessages(threadId)
     console.log('Fetched messages:', messages.length)
-    return messages.map(msg => ({
-        id: msg.id.toString(),
-        role: msg.role as 'user' | 'system' | 'assistant' | 'function',
-        content: msg.content,
-    }))
+    return messages.map(msg => {
+        const baseMessage = {
+            id: msg.id.toString(),
+            content: msg.content,
+        }
+        if (msg.role === 'user') {
+            return { ...baseMessage, role: 'user' } as ClientMessage
+        } else {
+            return { ...baseMessage, role: msg.role as ServerMessage['role'] } as ServerMessage
+        }
+    })
 }
 
 export async function updateThreadData(threadId: number, metadata: any) {
