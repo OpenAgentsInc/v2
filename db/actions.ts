@@ -37,25 +37,37 @@ export async function createNewThread(clerkUserId: string) {
     }
 }
 
-export async function fetchThreadMessages(threadId: number): Promise<ChatMessage[]> {
-    console.log('Fetching messages for thread:', threadId)
+export async function fetchThreadMessages(threadId: number, page: number = 1, limit: number = 10): Promise<{ messages: ChatMessage[], hasMore: boolean }> {
+    console.log('Fetching messages for thread:', threadId, 'page:', page, 'limit:', limit)
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
-        return []
+        return { messages: [], hasMore: false }
     }
-    const messages = await getThreadMessages(threadId)
-    console.log('Fetched messages:', messages.length)
-    return messages.map(msg => {
-        const baseMessage = {
-            id: msg.id.toString(),
-            content: msg.content,
-        }
-        if (msg.role === 'user') {
-            return { ...baseMessage, role: 'user' } as ClientMessage
-        } else {
-            return { ...baseMessage, role: msg.role as ServerMessage['role'] } as ServerMessage
-        }
-    })
+    const offset = (page - 1) * limit
+    const { rows: messages, rowCount } = await sql`
+        SELECT * FROM messages
+        WHERE thread_id = ${threadId}
+        ORDER BY created_at DESC
+        LIMIT ${limit + 1}
+        OFFSET ${offset}
+    `
+    const hasMore = messages.length > limit
+    const paginatedMessages = messages.slice(0, limit)
+    console.log('Fetched messages:', paginatedMessages.length, 'hasMore:', hasMore)
+    return {
+        messages: paginatedMessages.map(msg => {
+            const baseMessage = {
+                id: msg.id.toString(),
+                content: msg.content,
+            }
+            if (msg.role === 'user') {
+                return { ...baseMessage, role: 'user' } as ClientMessage
+            } else {
+                return { ...baseMessage, role: msg.role as ServerMessage['role'] } as ServerMessage
+            }
+        }),
+        hasMore
+    }
 }
 
 export async function updateThreadData(threadId: number, metadata: any) {
