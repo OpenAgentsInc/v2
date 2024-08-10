@@ -2,6 +2,7 @@ import { useChat } from '@/hooks/useChat'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
 import { ChatShareDialog } from '@/components/chat-share-dialog'
+import { FooterText } from '@/components/footer'
 import { useEffect, useState } from 'react'
 import { useHudStore } from '@/store/hud'
 import { useRepoStore } from '@/store/repo'
@@ -109,6 +110,7 @@ export function ChatPanel({
           scrollToBottom={scrollToBottom}
         />
       )}
+      <FooterText className="absolute bottom-0 left-0 right-0" />
     </div>
   )
 }
