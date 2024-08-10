@@ -177,11 +177,16 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 }
             }
         },
+        onError: (error) => {
+            console.error('Error in chat:', error);
+            toast.error('An error occurred while processing your request. Please try again.');
+        },
     });
 
     const sendMessage = useCallback(async (message: string) => {
         if (!threadId || !user) {
             console.error('No thread ID or user available');
+            toast.error('Unable to send message. Please try refreshing the page.');
             return;
         }
 
@@ -195,6 +200,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
             // Save the message to the database
             await saveMessage(threadId, user.id, userMessage);
+
+            // Ensure the last message is a user message before sending a new request
+            const filteredMessages = updatedMessages.filter(msg => msg.role === 'user' || msg.role === 'assistant');
+            const lastUserMessage = filteredMessages.filter(msg => msg.role === 'user').pop();
+            if (lastUserMessage !== userMessage) {
+                console.warn('Last message is not the current user message. Adjusting messages for the API request.');
+                const lastUserIndex = filteredMessages.lastIndexOf(lastUserMessage!);
+                vercelChatProps.setMessages(filteredMessages.slice(0, lastUserIndex + 1) as VercelMessage[]);
+            }
+
+            // Trigger the API request
+            await vercelChatProps.reload();
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
