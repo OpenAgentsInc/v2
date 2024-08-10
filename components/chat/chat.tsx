@@ -1,9 +1,9 @@
 "use client"
 
 import { useChat } from '@/hooks/useChat'
-import { ChatList } from '@/components/chat-list'
-import { ChatPanel } from '@/components/chat-panel'
-import { EmptyScreen } from '@/components/empty-screen'
+import { ChatList } from './chat-list'
+import { ChatPanel } from './chat-panel'
+import { EmptyScreen } from './empty-screen'
 import { useEffect, useRef } from 'react'
 import { useHudStore } from '@/store/hud'
 

@@ -3,7 +3,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { Pane } from '@/components/hud/pane'
-import { ChatHistory } from '@/components/chat-history'
+import { ChatHistory } from '@/components/sidebar/chat-history'
 import { Hud } from '@/components/hud/hud'
 
 export const HomeAuthed = async () => {

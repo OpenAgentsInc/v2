@@ -1,6 +1,6 @@
 import { Separator } from '@/components/ui/separator'
 import { Message, User } from '@/lib/types'
-import { ChatMessage } from '@/components/chat-message'
+import { ChatMessage } from './chat-message'
 
 export interface ChatListProps {
     messages: Message[]

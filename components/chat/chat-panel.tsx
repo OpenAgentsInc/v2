@@ -1,15 +1,15 @@
 import { useChat } from '@/hooks/useChat'
-import { PromptForm } from '@/components/prompt-form'
+import { PromptForm } from './prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { ChatShareDialog } from '@/components/chat-share-dialog'
-import { FooterText } from '@/components/footer'
+import { ChatShareDialog } from '@/components/share/chat-share-dialog'
+import { FooterText } from './footer'
 import { useEffect, useState } from 'react'
 import { useHudStore } from '@/store/hud'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
-import { Message, ServerActionResult, Chat } from '@/lib/types'
-import { ChatList } from '@/components/chat-list'
+import { ServerActionResult, Chat } from '@/lib/types'
+import { ChatList } from './chat-list'
 
 export interface ChatPanelProps {
     id?: number
