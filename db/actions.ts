@@ -37,7 +37,7 @@ export async function createNewThread(clerkUserId: string) {
     }
 }
 
-export async function fetchThreadMessages(threadId: number) {
+export async function fetchThreadMessages(threadId: number): Promise<Message[]> {
     console.log('Fetching messages for thread:', threadId)
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
@@ -45,7 +45,11 @@ export async function fetchThreadMessages(threadId: number) {
     }
     const messages = await getThreadMessages(threadId)
     console.log('Fetched messages:', messages.length)
-    return messages
+    return messages.map(msg => ({
+        id: msg.id.toString(),
+        role: msg.role as 'user' | 'system' | 'assistant' | 'tool',
+        content: msg.content,
+    }))
 }
 
 export async function updateThreadData(threadId: number, metadata: any) {
@@ -137,7 +141,7 @@ export async function saveMessage(threadId: number, message: Message) {
   try {
     await sql`
       INSERT INTO messages (thread_id, content, role, created_at)
-      VALUES (${threadId}, ${message.content}, ${message.role}, NOW())
+      VALUES (${threadId}, ${message.content.toString()}, ${message.role}, NOW())
     `;
   } catch (error) {
     console.error('Error saving message:', error);
