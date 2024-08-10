@@ -36,13 +36,14 @@
       - Implements smooth scrolling with Lenis
       - Renders GridScene component
   - chat/ - Chat-related components
-    - chat-history.tsx - Renders chat history with a new chat button and sidebar list
     - chat-list.tsx - Renders a list of chat messages with separators
     - chat-message-actions.tsx - Implements copy-to-clipboard functionality for chat messages
     - chat-message.tsx - Renders individual chat messages with markdown support and tool invocations
-    - chat-panel.tsx - Renders the chat input area, share functionality, and scroll-to-bottom button
-    - chat-share-dialog.tsx - Implements a dialog for sharing chat links
-    - chat.tsx - Main chat component that combines ChatList, ChatPanel, and EmptyScreen
+    - chat.tsx - Main chat component that combines ChatList and EmptyScreen
+    - empty-screen.tsx - Renders an empty screen when no chat is active
+    - index.ts - Exports chat components
+    - markdown.tsx - Renders markdown content
+    - tool-result.tsx - Renders the result of tool invocations
   - clear-history.tsx - Component for clearing chat history
   - dom/ - DOM-related utility components
     - Layout.tsx - Main layout component
