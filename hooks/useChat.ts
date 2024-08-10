@@ -4,7 +4,10 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message as CustomMessage, ToolInvocation } from '@/lib/types';
+import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types';
+import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
+import { toast } from 'sonner';
+import { useUser } from '@clerk/nextjs';
 
 interface User {
     id: string;
@@ -13,7 +16,7 @@ interface User {
 
 interface ThreadData {
     id: number;
-    messages: CustomMessage[];
+    messages: ChatMessage[];
     input: string;
     user?: User;
 }
@@ -25,7 +28,7 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: CustomMessage[]) => void;
+    setMessages: (id: number, messages: ChatMessage[]) => void;
     setInput: (id: number, input: string) => void;
 }
 
@@ -42,7 +45,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: CustomMessage[]) =>
+    setMessages: (id: number, messages: ChatMessage[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -66,10 +69,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const model = useModelStore((state) => state.model);
     const repo = useRepoStore((state) => state.repo);
     const tools = useToolStore((state) => state.tools);
+    const { user } = useUser();
 
     const {
         currentThreadId,
-        user,
         setCurrentThreadId,
         setUser,
         getThreadData,
@@ -83,20 +86,31 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         if (propsId) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
-        } else if (!threadId) {
-            // Create a new thread
-            fetch('/api/thread', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            })
-                .then(response => response.json())
+        } else if (!threadId && user) {
+            createNewThread(user.id)
                 .then(({ threadId: newThreadId }) => {
                     setThreadId(newThreadId);
                     setCurrentThreadId(newThreadId);
                 })
-                .catch(error => console.error('Error creating new thread:', error));
+                .catch(error => {
+                    console.error('Error creating new thread:', error);
+                    toast.error('Failed to create a new chat thread. Please try again.');
+                });
         }
-    }, [propsId, threadId, setCurrentThreadId]);
+    }, [propsId, threadId, setCurrentThreadId, user]);
+
+    useEffect(() => {
+        if (threadId) {
+            fetchThreadMessages(threadId)
+                .then((messages) => {
+                    setMessages(threadId, messages);
+                })
+                .catch(error => {
+                    console.error('Error fetching thread messages:', error);
+                    toast.error('Failed to load chat messages. Please try refreshing the page.');
+                });
+        }
+    }, [threadId, setMessages]);
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
@@ -107,69 +121,17 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): CustomMessage => {
-        const baseMessage: CustomMessage = {
+    const adaptMessage = (message: VercelMessage): ChatMessage => {
+        const baseMessage = {
             id: message.id,
             content: message.content,
-            role: message.role as 'user' | 'system' | 'assistant' | 'data',
         };
 
-        if (message.toolInvocations) {
-            return {
-                ...baseMessage,
-                toolInvocations: message.toolInvocations.map((invocation): ToolInvocation => {
-                    if ('state' in invocation) {
-                        return invocation as ToolInvocation;
-                    } else {
-                        // Convert legacy tool calls to the new format
-                        return {
-                            state: 'call',
-                            id: invocation.id,
-                            type: invocation.type,
-                            function: {
-                                name: invocation.function.name,
-                                arguments: invocation.function.arguments,
-                            },
-                        } as ToolInvocation;
-                    }
-                }),
-            };
+        if (message.role === 'user') {
+            return { ...baseMessage, role: 'user' } as ClientMessage;
+        } else {
+            return { ...baseMessage, role: message.role as ServerMessage['role'] } as ServerMessage;
         }
-
-        // Handle deprecated function_call and tool_calls
-        if (message.function_call) {
-            console.warn('Deprecated: function_call is no longer supported. Use toolInvocations instead.');
-            return {
-                ...baseMessage,
-                toolInvocations: [{
-                    state: 'call',
-                    id: Date.now().toString(),
-                    type: 'function',
-                    function: {
-                        name: typeof message.function_call === 'string' ? message.function_call : message.function_call.name || '',
-                        arguments: typeof message.function_call === 'string' ? '' : message.function_call.arguments || '',
-                    },
-                }],
-            };
-        }
-
-        if (message.tool_calls) {
-            console.warn('Deprecated: tool_calls is no longer supported. Use toolInvocations instead.');
-            return {
-                ...baseMessage,
-                toolInvocations: (typeof message.tool_calls === 'string' ? [] : message.tool_calls).map(call => ({
-                    state: 'call',
-                    id: call.id,
-                    type: call.type,
-                    function: {
-                        name: call.function.name,
-                        arguments: call.function.arguments,
-                    },
-                })),
-            };
-        }
-
-        return baseMessage;
     };
 
     const vercelChatProps = useVercelChat({
@@ -177,11 +139,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
-        onFinish: (message) => {
+        onFinish: async (message) => {
             if (threadId) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages);
+                
+                try {
+                    await saveMessage(threadId, adaptedMessage);
+                } catch (error) {
+                    console.error('Error saving AI message:', error);
+                    toast.error('Failed to save AI response. Some messages may be missing.');
+                }
             }
         },
     });
@@ -192,11 +161,22 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             return;
         }
 
-        const userMessage: CustomMessage = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: ClientMessage = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
-        return vercelChatProps.append(userMessage as VercelMessage);
+        try {
+            // Optimistically update the UI
+            vercelChatProps.append(userMessage as VercelMessage);
+
+            // Save the message to the database
+            await saveMessage(threadId, userMessage);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            toast.error('Failed to send message. Please try again.');
+            // Revert the optimistic update
+            setMessages(threadId, threadData.messages);
+        }
     }, [threadId, vercelChatProps, threadData.messages, setMessages]);
 
     const setInput = (input: string) => {

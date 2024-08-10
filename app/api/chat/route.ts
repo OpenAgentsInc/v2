@@ -30,12 +30,20 @@ export async function POST(req: Request) {
         model: toolContext.model,
         system: getSystemPrompt(toolContext),
         tools,
-        onFinish: (finishResult) => onFinish({
-            ...finishResult,
-            threadId,
-            clerkUserId: userId,
-            userMessage
-        }),
+        onFinish: (finishResult) => {
+            const assistantMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: finishResult.text,
+            };
+            onFinish({
+                ...finishResult,
+                threadId,
+                clerkUserId: userId,
+                userMessage,
+                assistantMessage,
+            });
+        },
     });
     return result.toAIStreamResponse();
 }

@@ -1,9 +1,10 @@
 'use server'
-import { sql } from '@vercel/postgres'
-import { saveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { Message, Chat } from '@/lib/types'
 
-export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
+import { sql } from '@vercel/postgres'
+import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
+import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types'
+
+export async function saveChatMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return null
@@ -13,7 +14,7 @@ export async function saveChatMessage(threadId: number, clerkUserId: string, mes
         console.log("Duplicate message, not saving:", message.content)
         return null
     }
-    const savedMessage = await saveMessage(threadId, clerkUserId, message)
+    const savedMessage = await dbSaveMessage(threadId, clerkUserId, message)
     console.log('Message saved:', savedMessage)
     return savedMessage
 }
@@ -36,7 +37,7 @@ export async function createNewThread(clerkUserId: string) {
     }
 }
 
-export async function fetchThreadMessages(threadId: number) {
+export async function fetchThreadMessages(threadId: number): Promise<ChatMessage[]> {
     console.log('Fetching messages for thread:', threadId)
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
@@ -44,7 +45,17 @@ export async function fetchThreadMessages(threadId: number) {
     }
     const messages = await getThreadMessages(threadId)
     console.log('Fetched messages:', messages.length)
-    return messages
+    return messages.map(msg => {
+        const baseMessage = {
+            id: msg.id.toString(),
+            content: msg.content,
+        }
+        if (msg.role === 'user') {
+            return { ...baseMessage, role: 'user' } as ClientMessage
+        } else {
+            return { ...baseMessage, role: msg.role as ServerMessage['role'] } as ServerMessage
+        }
+    })
 }
 
 export async function updateThreadData(threadId: number, metadata: any) {
@@ -130,4 +141,16 @@ export async function getChatById(threadId: number, userId: string) {
     }
 
     return chatResult.rows[0];
+}
+
+export async function saveMessage(threadId: number, message: ChatMessage) {
+  try {
+    await sql`
+      INSERT INTO messages (thread_id, content, role, created_at)
+      VALUES (${threadId}, ${message.content.toString()}, ${message.role}, NOW())
+    `;
+  } catch (error) {
+    console.error('Error saving message:', error);
+    throw new Error('Failed to save message');
+  }
 }
