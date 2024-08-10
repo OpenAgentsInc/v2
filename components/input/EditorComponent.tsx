@@ -38,7 +38,7 @@ const createDefaultState = (content: string) => {
     return EditorState.create({
         schema,
         doc: schema.node("doc", null, [
-            schema.node("paragraph", null, content ? [schema.text(content)] : null)
+            schema.node("paragraph", null, content ? [schema.text(content)] : [])
         ]),
         plugins: [
             keymap({
