@@ -1,4 +1,4 @@
-import { convertToCoreMessages, streamText } from 'ai';
+import { convertToCoreMessages, streamText, Message as AIMessage } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { onFinish } from './onFinish';
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // Fetch paginated messages
     const { messages: dbMessages, hasMore } = await fetchThreadMessages(threadId, page, limit);
 
-    const messages = convertToCoreMessages(dbMessages);
+    const messages = convertToCoreMessages(dbMessages as AIMessage[]);
     const userMessage = messages[messages.length - 1] as Message;
     const result = await streamText({
         messages,
@@ -53,15 +53,14 @@ export async function POST(req: Request) {
     });
 
     // Add pagination information to the response
-    const responseHeaders = new Headers(result.headers);
+    const responseHeaders = new Headers();
     responseHeaders.set('X-Has-More', hasMore.toString());
     responseHeaders.set('X-Page', page.toString());
     responseHeaders.set('X-Limit', limit.toString());
 
-    return new Response(result.body, {
+    return new Response(result.toAIStreamResponse().body, {
         headers: responseHeaders,
-        status: result.status,
-        statusText: result.statusText,
+        status: 200,
     });
 }
 
