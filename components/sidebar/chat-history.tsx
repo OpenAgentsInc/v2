@@ -1,7 +1,7 @@
 import * as React from 'react'
 
-import { SidebarList } from '@/components/sidebar-list'
-import { NewChatButton } from '@/components/new-chat-button'
+import { SidebarList } from './sidebar-list'
+import { NewChatButton } from './new-chat-button'
 
 interface ChatHistoryProps {
     userId: string

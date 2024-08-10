@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { nanoid } from 'lib/utils'
 
 import { motion } from 'framer-motion'
 
