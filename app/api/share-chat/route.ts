@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs'
-import { db } from '@/lib/db'
+import { db } from 'db'
 import { ServerActionResult, Chat } from '@/lib/types'
 
 export async function POST(req: NextRequest): Promise<NextResponse<ServerActionResult<Chat>>> {
