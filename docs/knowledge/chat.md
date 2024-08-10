@@ -36,6 +36,36 @@ The "New Chat" button in the sidebar creates a new chat pane with a fresh thread
 
 This implementation allows users to create and manage multiple chat threads simultaneously, enhancing the overall user experience and functionality of the application.
 
+## Loading Existing Messages
+
+The process of loading existing messages is primarily handled by the `useChat` hook and related components. Here's an overview of how it works:
+
+1. The main component responsible for managing chat state and interactions is the `useChat` hook, located in `hooks/useChat.ts`. This hook handles the loading and management of existing messages for a given thread.
+
+2. The `useChat` hook uses the `useChatStore` (defined in `store/chat.ts`) to manage the state of chat threads and messages. It retrieves existing messages for a given thread ID using the `getThreadData` function from the chat store.
+
+3. The `Chat` component (in `components/chat.tsx`) is the main component that renders the chat interface. It uses the `useChat` hook to manage the chat state, including loading existing messages.
+
+4. The `ChatList` component (in `components/chat-list.tsx`) is responsible for rendering the list of chat messages. It receives the messages from the `Chat` component and maps through them to render individual `ChatMessage` components.
+
+5. The `app/api/chat/route.ts` file contains the API route for handling chat requests. It includes logic for validating and processing chat messages, as well as streaming AI responses and handling tool invocations.
+
+6. The `app/api/thread/route.ts` file contains the API route for managing threads. It handles thread creation and retrieval, which is necessary for loading existing messages associated with a thread.
+
+7. The `db/actions.ts` file contains database actions for saving and fetching chat messages and threads. These actions are likely used by the API routes to interact with the database and retrieve existing messages.
+
+To ensure smooth functionality, especially considering the recent refactoring to use integer-based thread IDs, the following improvements might be needed:
+
+1. Ensure that the `useChat` hook in `hooks/useChat.ts` is correctly fetching existing messages when initializing with a thread ID.
+
+2. Verify that the `ChatStore` in `store/chat.ts` is properly managing the state of existing messages for each thread.
+
+3. Check the `app/api/chat/route.ts` to make sure it's correctly handling requests for existing messages and returning them in the expected format.
+
+4. Review the database queries in `db/queries.ts` and the actions in `db/actions.ts` to ensure they're efficiently fetching existing messages for a given thread ID.
+
+5. Implement proper error handling and loading states in the `Chat` component to handle cases where existing messages are being fetched.
+
 ## Chat Thread ID Creation and Management
 
 The current implementation of chat thread ID creation and management has some issues that need to be addressed. Here's an overview of the current implementation, issues, and suggested improvements:
@@ -112,331 +142,6 @@ To address the issues with chat thread ID creation and management, the following
 7. Improve Error Recovery:
    - Implement a retry mechanism for thread creation in case of network errors
    - Provide clear feedback to the user if thread creation fails and offer options to retry or cancel
-
-## Specific File Updates for Refactoring
-
-To implement the suggested improvements, the following files should be updated:
-
-### 1. components/new-chat-button.tsx
-
-```typescript
-import { useState } from 'react'
-import { useHudStore } from '@/store/hud'
-import { useChatStore } from '@/store/chat'
-import { buttonVariants } from '@/components/ui/button'
-import { IconPlus } from '@/components/ui/icons'
-import { cn } from '@/lib/utils'
-
-export function NewChatButton() {
-    const { addPane } = useHudStore()
-    const { setCurrentThreadId } = useChatStore()
-    const [isCreating, setIsCreating] = useState(false)
-
-    const handleNewChat = async () => {
-        setIsCreating(true)
-        try {
-            const response = await fetch('/api/thread', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            })
-            if (!response.ok) throw new Error('Failed to create thread')
-            const { threadId } = await response.json()
-            setCurrentThreadId(threadId)
-            addPane({
-                type: 'chat',
-                title: 'New Chat',
-                paneProps: {
-                    x: 300,
-                    y: 20,
-                    width: 600,
-                    height: 400,
-                    id: threadId
-                }
-            })
-        } catch (error) {
-            console.error('Error creating new chat:', error)
-            // Implement user-facing error handling here
-        } finally {
-            setIsCreating(false)
-        }
-    }
-
-    return (
-        <button
-            onClick={handleNewChat}
-            disabled={isCreating}
-            className={cn(
-                buttonVariants({ variant: 'outline' }),
-                'h-10 w-full justify-start bg-zinc-50 px-4 shadow-none transition-colors hover:bg-zinc-200/40 dark:bg-zinc-900 dark:hover:bg-zinc-300/10'
-            )}
-        >
-            <IconPlus className="-translate-x-2 stroke-2" />
-            {isCreating ? 'Creating...' : 'New Chat'}
-        </button>
-    )
-}
-```
-
-### 2. hooks/useChat.ts
-
-```typescript
-import { useCallback, useState } from 'react'
-import { create } from 'zustand'
-import { useChat as useVercelChat, Message } from 'ai/react'
-import { useModelStore } from '@/store/models'
-import { useRepoStore } from '@/store/repo'
-import { useToolStore } from '@/store/tools'
-
-interface ChatStore {
-    currentThreadId: number | null
-    threads: Record<number, ThreadData>
-    setCurrentThreadId: (id: number) => void
-    getThreadData: (id: number) => ThreadData
-    setMessages: (id: number, messages: Message[]) => void
-    setInput: (id: number, input: string) => void
-}
-
-const useChatStore = create<ChatStore>((set, get) => ({
-    currentThreadId: null,
-    threads: {},
-    setCurrentThreadId: (id: number) => set({ currentThreadId: id }),
-    getThreadData: (id: number) => {
-        const { threads } = get()
-        if (!threads[id]) {
-            threads[id] = { id, messages: [], input: '' }
-        }
-        return threads[id]
-    },
-    setMessages: (id: number, messages: Message[]) =>
-        set(state => ({
-            threads: {
-                ...state.threads,
-                [id]: { ...state.threads[id], messages }
-            }
-        })),
-    setInput: (id: number, input: string) =>
-        set(state => ({
-            threads: {
-                ...state.threads,
-                [id]: { ...state.threads[id], input }
-            }
-        })),
-}))
-
-interface UseChatProps {
-    id?: number
-}
-
-export function useChat({ id: propsId }: UseChatProps = {}) {
-    const model = useModelStore((state) => state.model)
-    const repo = useRepoStore((state) => state.repo)
-    const tools = useToolStore((state) => state.tools)
-
-    const {
-        currentThreadId,
-        setCurrentThreadId,
-        getThreadData,
-        setMessages,
-        setInput: setStoreInput
-    } = useChatStore()
-
-    const [threadId] = useState<number | undefined>(propsId || currentThreadId || undefined)
-
-    if (!threadId) {
-        throw new Error('No thread ID available')
-    }
-
-    const threadData = getThreadData(threadId)
-
-    const body: any = { model, tools, threadId }
-    if (repo) {
-        body.repoOwner = repo.owner
-        body.repoName = repo.name
-        body.repoBranch = repo.branch
-    }
-
-    const vercelChatProps = useVercelChat({
-        id: threadId.toString(),
-        initialMessages: threadData.messages,
-        body,
-        onFinish: (message) => {
-            const updatedMessages = [...threadData.messages, message]
-            setMessages(threadId, updatedMessages)
-        },
-    })
-
-    const sendMessage = useCallback(async (message: string) => {
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' }
-        const updatedMessages = [...threadData.messages, userMessage]
-        setMessages(threadId, updatedMessages)
-
-        return vercelChatProps.append(userMessage)
-    }, [threadId, vercelChatProps, threadData.messages, setMessages])
-
-    const setInput = (input: string) => {
-        setStoreInput(threadId, input)
-        vercelChatProps.setInput(input)
-    }
-
-    return {
-        ...vercelChatProps,
-        id: threadId,
-        threadData,
-        setCurrentThreadId,
-        setInput,
-        sendMessage,
-    }
-}
-```
-
-### 3. components/chat.tsx
-
-```typescript
-export interface ChatProps extends React.ComponentProps<'div'> {
-    id?: number
-}
-
-export const Chat = React.memo(function Chat({ className, id: propId }: ChatProps) {
-    const {
-        messages,
-        input,
-        id,
-        handleInputChange,
-        handleSubmit,
-    } = useChat({ id: propId })
-
-    // Rest of the component remains the same
-})
-```
-
-### 4. app/api/thread/route.ts
-
-```typescript
-import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs'
-import { db } from '@/lib/db'
-
-export async function POST() {
-    try {
-        const { userId } = auth()
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-
-        const result = await db.query(
-            'INSERT INTO threads (user_id) VALUES ($1) RETURNING id',
-            [userId]
-        )
-
-        const threadId = result.rows[0].id
-
-        return NextResponse.json({ threadId }, { status: 201 })
-    } catch (error) {
-        console.error('Error creating thread:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
-    }
-}
-```
-
-### 5. app/api/chat/route.ts
-
-```typescript
-import { NextRequest, NextResponse } from 'next/server'
-import { Message as VercelChatMessage, StreamingTextResponse } from 'ai'
-import { ChatOpenAI } from 'langchain/chat_models/openai'
-import { BytesOutputParser } from 'langchain/schema/output_parser'
-import { PromptTemplate } from 'langchain/prompts'
-import { auth } from '@clerk/nextjs'
-import { db } from '@/lib/db'
-
-export const runtime = 'edge'
-
-export async function POST(req: NextRequest) {
-    const { userId } = auth()
-    if (!userId) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { messages, threadId } = await req.json()
-    
-    if (!threadId || isNaN(Number(threadId))) {
-        return NextResponse.json({ error: 'Invalid thread ID' }, { status: 400 })
-    }
-
-    // Verify that the thread belongs to the user
-    const threadResult = await db.query(
-        'SELECT id FROM threads WHERE id = $1 AND user_id = $2',
-        [threadId, userId]
-    )
-
-    if (threadResult.rows.length === 0) {
-        return NextResponse.json({ error: 'Thread not found' }, { status: 404 })
-    }
-
-    // Rest of the chat logic remains the same
-}
-```
-
-### 6. types/index.ts
-
-```typescript
-export interface Thread {
-    id: number
-    userId: string
-    createdAt: Date
-    updatedAt: Date
-}
-
-export interface Message {
-    id: number
-    threadId: number
-    content: string
-    role: 'user' | 'assistant'
-    createdAt: Date
-}
-```
-
-### 7. store/chat.ts
-
-```typescript
-import { create } from 'zustand'
-import { Message } from '@/types'
-
-interface ChatState {
-    currentThreadId: number | null
-    threads: Record<number, {
-        messages: Message[]
-        input: string
-    }>
-    setCurrentThreadId: (id: number) => void
-    addMessage: (threadId: number, message: Message) => void
-    setInput: (threadId: number, input: string) => void
-}
-
-export const useChatStore = create<ChatState>((set) => ({
-    currentThreadId: null,
-    threads: {},
-    setCurrentThreadId: (id) => set({ currentThreadId: id }),
-    addMessage: (threadId, message) => set((state) => ({
-        threads: {
-            ...state.threads,
-            [threadId]: {
-                ...state.threads[threadId],
-                messages: [...(state.threads[threadId]?.messages || []), message],
-            },
-        },
-    })),
-    setInput: (threadId, input) => set((state) => ({
-        threads: {
-            ...state.threads,
-            [threadId]: {
-                ...state.threads[threadId],
-                input,
-            },
-        },
-    })),
-}))
-```
 
 ## Conclusion
 
