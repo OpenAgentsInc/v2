@@ -125,7 +125,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         const baseMessage: Message = {
             id: message.id,
             content: message.content,
-            role: message.role as 'user' | 'system' | 'assistant' | 'data',
+            role: message.role as 'user' | 'system' | 'assistant' | 'tool',
         };
 
         if (message.function_call) {
