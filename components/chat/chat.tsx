@@ -13,14 +13,21 @@ export const Chat = ({ threadId, className }: ChatProps) => {
     const {
         messages,
         sendMessage,
-        isLoading
+        isLoading,
+        loadMoreMessages,
+        threadData
     } = useChat({ id: threadId })
     const chatContainerRef = useChatScroll(messages);
 
     return (
         <div className={`flex flex-col h-full ${className}`}>
             <div className="flex-1 overflow-auto" ref={chatContainerRef}>
-                <ChatList messages={messages} />
+                <ChatList 
+                    messages={messages} 
+                    loadMoreMessages={loadMoreMessages}
+                    hasMore={threadData.hasMore}
+                    isLoading={isLoading}
+                />
             </div>
             <div className="flex-shrink-0 w-full">
                 <div className="sticky bottom-0 w-full">
@@ -30,8 +37,6 @@ export const Chat = ({ threadId, className }: ChatProps) => {
         </div>
     )
 }
-
-
 
 
 
