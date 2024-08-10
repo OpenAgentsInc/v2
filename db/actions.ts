@@ -2,7 +2,7 @@
 
 import { sql } from '@vercel/postgres'
 import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { Message, Chat, CustomMessage } from '@/lib/types'
+import { Message, Chat } from '@/lib/types'
 
 export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
     if (isNaN(threadId)) {
@@ -133,7 +133,7 @@ export async function getChatById(threadId: number, userId: string) {
     return chatResult.rows[0];
 }
 
-export async function saveMessage(threadId: number, message: CustomMessage) {
+export async function saveMessage(threadId: number, message: Message) {
   try {
     await sql`
       INSERT INTO messages (thread_id, content, role, created_at)
