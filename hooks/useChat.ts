@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, ServerMessage, ClientMessage, ChatMessage } from '@/lib/types';
+import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -122,45 +122,16 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): ChatMessage => {
-        const baseMessage: Partial<ServerMessage | ClientMessage> = {
+        const baseMessage = {
             id: message.id,
             content: message.content,
-            role: message.role as 'user' | 'system' | 'assistant' | 'function',
         };
 
-        if (message.function_call) {
-            console.warn('Deprecated: function_call is no longer supported. Use toolInvocations instead.');
-            return {
-                ...baseMessage,
-                toolInvocations: [{
-                    state: 'call',
-                    id: Date.now().toString(),
-                    type: 'function',
-                    function: {
-                        name: typeof message.function_call === 'string' ? message.function_call : message.function_call.name || '',
-                        arguments: typeof message.function_call === 'string' ? '' : message.function_call.arguments || '',
-                    },
-                }],
-            } as ServerMessage;
+        if (message.role === 'user') {
+            return { ...baseMessage, role: 'user' } as ClientMessage;
+        } else {
+            return { ...baseMessage, role: message.role as ServerMessage['role'] } as ServerMessage;
         }
-
-        if (message.tool_calls) {
-            console.warn('Deprecated: tool_calls is no longer supported. Use toolInvocations instead.');
-            return {
-                ...baseMessage,
-                toolInvocations: (typeof message.tool_calls === 'string' ? [] : message.tool_calls).map(call => ({
-                    state: 'call',
-                    id: call.id,
-                    type: call.type,
-                    function: {
-                        name: call.function.name,
-                        arguments: call.function.arguments,
-                    },
-                })),
-            } as ServerMessage;
-        }
-
-        return baseMessage as ChatMessage;
     };
 
     const vercelChatProps = useVercelChat({
