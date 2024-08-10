@@ -1,9 +1,8 @@
-import { nanoid } from "lib/utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 export type Pane = {
-    id: string
+    id: number
     title: string
     x: number
     y: number
@@ -18,7 +17,7 @@ export type Pane = {
 }
 
 type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
-    id?: string;
+    id?: number;
     paneProps?: {
         x: number
         y: number
@@ -33,9 +32,9 @@ type HudStore = {
     activeTerminalId: number | null
     lastPanePosition: { x: number; y: number; width: number; height: number } | null
     addPane: (pane: PaneInput, shouldTile?: boolean) => void
-    removePane: (id: string) => void
-    updatePanePosition: (id: string, x: number, y: number) => void
-    updatePaneSize: (id: string, width: number, height: number) => void
+    removePane: (id: number) => void
+    updatePanePosition: (id: number, x: number, y: number) => void
+    updatePaneSize: (id: number, width: number, height: number) => void
     setChatOpen: (isOpen: boolean) => void
     setActiveTerminalId: (id: number | null) => void
     isInputFocused: boolean
@@ -43,12 +42,12 @@ type HudStore = {
     isRepoInputOpen: boolean
     setRepoInputOpen: (isOpen: boolean) => void
     openChatPane: (pane: PaneInput) => void
-    bringPaneToFront: (id: string) => void
-    setActivePane: (id: string) => void
+    bringPaneToFront: (id: number) => void
+    setActivePane: (id: number) => void
 }
 
 const initialChatPane: Pane = {
-    id: 'default-chat',
+    id: 0,
     title: 'Chat',
     x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 400,
     y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.05,
@@ -68,7 +67,7 @@ export const useHudStore = create<HudStore>()(
             activeTerminalId: null,
             lastPanePosition: null,
             addPane: (newPane, shouldTile = false) => set((state) => {
-                const paneId = newPane.id || nanoid(); // Use existing ID if provided, otherwise generate new
+                const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => p.id)) + 1;
                 let updatedPanes: Pane[]
                 let panePosition
 
@@ -128,7 +127,7 @@ export const useHudStore = create<HudStore>()(
 
                 const newPaneWithPosition: Pane = {
                     ...newPane,
-                    id: paneId, // Use the paneId we determined earlier
+                    id: paneId,
                     ...adjustedPosition,
                     isActive: true
                 }
@@ -186,7 +185,7 @@ export const useHudStore = create<HudStore>()(
                     width: panePosition.width,
                     height: panePosition.height,
                     isActive: true,
-                    id: nanoid()
+                    id: Math.max(0, ...state.panes.map(p => p.id)) + 1
                 }
                 return {
                     panes: [
@@ -216,7 +215,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-1522',
+            name: 'openagents-hud-storage-1523',
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )

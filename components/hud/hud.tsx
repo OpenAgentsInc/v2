@@ -6,6 +6,7 @@ import { Pane } from '@/components/hud/pane'
 
 export const Hud = () => {
     const { panes } = useHudStore()
+    console.log(panes)
 
     return (
         <div>
@@ -19,7 +20,7 @@ export const Hud = () => {
                     height={pane.height}
                     width={pane.width}
                 >
-                    {pane.type === 'chat' && <Chat chatId={pane.id.toString()} />}
+                    {pane.type === 'chat' && <Chat threadId={pane.id} />}
                 </Pane>
             ))}
         </div>
