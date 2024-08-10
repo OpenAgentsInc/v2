@@ -18,9 +18,11 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
         handleInputChange,
         handleSubmit,
         id,
-        setCurrentThreadId
-    } = useChat({ id: typeof propId === 'string' ? parseInt(propId, 10) : propId })
+        setCurrentThreadId,
+        sendMessage
+    } = useChat({ id: typeof propId === 'string' ? parseInt(propId, 10) : propId }) // remove?
 
+    // remove?
     useEffect(() => {
         if (id) {
             setCurrentThreadId(id)
@@ -43,7 +45,7 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
                 {messages.length ? (
                     <ChatList messages={messages} isShared={false} />
                 ) : (
-                    <EmptyScreen />
+                    <></>
                 )}
             </div>
             <div className="flex-shrink-0 w-full">
@@ -51,7 +53,7 @@ export const Chat = ({ chatId: propId, className }: ChatProps) => {
                     <InputBar
                         input={input}
                         onInputChange={handleInputChange}
-                        onSubmit={handleSubmit}
+                        onSubmit={sendMessage}
                     />
                 </div>
             </div>

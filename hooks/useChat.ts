@@ -89,12 +89,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             })
-            .then(response => response.json())
-            .then(({ threadId: newThreadId }) => {
-                setThreadId(newThreadId);
-                setCurrentThreadId(newThreadId);
-            })
-            .catch(error => console.error('Error creating new thread:', error));
+                .then(response => response.json())
+                .then(({ threadId: newThreadId }) => {
+                    setThreadId(newThreadId);
+                    setCurrentThreadId(newThreadId);
+                })
+                .catch(error => console.error('Error creating new thread:', error));
         }
     }, [propsId, threadId, setCurrentThreadId]);
 
@@ -140,6 +140,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     });
 
     const sendMessage = useCallback(async (message: string) => {
+        console.log("in sendMessage", message);
         if (!threadId) {
             console.error('No thread ID available');
             return;

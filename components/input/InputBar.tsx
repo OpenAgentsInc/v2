@@ -44,6 +44,7 @@ export const InputBar: React.FC<InputBarProps> = ({ onSubmit }) => {
 
     const handleSubmit = useCallback(() => {
         const content = editorState.doc.textContent;  // Remove trim() here
+        console.log("Submitting with:", content, visualRepresentations);
         if (content || visualRepresentations.length > 0) {
             const fullContent = [
                 ...visualRepresentations.map(vr => vr.content),
