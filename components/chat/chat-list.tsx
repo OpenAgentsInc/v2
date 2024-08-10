@@ -11,12 +11,14 @@ export function ChatList({ messages }: ChatListProps) {
         return null
     }
 
+    const reversedMessages = [...messages].reverse()
+
     return (
         <div className="overflow-y-scroll pt-6 px-20 w-full">
-            {messages.map((message, index) => (
+            {reversedMessages.map((message, index) => (
                 <div key={message.id}>
                     <ChatMessage message={message as any} />
-                    {index < messages.length - 1 && <Separator className="my-4" />}
+                    {index < reversedMessages.length - 1 && <Separator className="my-4" />}
                 </div>
             ))}
         </div>
