@@ -12,6 +12,7 @@ import { searchCodebaseTool } from './search-codebase';
 import { getGitHubToken } from "@/lib/github/isGitHubUser";
 import { anthropic } from '@ai-sdk/anthropic';
 import { openai } from '@ai-sdk/openai';
+import { bedrock } from '@ai-sdk/amazon-bedrock';
 
 const allTools = {
     create_file: createFileTool,
@@ -60,7 +61,20 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     const firecrawlToken = process.env.FIRECRAWL_API_KEY;
     const greptileToken = process.env.GREPTILE_API_KEY;
 
-    const model = theModel.provider === 'anthropic' ? anthropic(theModel.id) : openai(theModel.id);
+    let model;
+    switch (theModel.provider) {
+        case 'anthropic':
+            model = anthropic(theModel.id);
+            break;
+        case 'openai':
+            model = openai(theModel.id);
+            break;
+        case 'bedrock':
+            model = bedrock(theModel.id);
+            break;
+        default:
+            throw new Error(`Unsupported model provider: ${theModel.provider}`);
+    }
 
     return {
         repo,

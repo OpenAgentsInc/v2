@@ -1,6 +1,6 @@
 import { Model } from '@/types'
 
-const USE_ANTHROPIC = false; // Feature flag to switch between Bedrock and Anthropic
+export const USE_ANTHROPIC = false; // Feature flag to switch between Bedrock and Anthropic
 
 export const models: Model[] = [
     {
