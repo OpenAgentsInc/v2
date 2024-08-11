@@ -16,13 +16,24 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
         WHERE thread_id = ${threadId}
         ORDER BY created_at ASC
         `;
-        return rows.map(msg => ({
-            id: msg.id.toString(),
-            content: msg.content,
-            role: msg.role as Message['role'],
-            createdAt: msg.createdAt,
-            toolInvocations: msg.toolInvocations ? JSON.parse(msg.toolInvocations) : null
-        }));
+        return rows.map(msg => {
+            let parsedToolInvocations;
+            if (msg.toolInvocations) {
+                try {
+                    parsedToolInvocations = JSON.parse(msg.toolInvocations);
+                } catch (error) {
+                    console.error(`Error parsing toolInvocations for message ${msg.id}:`, error);
+                    parsedToolInvocations = undefined;
+                }
+            }
+            return {
+                id: msg.id.toString(),
+                content: msg.content,
+                role: msg.role as Message['role'],
+                createdAt: msg.createdAt,
+                toolInvocations: parsedToolInvocations
+            };
+        });
     } catch (error) {
         console.error('Error in getThreadMessages:', error);
         throw error;
