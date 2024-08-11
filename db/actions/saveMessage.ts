@@ -8,23 +8,23 @@ export async function saveMessage(threadId: number, clerkUserId: string, message
         const contentString = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
         const toolInvocationsString = message.toolInvocations ? JSON.stringify(message.toolInvocations) : null;
 
-        let query = sql`
-        INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations
-        `;
+        let queryString = `
+        INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations`;
 
-        let values = [threadId, clerkUserId, message.role, contentString, sql`${toolInvocationsString}::jsonb`];
+        let values = [threadId, clerkUserId, message.role, contentString, toolInvocationsString];
+        let placeholders = ['$1', '$2', '$3', '$4', '$5::jsonb'];
 
         if (options) {
-            query = sql`${query}, finish_reason, total_tokens, prompt_tokens, completion_tokens`;
+            queryString += `, finish_reason, total_tokens, prompt_tokens, completion_tokens`;
             values.push(options.finishReason, options.usage.totalTokens, options.usage.promptTokens, options.usage.completionTokens);
+            placeholders.push('$6', '$7', '$8', '$9');
         }
 
-        query = sql`${query})
-        VALUES (${sql.join(values, sql`, `)})
-        RETURNING id, created_at as "createdAt", tool_invocations as "toolInvocations"
-        `;
+        queryString += `)
+        VALUES (${placeholders.join(', ')})
+        RETURNING id, created_at as "createdAt", tool_invocations as "toolInvocations"`;
 
-        const { rows } = await query;
+        const { rows } = await sql.query(queryString, values);
 
         const savedMessage = {
             ...message,
