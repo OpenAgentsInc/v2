@@ -21,6 +21,7 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
             let createdAt: Date;
 
             if (typeof msg.content === 'string') {
+                console.log('Message content is string:', msg.content)
                 try {
                     const parsedContent = JSON.parse(msg.content);
                     if (Array.isArray(parsedContent) && parsedContent[0]?.type === 'tool-result') {
@@ -42,6 +43,7 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
                     }
                 } catch {
                     // If parsing fails, it's already a string
+                    console.log("failed - already a string", msg.content)
                     content = msg.content;
                     createdAt = new Date(msg.createdAt);
                 }
@@ -64,13 +66,20 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
 
             // If toolInvocations is still undefined, check msg.toolInvocations
             if (!toolInvocations && msg.toolInvocations) {
-                try {
-                    const parsedToolInvocations = JSON.parse(msg.toolInvocations);
-                    if (Array.isArray(parsedToolInvocations)) {
-                        toolInvocations = parsedToolInvocations;
+                console.log('Checking toolInvocations:', msg.toolInvocations)
+                if (Array.isArray(msg.toolInvocations)) {
+                    toolInvocations = msg.toolInvocations;
+                } else if (typeof msg.toolInvocations === 'string') {
+                    try {
+                        const parsedToolInvocations = JSON.parse(msg.toolInvocations);
+                        if (Array.isArray(parsedToolInvocations)) {
+                            toolInvocations = parsedToolInvocations;
+                        }
+                    } catch (error) {
+                        console.error(`Error parsing toolInvocations string for message ${msg.id}:`, error);
                     }
-                } catch (error) {
-                    console.error(`Error parsing toolInvocations for message ${msg.id}:`, error);
+                } else {
+                    console.error(`Unexpected toolInvocations format for message ${msg.id}:`, msg.toolInvocations);
                 }
             }
 
