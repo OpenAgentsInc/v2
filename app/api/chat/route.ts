@@ -2,6 +2,7 @@ import { convertToCoreMessages, streamText } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { auth } from '@clerk/nextjs/server';
+import { OnFinishResult } from '@/types'
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
         model: toolContext.model,
         system: getSystemPrompt(toolContext),
         tools,
+        onFinish: async (result: OnFinishResult) => {
+            console.log('chat route onFinish', result);
+        }
     });
     return result.toAIStreamResponse();
 }
