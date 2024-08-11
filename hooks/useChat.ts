@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-// import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types';
+import { Message } from '@/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -16,7 +16,7 @@ interface User {
 
 interface ThreadData {
     id: number;
-    messages: ChatMessage[];
+    messages: Message[];
     input: string;
     user?: User;
 }
@@ -28,7 +28,7 @@ interface ChatStore {
     setCurrentThreadId: (id: number) => void;
     setUser: (user: User) => void;
     getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: ChatMessage[]) => void;
+    setMessages: (id: number, messages: Message[]) => void;
     setInput: (id: number, input: string) => void;
 }
 
@@ -45,7 +45,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         }
         return threads[id];
     },
-    setMessages: (id: number, messages: ChatMessage[]) =>
+    setMessages: (id: number, messages: Message[]) =>
         set(state => ({
             threads: {
                 ...state.threads,
@@ -121,18 +121,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): ChatMessage => {
-        const baseMessage = {
-            id: message.id,
-            content: message.content,
-        };
-
-        if (message.role === 'user') {
-            return { ...baseMessage, role: 'user' } as ClientMessage;
-        } else {
-            return { ...baseMessage, role: message.role as ServerMessage['role'] } as ServerMessage;
-        }
-    };
+    const adaptMessage = (message: VercelMessage): Message => ({
+        id: message.id,
+        content: message.content,
+        role: message.role,
+    });
 
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
@@ -146,7 +139,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveMessage(threadId, adaptedMessage);
+                    await saveMessage(threadId, user?.id || '', adaptedMessage);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
@@ -156,12 +149,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     });
 
     const sendMessage = useCallback(async (message: string) => {
-        if (!threadId) {
-            console.error('No thread ID available');
+        if (!threadId || !user) {
+            console.error('No thread ID or user available');
             return;
         }
 
-        const userMessage: ClientMessage = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
 
@@ -170,14 +163,14 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             vercelChatProps.append(userMessage as VercelMessage);
 
             // Save the message to the database
-            await saveMessage(threadId, userMessage);
+            await saveMessage(threadId, user.id, userMessage);
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
             // Revert the optimistic update
             setMessages(threadId, threadData.messages);
         }
-    }, [threadId, vercelChatProps, threadData.messages, setMessages]);
+    }, [threadId, user, vercelChatProps, threadData.messages, setMessages]);
 
     const setInput = (input: string) => {
         if (threadId) {
