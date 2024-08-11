@@ -3,6 +3,7 @@ import { Model } from '@/types'
 export const USE_ANTHROPIC = false; // Feature flag to switch between Bedrock and Anthropic
 
 export const models: Model[] = [
+    /**
     {
         name: 'Claude 3 Opus',
         id: 'claude-3-opus-20240229',
@@ -10,6 +11,7 @@ export const models: Model[] = [
         providerCentsPerMillionInputTokens: 1500,
         providerCentsPerMillionOutputTokens: 7500
     },
+    */
     {
         name: 'GPT-4o',
         id: 'gpt-4o',
