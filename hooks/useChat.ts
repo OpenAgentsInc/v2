@@ -132,7 +132,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             if (threadId && user) {
                 const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
-                console.log("CLIENT ONFINISH:", message)
 
                 try {
                     await saveChatMessage(threadId, user.id, message as Message);
