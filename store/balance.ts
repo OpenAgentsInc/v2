@@ -13,7 +13,7 @@ export const useBalanceStore = create<BalanceState>()(
             setBalance: (balance) => set({ balance }),
         }),
         {
-            name: 'openagents-user-balance-storage',
+            name: 'openagents-user-balance-storage-2',
             partialize: (state) => ({ balance: state.balance }),
         }
     )

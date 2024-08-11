@@ -2,9 +2,10 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
+import { Balance } from '@/components/hud/balance'
+import { Hud } from '@/components/hud/hud'
 import { Pane } from '@/components/hud/pane'
 import { ChatHistory } from '@/components/sidebar/chat-history'
-import { Hud } from '@/components/hud/hud'
 
 export const HomeAuthed = async () => {
     const userId = auth().userId
@@ -19,6 +20,7 @@ export const HomeAuthed = async () => {
             <Pane title="Chat History" id={0} x={20} y={20} height={450} width={260} dismissable={false}>
                 <ChatHistory userId={userId} />
             </Pane>
+            <Balance />
             <Hud />
         </main>
     )
