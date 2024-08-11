@@ -6,7 +6,6 @@ import { UserButton } from '@clerk/nextjs'
 
 export const UserStatus = () => {
     const { user } = useUser()
-    console.log(user)
     if (!user) {
         return null
     }
