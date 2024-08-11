@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
-// import { ServerActionResult } from '@/lib/types'
+import { ServerActionResult } from '@/types'
 
 const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
     console.log("Remove chat:", args)

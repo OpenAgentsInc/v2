@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator'
-import { Message } from '@/lib/types'
+import { Message } from '@/types'
 import { ChatMessage } from './chat-message'
 
 export interface ChatListProps {
@@ -15,7 +15,7 @@ export function ChatList({ messages }: ChatListProps) {
         <div className="overflow-y-scroll pt-6 px-20 w-full">
             {messages.map((message, index) => (
                 <div key={message.id}>
-                    <ChatMessage message={message as any} />
+                    <ChatMessage message={message} />
                     {index < messages.length - 1 && <Separator className="my-4" />}
                 </div>
             ))}
