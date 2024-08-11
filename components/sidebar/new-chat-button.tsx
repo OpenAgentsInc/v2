@@ -2,14 +2,12 @@
 
 import { useState } from 'react'
 import { useHudStore } from '@/store/hud'
-import { useChatStore } from '@/store/chat'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 export function NewChatButton() {
     const { addPane } = useHudStore()
-    const { setCurrentThreadId } = useChatStore()
     const [isCreating, setIsCreating] = useState(false)
 
     const handleNewChat = async () => {
@@ -21,7 +19,6 @@ export function NewChatButton() {
             })
             if (!response.ok) throw new Error('Failed to create thread')
             const { threadId } = await response.json()
-            setCurrentThreadId(threadId)
             addPane({
                 type: 'chat',
                 title: 'New Chat',
@@ -31,7 +28,7 @@ export function NewChatButton() {
                     width: 600,
                     height: 400,
                 },
-                id: threadId.toString() // Add id as a separate property
+                id: threadId
             })
         } catch (error) {
             console.error('Error creating new chat:', error)

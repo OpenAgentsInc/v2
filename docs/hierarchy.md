@@ -7,28 +7,15 @@
       - Renders `HomeDashboard` for authenticated users
   - api/
     - chat/
-      - onFinish.ts - Handles chat completion
-        - Saves user and assistant messages to the database
-        - Logs token usage and handles potential credit deductions
       - route.ts - Chat API route
         - Validates and processes chat messages
         - Streams AI responses and handles tool invocations
-        - Uses `onFinish` to save messages and manage state
     - thread/
       - route.ts - Thread API route
         - Authenticates user and manages thread creation
         - Returns existing empty thread or creates a new one
-  - share/
-    - [id]/
-      - page.tsx - Share chat page (unimplemented)
-        - Fetches shared chat data and displays chat title and messages
-        - Uses `ChatList` and `FooterText` components
   - globals.css - Global CSS styles
   - layout.tsx - Main application layout
-  - signup/
-    - page.tsx - Signup page
-      - Renders `SignUp` component for new users
-      - Displays `UserButton` for authenticated users
 - components/ - React components
   - canvas/ - Canvas-related components
     - Scene.tsx - Main scene component for 3D rendering
@@ -44,7 +31,6 @@
     - index.ts - Exports chat components
     - markdown.tsx - Renders markdown content
     - tool-result.tsx - Renders the result of tool invocations
-  - clear-history.tsx - Component for clearing chat history
   - dom/ - DOM-related utility components
     - Layout.tsx - Main layout component
   - external-link.tsx - Reusable component for rendering external links
@@ -59,7 +45,6 @@
   - input/ - Input-related components
     - prompt-form.tsx - Implements the chat input form with auto-resizing textarea and submit button
   - providers.tsx - Sets up theme, sidebar, tooltip, and authentication providers
-  - share/ - Share-related components
   - sidebar/ - Sidebar-related components
     - sidebar-actions.tsx - Provides actions for sharing and deleting chats
     - sidebar-desktop.tsx - Renders the sidebar for desktop view
@@ -70,7 +55,6 @@
     - sidebar-mobile.tsx - Renders the sidebar for mobile view
     - sidebar-toggle.tsx - Provides a button to toggle the sidebar
     - sidebar.tsx - Implements the main sidebar component with open/closed state management
-  - theme-toggle.tsx - Provides a button to toggle between light and dark themes
   - ui/ - Reusable UI components
     - alert-dialog.tsx - Implements an alert dialog component
     - badge.tsx - Badge component for displaying status or labels
@@ -91,7 +75,6 @@
 - db/ - Database related files
   - actions.ts - Database actions for saving and fetching chat messages and threads
   - init-db.ts - Initializes the database and seeds initial data
-  - queries.ts - SQL queries for interacting with the database
   - seed.ts - Seeds the database with initial data
 - docs/ - Documentation files
   - hud.md - Describes the HUD overlay and its components
@@ -101,6 +84,7 @@
 - hooks/ - Custom React hooks
   - useCameraAnimation.ts - Hook for animating the camera in a 3D scene
   - useChat.ts - Hook for managing chat state and interactions
+  - useChatScroll.ts - Hook for managing chat scrolling behavior
   - usePostprocess.jsx - Hook for applying post-processing effects in a 3D scene
   - useThreadCreation.ts - Hook for creating new chat threads
 - lib/ - Utility functions and modules
@@ -114,11 +98,9 @@
 - public/ - Public assets
 - scripts/ - Build and maintenance scripts
 - store/ - State management
-  - chat.ts - Zustand store for managing chat state
   - hud.ts - Zustand store for managing HUD state
   - models.ts - Zustand store for managing model state
   - repo.ts - Zustand store for managing repository state
-  - sidebar.ts - Zustand store for managing sidebar state
   - tools.ts - Zustand store for managing tools state
   - user.ts - Zustand store for managing user state
 - tools/ - Custom tools and integrations
@@ -133,12 +115,17 @@
   - view-file.ts - Tool for viewing file contents
   - view-hierarchy.ts - Tool for viewing file/folder hierarchy
 - types/ - TypeScript type definitions
+  - attachment.ts - Defines the Attachment interface for file attachments
+  - chat.ts - Defines the Chat interface for chat threads
   - index.ts - Exports all type definitions
   - message.ts - Defines the Message interface for chat messages
-  - misc.ts - Defines the JSONValue type for JSON serialization
+  - model.ts - Defines the Model interface for large language models
   - repo.ts - Defines the Repo interface for repository information
-  - schema.ts - Defines schema utilities for validation
-  - tools.ts - Defines types for tools and their context
-  - user.ts - Defines the User interface for user information
+  - server-action-result.ts - Defines the ServerActionResult interface for server responses
+  - token-usage.ts - LLM token usage
+  - tool-call.ts - Defines the ToolCall interface for tool invocations
+  - tool-context.ts - Defines the ToolContext interface for tool context
+  - tool-invocation.ts - Defines the ToolInvocation interface for tool invocations
+  - tool-result.ts - Defines the ToolResult interface for tool results
 
 This hierarchy provides an overview of the main folders and files in the project, focusing on the most important and frequently accessed components. It omits less relevant files such as images and fonts.

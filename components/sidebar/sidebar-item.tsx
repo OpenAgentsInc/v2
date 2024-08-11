@@ -31,7 +31,6 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
-        console.log('Clicked chat:', chat)
         const newPane = {
             id: Number(chat.id),
             title: chat.title,

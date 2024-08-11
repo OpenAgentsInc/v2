@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
@@ -5,7 +7,7 @@ import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
 import { Message } from '@/types';
-import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
+import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 
@@ -121,26 +123,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): Message => ({
-        id: message.id,
-        content: message.content,
-        role: message.role as Message['role'],
-        toolInvocations: message.toolInvocations,
-    });
-
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message) => {
-            if (threadId) {
-                const adaptedMessage = adaptMessage(message);
-                const updatedMessages = [...threadData.messages, adaptedMessage];
+            if (threadId && user) {
+                const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveMessage(threadId, user?.id || '', adaptedMessage);
+                    await saveChatMessage(threadId, user.id, message as Message);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
@@ -164,7 +158,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             vercelChatProps.append(userMessage as VercelMessage);
 
             // Save the message to the database
-            await saveMessage(threadId, user.id, userMessage);
+            await saveChatMessage(threadId, user.id, userMessage);
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
@@ -180,11 +174,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         vercelChatProps.setInput(input);
     };
 
-    const adaptedMessages = vercelChatProps.messages.map(adaptMessage);
-
     return {
         ...vercelChatProps,
-        messages: adaptedMessages,
         id: threadId,
         threadData,
         user,

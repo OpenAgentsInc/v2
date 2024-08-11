@@ -79,7 +79,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     };
 
     return (
-        <div className="mt-6 mb-4 px-4 text-sm text-foreground">
+        <div className="my-2 px-4 text-sm text-foreground">
             <div className={cn("bg-background text-foreground rounded border border-border overflow-hidden")}>
                 <div className="flex justify-between items-center p-2 bg-secondary border-b border-border">
                     <span className="font-bold">{toolName}</span>
