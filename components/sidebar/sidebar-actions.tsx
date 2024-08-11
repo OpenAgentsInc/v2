@@ -74,6 +74,7 @@ export function SidebarActions({
         })
     }, [shareChat])
 
+    return <></>
     return (
         <>
             <div className="">
