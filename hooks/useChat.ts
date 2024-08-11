@@ -103,8 +103,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         if (threadId) {
             fetchThreadMessages(threadId)
                 .then((messages) => {
-                    console.log('Fetched messages for thread:', threadId);
-                    console.log(messages);
                     setMessages(threadId, messages);
                 })
                 .catch(error => {
