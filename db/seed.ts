@@ -48,7 +48,7 @@ export async function seed(dropTables = false) {
     );
     `);
 
-    // Create messages table
+    // Create messages table with new token usage fields, model_id, and cost_in_cents
     await executeSQL(`
     CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -57,7 +57,13 @@ export async function seed(dropTables = false) {
       role VARCHAR(50) NOT NULL,
       content TEXT NOT NULL,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      tool_invocations JSONB
+      tool_invocations JSONB,
+      finish_reason VARCHAR(50),
+      total_tokens INTEGER,
+      prompt_tokens INTEGER,
+      completion_tokens INTEGER,
+      model_id VARCHAR(255),
+      cost_in_cents DECIMAL(10, 2)
     );
     `);
 
@@ -88,42 +94,11 @@ export async function seed(dropTables = false) {
             userId = insertedUser.rows[0].id;
             const clerkUserId = insertedUser.rows[0].clerk_user_id;
             console.log(`Upserted user with id: ${userId} and clerk_user_id: ${clerkUserId}`);
-
-            // Insert sample threads and messages
-            const threadTitles = [
-                "Welcome to AI Chat",
-                "Exploring Machine Learning",
-                "The Future of AI"
-            ];
-
-            for (let i = 0; i < threadTitles.length; i++) {
-                // Insert a thread
-                const insertedThread = await sql`
-                    INSERT INTO threads (user_id, clerk_user_id, metadata)
-                    VALUES (${userId}, ${clerkUserId}, ${JSON.stringify({ title: threadTitles[i] })}::jsonb)
-                    RETURNING id;
-                `;
-                const threadId = insertedThread.rows[0].id;
-
-                // Insert user message
-                await sql`
-                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
-                    VALUES (${threadId}, ${clerkUserId}, 'user', ${`Tell me about ${threadTitles[i].toLowerCase()}`});
-                `;
-
-                // Insert AI response
-                await sql`
-                    INSERT INTO messages (thread_id, clerk_user_id, role, content)
-                    VALUES (${threadId}, ${clerkUserId}, 'assistant', ${`Here's some information about ${threadTitles[i].toLowerCase()}...`});
-                `;
-            }
-
-            console.log(`Inserted sample threads and messages`);
         } catch (error) {
-            console.error("Error inserting data:", error);
+            console.error("Error inserting user data:", error);
         }
     } else {
-        console.log("No user found, skipping user and thread seeding");
+        console.log("No user found, skipping user seeding");
     }
 
     return {

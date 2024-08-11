@@ -1,12 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/types';
+import { Message, OnFinishOptions } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -83,6 +83,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     } = useChatStore();
 
     const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId);
+    const currentModelRef = useRef(model);
+
+    useEffect(() => {
+        currentModelRef.current = model;
+    }, [model]);
 
     useEffect(() => {
         if (propsId) {
@@ -128,13 +133,17 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
-        onFinish: async (message) => {
+        onFinish: async (message, options: OnFinishOptions) => {
+            console.log('useChat onFinish', message, options);
             if (threadId && user) {
                 const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveChatMessage(threadId, user.id, message as Message);
+                    await saveChatMessage(threadId, user.id, message as Message, {
+                        ...options,
+                        model: currentModelRef.current // Use the model from when the request was initiated
+                    });
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
