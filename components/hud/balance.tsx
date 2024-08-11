@@ -20,7 +20,7 @@ export const Balance = () => {
                     <span className="text-sm font-bold text-white">{formattedBalance}</span>
                 </div>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="z-[10000]">
                 <DialogHeader>
                     <DialogTitle>Add Credits</DialogTitle>
                     <DialogDescription>
