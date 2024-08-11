@@ -12,7 +12,7 @@ export const HomeAuthed = async () => {
     }
     return (
         <main className="h-screen flex items-center justify-center relative">
-            <Pane title="Chat History" id={0} x={10} y={150} height={450} width={260} dismissable={false}>
+            <Pane title="Chat History" id={0} x={90} y={190} height={450} width={260} dismissable={false}>
                 <ChatHistory userId={userId} />
             </Pane>
             <Hud />
