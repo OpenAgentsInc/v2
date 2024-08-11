@@ -1,12 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { models } from '@/lib/models'
-
-interface Model {
-    name: string;
-    id: string;
-    provider: string;
-}
+import { Model } from '@/types'
 
 interface ModelState {
     model: Model;
@@ -16,7 +11,8 @@ interface ModelState {
 export const useModelStore = create<ModelState>()(
     persist(
         (set) => ({
-            model: models[2], // Default to the first model
+            // Default to the cheapest model, which is the last in the array
+            model: models[models.length - 1],
             setModel: (model) => set({ model }),
         }),
         {

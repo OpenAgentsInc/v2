@@ -4,13 +4,6 @@ export const USE_ANTHROPIC = false; // Feature flag to switch between Bedrock an
 
 export const models: Model[] = [
     {
-        name: 'Claude 3.5 Sonnet',
-        id: USE_ANTHROPIC ? 'claude-3-5-sonnet-20240620' : 'anthropic.claude-3-5-sonnet-20240620-v1:0',
-        provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
-        providerCentsPerMillionInputTokens: 300,
-        providerCentsPerMillionOutputTokens: 1500
-    },
-    {
         name: 'Claude 3 Opus',
         id: USE_ANTHROPIC ? 'claude-3-opus-20240229' : 'anthropic.claude-3-opus-20240229-v1:0',
         provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
@@ -18,8 +11,15 @@ export const models: Model[] = [
         providerCentsPerMillionOutputTokens: 7500
     },
     {
-        name: 'Claude 3 Sonnet',
-        id: USE_ANTHROPIC ? 'claude-3-sonnet-20240229' : 'anthropic.claude-3-sonnet-20240229-v1:0',
+        name: 'GPT-4o',
+        id: 'gpt-4o',
+        provider: 'openai',
+        providerCentsPerMillionInputTokens: 500,
+        providerCentsPerMillionOutputTokens: 1500
+    },
+    {
+        name: 'Claude 3.5 Sonnet',
+        id: USE_ANTHROPIC ? 'claude-3-5-sonnet-20240620' : 'anthropic.claude-3-5-sonnet-20240620-v1:0',
         provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
         providerCentsPerMillionInputTokens: 300,
         providerCentsPerMillionOutputTokens: 1500
@@ -30,13 +30,6 @@ export const models: Model[] = [
         provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
         providerCentsPerMillionInputTokens: 25,
         providerCentsPerMillionOutputTokens: 125
-    },
-    {
-        name: 'GPT-4o',
-        id: 'gpt-4o',
-        provider: 'openai',
-        providerCentsPerMillionInputTokens: 500,
-        providerCentsPerMillionOutputTokens: 1500
     },
     {
         name: 'GPT-4o Mini',

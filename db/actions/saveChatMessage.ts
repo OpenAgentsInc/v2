@@ -4,7 +4,7 @@ import { Message, OnFinishOptions } from '@/types'
 import { getLastMessage } from './getLastMessage'
 import { saveMessage } from './saveMessage'
 
-export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message, options: OnFinishOptions) {
+export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message, options?: OnFinishOptions) {
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return null
