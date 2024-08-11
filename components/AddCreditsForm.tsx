@@ -2,7 +2,7 @@
 
 import type Stripe from "stripe";
 import React, { useState } from "react";
-import CustomDonationInput from "@/components/CustomDonationInput";
+import { Slider } from "@/components/ui/slider";
 import { formatAmountForDisplay } from "@/lib/stripe/stripe-helpers";
 import * as config from "@/lib/stripe/config";
 import { createCheckoutSession } from "@/lib/stripe/actions";
@@ -18,18 +18,8 @@ interface AddCreditsFormProps {
 
 export default function AddCreditsForm(props: AddCreditsFormProps): JSX.Element {
     const [loading, setLoading] = useState<boolean>(false);
-    const [input, setInput] = useState<{ customAmount: number }>({
-        customAmount: Math.round(config.MAX_AMOUNT / config.AMOUNT_STEP),
-    });
+    const [credits, setCredits] = useState<number>(10);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
-
-    const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (
-        e,
-    ): void =>
-        setInput({
-            ...input,
-            [e.currentTarget.name]: e.currentTarget.value,
-        });
 
     const formAction = async (data: FormData): Promise<void> => {
         setLoading(true);
@@ -50,22 +40,30 @@ export default function AddCreditsForm(props: AddCreditsFormProps): JSX.Element 
         <>
             <form action={formAction}>
                 <input type="hidden" name="uiMode" value={props.uiMode} />
-                <CustomDonationInput
-                    className="checkout-style"
-                    name="customAmount"
-                    min={config.MIN_AMOUNT}
-                    max={config.MAX_AMOUNT}
-                    step={config.AMOUNT_STEP}
-                    currency={config.CURRENCY}
-                    onChange={handleInputChange}
-                    value={input.customAmount}
-                />
+                <input type="hidden" name="customAmount" value={credits * 100} />
+                <div className="mb-4">
+                    <label htmlFor="credits" className="block text-sm font-medium text-gray-700">
+                        Credits to add
+                    </label>
+                    <Slider
+                        id="credits"
+                        min={1}
+                        max={100}
+                        step={1}
+                        value={[credits]}
+                        onValueChange={(value) => setCredits(value[0])}
+                        className="mt-1"
+                    />
+                    <span className="mt-2 block text-sm text-gray-500">
+                        {credits} credits ({formatAmountForDisplay(credits * 100, config.CURRENCY)})
+                    </span>
+                </div>
                 <button
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mt-4 w-full"
                     type="submit"
                     disabled={loading}
                 >
-                    {loading ? "Processing..." : `Add ${formatAmountForDisplay(input.customAmount, config.CURRENCY)} Credits`}
+                    {loading ? "Processing..." : `Add ${credits} Credits`}
                 </button>
             </form>
             {clientSecret && (
