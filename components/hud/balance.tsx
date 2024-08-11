@@ -12,7 +12,7 @@ export const Balance = () => {
     }).format(balanceInDollars)
 
     return (
-        <div className="mt-1 mb-2 px-3 py-1 bg-black border border-white rounded-full flex items-center space-x-2">
+        <div className="opacity-75 mt-1 mb-2 px-3 py-1 bg-black border border-white rounded-full flex items-center space-x-2">
             <span className="text-xs font-semibold text-gray-300">Credits</span>
             <span className="text-sm font-bold text-white">{formattedBalance}</span>
         </div>
