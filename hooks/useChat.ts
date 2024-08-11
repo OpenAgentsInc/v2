@@ -130,7 +130,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         };
 
         let content = message.content;
-        let toolInvocations = null;
+        let toolInvocations: Message['toolInvocations'] = undefined;
 
         // Check if content is a JSON string containing tool invocations
         if (typeof content === 'string' && content.startsWith('[{') && content.endsWith('}]')) {
