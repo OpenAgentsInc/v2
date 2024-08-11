@@ -20,28 +20,28 @@ export async function createCheckoutSession(
     const checkoutSession: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
             mode: "payment",
-            submit_type: "donate",
+            submit_type: "pay",
             line_items: [
                 {
                     quantity: 1,
                     price_data: {
                         currency: CURRENCY,
                         product_data: {
-                            name: "Custom amount donation",
+                            name: "OpenAgents Credits",
                         },
                         unit_amount: formatAmountForStripe(
-                            Number(data.get("customDonation") as string),
+                            Number(data.get("customAmount") as string),
                             CURRENCY,
                         ),
                     },
                 },
             ],
             ...(ui_mode === "hosted" && {
-                success_url: `${origin}/donate-with-checkout/result?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${origin}/donate-with-checkout`,
+                success_url: `${origin}/add-credits/result?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${origin}/add-credits`,
             }),
             ...(ui_mode === "embedded" && {
-                return_url: `${origin}/donate-with-embedded-checkout/result?session_id={CHECKOUT_SESSION_ID}`,
+                return_url: `${origin}/add-credits/result?session_id={CHECKOUT_SESSION_ID}`,
             }),
             ui_mode,
         });
@@ -58,7 +58,7 @@ export async function createPaymentIntent(
     const paymentIntent: Stripe.PaymentIntent =
         await stripe.paymentIntents.create({
             amount: formatAmountForStripe(
-                Number(data.get("customDonation") as string),
+                Number(data.get("customAmount") as string),
                 CURRENCY,
             ),
             automatic_payment_methods: { enabled: true },
