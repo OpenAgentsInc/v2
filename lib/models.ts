@@ -1,4 +1,4 @@
-import { Model } from './types'
+import { Model } from '@/types'
 
 export const models: Model[] = [
     { name: 'Claude 3.5 Sonnet', id: 'claude-3-5-sonnet-20240620', provider: 'anthropic' },
