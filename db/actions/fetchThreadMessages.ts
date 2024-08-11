@@ -21,7 +21,7 @@ export async function fetchThreadMessages(threadId: number): Promise<Message[]> 
             content: msg.content,
             role: msg.role as Message['role'],
             createdAt: msg.createdAt,
-            toolInvocations: msg.toolInvocations
+            toolInvocations: msg.toolInvocations ? JSON.parse(msg.toolInvocations) : null
         }));
     } catch (error) {
         console.error('Error in getThreadMessages:', error);

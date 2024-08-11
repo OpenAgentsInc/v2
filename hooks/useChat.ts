@@ -103,6 +103,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         if (threadId) {
             fetchThreadMessages(threadId)
                 .then((messages) => {
+                    console.log('Fetched messages for thread:', threadId);
+                    console.log(messages);
                     setMessages(threadId, messages);
                 })
                 .catch(error => {
@@ -125,7 +127,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         id: message.id,
         content: message.content,
         role: message.role as Message['role'],
-        toolInvocations: message.toolInvocations,
+        toolInvocations: typeof message.toolInvocations === 'string'
+            ? JSON.parse(message.toolInvocations)
+            : message.toolInvocations,
     });
 
     const vercelChatProps = useVercelChat({
