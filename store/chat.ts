@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Message, User } from '@/lib/types'
+import { Message } from '@/types' // User
 
 interface ThreadData {
     messages: Message[];
@@ -10,12 +10,12 @@ interface ThreadData {
 interface ChatState {
     threads: Record<string, ThreadData>;
     currentThreadId: string | undefined;
-    user: User | undefined;
+    // user: User | undefined;
     addMessage: (threadId: string, message: Message) => void;
     setMessages: (threadId: string, messages: Message[]) => void;
     setInput: (threadId: string, input: string) => void;
     setCurrentThreadId: (id: string | undefined) => void;
-    setUser: (user: User | undefined) => void;
+    // setUser: (user: User | undefined) => void;
     getThreadData: (threadId: string) => ThreadData;
 }
 
@@ -58,7 +58,7 @@ export const useChatStore = create<ChatState>()(
 
             setCurrentThreadId: (id) => set({ currentThreadId: id }),
 
-            setUser: (user) => set({ user }),
+            // setUser: (user) => set({ user }),
 
             getThreadData: (threadId) => {
                 const state = get();

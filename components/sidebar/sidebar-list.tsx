@@ -1,7 +1,7 @@
 import { SidebarItems } from './sidebar-items'
 import { cache } from 'react'
 import { fetchUserThreads } from '@/db/actions'
-import { Chat } from '@/lib/types'
+import { Chat } from '@/types'
 
 interface SidebarListProps {
     userId?: string

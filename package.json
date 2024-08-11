@@ -16,6 +16,7 @@
     "@ai-sdk/anthropic": "^0.0.35",
     "@ai-sdk/openai": "^0.0.34",
     "@ai-sdk/provider-utils": "^1.0.9",
+    "@ai-sdk/ui-utils": "^0.0.29",
     "@clerk/nextjs": "^5.2.13",
     "@clerk/themes": "^2.1.18",
     "@nytimes/react-prosemirror": "^0.6.2",

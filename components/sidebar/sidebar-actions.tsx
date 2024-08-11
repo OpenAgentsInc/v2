@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
 
-import { ServerActionResult, type Chat } from '@/lib/types'
+import { ServerActionResult, type Chat } from '@/types'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { IconShare, IconSpinner, IconTrash } from '@/components/ui/icons'
-import { ChatShareDialog } from '@/components/share/chat-share-dialog'
 import {
     Tooltip,
     TooltipContent,
@@ -107,13 +106,6 @@ export function SidebarActions({
                     <TooltipContent>Delete chat</TooltipContent>
                 </Tooltip>
             </div>
-            <ChatShareDialog
-                chat={chat}
-                shareChat={handleShareChat}
-                open={shareDialogOpen}
-                onOpenChange={setShareDialogOpen}
-                onCopy={() => setShareDialogOpen(false)}
-            />
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

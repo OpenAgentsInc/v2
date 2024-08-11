@@ -14,6 +14,9 @@ dependencies:
   '@ai-sdk/provider-utils':
     specifier: ^1.0.9
     version: 1.0.9(zod@3.23.8)
+  '@ai-sdk/ui-utils':
+    specifier: ^0.0.29
+    version: 0.0.29(zod@3.23.8)
   '@clerk/nextjs':
     specifier: ^5.2.13
     version: 5.2.13(next@14.2.4)(react-dom@18.3.1)(react@18.3.1)
@@ -426,6 +429,21 @@ packages:
         optional: true
     dependencies:
       '@ai-sdk/provider-utils': 1.0.5(zod@3.23.8)
+      secure-json-parse: 2.7.0
+      zod: 3.23.8
+    dev: false
+
+  /@ai-sdk/ui-utils@0.0.29(zod@3.23.8):
+    resolution: {integrity: sha512-1d+8ogA/xm8xiVdKQt2uJ5HDbkowMYUDS4a30kYkaGNXk7JHy65feEtDHQnnUZKqHdqAruyPB8sLNA75gi6OHQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+    dependencies:
+      '@ai-sdk/provider': 0.0.17
+      '@ai-sdk/provider-utils': 1.0.9(zod@3.23.8)
       secure-json-parse: 2.7.0
       zod: 3.23.8
     dev: false

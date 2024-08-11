@@ -1,11 +1,8 @@
-import { type JSONValue } from './misc'
-import { type ToolInvocation } from './tools'
+import { Message as SDKMessage } from 'ai';
+import { Attachment } from './attachment';
+import { ToolInvocation } from './tool-invocation';
 
-/**
- * Our simplified version of AI SDK UI Messages. 
- * They are used in the client and to communicate between the frontend and the API routes.
- */
-export interface Message {
+export interface Message extends Partial<SDKMessage> {
     /**
      * A unique identifier for the message.
      */
@@ -28,14 +25,12 @@ export interface Message {
     | 'system'
     | 'user'
     | 'assistant'
-    | 'data'
-
-    data?: JSONValue;
+    | 'data';
 
     /**
-     * Additional message-specific information added on the server via StreamData
+     * Additional attachments to be sent along with the message.
      */
-    annotations?: JSONValue[] | undefined;
+    experimental_attachments?: Attachment[];
 
     /**
      * Tool invocations (that can be tool calls or tool results, depending on whether or not the invocation has finished)
