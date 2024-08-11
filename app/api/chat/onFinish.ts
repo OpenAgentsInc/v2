@@ -9,7 +9,8 @@ export async function onFinish(result: {
 }) {
     try {
         await saveChatMessage(result.threadId, result.clerkUserId, result.userMessage)
-        await saveChatMessage(result.threadId, result.clerkUserId, result.assistantMessage)
+        console.log("skipping server save of assistant message")
+        // await saveChatMessage(result.threadId, result.clerkUserId, result.assistantMessage)
     } catch (error) {
         console.error('Error in onFinish:', error)
     }

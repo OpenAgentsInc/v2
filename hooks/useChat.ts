@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
@@ -5,7 +7,7 @@ import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
 import { Message, ToolInvocation } from '@/types';
-import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
+import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 
@@ -122,6 +124,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): Message => {
+        // console.log("returning message")
+        return message as Message
         const baseMessage: Message = {
             id: message.id,
             content: message.content,
@@ -156,13 +160,14 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message) => {
-            if (threadId) {
+            if (threadId && user) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages);
+                console.log("CLIENT ONFINISH:", message)
 
                 try {
-                    await saveMessage(threadId, user?.id || '', adaptedMessage);
+                    await saveChatMessage(threadId, user.id, adaptedMessage);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
@@ -186,7 +191,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             vercelChatProps.append(userMessage as VercelMessage);
 
             // Save the message to the database
-            await saveMessage(threadId, user.id, userMessage);
+            await saveChatMessage(threadId, user.id, userMessage);
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');

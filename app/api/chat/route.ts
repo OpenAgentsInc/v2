@@ -31,6 +31,7 @@ export async function POST(req: Request) {
         system: getSystemPrompt(toolContext),
         tools,
         onFinish: (finishResult) => {
+            console.log('Finish result:', finishResult);
             const assistantMessage: Message = {
                 id: Date.now().toString(),
                 role: 'assistant',

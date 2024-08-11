@@ -4,6 +4,7 @@ import { Message } from '@/types'
 
 export async function saveMessage(threadId: number, clerkUserId: string, message: Message) {
     try {
+        console.log("IN DB saveMessage WITH MESSAGE:", message);
         const contentString = typeof message.content === 'string' ? message.content : JSON.stringify(message.content);
         const toolInvocationsString = message.toolInvocations ? JSON.stringify(message.toolInvocations) : null;
 
