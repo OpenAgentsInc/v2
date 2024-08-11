@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import type { Stripe } from 'stripe'
 import { stripe } from '@/lib/stripe/stripe'
-import { updateUserCredits } from '@/lib/user'
+import { updateUserCredits } from '@/db/actions'
 
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -42,8 +42,12 @@ export async function POST(req: Request) {
 
             if (amountTotal && userId) {
               const creditsToAdd = Math.floor(amountTotal / 100) // Convert cents to dollars/credits
-              await updateUserCredits(userId, creditsToAdd)
-              console.log(`Added ${creditsToAdd} credits to user ${userId}`)
+              const result = await updateUserCredits(userId, creditsToAdd)
+              if (result.success) {
+                console.log(`Added ${creditsToAdd} credits to user ${userId}. New balance: ${result.newBalance}`)
+              } else {
+                console.error(`Failed to add credits to user ${userId}: ${result.error}`)
+              }
             }
           }
           break
