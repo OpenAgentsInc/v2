@@ -124,7 +124,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const adaptMessage = (message: VercelMessage): Message => ({
         id: message.id,
         content: message.content,
-        role: message.role,
+        role: message.role as Message['role'],
     });
 
     const vercelChatProps = useVercelChat({
