@@ -1,16 +1,16 @@
 import { saveChatMessage } from '@/db/actions'
-import { Message, ChatMessage } from '@/lib/types'
+import { Message } from '@/types'
 
 export async function onFinish(result: {
-  threadId: number
-  clerkUserId: string
-  userMessage: Message
-  assistantMessage: Message
+    threadId: number
+    clerkUserId: string
+    userMessage: Message
+    assistantMessage: Message
 }) {
-  try {
-    await saveChatMessage(result.threadId, result.clerkUserId, result.userMessage as ChatMessage)
-    await saveChatMessage(result.threadId, result.clerkUserId, result.assistantMessage as ChatMessage)
-  } catch (error) {
-    console.error('Error in onFinish:', error)
-  }
+    try {
+        await saveChatMessage(result.threadId, result.clerkUserId, result.userMessage)
+        await saveChatMessage(result.threadId, result.clerkUserId, result.assistantMessage)
+    } catch (error) {
+        console.error('Error in onFinish:', error)
+    }
 }

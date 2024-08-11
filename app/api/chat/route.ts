@@ -3,7 +3,7 @@ import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { onFinish } from './onFinish';
 import { auth } from '@clerk/nextjs/server';
-import { Message } from '@/lib/types';
+import { Message } from '@/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
