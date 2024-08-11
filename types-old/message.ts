@@ -1,8 +1,11 @@
-import { Message as SDKMessage } from 'ai';
-import { Attachment } from './attachment';
-import { ToolInvocation } from './tool-invocation';
+import { type JSONValue } from './misc'
+import { type ToolInvocation } from './tools'
 
-export interface Message extends Partial<SDKMessage> {
+/**
+ * Our simplified version of AI SDK UI Messages. 
+ * They are used in the client and to communicate between the frontend and the API routes.
+ */
+export interface Message {
     /**
      * A unique identifier for the message.
      */
@@ -25,12 +28,14 @@ export interface Message extends Partial<SDKMessage> {
     | 'system'
     | 'user'
     | 'assistant'
-    | 'data';
+    | 'data'
+
+    data?: JSONValue;
 
     /**
-     * Additional attachments to be sent along with the message.
+     * Additional message-specific information added on the server via StreamData
      */
-    experimental_attachments?: Attachment[];
+    annotations?: JSONValue[] | undefined;
 
     /**
      * Tool invocations (that can be tool calls or tool results, depending on whether or not the invocation has finished)

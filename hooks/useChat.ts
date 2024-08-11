@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types';
+// import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -144,7 +144,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 const adaptedMessage = adaptMessage(message);
                 const updatedMessages = [...threadData.messages, adaptedMessage];
                 setMessages(threadId, updatedMessages);
-                
+
                 try {
                     await saveMessage(threadId, adaptedMessage);
                 } catch (error) {
