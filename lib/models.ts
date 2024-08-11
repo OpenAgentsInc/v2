@@ -5,8 +5,8 @@ export const USE_ANTHROPIC = false; // Feature flag to switch between Bedrock an
 export const models: Model[] = [
     {
         name: 'Claude 3 Opus',
-        id: USE_ANTHROPIC ? 'claude-3-opus-20240229' : 'anthropic.claude-3-opus-20240229-v1:0',
-        provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
+        id: 'claude-3-opus-20240229',
+        provider: 'anthropic',
         providerCentsPerMillionInputTokens: 1500,
         providerCentsPerMillionOutputTokens: 7500
     },

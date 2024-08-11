@@ -140,10 +140,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveChatMessage(threadId, user.id, message as Message, {
+                    const result = await saveChatMessage(threadId, user.id, message as Message, {
                         ...options,
                         model: currentModelRef.current // Use the model from when the request was initiated
                     });
+                    console.log('New user balance after message:', result.newBalance);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');

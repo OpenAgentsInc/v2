@@ -61,6 +61,8 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     const firecrawlToken = process.env.FIRECRAWL_API_KEY;
     const greptileToken = process.env.GREPTILE_API_KEY;
 
+    console.log('the model:', theModel);
+
     let model;
     switch (theModel.provider) {
         case 'anthropic':

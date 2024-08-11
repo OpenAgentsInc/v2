@@ -3,6 +3,7 @@
 import { sql } from '@vercel/postgres'
 import { Message, OnFinishOptions } from '@/types'
 import { calculateMessageCost } from '@/lib/calculateMessageCost'
+import { deductUserCredits } from '@/lib/deductUserCredits'
 
 async function getLastMessage(threadId: number) {
     try {
@@ -25,17 +26,16 @@ export async function saveChatMessage(
     clerkUserId: string,
     message: Message,
     options?: OnFinishOptions
-) {
+): Promise<{ savedMessage: Message, newBalance: number | null }> {
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
-        return null
+        throw new Error("Invalid threadId")
     }
 
-    // TODO: refactor to not use this lol
     const lastMessage = await getLastMessage(threadId)
     if (lastMessage && lastMessage.content === message.content) {
         console.log("Duplicate message, not saving:", message.content)
-        return null
+        throw new Error("Duplicate message")
     }
 
     try {
@@ -48,8 +48,9 @@ export async function saveChatMessage(
         let values = [threadId, clerkUserId, message.role, contentString, toolInvocationsString];
         let placeholders = ['$1', '$2', '$3', '$4', '$5::jsonb'];
 
+        let costInCents = 0;
         if (options) {
-            const costInCents = calculateMessageCost(options.model, options.usage)
+            costInCents = calculateMessageCost(options.model, options.usage)
             queryString += `, finish_reason, total_tokens, prompt_tokens, completion_tokens, model_id, cost_in_cents`;
             values.push(
                 options.finishReason,
@@ -66,6 +67,12 @@ export async function saveChatMessage(
         VALUES (${placeholders.join(', ')})
         RETURNING id, created_at as "createdAt", tool_invocations as "toolInvocations"`;
 
+        // Deduct credits before saving the message
+        const deductionResult = await deductUserCredits(clerkUserId, costInCents);
+        if (!deductionResult.success) {
+            throw new Error(deductionResult.error || 'Failed to deduct credits');
+        }
+
         const { rows } = await sql.query(queryString, values);
 
         const savedMessage = {
@@ -76,7 +83,7 @@ export async function saveChatMessage(
         };
 
         console.log('Message saved:', savedMessage)
-        return savedMessage;
+        return { savedMessage, newBalance: deductionResult.newBalance };
     } catch (error) {
         console.error('Error in saveChatMessage:', error);
         throw error;
