@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
@@ -83,6 +83,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     } = useChatStore();
 
     const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId);
+    const currentModelRef = useRef(model);
+
+    useEffect(() => {
+        currentModelRef.current = model;
+    }, [model]);
 
     useEffect(() => {
         if (propsId) {
@@ -135,7 +140,10 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveChatMessage(threadId, user.id, message as Message, options);
+                    await saveChatMessage(threadId, user.id, message as Message, {
+                        ...options,
+                        model: currentModelRef.current // Use the model from when the request was initiated
+                    });
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');

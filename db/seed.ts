@@ -48,7 +48,7 @@ export async function seed(dropTables = false) {
     );
     `);
 
-    // Create messages table with new token usage fields
+    // Create messages table with new token usage fields, model_id, and cost_in_cents
     await executeSQL(`
     CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -61,7 +61,9 @@ export async function seed(dropTables = false) {
       finish_reason VARCHAR(50),
       total_tokens INTEGER,
       prompt_tokens INTEGER,
-      completion_tokens INTEGER
+      completion_tokens INTEGER,
+      model_id VARCHAR(255),
+      cost_in_cents DECIMAL(10, 2)
     );
     `);
 
