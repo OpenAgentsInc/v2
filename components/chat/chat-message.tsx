@@ -1,43 +1,22 @@
-// components/chat-message.tsx
-"use client"
-
-import { useMemo } from 'react'
-import { Message } from 'ai'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
-import { cn } from '@/lib/utils'
-import { CodeBlock } from '@/components/ui/codeblock'
-import { MemoizedReactMarkdown } from './markdown'
-import { IconOpenAgents, IconUser } from '@/components/ui/icons'
-import { ChatMessageActions } from './chat-message-actions'
-import { FileViewer } from '@/components/github/file-viewer'
-import { ToolResult } from './tool-result'
+import React from 'react';
+import { Message } from '@/types';
+import { cn } from '@/lib/utils';
+import { CodeBlock } from '@/components/ui/codeblock';
+import { MemoizedReactMarkdown } from './markdown';
+import { IconOpenAgents, IconUser } from '@/components/ui/icons';
+import { ChatMessageActions } from './chat-message-actions';
+import { ToolResult } from './tool-result';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 
 export interface ChatMessageProps {
-    message: Message & { toolInvocations?: any[] }
+    message: Message;
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
-    const renderToolInvocation = (toolInvocation: any) => {
-        return (
-            <ToolResult
-                key={toolInvocation.toolCallId}
-                toolName={toolInvocation.toolName}
-                args={toolInvocation.args}
-                result={toolInvocation.result}
-                state={toolInvocation.result ? 'result' : 'call'}
-            />
-        )
-    }
-
-    const toolInvocations = message.toolInvocations || 
-        (typeof message.content === 'string' && message.content.startsWith('[{') && message.content.endsWith('}]')
-            ? JSON.parse(message.content)
-            : null);
-
     return (
         <div
-            className={cn('group relative mb-4 flex items-start md:-ml-12')}
+            className={cn('group relative mb-4 flex items-start')}
             {...props}
         >
             <div
@@ -50,8 +29,8 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             >
                 {message.role === 'user' ? <IconUser /> : <IconOpenAgents />}
             </div>
-            <div className="flex-1 px-1 ml-3 space-y-1 overflow-hidden">
-                {(!toolInvocations || toolInvocations.length === 0) && (
+            <div className="flex-1 px-1 ml-3 space-y-2 overflow-hidden">
+                {message.content && (
                     <MemoizedReactMarkdown
                         className="prose prose-full-width dark:prose-invert text-sm break-words leading-relaxed"
                         remarkPlugins={[remarkGfm, remarkMath]}
@@ -66,7 +45,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
                                             <span className="mt-1 cursor-default animate-pulse">▍</span>
                                         )
                                     }
-                                    children[0] = (children[0] as string).replace('▍', '▍')
+                                    children[0] = (children[0] as string).replace('▍', '')
                                 }
                                 const match = /language-(\w+)/.exec(className || '')
                                 if (inline) {
@@ -90,7 +69,15 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
                         {message.content}
                     </MemoizedReactMarkdown>
                 )}
-                {toolInvocations && toolInvocations.map(renderToolInvocation)}
+                {message.toolInvocations && message.toolInvocations.map(invocation => (
+                    <ToolResult
+                        key={invocation.toolCallId}
+                        toolName={invocation.toolName}
+                        args={invocation.args}
+                        result={invocation.state === 'result' ? invocation.result : undefined}
+                        state={invocation.state}
+                    />
+                ))}
                 <ChatMessageActions message={message} />
             </div>
         </div>

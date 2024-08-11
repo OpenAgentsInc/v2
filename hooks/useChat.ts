@@ -122,34 +122,21 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): Message => {
-        console.log("Adapting:", message);
-        const baseMessage = {
+        const baseMessage: Message = {
             id: message.id,
+            content: message.content,
             role: message.role as Message['role'],
-            toolInvocations: message.toolInvocations,
+            createdAt: new Date(),
         };
 
-        let content = message.content;
-        let toolInvocations: Message['toolInvocations'] = baseMessage.toolInvocations;
-
-        // Check if content is a JSON string containing tool invocations
-        if (typeof content === 'string' && content.startsWith('[{') && content.endsWith('}]')) {
-            try {
-                const parsedContent = JSON.parse(content);
-                if (Array.isArray(parsedContent) && parsedContent[0]?.type === 'tool-result') {
-                    toolInvocations = parsedContent;
-                    content = ''; // Set content to empty string as it's now in toolInvocations
-                }
-            } catch (error) {
-                console.error('Error parsing message content:', error);
-            }
+        if (Array.isArray(message.toolInvocations)) {
+            baseMessage.toolInvocations = message.toolInvocations.map(invocation => ({
+                ...invocation,
+                state: invocation.result ? 'result' : 'call'
+            }));
         }
 
-        return {
-            ...baseMessage,
-            content,
-            toolInvocations,
-        };
+        return baseMessage;
     };
 
     const vercelChatProps = useVercelChat({
