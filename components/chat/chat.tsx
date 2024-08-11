@@ -16,6 +16,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
         isLoading
     } = useChat({ id: threadId })
     const chatContainerRef = useChatScroll(messages);
+    console.log(messages)
 
     return (
         <div className={`flex flex-col h-full ${className}`}>

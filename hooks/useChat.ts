@@ -122,13 +122,15 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     }
 
     const adaptMessage = (message: VercelMessage): Message => {
+        console.log("Adapting:", message);
         const baseMessage = {
             id: message.id,
             role: message.role as Message['role'],
+            toolInvocations: message.toolInvocations,
         };
 
         let content = message.content;
-        let toolInvocations: Message['toolInvocations'] = undefined;
+        let toolInvocations: Message['toolInvocations'] = baseMessage.toolInvocations;
 
         // Check if content is a JSON string containing tool invocations
         if (typeof content === 'string' && content.startsWith('[{') && content.endsWith('}]')) {
