@@ -3,12 +3,14 @@
 import { useHudStore } from '@/store/hud'
 import { Chat } from '@/components/chat'
 import { Pane } from '@/components/hud/pane'
+import { UserStatus } from './UserStatus'
 
 export const Hud = () => {
     const { panes } = useHudStore()
 
     return (
         <div>
+            <UserStatus />
             {panes.map((pane) => (
                 <Pane
                     key={pane.id}

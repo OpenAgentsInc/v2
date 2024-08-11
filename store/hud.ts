@@ -49,7 +49,7 @@ type HudStore = {
 const initialChatPane: Pane = {
     id: 0,
     title: 'Chat',
-    x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 400,
+    x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 300,
     y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.05,
     width: 800,
     height: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.9,
@@ -218,7 +218,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-1524',
+            name: 'openagents-hud-storage-1525' + Math.random(),
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )
