@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
+import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
@@ -71,6 +72,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const model = useModelStore((state) => state.model);
     const repo = useRepoStore((state) => state.repo);
     const tools = useToolStore((state) => state.tools);
+    const setBalance = useBalanceStore((state) => state.setBalance);
     const { user } = useUser();
 
     const {
@@ -140,10 +142,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveChatMessage(threadId, user.id, message as Message, {
+                    const result = await saveChatMessage(threadId, user.id, message as Message, {
                         ...options,
                         model: currentModelRef.current // Use the model from when the request was initiated
                     });
+                    console.log('New user balance after message:', result.newBalance);
+                    setBalance(result.newBalance || 0);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');

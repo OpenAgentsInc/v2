@@ -6,4 +6,4 @@ Our costs are primarily compute paid to the LLM providers like OpenAI and Anthro
 
 In `hooks/useChat.ts` we wrap the Vercel AI SDK's `useChat()` hook, passing an `onFinish()` callback that saves the message including its token amounts and calculates usage based on current prices.
 
-When we save messages
+The calculation and user balance deduction is for now done all in the `db/actions/saveChatMessage.ts` file, calling `lib/calculateMessageCost.ts` and `lib/deductUserCredits.ts`.

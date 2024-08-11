@@ -26,13 +26,14 @@ export async function seed(dropTables = false) {
         console.log("Skipping table drop");
     }
 
-    // Create users table
+    // Create users table with credits column
     await executeSQL(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       clerk_user_id VARCHAR(255) UNIQUE NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       image VARCHAR(255),
+      credits DECIMAL(10, 2) NOT NULL DEFAULT 0,
       "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
     `);
@@ -86,8 +87,8 @@ export async function seed(dropTables = false) {
         try {
             // Insert user and get the id
             const insertedUser = await sql`
-                INSERT INTO users (clerk_user_id, email, image)
-                VALUES (${user.id}, ${user.emailAddresses[0].emailAddress}, ${user.imageUrl})
+                INSERT INTO users (clerk_user_id, email, image, credits)
+                VALUES (${user.id}, ${user.emailAddresses[0].emailAddress}, ${user.imageUrl}, 1000)
                 ON CONFLICT (clerk_user_id) DO UPDATE SET email = EXCLUDED.email, image = EXCLUDED.image
                 RETURNING id, clerk_user_id;
             `;
