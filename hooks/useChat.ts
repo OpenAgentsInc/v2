@@ -6,7 +6,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, ToolInvocation } from '@/types';
+import { Message } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -123,37 +123,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): Message => {
-        // console.log("returning message")
-        return message as Message
-        const baseMessage: Message = {
-            id: message.id,
-            content: message.content,
-            role: message.role as Message['role'],
-            createdAt: new Date(),
-        };
-
-        if (Array.isArray(message.toolInvocations)) {
-            baseMessage.toolInvocations = message.toolInvocations.map(invocation => {
-                if ('result' in invocation) {
-                    return {
-                        ...invocation,
-                        state: 'result'
-                    } as ToolInvocation;
-                } else if (invocation.state === 'partial-call') {
-                    return invocation;
-                } else {
-                    return {
-                        ...invocation,
-                        state: 'call'
-                    } as ToolInvocation;
-                }
-            });
-        }
-
-        return baseMessage;
-    };
-
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
         initialMessages: threadData.messages as VercelMessage[],
@@ -161,13 +130,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         maxToolRoundtrips: 20,
         onFinish: async (message) => {
             if (threadId && user) {
-                const adaptedMessage = adaptMessage(message);
-                const updatedMessages = [...threadData.messages, adaptedMessage];
+                const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
                 console.log("CLIENT ONFINISH:", message)
 
                 try {
-                    await saveChatMessage(threadId, user.id, adaptedMessage);
+                    await saveChatMessage(threadId, user.id, message as Message);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');
@@ -207,11 +175,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         vercelChatProps.setInput(input);
     };
 
-    const adaptedMessages = vercelChatProps.messages.map(adaptMessage);
-
     return {
         ...vercelChatProps,
-        messages: adaptedMessages,
         id: threadId,
         threadData,
         user,
