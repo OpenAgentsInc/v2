@@ -16,9 +16,6 @@ export const Balance = () => {
         maximumFractionDigits: 2
     }).format(balanceInDollars)
 
-    console.log('Balance in cents:', balanceInCents)
-    console.log('Formatted balance:', formattedBalance)
-
     return (
         <Pane title="Balance" id={0} x={1300} y={100} height={100} width={100} dismissable={false}>
             <div className="h-full w-full flex justify-center items-center">
