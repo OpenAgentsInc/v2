@@ -123,14 +123,34 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
-    const adaptMessage = (message: VercelMessage): Message => ({
-        id: message.id,
-        content: message.content,
-        role: message.role as Message['role'],
-        toolInvocations: typeof message.toolInvocations === 'string'
-            ? JSON.parse(message.toolInvocations)
-            : message.toolInvocations,
-    });
+    const adaptMessage = (message: VercelMessage): Message => {
+        const baseMessage = {
+            id: message.id,
+            role: message.role as Message['role'],
+        };
+
+        let content = message.content;
+        let toolInvocations = null;
+
+        // Check if content is a JSON string containing tool invocations
+        if (typeof content === 'string' && content.startsWith('[{') && content.endsWith('}]')) {
+            try {
+                const parsedContent = JSON.parse(content);
+                if (Array.isArray(parsedContent) && parsedContent[0]?.type === 'tool-result') {
+                    toolInvocations = parsedContent;
+                    content = ''; // Set content to empty string as it's now in toolInvocations
+                }
+            } catch (error) {
+                console.error('Error parsing message content:', error);
+            }
+        }
+
+        return {
+            ...baseMessage,
+            content,
+            toolInvocations,
+        };
+    };
 
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
