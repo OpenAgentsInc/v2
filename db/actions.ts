@@ -1,8 +1,8 @@
 'use server'
 
 import { sql } from '@vercel/postgres'
-import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage, getSharedChat } from './queries'
-import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types'
+import { saveMessage as dbSaveMessage, createThread, getThreadMessages, updateThread, getUserThreads, getLastMessage } from './queries'
+// import { ChatMessage, ServerMessage, ClientMessage } from '@/lib/types'
 
 export async function saveChatMessage(threadId: number, clerkUserId: string, message: ChatMessage) {
     if (isNaN(threadId)) {
@@ -101,34 +101,6 @@ export async function getLastEmptyThread(clerkUserId: string) {
         console.error('Error in getLastEmptyThread:', error);
         throw error;
     }
-}
-
-export async function shareChat(threadId: number, userId: string) {
-    const chatResult = await sql`
-        SELECT * FROM threads WHERE id = ${threadId} AND user_id = ${userId}
-    `;
-
-    if (chatResult.rows.length === 0) {
-        throw new Error('Chat not found');
-    }
-
-    const chat = chatResult.rows[0];
-    const shareId = Math.random().toString(36).substring(2, 15);
-    const sharePath = `/share/${shareId}`;
-
-    await sql`
-        INSERT INTO shared_chats (thread_id, share_id) VALUES (${threadId}, ${shareId})
-    `;
-
-    return {
-        id: chat.id,
-        title: chat.title || 'Shared Chat',
-        messages: [],
-        sharePath,
-        createdAt: chat.created_at,
-        userId: chat.user_id,
-        path: `/chat/${chat.id}`
-    };
 }
 
 export async function getChatById(threadId: number, userId: string) {
