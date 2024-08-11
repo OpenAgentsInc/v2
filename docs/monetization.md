@@ -13,7 +13,7 @@ The calculation and user balance deduction is for now done all in the `db/action
 To integrate the Stripe checkout flow into our current "add credits" functionality, we propose the following changes:
 
 1. Update `components/hud/balance.tsx`:
-   - Replace the existing buttons with a slider-based input for selecting credit amounts.
+   - Replace the existing buttons with a slider-based input for selecting credit amounts, using any base shad-ui components in components/ui/ where possible.
    - Integrate the `CustomDonationInput` component from `components/CheckoutForm.tsx`.
    - Add a "Add Credits" button that triggers the Stripe checkout process.
 
