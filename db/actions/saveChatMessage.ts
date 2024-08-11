@@ -2,6 +2,7 @@
 
 import { sql } from '@vercel/postgres'
 import { Message, OnFinishOptions } from '@/types'
+import { calculateMessageCost } from '@/lib/calculateMessageCost'
 
 async function getLastMessage(threadId: number) {
     try {
@@ -30,6 +31,7 @@ export async function saveChatMessage(
         return null
     }
 
+    // TODO: refactor to not use this lol
     const lastMessage = await getLastMessage(threadId)
     if (lastMessage && lastMessage.content === message.content) {
         console.log("Duplicate message, not saving:", message.content)
@@ -47,14 +49,15 @@ export async function saveChatMessage(
         let placeholders = ['$1', '$2', '$3', '$4', '$5::jsonb'];
 
         if (options) {
+            const costInCents = calculateMessageCost(options.model, options.usage)
             queryString += `, finish_reason, total_tokens, prompt_tokens, completion_tokens, model_id, cost_in_cents`;
             values.push(
                 options.finishReason,
                 options.usage?.totalTokens,
                 options.usage?.promptTokens,
                 options.usage?.completionTokens,
-                options.modelId || null,
-                options.costInCents || null
+                options.model.id || null,
+                costInCents || null
             );
             placeholders.push('$6', '$7', '$8', '$9', '$10', '$11');
         }

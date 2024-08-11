@@ -5,6 +5,7 @@ export * from './on-finish-options'
 export * from './on-finish-result'
 export * from './repo'
 export * from './server-action-result'
+export * from './token-usage'
 export * from './tool-context'
 export * from './tool-invocation'
 

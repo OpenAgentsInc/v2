@@ -1,7 +1,6 @@
 export * from './getUserData'
 export * from './getUserThreads'
 export * from './saveChatMessage'
-export * from './saveMessage'
 export * from './createNewThread'
 export * from './fetchThreadMessages'
 export * from './updateThreadData'
