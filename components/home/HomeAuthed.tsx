@@ -16,7 +16,7 @@ export const HomeAuthed = async () => {
             <div className="absolute top-4 right-4">
                 <UserButton />
             </div>
-            <Pane title="Chat History" id={0} x={20} y={20} height={450} width={260}>
+            <Pane title="Chat History" id={0} x={20} y={20} height={450} width={260} dismissable={false}>
                 <ChatHistory userId={userId} />
             </Pane>
             <Hud />

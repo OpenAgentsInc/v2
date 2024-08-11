@@ -14,6 +14,7 @@ interface PaneProps {
     height: number
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
+    dismissable?: boolean
 }
 
 const useResizeHandlers = (
@@ -100,7 +101,7 @@ const useResizeHandlers = (
     return { position, size, setPosition, setSize, resizeHandlers }
 }
 
-export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons }) => {
+export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons, dismissable = true }) => {
     const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
@@ -168,12 +169,14 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 <span className="text-sm">{title}</span>
                 <div className="flex items-center">
                     {titleBarButtons}
-                    <button
-                        onClick={handleClose}
-                        className="ml-2 text-white hover:text-red-500 focus:outline-none"
-                    >
-                        <X size={18} />
-                    </button>
+                    {dismissable && (
+                        <button
+                            onClick={handleClose}
+                            className="ml-2 text-white hover:text-red-500 focus:outline-none"
+                        >
+                            <X size={18} />
+                        </button>
+                    )}
                 </div>
             </div>
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
