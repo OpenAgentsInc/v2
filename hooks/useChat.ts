@@ -6,7 +6,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/types';
+import { Message, OnFinishOptions } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -128,14 +128,14 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
-        onFinish: async (message, options) => {
+        onFinish: async (message, options: OnFinishOptions) => {
             console.log('useChat onFinish', message, options);
             if (threadId && user) {
                 const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    await saveChatMessage(threadId, user.id, message as Message);
+                    await saveChatMessage(threadId, user.id, message as Message, options);
                 } catch (error) {
                     console.error('Error saving AI message:', error);
                     toast.error('Failed to save AI response. Some messages may be missing.');

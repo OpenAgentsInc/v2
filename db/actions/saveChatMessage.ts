@@ -1,10 +1,10 @@
 'use server'
 
-import { Message } from '@/types'
+import { Message, OnFinishOptions } from '@/types'
 import { getLastMessage } from './getLastMessage'
 import { saveMessage } from './saveMessage'
 
-export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message) {
+export async function saveChatMessage(threadId: number, clerkUserId: string, message: Message, options: OnFinishOptions) {
     if (isNaN(threadId)) {
         console.error("Invalid threadId:", threadId)
         return null
@@ -14,7 +14,7 @@ export async function saveChatMessage(threadId: number, clerkUserId: string, mes
         console.log("Duplicate message, not saving:", message.content)
         return null
     }
-    const savedMessage = await saveMessage(threadId, clerkUserId, message)
+    const savedMessage = await saveMessage(threadId, clerkUserId, message, options)
     console.log('Message saved:', savedMessage)
     return savedMessage
 }
