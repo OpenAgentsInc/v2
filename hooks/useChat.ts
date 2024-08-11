@@ -4,7 +4,7 @@ import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/types';
+import { Message, ToolInvocation } from '@/types';
 import { createNewThread, fetchThreadMessages, saveMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -130,10 +130,21 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         };
 
         if (Array.isArray(message.toolInvocations)) {
-            baseMessage.toolInvocations = message.toolInvocations.map(invocation => ({
-                ...invocation,
-                state: invocation.result ? 'result' : 'call'
-            }));
+            baseMessage.toolInvocations = message.toolInvocations.map(invocation => {
+                if ('result' in invocation) {
+                    return {
+                        ...invocation,
+                        state: 'result'
+                    } as ToolInvocation;
+                } else if (invocation.state === 'partial-call') {
+                    return invocation;
+                } else {
+                    return {
+                        ...invocation,
+                        state: 'call'
+                    } as ToolInvocation;
+                }
+            });
         }
 
         return baseMessage;
