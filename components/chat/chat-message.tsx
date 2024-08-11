@@ -51,7 +51,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
                 {message.role === 'user' ? <IconUser /> : <IconOpenAgents />}
             </div>
             <div className="flex-1 px-1 ml-3 space-y-1 overflow-hidden">
-                {!toolInvocations && (
+                {(!toolInvocations || toolInvocations.length === 0) && (
                     <MemoizedReactMarkdown
                         className="prose prose-full-width dark:prose-invert text-sm break-words leading-relaxed"
                         remarkPlugins={[remarkGfm, remarkMath]}
