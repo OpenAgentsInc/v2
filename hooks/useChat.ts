@@ -146,7 +146,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         ...options,
                         model: currentModelRef.current
                     });
-                    setBalance(result.newBalance || 0);
+                    if (result.newBalance) {
+                        setBalance(result.newBalance);
+                    }
                     setError(null);
                 } catch (error: any) {
                     console.log('error message is:', error.message);
