@@ -69,7 +69,6 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                                 placeholder="Message OpenAgents..."
                                 className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white resize-none bg-transparent placeholder-white/40"
                                 style={{ whiteSpace: 'pre-wrap' }}
-                                disabled={isLoading}
                             />
                             <div className="flex items-center gap-2">
                                 {isLoading ? (
