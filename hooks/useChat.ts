@@ -7,7 +7,7 @@ import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, OnFinishOptions } from '@/types';
+import { Message } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -74,6 +74,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const tools = useToolStore((state) => state.tools);
     const setBalance = useBalanceStore((state) => state.setBalance);
     const { user } = useUser();
+    const [error, setError] = useState<string | null>(null);
 
     const {
         currentThreadId,
@@ -135,8 +136,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         initialMessages: threadData.messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
-        onFinish: async (message, options: OnFinishOptions) => {
-            console.log('useChat onFinish', message, options);
+        onFinish: async (message, options) => {
             if (threadId && user) {
                 const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
@@ -144,14 +144,30 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 try {
                     const result = await saveChatMessage(threadId, user.id, message as Message, {
                         ...options,
-                        model: currentModelRef.current // Use the model from when the request was initiated
+                        model: currentModelRef.current
                     });
-                    console.log('New user balance after message:', result.newBalance);
                     setBalance(result.newBalance || 0);
-                } catch (error) {
-                    console.error('Error saving AI message:', error);
-                    toast.error('Failed to save AI response. Some messages may be missing.');
+                    setError(null); // Clear any previous errors
+                } catch (error: any) {
+                    // console.error('Error saving AI message!!!!:', error);
+                    console.log('error message is:', error.message);
+                    if (error instanceof Error && error.message === 'Insufficient credits') {
+                        // setError('Insufficient credits. Please add more credits to continue chatting.');
+                        toast.error('Insufficient credits. Please add more credits to continue chatting.');
+                    } else {
+                        // setError('Failed to save AI response. Some messages may be missing.');
+                        toast.error('Unknown error. Try again or try a different model.');
+                    }
                 }
+            }
+        },
+        onError: (error) => {
+            if (error.message === 'Insufficient credits') {
+                // setError('Insufficient credits. Please add more credits to continue chatting.');
+                toast.error('Insufficient credits. Please add more credits to continue chatting.');
+            } else {
+                setError('Error :(');
+                toast.error('Unknown error. Try again or try a different model.');
             }
         },
     });
@@ -196,5 +212,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setUser,
         setInput,
         sendMessage,
+        error
     };
 }

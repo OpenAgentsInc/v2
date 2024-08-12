@@ -1,9 +1,9 @@
 import dynamic from 'next/dynamic'
+import { Providers } from '@/components/providers'
 import { jetbrainsMono } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
+import { Toaster } from '@/components/ui/sonner'
 import '@/app/globals.css'
-import { Providers } from '@/components/providers'
-import { initializeDatabase } from '@/db/init-db'
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
@@ -31,8 +31,6 @@ export const viewport = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    // await initializeDatabase();
-
     return (
         <html lang='en' className='antialiased' suppressHydrationWarning>
             {/*
@@ -46,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     jetbrainsMono.variable
                 )}
             >
+                <Toaster position='top-right' />
                 <Providers
                     attribute="class"
                     defaultTheme="system"
