@@ -68,7 +68,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={chats} setChats={() => {}} />
+                <SidebarList chats={chats} setChats={() => { }} />
             )}
         </div>
     )

@@ -13,6 +13,7 @@ import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/acti
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 import { useDebounce } from 'use-debounce';
+import { useChatStore as useNewChatStore } from '@/store/chat';
 
 interface User {
     id: string;
@@ -77,6 +78,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const setBalance = useBalanceStore((state) => state.setBalance);
     const { user } = useUser();
     const [error, setError] = useState<string | null>(null);
+    const updateThreadTitle = useNewChatStore((state) => state.updateThreadTitle);
 
     const {
         currentThreadId,
@@ -159,6 +161,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         console.log(updatedMessages)
                         try {
                             const title = await generateTitle(threadId, updatedMessages);
+                            updateThreadTitle(threadId, title);
                             console.log("updated with tiel", title);
                             // Update the thread title in the local state
                             // setThreadData(threadId, { ...threadData, title });
