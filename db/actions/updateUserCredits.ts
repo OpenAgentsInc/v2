@@ -19,7 +19,7 @@ export async function updateUserCredits(clerkUserId: string, creditsToAdd: numbe
         const currentBalance = parseFloat(selectResult.rows[0].credits)
         console.log(`Current balance for user ${clerkUserId}: ${currentBalance}`)
 
-        const newBalance = currentBalance + creditsToAdd
+        const newBalance = currentBalance + creditsToAdd * 100 // Convert credits to cents
         console.log(`New balance to set: ${newBalance}`)
 
         // Update the user's balance
