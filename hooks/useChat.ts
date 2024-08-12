@@ -152,22 +152,22 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                     // console.error('Error saving AI message!!!!:', error);
                     console.log('error message is:', error.message);
                     if (error instanceof Error && error.message === 'Insufficient credits') {
-                        setError('Insufficient credits. Please add more credits to continue chatting.');
+                        // setError('Insufficient credits. Please add more credits to continue chatting.');
                         toast.error('Insufficient credits. Please add more credits to continue chatting.');
                     } else {
-                        setError('Failed to save AI response. Some messages may be missing.');
-                        toast.error('Failed to save AI response. Some messages may be missing.');
+                        // setError('Failed to save AI response. Some messages may be missing.');
+                        toast.error('Unknown error. Try again or try a different model.');
                     }
                 }
             }
         },
         onError: (error) => {
             if (error.message === 'Insufficient credits') {
-                setError('Insufficient credits. Please add more credits to continue chatting.');
+                // setError('Insufficient credits. Please add more credits to continue chatting.');
                 toast.error('Insufficient credits. Please add more credits to continue chatting.');
             } else {
-                setError('An error occurred while processing your request. Please try again.');
-                toast.error('An error occurred. Please try again.');
+                setError('Error :(');
+                toast.error('Unknown error. Try again or try a different model.');
             }
         },
     });
