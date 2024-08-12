@@ -21,11 +21,6 @@ export async function deductUserCredits(
         const userId = userResult.rows[0].id;
         const currentBalance = parseFloat(userResult.rows[0].credits);
 
-        if (currentBalance < amountToDeduct) {
-            await sql.query('ROLLBACK');
-            return { success: false, newBalance: currentBalance, error: 'Insufficient credits' };
-        }
-
         // Deduct credits
         const newBalance = currentBalance - amountToDeduct;
         await sql`

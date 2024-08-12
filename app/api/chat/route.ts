@@ -2,7 +2,6 @@ import { convertToCoreMessages, streamText } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { auth } from '@clerk/nextjs/server';
-import { OnFinishResult } from '@/types'
 import { getUserBalance } from '@/db/actions';
 
 export const dynamic = 'force-dynamic';
@@ -23,15 +22,17 @@ export async function POST(req: Request) {
         return new Response('Unauthorized', { status: 401 });
     }
 
-    // Check user balance is > 0
-    try {
-        const userBalance = await getUserBalance(userId);
-        if (userBalance <= 0) {
-            return new Response('Insufficient credits', { status: 403 });
+    // Check user balance is > 0, but skip for GPT-4o Mini
+    if (body.model !== 'gpt-4o-mini') {
+        try {
+            const userBalance = await getUserBalance();
+            if (userBalance <= 0) {
+                return new Response('Insufficient credits', { status: 403 });
+            }
+        } catch (error) {
+            console.error('Error checking user balance:', error);
+            return new Response('Error checking user balance', { status: 500 });
         }
-    } catch (error) {
-        console.error('Error checking user balance:', error);
-        return new Response('Error checking user balance', { status: 500 });
     }
 
     const messages = convertToCoreMessages(body.messages);
@@ -40,9 +41,6 @@ export async function POST(req: Request) {
         model: toolContext.model,
         system: getSystemPrompt(toolContext),
         tools,
-        onFinish: async (result: OnFinishResult) => {
-            console.log('chat route onFinish', result);
-        }
     });
     return result.toAIStreamResponse();
 }

@@ -27,7 +27,7 @@ export async function POST() {
         }
 
         // If no empty thread exists or there was an error fetching it, create a new one
-        const result = await createNewThread(userId);
+        const result = await createNewThread();
 
         // Return the thread ID
         return NextResponse.json({ threadId: result.threadId }, { status: 201 });
