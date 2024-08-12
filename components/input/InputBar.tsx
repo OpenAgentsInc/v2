@@ -2,60 +2,40 @@
 
 import React, { useCallback, useRef, useEffect, useState } from "react";
 import Textarea from "react-textarea-autosize";
-import { EditorFocuser } from "./EditorFocuser";
 import { InputSettings } from "./InputSettings";
-import { FileRepresentation } from "./FileRepresentation";
-import { useFileDrop } from "./useFileDrop";
-import { useVisualRepresentations } from "./useVisualRepresentations";
 
 interface InputBarProps {
     onSubmit: (content: string) => void;
     isLoading: boolean;
 }
 
-const MAX_REPRESENTATIONS = 5;
 const MAX_CONTENT_LENGTH = 3500;
 
 export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
     const [input, setInput] = useState("");
-    const { visualRepresentations, addVisualRepresentation, deleteVisualRepresentation, setVisualRepresentations } = useVisualRepresentations(MAX_REPRESENTATIONS);
-    const { isDragging, errorMessage, handleDragOver, handleDragLeave, handleDrop, setErrorMessage } = useFileDrop(MAX_REPRESENTATIONS);
-    const dropAreaRef = useRef<HTMLDivElement>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     const handleInputChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const content = e.target.value;
             if (content.length > MAX_CONTENT_LENGTH) {
-                if (addVisualRepresentation(content)) {
-                    setInput("");
-                    setErrorMessage(null);
-                } else {
-                    setErrorMessage(`Max of ${MAX_REPRESENTATIONS}`);
-                }
+                setErrorMessage(`Max length of ${MAX_CONTENT_LENGTH} characters exceeded`);
             } else {
                 setInput(content);
+                setErrorMessage(null);
             }
         },
-        [addVisualRepresentation, setErrorMessage],
+        [],
     );
 
     const handleSubmit = useCallback(() => {
-        if (input || visualRepresentations.length > 0) {
-            const fullContent = [
-                ...visualRepresentations.map(vr => vr.content),
-                input
-            ].join('\n');
-            onSubmit(fullContent);
-            setVisualRepresentations([]);
+        if (input) {
+            onSubmit(input);
             setInput("");
             setErrorMessage(null);
         }
-    }, [input, onSubmit, visualRepresentations, setVisualRepresentations, setErrorMessage]);
-
-    const handleFileRead = useCallback((content: string, fileName: string, fileExtension: string) => {
-        addVisualRepresentation(content, fileName, fileExtension);
-    }, [addVisualRepresentation]);
+    }, [input, onSubmit]);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -64,35 +44,12 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
     }, []);
 
     return (
-        <div
-            ref={dropAreaRef}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, visualRepresentations.length, handleFileRead)}
-            className="flex flex-col items-start w-full relative"
-        >
-            {isDragging && (
-                <div className="absolute inset-0 border-2 border-dashed border-white pointer-events-none z-10"></div>
-            )}
-            <div className="flex items-end gap-1 overflow-x-auto w-full px-4">
-                {visualRepresentations.map(rep => (
-                    <FileRepresentation
-                        key={rep.id}
-                        representation={rep}
-                        onDelete={deleteVisualRepresentation}
-                    />
-                ))}
-            </div>
-            {(visualRepresentations.length > 0 || errorMessage) && (
+        <div className="flex flex-col items-start w-full relative">
+            {errorMessage && (
                 <div className="text-sm flex items-center gap-2 px-4">
-                    <span className="text-gray-500 my-1">
-                        {visualRepresentations.length} {visualRepresentations.length === 1 ? 'file' : 'files'} added
+                    <span className="text-red-500">
+                        {errorMessage}
                     </span>
-                    {errorMessage && (
-                        <span className="text-red-500">
-                            {errorMessage}
-                        </span>
-                    )}
                 </div>
             )}
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="w-full">
@@ -109,8 +66,8 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                                         handleSubmit();
                                     }
                                 }}
-                                placeholder="Write your prompt"
-                                className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white resize-none bg-transparent"
+                                placeholder="Message OpenAgents..."
+                                className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white resize-none bg-transparent placeholder-white/40"
                                 style={{ whiteSpace: 'pre-wrap' }}
                             />
                             <div className="flex items-center gap-2">
