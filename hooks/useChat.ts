@@ -7,7 +7,7 @@ import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, OnFinishOptions } from '@/types';
+import { Message } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -137,7 +137,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message, options) => {
-            console.log('useChat onFinish', message, options);
             if (threadId && user) {
                 const updatedMessages = [...threadData.messages, message as Message];
                 setMessages(threadId, updatedMessages);
@@ -147,10 +146,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         ...options,
                         model: currentModelRef.current
                     });
-                    console.log('New user balance after message:', result.newBalance);
                     setBalance(result.newBalance || 0);
                     setError(null); // Clear any previous errors
-                } catch (error) {
+                } catch (error: any) {
                     // console.error('Error saving AI message!!!!:', error);
                     console.log('error message is:', error.message);
                     if (error instanceof Error && error.message === 'Insufficient credits') {
