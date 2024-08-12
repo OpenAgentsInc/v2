@@ -11,9 +11,10 @@ import { deleteThread } from '@/db/actions/deleteThread'
 interface SidebarItemsProps {
     chats: Chat[]
     setChats: React.Dispatch<React.SetStateAction<Chat[]>>
+    newChatId: number | null
 }
 
-export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
+export function SidebarItems({ chats, setChats, newChatId }: SidebarItemsProps) {
     const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
         const result = await deleteThread(args.id)
         if (result.success) {
@@ -36,7 +37,11 @@ export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
                                 height: 0
                             }}
                         >
-                            <SidebarItem index={index} chat={chat}>
+                            <SidebarItem 
+                                index={index} 
+                                chat={chat} 
+                                isNew={chat.id === newChatId}
+                            >
                                 <SidebarActions
                                     chat={chat}
                                     removeChat={removeChatAsync}

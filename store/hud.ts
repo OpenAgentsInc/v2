@@ -174,7 +174,10 @@ export const useHudStore = create<HudStore>()(
             openChatPane: (newPane) => set((state) => {
                 const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
                 const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
-                const paneId = Math.max(0, ...state.panes.map(p => p.id)) + 1
+
+                // Use the provided ID if it exists, otherwise generate a new one
+                const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => p.id)) + 1
+
                 const newPaneWithPosition: Pane = {
                     ...newPane,
                     x: panePosition.x,
@@ -239,11 +242,4 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         height: screenHeight * 0.8
     }
 }
-
-
-
-
-
-
-
 

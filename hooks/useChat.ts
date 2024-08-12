@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
+import { generateTitle } from '@/db/actions';
 import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
@@ -12,6 +13,7 @@ import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/acti
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 import { useDebounce } from 'use-debounce';
+import { useChatStore as useNewChatStore } from '@/store/chat';
 
 interface User {
     id: string;
@@ -76,6 +78,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const setBalance = useBalanceStore((state) => state.setBalance);
     const { user } = useUser();
     const [error, setError] = useState<string | null>(null);
+    const updateThreadTitle = useNewChatStore((state) => state.updateThreadTitle);
 
     const {
         currentThreadId,
@@ -151,6 +154,25 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         setBalance(result.newBalance);
                     }
                     setError(null);
+
+                    // Check if this is the first assistant message
+
+                    if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+                        console.log(updatedMessages)
+                        try {
+                            const title = await generateTitle(threadId);
+                            updateThreadTitle(threadId, title);
+                            console.log("updated with tiel", title);
+                            // Update the thread title in the local state
+                            // setThreadData(threadId, { ...threadData, title });
+                            // Notify the sidebar to update
+                            // You'll need to implement this function
+                            // notifySidebarOfTitleChange(threadId, title);
+                        } catch (error) {
+                            console.error('Error generating title:', error);
+                        }
+                    }
+
                 } catch (error: any) {
                     console.log('error message is:', error.message);
                     if (error instanceof Error && error.message === 'Insufficient credits') {

@@ -5,28 +5,30 @@ import { SidebarList } from './sidebar-list'
 import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
 import { fetchUserThreads } from '@/db/actions'
+import { useChatStore } from '@/store/chat'
+import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 
 interface ChatHistoryProps {
     userId: string
 }
 
 export function ChatHistory({ userId }: ChatHistoryProps) {
-    const [chats, setChats] = React.useState<Chat[]>([])
+    const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
+    const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
 
     React.useEffect(() => {
         async function loadInitialChats() {
             try {
-                const threads = await fetchUserThreads(userId)
-                const formattedChats = threads.map((thread) => ({
-                    id: thread.id,
-                    title: thread.metadata?.title || 'Untitled Thread',
-                    path: `/chat/${thread.id}`,
-                    createdAt: thread.createdAt,
-                    messages: [],
-                    userId: userId,
-                }))
-                setChats(formattedChats)
+                const fetchedThreads = await fetchUserThreads(userId)
+                fetchedThreads.forEach((thread) => {
+                    setThread(thread.id, {
+                        id: thread.id,
+                        title: thread.metadata?.title || 'Untitled Thread',
+                        messages: [],
+                        createdAt: new Date(thread.createdAt),
+                    })
+                })
             } catch (error) {
                 console.error('Error fetching initial chats:', error)
             } finally {
@@ -35,16 +37,35 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
         }
 
         loadInitialChats()
-    }, [userId])
+    }, [userId, setThread])
 
     const addChat = React.useCallback((newChat: Chat) => {
-        setChats(prevChats => [newChat, ...prevChats])
-    }, [])
+        setThread(newChat.id, {
+            id: newChat.id,
+            title: newChat.title,
+            messages: [],
+            createdAt: new Date(),
+        })
+        setNewChatId(newChat.id)
+    }, [setThread, setNewChatId])
+
+    const sortedChats = React.useMemo(() => {
+        return Object.values(threads)
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .map(thread => ({
+                id: thread.id,
+                title: thread.title,
+                path: `/chat/${thread.id}`,
+                createdAt: thread.createdAt,
+                messages: thread.messages,
+                userId: userId,
+            }))
+    }, [threads, userId])
 
     return (
         <div className="flex flex-col h-full">
             <div className="mt-2 mb-2 px-2">
-                <NewChatButton addChat={addChat} userId={userId} chats={chats} />
+                <NewChatButton addChat={addChat} userId={userId} chats={sortedChats} />
             </div>
             {isLoading ? (
                 <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
@@ -56,7 +77,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={chats} setChats={setChats} />
+                <SidebarList chats={sortedChats} setChats={() => {}} newChatId={newChatId} />
             )}
         </div>
     )

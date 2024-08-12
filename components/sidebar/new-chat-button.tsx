@@ -21,38 +21,26 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
     const handleNewChat = async (event: React.MouseEvent) => {
         setIsCreating(true)
         try {
-            console.log('Attempting to create/get thread');
-            const { threadId } = await createNewThread()
+            console.log('Attempting to create new thread');
+            const { threadId } = await createNewThread() // Force creation of a new thread
             console.log('Received threadId:', threadId);
 
-            // Check if the thread already exists in the chats
-            const existingChat = chats.find(chat => chat.id === threadId)
-
-            if (existingChat) {
-                console.log('Thread already exists, reusing:', existingChat);
-                openChatPane({
-                    id: existingChat.id,
-                    title: existingChat.title,
-                    type: 'chat',
-                })
-            } else {
-                console.log('Creating new chat for thread:', threadId);
-                const newChat: Chat = {
-                    id: threadId,
-                    title: 'New Chat',
-                    path: `/chat/${threadId}`,
-                    createdAt: new Date().toISOString(),
-                    messages: [],
-                    userId: userId
-                }
-                addChat(newChat)
-
-                openChatPane({
-                    id: threadId,
-                    title: 'New Chat',
-                    type: 'chat',
-                })
+            console.log('Creating new chat for thread:', threadId);
+            const newChat: Chat = {
+                id: threadId,
+                title: 'New Chat',
+                path: `/chat/${threadId}`,
+                createdAt: new Date(),
+                messages: [],
+                userId: userId
             }
+            addChat(newChat)
+
+            openChatPane({
+                id: threadId,
+                title: 'New Chat',
+                type: 'chat',
+            })
         } catch (error) {
             console.error('Error creating new chat:', error)
             // Implement user-facing error handling here

@@ -9,7 +9,6 @@ import {
     TooltipContent,
     TooltipTrigger
 } from '@/components/ui/tooltip'
-import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { type Chat } from '@/types'
 import { cn } from '@/lib/utils'
 import { useHudStore } from '@/store/hud'
@@ -18,14 +17,14 @@ interface SidebarItemProps {
     index: number
     chat: Chat
     children: React.ReactNode
+    isNew: boolean
 }
 
-export function SidebarItem({ index, chat, children }: SidebarItemProps) {
+export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
     const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
-    const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
-    const shouldAnimate = index === 0 && isActive && newChatId
+    const shouldAnimate = isNew && index === 0
 
     if (!chat?.id) return null
 
@@ -56,8 +55,8 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                     opacity: 1
                 }
             }}
-            initial={shouldAnimate ? 'initial' : undefined}
-            animate={shouldAnimate ? 'animate' : undefined}
+            initial={shouldAnimate ? 'initial' : false}
+            animate={shouldAnimate ? 'animate' : false}
             transition={{
                 duration: 0.25,
                 ease: 'easeIn'
@@ -82,7 +81,7 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                 onClick={handleClick}
                 className={cn(
                     buttonVariants({ variant: 'ghost' }),
-                    'group w-full px-8 transition-colors hover:bg-zinc-200/40 dark:hover:bg-zinc-300/10',
+                    'group w-full px-8 transition-colors hover:bg-white/10',
                     isOpen && 'bg-zinc-200 dark:bg-zinc-800',
                     isActive && 'pr-16 font-semibold',
                     'text-left'
@@ -107,18 +106,13 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                                             x: 0
                                         }
                                     }}
-                                    initial={shouldAnimate ? 'initial' : undefined}
-                                    animate={shouldAnimate ? 'animate' : undefined}
+                                    initial="initial"
+                                    animate="animate"
                                     transition={{
                                         duration: 0.25,
                                         ease: 'easeIn',
                                         delay: index * 0.05,
                                         staggerChildren: 0.05
-                                    }}
-                                    onAnimationComplete={() => {
-                                        if (index === chat.title.length - 1) {
-                                            setNewChatId(null)
-                                        }
                                     }}
                                 >
                                     {character}
@@ -131,6 +125,6 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                 </div>
             </button>
             {isActive && <div className="absolute right-2 top-1">{children}</div>}
-        </motion.div>
+        </motion.div >
     )
 }
