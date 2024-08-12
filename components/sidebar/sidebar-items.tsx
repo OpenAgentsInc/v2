@@ -6,10 +6,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
 import { ServerActionResult } from '@/types'
+import { deleteThread } from '@/db/actions/deleteThread'
 
 const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
-    console.log("Remove chat:", args)
-    return { success: true, data: undefined }
+    const userId = 'TODO: Get the user ID from the authentication context'
+    return await deleteThread(args.id, userId)
 }
 
 const shareChatAsync = async (id: number): Promise<ServerActionResult<Chat>> => {
