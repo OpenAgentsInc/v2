@@ -94,25 +94,19 @@ export const useHudStore = create<HudStore>()(
                     } : calculatePanePosition(state.panes.length)
                     updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
                 } else {
-                    // Non-tiling behavior: replace the active pane or all panes if there's only one
-                    const chatPanes = state.panes.filter(pane => pane.type === 'chat')
-                    if (chatPanes.length <= 1) {
-                        // If there's only one or no chat panes, replace all panes
-                        panePosition = chatPanes[0] || calculatePanePosition(0)
-                        updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
-                    } else {
-                        // If there are multiple chat panes, replace only the active one
-                        const activePane = chatPanes.find(pane => pane.isActive) || chatPanes[chatPanes.length - 1]
+                    // Non-tiling behavior: use the last chat pane's position and size
+                    const lastChatPane = state.panes.filter(pane => pane.type === 'chat').pop()
+                    if (lastChatPane) {
                         panePosition = {
-                            x: activePane.x,
-                            y: activePane.y,
-                            width: activePane.width,
-                            height: activePane.height
+                            x: lastChatPane.x,
+                            y: lastChatPane.y,
+                            width: lastChatPane.width,
+                            height: lastChatPane.height
                         }
-                        updatedPanes = state.panes.map(pane =>
-                            pane.id === activePane.id ? { ...pane, isActive: false } : pane
-                        )
+                    } else {
+                        panePosition = calculatePanePosition(0)
                     }
+                    updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
                 }
 
                 // Ensure the new pane is within the viewport
@@ -178,7 +172,8 @@ export const useHudStore = create<HudStore>()(
             isRepoInputOpen: false,
             setRepoInputOpen: (isOpen) => set({ isRepoInputOpen: isOpen }),
             openChatPane: (newPane) => set((state) => {
-                const panePosition = newPane.paneProps || state.lastPanePosition || calculatePanePosition(0)
+                const lastChatPane = state.panes.filter(pane => pane.type === 'chat').pop()
+                const panePosition = lastChatPane || state.lastPanePosition || calculatePanePosition(0)
                 const paneId = Math.max(0, ...state.panes.map(p => p.id)) + 1
                 const newPaneWithPosition: Pane = {
                     ...newPane,
@@ -192,7 +187,7 @@ export const useHudStore = create<HudStore>()(
                 }
                 return {
                     panes: [
-                        ...state.panes.filter(pane => pane.type !== 'chat').map(pane => ({ ...pane, isActive: false })),
+                        ...state.panes.map(pane => ({ ...pane, isActive: false })),
                         newPaneWithPosition
                     ],
                     isChatOpen: true,
@@ -246,7 +241,6 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         height: screenHeight * 0.8
     }
 }
-
 
 
 
