@@ -31,11 +31,13 @@ export async function saveChatMessage(
         throw new Error("Invalid threadId")
     }
 
+    /**
     const lastMessage = await getLastMessage(threadId)
     if (lastMessage && lastMessage.content === message.content) {
         console.log("Duplicate message, not saving:", message.content)
         throw new Error("Duplicate message")
     }
+    */
 
     try {
         console.log("IN DB saveChatMessage WITH MESSAGE AND OPTIONS:", message, options);
@@ -65,7 +67,6 @@ export async function saveChatMessage(
             );
             placeholders.push('$6', '$7', '$8', '$9', '$10', '$11');
 
-            console.log("About to check deduct credits etc with options:", options);
             if (options.model.id !== 'gpt-4o-mini') {
                 deductionResult = await deductUserCredits(clerkUserId, costInCents);
                 if (!deductionResult.success) {
@@ -87,7 +88,6 @@ export async function saveChatMessage(
             toolInvocations: rows[0].toolInvocations || undefined
         };
 
-        console.log('Message saved:', savedMessage)
         return { savedMessage, newBalance: deductionResult.newBalance };
     } catch (error) {
         console.error('Error in saveChatMessage:', error);

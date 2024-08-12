@@ -11,6 +11,7 @@ import { Message, Model } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
+import { useDebounce } from 'use-debounce';
 
 interface User {
     id: string;
@@ -197,8 +198,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         vercelChatProps.setInput(input);
     };
 
+    const [debouncedMessages] = useDebounce(vercelChatProps.messages, 250, { maxWait: 250 });
+
     return {
         ...vercelChatProps,
+        messages: debouncedMessages,
         id: threadId,
         threadData,
         user,
