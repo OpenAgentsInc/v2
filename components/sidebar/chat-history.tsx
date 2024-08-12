@@ -5,28 +5,27 @@ import { SidebarList } from './sidebar-list'
 import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
 import { fetchUserThreads } from '@/db/actions'
+import { useChatStore } from '@/store/chat'
 
 interface ChatHistoryProps {
     userId: string
 }
 
 export function ChatHistory({ userId }: ChatHistoryProps) {
-    const [chats, setChats] = React.useState<Chat[]>([])
+    const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
 
     React.useEffect(() => {
         async function loadInitialChats() {
             try {
-                const threads = await fetchUserThreads(userId)
-                const formattedChats = threads.map((thread) => ({
-                    id: thread.id,
-                    title: thread.metadata?.title || 'Untitled Thread',
-                    path: `/chat/${thread.id}`,
-                    createdAt: thread.createdAt,
-                    messages: [],
-                    userId: userId,
-                }))
-                setChats(formattedChats)
+                const fetchedThreads = await fetchUserThreads(userId)
+                fetchedThreads.forEach((thread) => {
+                    setThread(thread.id, {
+                        id: thread.id,
+                        title: thread.metadata?.title || 'Untitled Thread',
+                        messages: [],
+                    })
+                })
             } catch (error) {
                 console.error('Error fetching initial chats:', error)
             } finally {
@@ -35,11 +34,24 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
         }
 
         loadInitialChats()
-    }, [userId])
+    }, [userId, setThread])
 
     const addChat = React.useCallback((newChat: Chat) => {
-        setChats(prevChats => [newChat, ...prevChats])
-    }, [])
+        setThread(newChat.id, {
+            id: newChat.id,
+            title: newChat.title,
+            messages: [],
+        })
+    }, [setThread])
+
+    const chats = Object.values(threads).map(thread => ({
+        id: thread.id,
+        title: thread.title,
+        path: `/chat/${thread.id}`,
+        createdAt: new Date(), // You might want to add createdAt to your Thread type
+        messages: thread.messages,
+        userId: userId,
+    }))
 
     return (
         <div className="flex flex-col h-full">
@@ -56,7 +68,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={chats} setChats={setChats} />
+                <SidebarList chats={chats} setChats={() => {}} />
             )}
         </div>
     )
