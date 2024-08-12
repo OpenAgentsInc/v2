@@ -3,7 +3,7 @@ import { Schema } from "prosemirror-model";
 export const schema = new Schema({
     nodes: {
         doc: {
-            content: "block+",
+            content: "block+"
         },
         paragraph: {
             group: "block",
@@ -11,9 +11,10 @@ export const schema = new Schema({
             toDOM() {
                 return ["p", { style: "white-space: pre-wrap;" }, 0];
             },
+            parseDOM: [{ tag: "p" }]
         },
         text: {
-            group: "inline",
-        },
-    },
+            group: "inline"
+        }
+    }
 });

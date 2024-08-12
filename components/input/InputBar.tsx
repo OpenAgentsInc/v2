@@ -1,13 +1,10 @@
 "use client"
 
-import React, { useCallback, useRef, useEffect } from "react";
-import { EditorState } from "prosemirror-state";
-import "prosemirror-view/style/prosemirror.css";
-import { ProseMirror } from "@nytimes/react-prosemirror";
+import React, { useCallback, useRef, useEffect, useState } from "react";
+import Textarea from "react-textarea-autosize";
 import { EditorFocuser } from "./EditorFocuser";
 import { InputSettings } from "./InputSettings";
 import { FileRepresentation } from "./FileRepresentation";
-import { useEditorState } from "./useEditorState";
 import { useFileDrop } from "./useFileDrop";
 import { useVisualRepresentations } from "./useVisualRepresentations";
 
@@ -20,53 +17,51 @@ const MAX_REPRESENTATIONS = 5;
 const MAX_CONTENT_LENGTH = 3500;
 
 export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
-    const [mount, setMount] = React.useState<HTMLElement | null>(null);
-    const { editorState, setEditorState, shouldReset, setShouldReset, createDefaultState } = useEditorState();
+    const [input, setInput] = useState("");
     const { visualRepresentations, addVisualRepresentation, deleteVisualRepresentation, setVisualRepresentations } = useVisualRepresentations(MAX_REPRESENTATIONS);
     const { isDragging, errorMessage, handleDragOver, handleDragLeave, handleDrop, setErrorMessage } = useFileDrop(MAX_REPRESENTATIONS);
     const dropAreaRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleEditorStateChange = useCallback(
-        (state: EditorState) => {
-            const content = state.doc.textContent;
+    const handleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const content = e.target.value;
             if (content.length > MAX_CONTENT_LENGTH) {
                 if (addVisualRepresentation(content)) {
-                    setEditorState(createDefaultState());
+                    setInput("");
                     setErrorMessage(null);
                 } else {
                     setErrorMessage(`Max of ${MAX_REPRESENTATIONS}`);
                 }
             } else {
-                setEditorState(state);
+                setInput(content);
             }
         },
-        [addVisualRepresentation, createDefaultState, setEditorState, setErrorMessage],
+        [addVisualRepresentation, setErrorMessage],
     );
 
     const handleSubmit = useCallback(() => {
-        const content = editorState.doc.textContent;
-        if (content || visualRepresentations.length > 0) {
+        if (input || visualRepresentations.length > 0) {
             const fullContent = [
                 ...visualRepresentations.map(vr => vr.content),
-                content
+                input
             ].join('\n');
             onSubmit(fullContent);
             setVisualRepresentations([]);
-            setShouldReset(true);
+            setInput("");
             setErrorMessage(null);
         }
-    }, [editorState, onSubmit, visualRepresentations, setVisualRepresentations, setShouldReset, setErrorMessage]);
+    }, [input, onSubmit, visualRepresentations, setVisualRepresentations, setErrorMessage]);
 
     const handleFileRead = useCallback((content: string, fileName: string, fileExtension: string) => {
         addVisualRepresentation(content, fileName, fileExtension);
     }, [addVisualRepresentation]);
 
     useEffect(() => {
-        if (shouldReset) {
-            setEditorState(createDefaultState());
-            setShouldReset(false);
+        if (inputRef.current) {
+            inputRef.current.focus();
         }
-    }, [shouldReset, setEditorState, createDefaultState, setShouldReset]);
+    }, []);
 
     return (
         <div
@@ -104,27 +99,20 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                 <fieldset className="flex w-full min-w-0 flex-col-reverse">
                     <div className="flex flex-col bg-white dark:bg-black gap-1.5 border-t border-r border-l border-white dark:border-white pl-4 pt-2.5 pr-2.5 pb-2.5 items-stretch transition-all duration-200 relative shadow-sm hover:border-white dark:hover:border-white focus-within:border-white dark:focus-within:border-white cursor-text z-10">
                         <div className="flex gap-2 w-full">
-                            <div
-                                aria-label="Write your prompt"
-                                className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white"
+                            <Textarea
+                                ref={inputRef}
+                                value={input}
+                                onChange={handleInputChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSubmit();
+                                    }
+                                }}
+                                placeholder="Write your prompt"
+                                className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white resize-none bg-transparent"
                                 style={{ whiteSpace: 'pre-wrap' }}
-                            >
-                                <ProseMirror
-                                    mount={mount}
-                                    state={editorState}
-                                    dispatchTransaction={(tr) => {
-                                        const newState = editorState.apply(tr);
-                                        handleEditorStateChange(newState);
-
-                                        if (tr.getMeta("isEnter")) {
-                                            handleSubmit();
-                                        }
-                                    }}
-                                >
-                                    <div ref={setMount} className="prosemirror-editor" />
-                                    <EditorFocuser shouldReset={shouldReset} />
-                                </ProseMirror>
-                            </div>
+                            />
                             <div className="flex items-center gap-2">
                                 {isLoading ? (
                                     <button
