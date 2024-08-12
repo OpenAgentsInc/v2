@@ -14,13 +14,13 @@ interface NewChatButtonProps {
 }
 
 export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
-    const { addPane } = useHudStore()
+    const { addPane, openChatPane } = useHudStore()
     const [isCreating, setIsCreating] = useState(false)
 
     const handleNewChat = async () => {
         setIsCreating(true)
         try {
-            console.log('Sending request to create/get thread');
+            console.log('Attempting to create/get thread');
             const response = await fetch('/api/thread', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,22 +33,14 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
             const existingChat = chats.find(chat => chat.id === threadId)
             
             if (existingChat) {
-                console.log('Thread already exists in chats:', existingChat);
-                // If the chat already exists, just open it
-                addPane({
-                    type: 'chat',
+                console.log('Thread already exists, reusing:', existingChat);
+                openChatPane({
+                    id: existingChat.id,
                     title: existingChat.title,
-                    paneProps: {
-                        x: 300,
-                        y: 20,
-                        width: 600,
-                        height: 400,
-                    },
-                    id: threadId
+                    type: 'chat',
                 })
             } else {
                 console.log('Creating new chat for thread:', threadId);
-                // If it's a new chat, add it to the sidebar
                 const newChat: Chat = {
                     id: threadId,
                     title: 'New Chat',
@@ -59,16 +51,10 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
                 }
                 addChat(newChat)
 
-                addPane({
-                    type: 'chat',
+                openChatPane({
+                    id: threadId,
                     title: 'New Chat',
-                    paneProps: {
-                        x: 300,
-                        y: 20,
-                        width: 600,
-                        height: 400,
-                    },
-                    id: threadId
+                    type: 'chat',
                 })
             }
         } catch (error) {
