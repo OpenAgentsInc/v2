@@ -1,6 +1,12 @@
-import { clerkClient, User } from "@clerk/nextjs/server";
+"use server"
 
-export function isGitHubUser(user: User) {
+import { clerkClient, currentUser, User } from "@clerk/nextjs/server";
+
+export async function isGitHubUser() {
+    const user = await currentUser();
+    if (!user) {
+        return false;
+    }
     return user.externalAccounts.some(account => account.provider === 'oauth_github');
 }
 
