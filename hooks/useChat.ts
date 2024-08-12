@@ -163,6 +163,15 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 }
             }
         },
+        onError: (error) => {
+            if (error.message === 'Insufficient credits') {
+                setError('Insufficient credits. Please add more credits to continue chatting.');
+                toast.error('Insufficient credits. Please add more credits to continue chatting.');
+            } else {
+                setError('An error occurred while processing your request. Please try again.');
+                toast.error('An error occurred. Please try again.');
+            }
+        },
     });
 
     const sendMessage = useCallback(async (message: string) => {

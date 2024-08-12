@@ -3,6 +3,7 @@ import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { auth } from '@clerk/nextjs/server';
 import { OnFinishResult } from '@/types'
+import { getUserBalance } from '@/db/actions';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -20,6 +21,17 @@ export async function POST(req: Request) {
     const { userId } = auth();
     if (!userId) {
         return new Response('Unauthorized', { status: 401 });
+    }
+
+    // Check user balance is > 0
+    try {
+        const userBalance = await getUserBalance(userId);
+        if (userBalance <= 0) {
+            return new Response('Insufficient credits', { status: 403 });
+        }
+    } catch (error) {
+        console.error('Error checking user balance:', error);
+        return new Response('Error checking user balance', { status: 500 });
     }
 
     const messages = convertToCoreMessages(body.messages);
