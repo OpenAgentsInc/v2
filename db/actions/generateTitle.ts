@@ -2,6 +2,7 @@
 import { sql } from '@vercel/postgres'
 import { Message } from '@/types'
 import { openai } from '@ai-sdk/openai'
+import { generateText } from 'ai'
 import { models } from '@/lib/models'
 
 export async function generateTitle(threadId: number): Promise<string> {
@@ -34,17 +35,17 @@ export async function generateTitle(threadId: number): Promise<string> {
             throw new Error('Model not found');
         }
 
-        const model = openai(modelObj.id);
-        const response = await model.generateText({
+        const { text } = await generateText({
+            model: openai(modelObj.id),
             messages: [
                 { role: 'system', content: 'You are a helpful assistant that generates concise and relevant titles for chat conversations.' },
                 { role: 'user', content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}` }
             ],
             temperature: 0.7,
-            max_tokens: 10
+            maxTokens: 10
         });
 
-        const generatedTitle = response.trim();
+        const generatedTitle = text.trim();
         console.log('Generated title:', generatedTitle);
 
         // Update the thread title in the database
