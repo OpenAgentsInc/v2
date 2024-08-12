@@ -183,11 +183,12 @@ export const useHudStore = create<HudStore>()(
                     height: panePosition.height,
                     isActive: true,
                     id: paneId,
+                    type: 'chat',
                     title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
                 return {
                     panes: [
-                        ...state.panes.map(pane => ({ ...pane, isActive: false })),
+                        ...state.panes.filter(pane => pane.type !== 'chat'),
                         newPaneWithPosition
                     ],
                     isChatOpen: true,
@@ -241,6 +242,3 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         height: screenHeight * 0.8
     }
 }
-
-
-
