@@ -28,7 +28,7 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
 
     const handleEditorStateChange = useCallback(
         (state: EditorState) => {
-            const content = state.doc.textContent.trim();
+            const content = state.doc.textContent;
             if (content.length > MAX_CONTENT_LENGTH) {
                 if (addVisualRepresentation(content)) {
                     setEditorState(createDefaultState());
@@ -44,12 +44,12 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
     );
 
     const handleSubmit = useCallback(() => {
-        const content = editorState.doc.textContent;  // Remove trim() here
+        const content = editorState.doc.textContent;
         if (content || visualRepresentations.length > 0) {
             const fullContent = [
                 ...visualRepresentations.map(vr => vr.content),
                 content
-            ].join('\n');  // Remove trim() here
+            ].join('\n');
             onSubmit(fullContent);
             setVisualRepresentations([]);
             setShouldReset(true);
