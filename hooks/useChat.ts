@@ -160,7 +160,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                     if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
                         console.log(updatedMessages)
                         try {
-                            const title = await generateTitle(threadId, threadData.messages);
+                            const title = await generateTitle(threadId);
                             updateThreadTitle(threadId, title);
                             console.log("updated with tiel", title);
                             // Update the thread title in the local state

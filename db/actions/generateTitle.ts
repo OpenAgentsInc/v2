@@ -2,11 +2,11 @@
 import { sql } from '@vercel/postgres'
 import { Message } from '@/types'
 
-export async function generateTitle(threadId: number, messages: Message[]): Promise<string> {
-    // For now, we'll use a dummy function that returns a fixed title
-    // In the future, this will be replaced with AI-powered title generation
+export async function generateTitle(threadId: number): Promise<string> {
 
-    console.log("In generateTitle with messages:", messages);
+    console.log('fetching the messages')
+
+    console.log("In generateTitle with messages:",);
 
     const dummyTitle = "This is a new thread";
 
