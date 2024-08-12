@@ -1,17 +1,26 @@
-import * as React from 'react'
+'use client'
 
+import * as React from 'react'
 import { SidebarList } from './sidebar-list'
 import { NewChatButton } from './new-chat-button'
+import { Chat } from '@/types'
 
 interface ChatHistoryProps {
     userId: string
+    initialChats: Chat[]
 }
 
-export async function ChatHistory({ userId }: ChatHistoryProps) {
+export function ChatHistory({ userId, initialChats }: ChatHistoryProps) {
+    const [chats, setChats] = React.useState<Chat[]>(initialChats)
+
+    const addChat = React.useCallback((newChat: Chat) => {
+        setChats(prevChats => [newChat, ...prevChats])
+    }, [])
+
     return (
         <div className="flex flex-col h-full">
             <div className="mt-2 mb-2 px-2">
-                <NewChatButton />
+                <NewChatButton addChat={addChat} userId={userId} />
             </div>
             <React.Suspense
                 fallback={
@@ -25,8 +34,7 @@ export async function ChatHistory({ userId }: ChatHistoryProps) {
                     </div>
                 }
             >
-                {/* @ts-ignore */}
-                <SidebarList userId={userId} />
+                <SidebarList chats={chats} setChats={setChats} />
             </React.Suspense>
         </div>
     )
