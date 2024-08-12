@@ -4,7 +4,7 @@ import { SidebarItems } from './sidebar-items'
 import { Chat } from '@/types'
 
 interface SidebarListProps {
-    chats: Chat[]
+    chats: Chat[] | undefined
     setChats: React.Dispatch<React.SetStateAction<Chat[]>>
 }
 
@@ -12,7 +12,7 @@ export function SidebarList({ chats, setChats }: SidebarListProps) {
     return (
         <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 overflow-auto">
-                {chats.length ? (
+                {chats && chats.length > 0 ? (
                     <div className="space-y-2 px-2">
                         <SidebarItems chats={chats} setChats={setChats} />
                     </div>
