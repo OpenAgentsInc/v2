@@ -17,11 +17,6 @@ const removeChatAsync = async (args: { id: number; path: string }): Promise<Serv
     return await deleteThread(args.id, userId)
 }
 
-const shareChatAsync = async (id: number): Promise<ServerActionResult<Chat>> => {
-    console.log("Share chat:", id)
-    return { success: false, error: "Not implemented" }
-}
-
 interface SidebarItemsProps {
     chats?: Chat[]
 }
@@ -45,7 +40,7 @@ export function SidebarItems({ chats }: SidebarItemsProps) {
                                 <SidebarActions
                                     chat={chat}
                                     removeChat={removeChatAsync}
-                                    shareChat={shareChatAsync}
+                                // shareChat={shareChatAsync}
                                 />
                             </SidebarItem>
                         </motion.div>

@@ -159,7 +159,7 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 width: size.width,
                 height: size.height,
             }}
-            className="pointer-events-auto z-[99] absolute bg-black/90 border border-white rounded-lg overflow-hidden shadow-lg transition-colors duration-200"
+            className="pointer-events-auto z-[49] absolute bg-black/90 border border-white rounded-lg overflow-hidden shadow-lg transition-colors duration-200"
             onClick={handlePaneClick}
         >
             <div
