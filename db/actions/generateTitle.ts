@@ -1,6 +1,8 @@
 'use server'
 import { sql } from '@vercel/postgres'
 import { Message } from '@/types'
+import { openai } from '@ai-sdk/openai'
+import { models } from '@/lib/models'
 
 export async function generateTitle(threadId: number): Promise<string> {
     console.log('Fetching messages for thread:', threadId);
@@ -26,18 +28,33 @@ export async function generateTitle(threadId: number): Promise<string> {
 
         console.log('Formatted messages:', formattedMessages);
 
-        // TODO: Call AI function to generate title
-        // For now, we'll use a dummy title
-        const dummyTitle = "This is a new thread";
+        // Use OpenAI to generate the title
+        const modelObj = models.find(m => m.name === 'GPT-4o Mini');
+        if (!modelObj) {
+            throw new Error('Model not found');
+        }
+
+        const model = openai(modelObj.id);
+        const response = await model.generateText({
+            messages: [
+                { role: 'system', content: 'You are a helpful assistant that generates concise and relevant titles for chat conversations.' },
+                { role: 'user', content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}` }
+            ],
+            temperature: 0.7,
+            max_tokens: 10
+        });
+
+        const generatedTitle = response.trim();
+        console.log('Generated title:', generatedTitle);
 
         // Update the thread title in the database
         await sql`
             UPDATE threads
-            SET metadata = jsonb_set(COALESCE(metadata, '{}'), '{title}', ${JSON.stringify(dummyTitle)})
+            SET metadata = jsonb_set(COALESCE(metadata, '{}'), '{title}', ${JSON.stringify(generatedTitle)})
             WHERE id = ${threadId}
         `;
 
-        return dummyTitle;
+        return generatedTitle;
     } catch (error) {
         console.error('Error in generateTitle:', error);
         throw error;
