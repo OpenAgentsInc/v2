@@ -2,7 +2,6 @@
 
 import { Chat } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useAuth } from '@clerk/nextjs'
 
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
@@ -10,11 +9,7 @@ import { ServerActionResult } from '@/types'
 import { deleteThread } from '@/db/actions/deleteThread'
 
 const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
-    const { userId } = useAuth()
-    if (!userId) {
-        return { success: false, error: 'User not authenticated' }
-    }
-    return await deleteThread(args.id, userId)
+    return await deleteThread(args.id)
 }
 
 interface SidebarItemsProps {
