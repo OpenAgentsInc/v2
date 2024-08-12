@@ -12,7 +12,7 @@ export async function getUserBalance(): Promise<number> {
         `;
 
         if (rows.length === 0) {
-            throw new Error('User not found');
+            return 0
         }
 
         return Number(rows[0].credits);
