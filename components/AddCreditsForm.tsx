@@ -13,6 +13,7 @@ import {
 
 interface AddCreditsFormProps {
     uiMode: Stripe.Checkout.SessionCreateParams.UiMode;
+    clerkUserId: string;
 }
 
 export default function AddCreditsForm(props: AddCreditsFormProps): JSX.Element {
@@ -39,6 +40,7 @@ export default function AddCreditsForm(props: AddCreditsFormProps): JSX.Element 
             <form action={formAction}>
                 <input type="hidden" name="uiMode" value={props.uiMode} />
                 <input type="hidden" name="customAmount" value={amount} />
+                <input type="hidden" name="clerkUserId" value={props.clerkUserId} />
                 <div className="mb-4">
                     <Slider
                         id="amount"

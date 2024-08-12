@@ -4,11 +4,13 @@ import { useBalanceStore } from '@/store/balance';
 import { getUserBalance } from '@/db/actions/getUserBalance'; // Import the new function
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import AddCreditsForm from '@/components/AddCreditsForm';
+import { useAuth } from '@clerk/nextjs';
 
 export const Balance = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const setBalance = useBalanceStore(state => state.setBalance);
+    const { userId } = useAuth();
 
     useEffect(() => {
         const fetchBalance = async () => {
@@ -33,6 +35,10 @@ export const Balance = () => {
         maximumFractionDigits: 2
     }).format(balanceInDollars);
 
+    if (!userId) {
+        return null;
+    }
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -48,7 +54,7 @@ export const Balance = () => {
                         Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
                     </DialogDescription>
                 </DialogHeader>
-                <AddCreditsForm uiMode="hosted" />
+                <AddCreditsForm uiMode="hosted" clerkUserId={userId} />
             </DialogContent>
         </Dialog>
     );

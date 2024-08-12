@@ -11,6 +11,7 @@ import { models } from '@/lib/models'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import AddCreditsForm from '@/components/AddCreditsForm'
 import { Model } from '@/types'
+import { useAuth } from '@clerk/nextjs'
 
 export function InputSettings({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
@@ -20,6 +21,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     const tools = useToolStore((state) => state.tools)
     const setTools = useToolStore((state) => state.setTools)
     const balance = useBalanceStore((state) => state.balance)
+    const { userId } = useAuth()
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -74,6 +76,10 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         } else {
             setModel(m)
         }
+    }
+
+    if (!userId) {
+        return null
     }
 
     return (
@@ -213,7 +219,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                             Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
                         </DialogDescription>
                     </DialogHeader>
-                    <AddCreditsForm uiMode="hosted" />
+                    <AddCreditsForm uiMode="hosted" clerkUserId={userId} />
                 </DialogContent>
             </Dialog>
         </div>

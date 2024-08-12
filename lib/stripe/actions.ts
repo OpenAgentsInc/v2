@@ -16,6 +16,7 @@ export async function createCheckoutSession(
     ) as Stripe.Checkout.SessionCreateParams.UiMode;
 
     const origin: string = headers().get("origin") as string;
+    const clerkUserId = data.get("clerkUserId") as string;
 
     const checkoutSession: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
@@ -36,6 +37,7 @@ export async function createCheckoutSession(
                     },
                 },
             ],
+            client_reference_id: clerkUserId,
             ...(ui_mode === "hosted" && {
                 // success_url: `${origin}/add-credits/result?session_id={CHECKOUT_SESSION_ID}`,
                 success_url: `${origin}`,
