@@ -4,6 +4,7 @@ import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
 import { useModelStore } from '@/store/models'
 import { useToolStore } from '@/store/tools'
+import { useBalanceStore } from '@/store/balance'
 import * as Popover from '@radix-ui/react-popover'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { models } from '@/lib/models'
@@ -15,6 +16,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     const setModel = useModelStore((state) => state.setModel)
     const tools = useToolStore((state) => state.tools)
     const setTools = useToolStore((state) => state.setTools)
+    const balance = useBalanceStore((state) => state.balance)
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -58,6 +60,10 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
 
     const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
 
+    const isModelDisabled = (modelId: string) => {
+        return balance === 0 && modelId !== 'gpt-4o-mini'
+    }
+
     return (
         <div
             className={cn(
@@ -82,8 +88,11 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                                 {models.map((m) => (
                                     <DropdownMenu.Item
                                         key={m.id}
-                                        className="px-2 py-1 text-foreground hover:bg-accent/80 hover:text-accent-foreground cursor-pointer focus:outline-none focus:bg-accent/80 focus:text-accent-foreground"
-                                        onClick={() => setModel(m)}
+                                        className={cn(
+                                            "px-2 py-1 text-foreground hover:bg-accent/80 hover:text-accent-foreground cursor-pointer focus:outline-none focus:bg-accent/80 focus:text-accent-foreground",
+                                            isModelDisabled(m.id) && "opacity-50 cursor-not-allowed"
+                                        )}
+                                        onClick={() => !isModelDisabled(m.id) && setModel(m)}
                                     >
                                         {m.name}
                                     </DropdownMenu.Item>
