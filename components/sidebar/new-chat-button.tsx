@@ -5,6 +5,7 @@ import { useHudStore } from '@/store/hud'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
+import { Chat, addChat } from './sidebar-items'
 
 export function NewChatButton() {
     const { addPane } = useHudStore()
@@ -19,6 +20,18 @@ export function NewChatButton() {
             })
             if (!response.ok) throw new Error('Failed to create thread')
             const { threadId } = await response.json()
+            
+            // Add the new chat to the sidebar
+            const newChat: Chat = {
+                id: threadId,
+                title: 'New Chat',
+                path: `/chat/${threadId}`,
+                createdAt: new Date().toISOString(),
+                messages: [],
+                userId: 'current-user-id' // You might need to get this from your auth context
+            }
+            addChat(newChat)
+
             addPane({
                 type: 'chat',
                 title: 'New Chat',
