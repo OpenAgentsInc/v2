@@ -2,7 +2,7 @@
 
 import { Chat } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
@@ -23,6 +23,10 @@ export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
         }
         return result
     }
+
+    const addChat = useCallback((newChat: Chat) => {
+        setChats(prevChats => [newChat, ...prevChats])
+    }, [])
 
     if (!chats?.length) return null
 
@@ -50,3 +54,6 @@ export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
         </AnimatePresence>
     )
 }
+
+export type { Chat }
+export { addChat }
