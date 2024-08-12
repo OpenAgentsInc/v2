@@ -1,5 +1,4 @@
 'use server'
-
 import { sql } from '@vercel/postgres'
 import { Message, OnFinishOptions } from '@/types'
 import { calculateMessageCost } from '@/lib/calculateMessageCost'
@@ -47,8 +46,12 @@ export async function saveChatMessage(
         INSERT INTO messages (thread_id, clerk_user_id, role, content, tool_invocations`;
         let values = [threadId, clerkUserId, message.role, contentString, toolInvocationsString];
         let placeholders = ['$1', '$2', '$3', '$4', '$5::jsonb'];
-
         let costInCents = 0;
+        let deductionResult: { success: boolean; newBalance: number | null; error?: string } = {
+            success: true,
+            newBalance: null
+        };
+
         if (options) {
             costInCents = calculateMessageCost(options.model, options.usage)
             queryString += `, finish_reason, total_tokens, prompt_tokens, completion_tokens, model_id, cost_in_cents`;
@@ -61,17 +64,18 @@ export async function saveChatMessage(
                 costInCents || null
             );
             placeholders.push('$6', '$7', '$8', '$9', '$10', '$11');
+
+            if (options.model.id !== 'gpt-4o-mini') {
+                deductionResult = await deductUserCredits(clerkUserId, costInCents);
+                if (!deductionResult.success) {
+                    throw new Error(deductionResult.error || 'Failed to deduct credits');
+                }
+            }
         }
 
         queryString += `)
         VALUES (${placeholders.join(', ')})
         RETURNING id, created_at as "createdAt", tool_invocations as "toolInvocations"`;
-
-        // Deduct credits before saving the message
-        const deductionResult = await deductUserCredits(clerkUserId, costInCents);
-        if (!deductionResult.success) {
-            throw new Error(deductionResult.error || 'Failed to deduct credits');
-        }
 
         const { rows } = await sql.query(queryString, values);
 

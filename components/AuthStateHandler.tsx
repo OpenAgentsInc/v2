@@ -10,11 +10,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
         const handleUserCreation = async () => {
             if (isLoaded && user && !isHandled) {
                 try {
-                    await createOrGetUser(
-                        user.id,
-                        user.primaryEmailAddress?.emailAddress || '',
-                        user.imageUrl
-                    )
+                    await createOrGetUser()
                     setIsHandled(true)
                 } catch (error) {
                     console.error('Error creating/getting user:', error)

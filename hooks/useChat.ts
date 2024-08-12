@@ -7,7 +7,7 @@ import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/types';
+import { Message, Model } from '@/types';
 import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
@@ -97,7 +97,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
         } else if (!threadId && user) {
-            createNewThread(user.id)
+            createNewThread()
                 .then(({ threadId: newThreadId }) => {
                     setThreadId(newThreadId);
                     setCurrentThreadId(newThreadId);
@@ -124,7 +124,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
-    const body: any = { model, tools, threadId };
+    const body: any = { model: model.id, tools, threadId };
     if (repo) {
         body.repoOwner = repo.owner;
         body.repoName = repo.name;
@@ -147,15 +147,12 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         model: currentModelRef.current
                     });
                     setBalance(result.newBalance || 0);
-                    setError(null); // Clear any previous errors
+                    setError(null);
                 } catch (error: any) {
-                    // console.error('Error saving AI message!!!!:', error);
                     console.log('error message is:', error.message);
                     if (error instanceof Error && error.message === 'Insufficient credits') {
-                        // setError('Insufficient credits. Please add more credits to continue chatting.');
                         toast.error('Insufficient credits. Please add more credits to continue chatting.');
                     } else {
-                        // setError('Failed to save AI response. Some messages may be missing.');
                         toast.error('Unknown error. Try again or try a different model.');
                     }
                 }
@@ -163,7 +160,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         },
         onError: (error) => {
             if (error.message === 'Insufficient credits') {
-                // setError('Insufficient credits. Please add more credits to continue chatting.');
                 toast.error('Insufficient credits. Please add more credits to continue chatting.');
             } else {
                 setError('Error :(');
@@ -183,15 +179,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setMessages(threadId, updatedMessages);
 
         try {
-            // Optimistically update the UI
             vercelChatProps.append(userMessage as VercelMessage);
-
-            // Save the message to the database
             await saveChatMessage(threadId, user.id, userMessage);
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
-            // Revert the optimistic update
             setMessages(threadId, threadData.messages);
         }
     }, [threadId, user, vercelChatProps, threadData.messages, setMessages]);

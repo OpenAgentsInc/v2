@@ -1,4 +1,4 @@
-import { Repo, ToolContext } from "@/types";
+import { Model, Repo, ToolContext } from "@/types";
 import { currentUser, User } from '@clerk/nextjs/server';
 import { createFileTool } from './create-file';
 import { listReposTool } from './list-repos';
@@ -13,6 +13,7 @@ import { getGitHubToken } from "@/lib/github/isGitHubUser";
 import { anthropic } from '@ai-sdk/anthropic';
 import { openai } from '@ai-sdk/openai';
 import { bedrock } from '@ai-sdk/amazon-bedrock';
+import { models } from '@/lib/models'
 
 const allTools = {
     create_file: createFileTool,
@@ -42,15 +43,11 @@ interface ToolContextBody {
     repoOwner: string;
     repoName: string;
     repoBranch: string;
-    model: {
-        id: string;
-        name: string;
-        provider: string;
-    };
+    model: string; // Change this to expect just the model ID
 }
 
 export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
-    const { repoOwner, repoName, repoBranch, model: theModel } = body;
+    const { repoOwner, repoName, repoBranch, model: modelId } = body;
     const repo: Repo = {
         owner: repoOwner,
         name: repoName,
@@ -61,21 +58,26 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     const firecrawlToken = process.env.FIRECRAWL_API_KEY;
     const greptileToken = process.env.GREPTILE_API_KEY;
 
-    console.log('the model:', theModel);
+    // Find the full model object based on the provided model ID
+    const modelObj = models.find((m: Model) => m.id === modelId);
+    if (!modelObj) {
+        throw new Error('Invalid model ID');
+    }
 
+    console.log('the model:', modelObj);
     let model;
-    switch (theModel.provider) {
+    switch (modelObj.provider) {
         case 'anthropic':
-            model = anthropic(theModel.id);
+            model = anthropic(modelObj.id);
             break;
         case 'openai':
-            model = openai(theModel.id);
+            model = openai(modelObj.id);
             break;
         case 'bedrock':
-            model = bedrock(theModel.id);
+            model = bedrock(modelObj.id);
             break;
         default:
-            throw new Error(`Unsupported model provider: ${theModel.provider}`);
+            throw new Error(`Unsupported model provider: ${modelObj.provider}`);
     }
 
     return {
