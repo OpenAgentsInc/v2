@@ -2,11 +2,30 @@
 
 import { sql } from '@vercel/postgres'
 import { ServerActionResult } from '@/types'
+import { auth } from '@clerk/nextjs'
 
-export async function deleteThread(threadId: number, userId: string): Promise<ServerActionResult<void>> {
+export async function deleteThread(threadId: number): Promise<ServerActionResult<void>> {
     try {
+        const { userId } = auth()
+        
+        if (!userId) {
+            return { success: false, error: 'User not authenticated' }
+        }
+
         // Start a transaction
         await sql`BEGIN`
+
+        // Check if the thread belongs to the authenticated user
+        const threadOwner = await sql`
+            SELECT clerk_user_id
+            FROM threads
+            WHERE id = ${threadId}
+        `
+
+        if (threadOwner.rows.length === 0 || threadOwner.rows[0].clerk_user_id !== userId) {
+            await sql`ROLLBACK`
+            return { success: false, error: 'Thread not found or user not authorized' }
+        }
 
         // Delete messages associated with the thread
         await sql`
@@ -15,17 +34,13 @@ export async function deleteThread(threadId: number, userId: string): Promise<Se
         `
 
         // Delete the thread
-        const result = await sql`
+        await sql`
             DELETE FROM threads
-            WHERE id = ${threadId} AND clerk_user_id = ${userId}
+            WHERE id = ${threadId}
         `
 
         // Commit the transaction
         await sql`COMMIT`
-
-        if (result.rowCount === 0) {
-            return { success: false, error: 'Thread not found or user not authorized' }
-        }
 
         return { success: true, data: undefined }
     } catch (error) {
