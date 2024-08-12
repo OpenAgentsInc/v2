@@ -3,7 +3,7 @@ import { SignIn, SignedIn, SignUp, SignedOut, UserButton } from '@clerk/nextjs'
 import cn from 'clsx'
 
 const apfel = localFont({
-    src: '../fonts/ApfelGrotezk-Regular.woff2',
+    src: '../../fonts/ApfelGrotezk-Regular.woff2',
 })
 
 export default function Page() {
@@ -28,5 +28,4 @@ export default function Page() {
         </>
     )
 }
-
 
