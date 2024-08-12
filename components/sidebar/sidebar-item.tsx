@@ -22,8 +22,12 @@ interface SidebarItemProps {
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
+    console.log(panes)
+    console.log('chatid', chat.id)
     const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
+    console.log('isanctive', isActive)
+    console.log('isopen', isOpen)
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
@@ -82,55 +86,55 @@ export function SidebarItem({ index, chat, children }: SidebarItemProps) {
                 onClick={handleClick}
                 className={cn(
                     buttonVariants({ variant: 'ghost' }),
-                    'group w-full px-8 transition-colors hover:bg-white/10',   
-            isOpen && 'bg-zinc-200 dark:bg-zinc-800',
-            isActive && 'pr-16 font-semibold',
-            'text-left'
+                    'group w-full px-8 transition-colors hover:bg-white/10',
+                    isOpen && 'bg-zinc-200 dark:bg-zinc-800',
+                    isActive && 'pr-16 font-semibold',
+                    'text-left'
                 )}
             >
-            <div
-                className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
-                title={chat.title}
-            >
-                <span className="whitespace-nowrap">
-                    {shouldAnimate ? (
-                        chat.title.split('').map((character, index) => (
-                            <motion.span
-                                key={index}
-                                variants={{
-                                    initial: {
-                                        opacity: 0,
-                                        x: -100
-                                    },
-                                    animate: {
-                                        opacity: 1,
-                                        x: 0
-                                    }
-                                }}
-                                initial={shouldAnimate ? 'initial' : undefined}
-                                animate={shouldAnimate ? 'animate' : undefined}
-                                transition={{
-                                    duration: 0.25,
-                                    ease: 'easeIn',
-                                    delay: index * 0.05,
-                                    staggerChildren: 0.05
-                                }}
-                                onAnimationComplete={() => {
-                                    if (index === chat.title.length - 1) {
-                                        setNewChatId(null)
-                                    }
-                                }}
-                            >
-                                {character}
-                            </motion.span>
-                        ))
-                    ) : (
-                        <span>{chat.title}</span>
-                    )}
-                </span>
-            </div>
-        </button>
-            { isActive && <div className="absolute right-2 top-1">{children}</div> }
+                <div
+                    className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
+                    title={chat.title}
+                >
+                    <span className="whitespace-nowrap">
+                        {shouldAnimate ? (
+                            chat.title.split('').map((character, index) => (
+                                <motion.span
+                                    key={index}
+                                    variants={{
+                                        initial: {
+                                            opacity: 0,
+                                            x: -100
+                                        },
+                                        animate: {
+                                            opacity: 1,
+                                            x: 0
+                                        }
+                                    }}
+                                    initial={shouldAnimate ? 'initial' : undefined}
+                                    animate={shouldAnimate ? 'animate' : undefined}
+                                    transition={{
+                                        duration: 0.25,
+                                        ease: 'easeIn',
+                                        delay: index * 0.05,
+                                        staggerChildren: 0.05
+                                    }}
+                                    onAnimationComplete={() => {
+                                        if (index === chat.title.length - 1) {
+                                            setNewChatId(null)
+                                        }
+                                    }}
+                                >
+                                    {character}
+                                </motion.span>
+                            ))
+                        ) : (
+                            <span>{chat.title}</span>
+                        )}
+                    </span>
+                </div>
+            </button>
+            {isActive && <div className="absolute right-2 top-1">{children}</div>}
         </motion.div >
     )
 }

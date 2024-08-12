@@ -22,7 +22,7 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
         setIsCreating(true)
         try {
             console.log('Attempting to create new thread');
-            const { threadId } = await createNewThread(true) // Force creation of a new thread
+            const { threadId } = await createNewThread() // Force creation of a new thread
             console.log('Received threadId:', threadId);
 
             console.log('Creating new chat for thread:', threadId);
@@ -30,7 +30,7 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
                 id: threadId,
                 title: 'New Chat',
                 path: `/chat/${threadId}`,
-                createdAt: new Date().toISOString(),
+                createdAt: new Date(),
                 messages: [],
                 userId: userId
             }
