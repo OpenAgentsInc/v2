@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     }
 
     // Check user balance is > 0, but skip for GPT-4o Mini
-    if (toolContext.model.id !== 'gpt-4o-mini') {
+    if (body.model !== 'gpt-4o-mini') {
         try {
             const userBalance = await getUserBalance(userId);
             if (userBalance <= 0) {

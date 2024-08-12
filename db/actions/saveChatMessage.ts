@@ -65,6 +65,7 @@ export async function saveChatMessage(
             );
             placeholders.push('$6', '$7', '$8', '$9', '$10', '$11');
 
+            console.log("About to check deduct credits etc with options:", options);
             if (options.model.id !== 'gpt-4o-mini') {
                 deductionResult = await deductUserCredits(clerkUserId, costInCents);
                 if (!deductionResult.success) {
