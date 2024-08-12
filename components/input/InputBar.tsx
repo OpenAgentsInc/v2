@@ -30,12 +30,12 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
     );
 
     const handleSubmit = useCallback(() => {
-        if (input) {
+        if (input && !isLoading) {
             onSubmit(input);
             setInput("");
             setErrorMessage(null);
         }
-    }, [input, onSubmit]);
+    }, [input, onSubmit, isLoading]);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -61,7 +61,7 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                                 value={input}
                                 onChange={handleInputChange}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
                                         e.preventDefault();
                                         handleSubmit();
                                     }
@@ -69,6 +69,7 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                                 placeholder="Message OpenAgents..."
                                 className="text-[16px] mt-1 max-h-96 w-full overflow-y-auto break-words outline-none focus:outline-none text-black dark:text-white resize-none bg-transparent placeholder-white/40"
                                 style={{ whiteSpace: 'pre-wrap' }}
+                                disabled={isLoading}
                             />
                             <div className="flex items-center gap-2">
                                 {isLoading ? (
