@@ -18,16 +18,16 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
     const { openChatPane } = useHudStore()
     const [isCreating, setIsCreating] = useState(false)
 
-    const handleNewChat = async () => {
+    const handleNewChat = async (event: React.MouseEvent) => {
         setIsCreating(true)
         try {
             console.log('Attempting to create/get thread');
             const { threadId } = await createNewThread()
             console.log('Received threadId:', threadId);
-            
+
             // Check if the thread already exists in the chats
             const existingChat = chats.find(chat => chat.id === threadId)
-            
+
             if (existingChat) {
                 console.log('Thread already exists, reusing:', existingChat);
                 openChatPane({
