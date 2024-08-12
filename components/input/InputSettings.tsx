@@ -61,7 +61,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
 
     const isModelDisabled = (modelId: string) => {
-        return balance === 0 && modelId !== 'gpt-4o-mini'
+        return balance <= 0 && modelId !== 'gpt-4o-mini'
     }
 
     return (
