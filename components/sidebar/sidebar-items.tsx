@@ -6,22 +6,22 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
 import { ServerActionResult } from '@/types'
-
-const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
-    console.log("Remove chat:", args)
-    return { success: true, data: undefined }
-}
-
-const shareChatAsync = async (id: number): Promise<ServerActionResult<Chat>> => {
-    console.log("Share chat:", id)
-    return { success: false, error: "Not implemented" }
-}
+import { deleteThread } from '@/db/actions/deleteThread'
 
 interface SidebarItemsProps {
-    chats?: Chat[]
+    chats: Chat[]
+    setChats: React.Dispatch<React.SetStateAction<Chat[]>>
 }
 
-export function SidebarItems({ chats }: SidebarItemsProps) {
+export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
+    const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
+        const result = await deleteThread(args.id)
+        if (result.success) {
+            setChats(prevChats => prevChats.filter(chat => chat.id !== args.id))
+        }
+        return result
+    }
+
     if (!chats?.length) return null
 
     return (
@@ -40,7 +40,6 @@ export function SidebarItems({ chats }: SidebarItemsProps) {
                                 <SidebarActions
                                     chat={chat}
                                     removeChat={removeChatAsync}
-                                    shareChat={shareChatAsync}
                                 />
                             </SidebarItem>
                         </motion.div>

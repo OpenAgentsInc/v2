@@ -30,12 +30,12 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
     );
 
     const handleSubmit = useCallback(() => {
-        if (input) {
+        if (input && !isLoading) {
             onSubmit(input);
             setInput("");
             setErrorMessage(null);
         }
-    }, [input, onSubmit]);
+    }, [input, onSubmit, isLoading]);
 
     useEffect(() => {
         if (inputRef.current) {
@@ -61,7 +61,7 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                                 value={input}
                                 onChange={handleInputChange}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
                                         e.preventDefault();
                                         handleSubmit();
                                     }

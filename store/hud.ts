@@ -246,3 +246,7 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         height: screenHeight * 0.8
     }
 }
+
+
+
+
