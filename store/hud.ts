@@ -172,7 +172,6 @@ export const useHudStore = create<HudStore>()(
             isRepoInputOpen: false,
             setRepoInputOpen: (isOpen) => set({ isRepoInputOpen: isOpen }),
             openChatPane: (newPane) => set((state) => {
-                console.log('in openChatPane with', newPane)
                 const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
                 const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
 

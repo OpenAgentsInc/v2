@@ -22,12 +22,8 @@ interface SidebarItemProps {
 
 export function SidebarItem({ index, chat, children }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
-    console.log(panes)
-    console.log('chatid', chat.id)
     const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
-    console.log('isanctive', isActive)
-    console.log('isopen', isOpen)
     const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
     const shouldAnimate = index === 0 && isActive && newChatId
 
