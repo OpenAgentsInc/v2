@@ -1,10 +1,14 @@
 'use server'
-import { sql } from '@vercel/postgres'
 
-export async function getUserBalance(clerkUserId: string): Promise<number> {
+import { sql } from '@vercel/postgres'
+import { auth } from "@clerk/nextjs/server";
+
+export async function getUserBalance(): Promise<number> {
+    const { userId } = auth();
+
     try {
         const { rows } = await sql`
-        SELECT credits FROM users WHERE clerk_user_id = ${clerkUserId}
+        SELECT credits FROM users WHERE clerk_user_id = ${userId}
         `;
 
         if (rows.length === 0) {
