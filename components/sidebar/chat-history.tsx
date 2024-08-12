@@ -6,6 +6,7 @@ import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
 import { fetchUserThreads } from '@/db/actions'
 import { useChatStore } from '@/store/chat'
+import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 
 interface ChatHistoryProps {
     userId: string
@@ -14,6 +15,7 @@ interface ChatHistoryProps {
 export function ChatHistory({ userId }: ChatHistoryProps) {
     const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
+    const [newChatId, setNewChatId] = useLocalStorage('newChatId2', null)
 
     React.useEffect(() => {
         async function loadInitialChats() {
@@ -44,7 +46,8 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
             messages: [],
             createdAt: new Date(),
         })
-    }, [setThread])
+        setNewChatId(newChat.id)
+    }, [setThread, setNewChatId])
 
     const sortedChats = React.useMemo(() => {
         return Object.values(threads)
@@ -74,7 +77,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={sortedChats} setChats={() => {}} />
+                <SidebarList chats={sortedChats} setChats={() => {}} newChatId={newChatId} />
             )}
         </div>
     )
