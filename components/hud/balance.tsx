@@ -25,7 +25,7 @@ export const Balance = () => {
                 <DialogHeader>
                     <DialogTitle>Add Credits</DialogTitle>
                     <DialogDescription>
-                        Select the amount of credits you want to add to your account.
+                        Select the amount of credits you want to add to your account. Min $5, max $200
                     </DialogDescription>
                 </DialogHeader>
                 <AddCreditsForm uiMode="hosted" />
