@@ -6,6 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 import { Chat } from '@/types'
+import { createNewThread } from '@/db/actions/createNewThread'
 
 interface NewChatButtonProps {
     addChat: (newChat: Chat) => void
@@ -14,19 +15,14 @@ interface NewChatButtonProps {
 }
 
 export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
-    const { addPane, openChatPane } = useHudStore()
+    const { openChatPane } = useHudStore()
     const [isCreating, setIsCreating] = useState(false)
 
     const handleNewChat = async () => {
         setIsCreating(true)
         try {
             console.log('Attempting to create/get thread');
-            const response = await fetch('/api/thread', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            })
-            if (!response.ok) throw new Error('Failed to create thread')
-            const { threadId } = await response.json()
+            const { threadId } = await createNewThread()
             console.log('Received threadId:', threadId);
             
             // Check if the thread already exists in the chats
