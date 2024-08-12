@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Wrench, Github, GitBranch } from 'lucide-react'
 import { useRepoStore } from '@/store/repo'
@@ -11,7 +11,8 @@ import { models } from '@/lib/models'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import AddCreditsForm from '@/components/AddCreditsForm'
 import { Model } from '@/types'
-import { useAuth } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
+import { isGitHubUser } from '@/lib/github/isGitHubUser'
 
 export function InputSettings({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
@@ -21,7 +22,9 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     const tools = useToolStore((state) => state.tools)
     const setTools = useToolStore((state) => state.setTools)
     const balance = useBalanceStore((state) => state.balance)
-    const { userId } = useAuth()
+    const { user, isLoaded, isSignedIn } = useUser()
+    const [isGitHubConnected, setIsGitHubConnected] = useState(false)
+    const [showGitHubConnectDialog, setShowGitHubConnectDialog] = useState(false)
 
     const [repoInput, setRepoInput] = React.useState({
         owner: repo?.owner || '',
@@ -32,6 +35,16 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     const [open, setOpen] = React.useState(false)
     const [toolsOpen, setToolsOpen] = React.useState(false)
     const [creditsDialogOpen, setCreditsDialogOpen] = React.useState(false)
+
+    useEffect(() => {
+        async function checkGitHubConnection() {
+            if (isLoaded && isSignedIn) {
+                const isGitHub = await isGitHubUser()
+                setIsGitHubConnected(isGitHub)
+            }
+        }
+        checkGitHubConnection()
+    }, [isLoaded, isSignedIn])
 
     const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
@@ -78,7 +91,11 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         }
     }
 
-    if (!userId) {
+    const handleGitHubIconClick = () => {
+        setShowGitHubConnectDialog(true)
+    }
+
+    if (!isLoaded || !isSignedIn) {
         return null
     }
 
@@ -151,63 +168,69 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                             </Popover.Content>
                         </Popover.Portal>
                     </Popover.Root>
-                    {repo && (
-                        <Popover.Root open={open} onOpenChange={setOpen}>
-                            <Popover.Trigger asChild>
-                                <button className={buttonClasses}>
-                                    <Github size={14} />
-                                    <span>{repo.owner}/{repo.name}</span>
-                                    <GitBranch size={14} />
-                                    <span>{repo.branch}</span>
-                                </button>
-                            </Popover.Trigger>
-                            <Popover.Portal>
-                                <Popover.Content
-                                    className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
-                                    style={{ width: '200px' }}
-                                    onOpenAutoFocus={(e) => e.preventDefault()}
-                                >
-                                    <form onSubmit={handleRepoSubmit} className="space-y-2">
-                                        <input
-                                            type="text"
-                                            name="owner"
-                                            value={repoInput.owner}
-                                            onChange={handleRepoInputChange}
-                                            placeholder="Owner"
-                                            className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
-                                            autoComplete="off"
-                                            autoFocus={false}
-                                        />
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={repoInput.name}
-                                            onChange={handleRepoInputChange}
-                                            placeholder="Repo name"
-                                            className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
-                                            autoComplete="off"
-                                            autoFocus={false}
-                                        />
-                                        <input
-                                            type="text"
-                                            name="branch"
-                                            value={repoInput.branch}
-                                            onChange={handleRepoInputChange}
-                                            placeholder="Branch"
-                                            className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
-                                            autoComplete="off"
-                                            autoFocus={false}
-                                        />
-                                        <button
-                                            type="submit"
-                                            className="w-full p-2 bg-background text-foreground border border-input rounded hover:bg-accent/80 hover:text-accent-foreground focus:outline-none text-sm transition-colors duration-200"
-                                        >
-                                            {repo ? 'Update Repo' : 'Set Repo'}
-                                        </button>
-                                    </form>
-                                </Popover.Content>
-                            </Popover.Portal>
-                        </Popover.Root>
+                    {isGitHubConnected ? (
+                        repo && (
+                            <Popover.Root open={open} onOpenChange={setOpen}>
+                                <Popover.Trigger asChild>
+                                    <button className={buttonClasses}>
+                                        <Github size={14} />
+                                        <span>{repo.owner}/{repo.name}</span>
+                                        <GitBranch size={14} />
+                                        <span>{repo.branch}</span>
+                                    </button>
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                    <Popover.Content
+                                        className="bg-background border border-input rounded-lg shadow-lg p-4 z-[9999] focus:outline-none"
+                                        style={{ width: '200px' }}
+                                        onOpenAutoFocus={(e) => e.preventDefault()}
+                                    >
+                                        <form onSubmit={handleRepoSubmit} className="space-y-2">
+                                            <input
+                                                type="text"
+                                                name="owner"
+                                                value={repoInput.owner}
+                                                onChange={handleRepoInputChange}
+                                                placeholder="Owner"
+                                                className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
+                                                autoComplete="off"
+                                                autoFocus={false}
+                                            />
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={repoInput.name}
+                                                onChange={handleRepoInputChange}
+                                                placeholder="Repo name"
+                                                className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
+                                                autoComplete="off"
+                                                autoFocus={false}
+                                            />
+                                            <input
+                                                type="text"
+                                                name="branch"
+                                                value={repoInput.branch}
+                                                onChange={handleRepoInputChange}
+                                                placeholder="Branch"
+                                                className="w-full p-2 bg-background text-foreground border border-input rounded focus:outline-none focus:border-ring text-sm"
+                                                autoComplete="off"
+                                                autoFocus={false}
+                                            />
+                                            <button
+                                                type="submit"
+                                                className="w-full p-2 bg-background text-foreground border border-input rounded hover:bg-accent/80 hover:text-accent-foreground focus:outline-none text-sm transition-colors duration-200"
+                                            >
+                                                {repo ? 'Update Repo' : 'Set Repo'}
+                                            </button>
+                                        </form>
+                                    </Popover.Content>
+                                </Popover.Portal>
+                            </Popover.Root>
+                        )
+                    ) : (
+                        <button className={buttonClasses} onClick={handleGitHubIconClick}>
+                            <Github size={14} />
+                        </button>
                     )}
                 </div>
             </div>
@@ -219,7 +242,17 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                             Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
                         </DialogDescription>
                     </DialogHeader>
-                    <AddCreditsForm uiMode="hosted" clerkUserId={userId} />
+                    <AddCreditsForm uiMode="hosted" clerkUserId={user.id} />
+                </DialogContent>
+            </Dialog>
+            <Dialog open={showGitHubConnectDialog} onOpenChange={setShowGitHubConnectDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Connect GitHub Account</DialogTitle>
+                        <DialogDescription>
+                            To use the repo selector, you need to connect your GitHub account. Click your profile picture top left, click Manage account, then click connect GitHub.
+                        </DialogDescription>
+                    </DialogHeader>
                 </DialogContent>
             </Dialog>
         </div>
