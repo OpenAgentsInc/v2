@@ -15,17 +15,12 @@ interface RepoState {
 export const useRepoStore = create<RepoState>()(
     persist(
         (set) => ({
-            repo: {
-                owner: 'openagentsinc',
-                name: 'v2',
-                branch: 'postgres',
-            },
+            repo: null,
             setRepo: (repo) => set({ repo }),
         }),
         {
-            name: 'openagents-repo-storage-9',
+            name: 'openagents-repo-storage-10',
             partialize: (state) => ({ repo: state.repo }),
         }
     )
 )
-
