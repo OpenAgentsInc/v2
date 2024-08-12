@@ -2,21 +2,28 @@
 
 import { Chat } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useState } from 'react'
 
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
 import { ServerActionResult } from '@/types'
 import { deleteThread } from '@/db/actions/deleteThread'
 
-const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
-    return await deleteThread(args.id)
-}
-
 interface SidebarItemsProps {
-    chats?: Chat[]
+    initialChats: Chat[]
 }
 
-export function SidebarItems({ chats }: SidebarItemsProps) {
+export function SidebarItems({ initialChats }: SidebarItemsProps) {
+    const [chats, setChats] = useState<Chat[]>(initialChats)
+
+    const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
+        const result = await deleteThread(args.id)
+        if (result.success) {
+            setChats(prevChats => prevChats.filter(chat => chat.id !== args.id))
+        }
+        return result
+    }
+
     if (!chats?.length) return null
 
     return (
