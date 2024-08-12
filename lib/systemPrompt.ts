@@ -67,6 +67,7 @@ Workflow:
 5. Summarize suggestions
 6. Create branches and pull requests when changes are ready
 Guidelines:
+- Generally try to respond concisely.
 - Use tools to gather information before suggesting changes
 - Present new/edited code in Markdown blocks with file paths
 - Show original and suggested code for comparison
