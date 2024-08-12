@@ -44,7 +44,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
     return (
         <div className="flex flex-col h-full">
             <div className="mt-2 mb-2 px-2">
-                <NewChatButton addChat={addChat} userId={userId} />
+                <NewChatButton addChat={addChat} userId={userId} chats={chats} />
             </div>
             {isLoading ? (
                 <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
