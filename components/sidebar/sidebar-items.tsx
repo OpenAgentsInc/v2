@@ -2,7 +2,6 @@
 
 import { Chat } from '@/types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState, useCallback } from 'react'
 
 import { SidebarActions } from './sidebar-actions'
 import { SidebarItem } from './sidebar-item'
@@ -11,11 +10,10 @@ import { deleteThread } from '@/db/actions/deleteThread'
 
 interface SidebarItemsProps {
     chats: Chat[]
+    setChats: React.Dispatch<React.SetStateAction<Chat[]>>
 }
 
-export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
-    const [chats, setChats] = useState<Chat[]>(initialChats)
-
+export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
     const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
         const result = await deleteThread(args.id)
         if (result.success) {
@@ -23,10 +21,6 @@ export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
         }
         return result
     }
-
-    const addChat = useCallback((newChat: Chat) => {
-        setChats(prevChats => [newChat, ...prevChats])
-    }, [])
 
     if (!chats?.length) return null
 
@@ -54,6 +48,3 @@ export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
         </AnimatePresence>
     )
 }
-
-export type { Chat }
-export { addChat }
