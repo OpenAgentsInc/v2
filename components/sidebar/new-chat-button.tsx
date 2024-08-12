@@ -20,17 +20,20 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
     const handleNewChat = async () => {
         setIsCreating(true)
         try {
+            console.log('Sending request to create/get thread');
             const response = await fetch('/api/thread', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             })
             if (!response.ok) throw new Error('Failed to create thread')
             const { threadId } = await response.json()
+            console.log('Received threadId:', threadId);
             
             // Check if the thread already exists in the chats
             const existingChat = chats.find(chat => chat.id === threadId)
             
             if (existingChat) {
+                console.log('Thread already exists in chats:', existingChat);
                 // If the chat already exists, just open it
                 addPane({
                     type: 'chat',
@@ -44,6 +47,7 @@ export function NewChatButton({ addChat, userId, chats }: NewChatButtonProps) {
                     id: threadId
                 })
             } else {
+                console.log('Creating new chat for thread:', threadId);
                 // If it's a new chat, add it to the sidebar
                 const newChat: Chat = {
                     id: threadId,
