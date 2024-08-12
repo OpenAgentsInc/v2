@@ -6,7 +6,7 @@ import { getLastEmptyThread } from './getLastEmptyThread'
 
 const RECENT_THREAD_THRESHOLD = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
-export async function createNewThread() {
+export async function createNewThread(forceNew: boolean = false) {
     try {
         // First, ensure the user exists
         const { userId } = await createOrGetUser();
@@ -18,21 +18,23 @@ export async function createNewThread() {
 
         console.log("Checking for existing empty thread for user", user.id);
 
-        // Check for an existing empty thread
-        const existingEmptyThread = await getLastEmptyThread(user.id);
+        // Check for an existing empty thread only if not forcing a new thread
+        if (!forceNew) {
+            const existingEmptyThread = await getLastEmptyThread(user.id);
 
-        if (existingEmptyThread) {
-            const threadCreationTime = new Date(existingEmptyThread.createdAt).getTime();
-            const currentTime = new Date().getTime();
+            if (existingEmptyThread) {
+                const threadCreationTime = new Date(existingEmptyThread.createdAt).getTime();
+                const currentTime = new Date().getTime();
 
-            console.log('Existing empty thread found:', existingEmptyThread);
-            console.log('Thread creation time:', new Date(threadCreationTime).toISOString());
-            console.log('Current time:', new Date(currentTime).toISOString());
-            console.log('Time difference:', currentTime - threadCreationTime);
+                console.log('Existing empty thread found:', existingEmptyThread);
+                console.log('Thread creation time:', new Date(threadCreationTime).toISOString());
+                console.log('Current time:', new Date(currentTime).toISOString());
+                console.log('Time difference:', currentTime - threadCreationTime);
 
-            if (currentTime - threadCreationTime < RECENT_THREAD_THRESHOLD) {
-                console.log('Reusing existing thread:', existingEmptyThread.id);
-                return { threadId: existingEmptyThread.id };
+                if (currentTime - threadCreationTime < RECENT_THREAD_THRESHOLD) {
+                    console.log('Reusing existing thread:', existingEmptyThread.id);
+                    return { threadId: existingEmptyThread.id };
+                }
             }
         }
 
