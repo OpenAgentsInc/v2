@@ -9,24 +9,16 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const handleUserCreation = async () => {
             if (isLoaded && user && !isHandled) {
-                const sessionKey = `user_handled_${user.id}`
-                const isHandledThisSession = sessionStorage.getItem(sessionKey)
-
-                if (!isHandledThisSession) {
-                    try {
-                        await createOrGetUser(
-                            user.id,
-                            user.primaryEmailAddress?.emailAddress || '',
-                            user.imageUrl
-                        )
-                        sessionStorage.setItem(sessionKey, 'true')
-                        setIsHandled(true)
-                    } catch (error) {
-                        console.error('Error creating/getting user:', error)
-                        // Handle error (e.g., show a notification to the user)
-                    }
-                } else {
+                try {
+                    await createOrGetUser(
+                        user.id,
+                        user.primaryEmailAddress?.emailAddress || '',
+                        user.imageUrl
+                    )
                     setIsHandled(true)
+                } catch (error) {
+                    console.error('Error creating/getting user:', error)
+                    // Handle error (e.g., show a notification to the user)
                 }
             }
         }
