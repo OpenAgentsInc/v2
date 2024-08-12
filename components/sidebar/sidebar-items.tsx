@@ -10,10 +10,10 @@ import { ServerActionResult } from '@/types'
 import { deleteThread } from '@/db/actions/deleteThread'
 
 interface SidebarItemsProps {
-    initialChats: Chat[]
+    chats: Chat[]
 }
 
-export function SidebarItems({ initialChats }: SidebarItemsProps) {
+export function SidebarItems({ chats: initialChats }: SidebarItemsProps) {
     const [chats, setChats] = useState<Chat[]>(initialChats)
 
     const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
@@ -42,7 +42,6 @@ export function SidebarItems({ initialChats }: SidebarItemsProps) {
                                 <SidebarActions
                                     chat={chat}
                                     removeChat={removeChatAsync}
-                                // shareChat={shareChatAsync}
                                 />
                             </SidebarItem>
                         </motion.div>
