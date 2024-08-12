@@ -4,6 +4,7 @@ import { sql } from '@vercel/postgres'
 
 export async function getLastEmptyThread(clerkUserId: string) {
     try {
+        console.log('Fetching last empty thread for user:', clerkUserId);
         const { rows } = await sql`
             SELECT t.id, t.clerk_user_id, t.metadata, t."createdAt"
             FROM threads t
@@ -14,6 +15,7 @@ export async function getLastEmptyThread(clerkUserId: string) {
             ORDER BY t."createdAt" DESC
             LIMIT 1
         `;
+        console.log('Query result:', rows);
         return rows[0] || null;
     } catch (error) {
         console.error('Error in getLastEmptyThread:', error);
