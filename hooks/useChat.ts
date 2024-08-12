@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { create } from 'zustand';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
+import { generateTitle } from '@/db/actions';
 import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
@@ -152,14 +153,22 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                     }
                     setError(null);
 
-                    // New check for message count and title
-                    if (updatedMessages.length >= 2) {
-                        console.log("Placeholder function: Message count > 2 and title is 'New Chat'");
-                        console.log("threadData is ", threadData);
-                        // You can replace this console.log with an actual function call
-                        // For example: updateChatTitle(threadId);
-                    }
+                    // Check if this is the first assistant message
 
+                    if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+                        console.log(updatedMessages)
+                        try {
+                            const title = await generateTitle(threadId, updatedMessages);
+                            console.log("updated with tiel", title);
+                            // Update the thread title in the local state
+                            // setThreadData(threadId, { ...threadData, title });
+                            // Notify the sidebar to update
+                            // You'll need to implement this function
+                            // notifySidebarOfTitleChange(threadId, title);
+                        } catch (error) {
+                            console.error('Error generating title:', error);
+                        }
+                    }
 
                 } catch (error: any) {
                     console.log('error message is:', error.message);
