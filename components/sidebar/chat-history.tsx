@@ -51,7 +51,11 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
 
     const sortedChats = React.useMemo(() => {
         return Object.values(threads)
-            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .sort((a, b) => {
+                const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
+                const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
+                return timeB - timeA;
+            })
             .map(thread => ({
                 id: thread.id,
                 title: thread.title,
@@ -77,7 +81,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={sortedChats} setChats={() => {}} newChatId={newChatId} />
+                <SidebarList chats={sortedChats} setChats={() => { }} newChatId={newChatId} />
             )}
         </div>
     )
