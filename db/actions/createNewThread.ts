@@ -13,6 +13,8 @@ export async function createNewThread() {
             throw new Error('No user found')
         }
 
+        console.log("I'm creating a new thread for user", user.id);
+
         // Now create the thread
         const { rows: [thread] } = await sql`
             INSERT INTO threads (user_id, clerk_user_id, metadata)
