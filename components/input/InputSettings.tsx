@@ -8,6 +8,8 @@ import { useBalanceStore } from '@/store/balance'
 import * as Popover from '@radix-ui/react-popover'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { models } from '@/lib/models'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import AddCreditsForm from '@/components/AddCreditsForm'
 
 export function InputSettings({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
@@ -26,6 +28,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
 
     const [open, setOpen] = React.useState(false)
     const [toolsOpen, setToolsOpen] = React.useState(false)
+    const [creditsDialogOpen, setCreditsDialogOpen] = React.useState(false)
 
     const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
@@ -64,6 +67,14 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         return balance <= 0 && modelId !== 'gpt-4o-mini'
     }
 
+    const handleModelClick = (m) => {
+        if (isModelDisabled(m.id)) {
+            setCreditsDialogOpen(true)
+        } else {
+            setModel(m)
+        }
+    }
+
     return (
         <div
             className={cn(
@@ -92,7 +103,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                                             "px-2 py-1 text-foreground hover:bg-accent/80 hover:text-accent-foreground cursor-pointer focus:outline-none focus:bg-accent/80 focus:text-accent-foreground",
                                             isModelDisabled(m.id) && "opacity-50 cursor-not-allowed"
                                         )}
-                                        onClick={() => !isModelDisabled(m.id) && setModel(m)}
+                                        onClick={() => handleModelClick(m)}
                                     >
                                         {m.name}
                                     </DropdownMenu.Item>
@@ -193,6 +204,17 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                     )}
                 </div>
             </div>
+            <Dialog open={creditsDialogOpen} onOpenChange={setCreditsDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add Credits</DialogTitle>
+                        <DialogDescription>
+                            Select the amount of credits you want to add to your account. Min $5, max $200
+                        </DialogDescription>
+                    </DialogHeader>
+                    <AddCreditsForm uiMode="hosted" />
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
