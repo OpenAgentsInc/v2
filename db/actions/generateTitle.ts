@@ -5,6 +5,9 @@ import { Message } from '@/types'
 export async function generateTitle(threadId: number, messages: Message[]): Promise<string> {
     // For now, we'll use a dummy function that returns a fixed title
     // In the future, this will be replaced with AI-powered title generation
+
+    console.log("In generateTitle with messages:", messages);
+
     const dummyTitle = "This is a new thread";
 
     try {
