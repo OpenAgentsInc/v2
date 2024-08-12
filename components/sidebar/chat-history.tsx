@@ -24,6 +24,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                         id: thread.id,
                         title: thread.metadata?.title || 'Untitled Thread',
                         messages: [],
+                        createdAt: new Date(thread.createdAt),
                     })
                 })
             } catch (error) {
@@ -41,22 +42,27 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
             id: newChat.id,
             title: newChat.title,
             messages: [],
+            createdAt: new Date(),
         })
     }, [setThread])
 
-    const chats = Object.values(threads).map(thread => ({
-        id: thread.id,
-        title: thread.title,
-        path: `/chat/${thread.id}`,
-        createdAt: new Date(), // You might want to add createdAt to your Thread type
-        messages: thread.messages,
-        userId: userId,
-    }))
+    const sortedChats = React.useMemo(() => {
+        return Object.values(threads)
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .map(thread => ({
+                id: thread.id,
+                title: thread.title,
+                path: `/chat/${thread.id}`,
+                createdAt: thread.createdAt,
+                messages: thread.messages,
+                userId: userId,
+            }))
+    }, [threads, userId])
 
     return (
         <div className="flex flex-col h-full">
             <div className="mt-2 mb-2 px-2">
-                <NewChatButton addChat={addChat} userId={userId} chats={chats} />
+                <NewChatButton addChat={addChat} userId={userId} chats={sortedChats} />
             </div>
             {isLoading ? (
                 <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
@@ -68,7 +74,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={chats} setChats={() => { }} />
+                <SidebarList chats={sortedChats} setChats={() => {}} />
             )}
         </div>
     )
