@@ -26,8 +26,8 @@ export const Chat = ({ threadId, className }: ChatProps) => {
                 {
                     id: 'error-message',
                     content: error,
-                    role: 'assistant',
-                    createdAt: new Date().toISOString()
+                    role: 'assistant' as const,
+                    createdAt: new Date()
                 } as Message
             ];
         }
