@@ -151,6 +151,16 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         setBalance(result.newBalance);
                     }
                     setError(null);
+
+                    // New check for message count and title
+                    if (updatedMessages.length >= 2) {
+                        console.log("Placeholder function: Message count > 2 and title is 'New Chat'");
+                        console.log("threadData is ", threadData);
+                        // You can replace this console.log with an actual function call
+                        // For example: updateChatTitle(threadId);
+                    }
+
+
                 } catch (error: any) {
                     console.log('error message is:', error.message);
                     if (error instanceof Error && error.message === 'Insufficient credits') {
