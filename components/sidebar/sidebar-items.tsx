@@ -31,15 +31,15 @@ export function SidebarItems({ chats, setChats, newChatId }: SidebarItemsProps) 
                 (chat, index) =>
                     chat && (
                         <motion.div
-                            key={chat?.id}
+                            key={chat?.id || Math.random()}
                             exit={{
                                 opacity: 0,
                                 height: 0
                             }}
                         >
-                            <SidebarItem 
-                                index={index} 
-                                chat={chat} 
+                            <SidebarItem
+                                index={index}
+                                chat={chat}
                                 isNew={chat.id === newChatId}
                             >
                                 <SidebarActions
