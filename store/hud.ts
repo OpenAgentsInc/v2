@@ -106,7 +106,7 @@ export const useHudStore = create<HudStore>()(
                     } else {
                         panePosition = calculatePanePosition(0)
                     }
-                    updatedPanes = [] // Close all other panes
+                    updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
                 }
 
                 // Ensure the new pane is within the viewport
@@ -187,7 +187,7 @@ export const useHudStore = create<HudStore>()(
                     title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
                 return {
-                    panes: [newPaneWithPosition], // Replace all panes with the new one
+                    panes: [...state.panes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
                     isChatOpen: true,
                     lastPanePosition: panePosition
                 }
@@ -239,11 +239,3 @@ function calculatePanePosition(paneCount: number): { x: number; y: number; width
         height: screenHeight * 0.8
     }
 }
-
-
-
-
-
-
-
-
