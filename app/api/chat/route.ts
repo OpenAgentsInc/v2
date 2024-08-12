@@ -2,7 +2,6 @@ import { convertToCoreMessages, streamText } from 'ai';
 import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { auth } from '@clerk/nextjs/server';
-import { OnFinishResult } from '@/types'
 import { getUserBalance } from '@/db/actions';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +25,7 @@ export async function POST(req: Request) {
     // Check user balance is > 0, but skip for GPT-4o Mini
     if (body.model !== 'gpt-4o-mini') {
         try {
-            const userBalance = await getUserBalance(userId);
+            const userBalance = await getUserBalance();
             if (userBalance <= 0) {
                 return new Response('Insufficient credits', { status: 403 });
             }

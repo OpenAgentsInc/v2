@@ -10,6 +10,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { models } from '@/lib/models'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import AddCreditsForm from '@/components/AddCreditsForm'
+import { Model } from '@/types'
 
 export function InputSettings({ className, ...props }: React.ComponentProps<'div'>) {
     const repo = useRepoStore((state) => state.repo)
@@ -67,7 +68,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         return balance <= 0 && modelId !== 'gpt-4o-mini'
     }
 
-    const handleModelClick = (m) => {
+    const handleModelClick = (m: Model) => {
         if (isModelDisabled(m.id)) {
             setCreditsDialogOpen(true)
         } else {
@@ -209,7 +210,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                     <DialogHeader>
                         <DialogTitle>Add Credits</DialogTitle>
                         <DialogDescription>
-                            Select the amount of credits you want to add to your account. Min $5, max $200
+                            Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
                         </DialogDescription>
                     </DialogHeader>
                     <AddCreditsForm uiMode="hosted" />

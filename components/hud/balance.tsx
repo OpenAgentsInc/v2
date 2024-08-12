@@ -15,7 +15,7 @@ export const Balance = () => {
             try {
                 const balance = await getUserBalance();
                 setBalance(balance);
-            } catch (err) {
+            } catch (err: any) {
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -45,7 +45,7 @@ export const Balance = () => {
                 <DialogHeader>
                     <DialogTitle>Add Credits</DialogTitle>
                     <DialogDescription>
-                        Select the amount of credits you want to add to your account. Min $5, max $200
+                        Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
                     </DialogDescription>
                 </DialogHeader>
                 <AddCreditsForm uiMode="hosted" />
