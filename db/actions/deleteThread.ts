@@ -2,12 +2,14 @@
 
 import { sql } from '@vercel/postgres'
 import { ServerActionResult } from '@/types'
-import { auth } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 
 export async function deleteThread(threadId: number): Promise<ServerActionResult<void>> {
+    const { userId } = auth()
+
     try {
         const { userId } = auth()
-        
+
         if (!userId) {
             return { success: false, error: 'User not authenticated' }
         }
