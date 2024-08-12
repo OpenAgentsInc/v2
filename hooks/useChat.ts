@@ -74,6 +74,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const tools = useToolStore((state) => state.tools);
     const setBalance = useBalanceStore((state) => state.setBalance);
     const { user } = useUser();
+    const [error, setError] = useState<string | null>(null);
 
     const {
         currentThreadId,
@@ -144,13 +145,21 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 try {
                     const result = await saveChatMessage(threadId, user.id, message as Message, {
                         ...options,
-                        model: currentModelRef.current // Use the model from when the request was initiated
+                        model: currentModelRef.current
                     });
                     console.log('New user balance after message:', result.newBalance);
                     setBalance(result.newBalance || 0);
+                    setError(null); // Clear any previous errors
                 } catch (error) {
-                    console.error('Error saving AI message:', error);
-                    toast.error('Failed to save AI response. Some messages may be missing.');
+                    // console.error('Error saving AI message!!!!:', error);
+                    console.log('error message is:', error.message);
+                    if (error instanceof Error && error.message === 'Insufficient credits') {
+                        setError('Insufficient credits. Please add more credits to continue chatting.');
+                        toast.error('Insufficient credits. Please add more credits to continue chatting.');
+                    } else {
+                        setError('Failed to save AI response. Some messages may be missing.');
+                        toast.error('Failed to save AI response. Some messages may be missing.');
+                    }
                 }
             }
         },
@@ -196,5 +205,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setUser,
         setInput,
         sendMessage,
+        error
     };
 }
