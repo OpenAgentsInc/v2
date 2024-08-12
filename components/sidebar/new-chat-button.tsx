@@ -5,9 +5,14 @@ import { useHudStore } from '@/store/hud'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
-import { Chat, addChat } from './sidebar-items'
+import { Chat } from '@/types'
 
-export function NewChatButton() {
+interface NewChatButtonProps {
+    addChat: (newChat: Chat) => void
+    userId: string
+}
+
+export function NewChatButton({ addChat, userId }: NewChatButtonProps) {
     const { addPane } = useHudStore()
     const [isCreating, setIsCreating] = useState(false)
 
@@ -28,7 +33,7 @@ export function NewChatButton() {
                 path: `/chat/${threadId}`,
                 createdAt: new Date().toISOString(),
                 messages: [],
-                userId: 'current-user-id' // You might need to get this from your auth context
+                userId: userId
             }
             addChat(newChat)
 
