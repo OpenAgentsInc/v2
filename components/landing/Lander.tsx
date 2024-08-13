@@ -5,6 +5,7 @@ import { GlobalDatabase } from "@/components/landing/ui/GlobalDatabase"
 import Hero from "@/components/landing/ui/Hero"
 import LogoCloud from "@/components/landing/ui/LogoCloud"
 import { Navigation } from "@/components/landing/ui/Navbar"
+import './landing.css'
 
 export function Lander() {
     return (
