@@ -11,10 +11,10 @@ export default function Hero() {
         >
             <h1
                 id="hero-title"
-                className="font-sans inline-block animate-slide-up-fade bg-white bg-clip-text p-2 text-4xl font-bold tracking-tighter text-transparent sm:text-6xl md:text-7xl"
+                className="font-sans inline-block animate-slide-up-fade bg-white bg-clip-text p-2 text-4xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl"
                 style={{ animationDuration: "700ms" }}
             >
-                Goodbye ChatGPT
+                Build Faster.
             </h1>
             <p
                 className="font-mono mt-6 max-w-lg animate-slide-up-fade text-lg text-white"
