@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { Providers } from "@/components/providers"
 import { apfel, jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
@@ -37,16 +36,9 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning className="dark">
             <body
-                className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black fixed w-screen`}
+                className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black fixed w-screen font-mono`}
             >
-                <Providers
-                    attribute="class"
-                    defaultTheme="dark"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    {children}
-                </Providers>
+                {children}
             </body>
         </html>
     )

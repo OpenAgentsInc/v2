@@ -6,7 +6,7 @@ import Hero from "@/components/landing/ui/Hero"
 import LogoCloud from "@/components/landing/ui/LogoCloud"
 import { Navigation } from "@/components/landing/ui/Navbar"
 
-export default function Home() {
+export function Lander() {
     return (
         <>
             <Navigation />
@@ -21,3 +21,4 @@ export default function Home() {
         </>
     )
 }
+
