@@ -1,70 +1,61 @@
-import dynamic from 'next/dynamic'
-import { Providers } from '@/components/providers'
-import { jetbrainsMono } from '@/lib/fonts'
-import { cn } from '@/lib/utils'
-import { Toaster } from '@/components/ui/sonner'
-import '@/app/globals.css'
+import type { Metadata } from "next"
+import { ThemeProvider } from "next-themes"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { siteConfig } from "./siteConfig"
 
-const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
+const inter = Inter({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-inter",
+})
 
-export const metadata = {
-    metadataBase: process.env.VERCEL_URL
-        ? new URL(`https://${process.env.VERCEL_URL}`)
-        : undefined,
-    title: {
-        default: 'OpenAgents',
-        template: `%s - OpenAgents`
+export const metadata: Metadata = {
+    metadataBase: new URL("https://yoururl.com"),
+    title: siteConfig.name,
+    description: siteConfig.description,
+    keywords: ["Marketing", "Database", "Software"],
+    authors: [
+        {
+            name: "yourname",
+            url: "",
+        },
+    ],
+    creator: "yourname",
+    openGraph: {
+        type: "website",
+        locale: "en_US",
+        url: siteConfig.url,
+        title: siteConfig.name,
+        description: siteConfig.description,
+        siteName: siteConfig.name,
     },
-    description: 'Your AI productivity dashboard',
+    twitter: {
+        card: "summary_large_image",
+        title: siteConfig.name,
+        description: siteConfig.description,
+        creator: "@yourname",
+    },
     icons: {
-        icon: '/favicon.ico',
-        // shortcut: '/favicon-16x16.png',
-        // apple: '/apple-touch-icon.png'
-    }
+        icon: "/favicon.ico",
+    },
 }
 
-export const viewport = {
-    themeColor: [
-        { media: '(prefers-color-scheme: light)', color: 'white' },
-        { media: '(prefers-color-scheme: dark)', color: 'black' }
-    ]
-}
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode
+}>) {
     return (
-        <html lang='en' className='antialiased' suppressHydrationWarning>
-            {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-        */}
-            <head />
+        <html lang="en" suppressHydrationWarning>
             <body
-                className={cn(
-                    'font-mono w-screen h-screen bg-black fixed',
-                    jetbrainsMono.variable
-                )}
+                className={`${inter.className} min-h-screen scroll-auto antialiased selection:bg-indigo-100 selection:text-indigo-700 dark:bg-gray-950`}
             >
-                <Toaster position='top-right' />
-                <Providers
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <Scene
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100vw',
-                            height: '100vh',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                        }}
-                    />
+                <ThemeProvider defaultTheme="system" attribute="class">
                     {children}
-                </Providers>
+                </ThemeProvider>
             </body>
         </html>
     )
 }
+
