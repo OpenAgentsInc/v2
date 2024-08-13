@@ -1,27 +1,15 @@
 import type { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
-import { Inter } from "next/font/google"
+import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
 
-const inter = Inter({
-    subsets: ["latin"],
-    display: "swap",
-    variable: "--font-inter",
-})
-
 export const metadata: Metadata = {
-    metadataBase: new URL("https://yoururl.com"),
+    metadataBase: new URL("https://openagents.com"),
     title: siteConfig.name,
     description: siteConfig.description,
-    keywords: ["Marketing", "Database", "Software"],
-    authors: [
-        {
-            name: "yourname",
-            url: "",
-        },
-    ],
-    creator: "yourname",
+    keywords: ["AI", "Developer", "Chatbot"],
+    creator: "OpenAgentsInc",
     openGraph: {
         type: "website",
         locale: "en_US",
@@ -34,7 +22,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: siteConfig.name,
         description: siteConfig.description,
-        creator: "@yourname",
+        creator: "@OpenAgentsInc",
     },
     icons: {
         icon: "/favicon.ico",
@@ -47,11 +35,11 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className="dark">
             <body
-                className={`${inter.className} min-h-screen scroll-auto antialiased selection:bg-indigo-100 selection:text-indigo-700 dark:bg-gray-950`}
+                className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black`}
             >
-                <ThemeProvider defaultTheme="system" attribute="class">
+                <ThemeProvider defaultTheme="dark" attribute="class">
                     {children}
                 </ThemeProvider>
             </body>
