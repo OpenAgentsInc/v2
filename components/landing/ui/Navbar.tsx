@@ -43,26 +43,10 @@ export function Navigation() {
                     <Link href={siteConfig.baseLinks.home} aria-label="Home">
                         <div className="flex flex-row items-center gap-2">
                             <span className="sr-only">Company logo</span>
-                            <IconOpenAgents className="h-8" />
+                            <IconOpenAgents className="h-6 w-6" />
                             <h1 className="font-mono text-lg font-bold">OpenAgents</h1>
                         </div>
                     </Link>
-                    <nav className="hidden md:absolute md:left-1/2 md:top-1/2 md:block md:-translate-x-1/2 md:-translate-y-1/2 md:transform">
-                        <div className="flex items-center gap-10 font-medium">
-                            <ExternalLink
-                                className="px-2 py-1 text-gray-900 dark:text-gray-50"
-                                href="https://x.com/OpenAgentsInc"
-                            >
-                                X
-                            </ExternalLink>
-                            <ExternalLink
-                                className="px-2 py-1 text-gray-900 dark:text-gray-50"
-                                href="https://github.com/OpenAgentsInc/openagents/wiki/Video-Series"
-                            >
-                                <span>Videos</span>
-                            </ExternalLink>
-                        </div>
-                    </nav>
                     <Button className="hidden h-10 font-semibold md:flex">
                         Log in
                     </Button>
