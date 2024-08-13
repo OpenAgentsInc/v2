@@ -1,5 +1,5 @@
 import localFont from 'next/font/local'
-import { SignIn, SignedIn, SignUp, SignedOut, UserButton } from '@clerk/nextjs'
+import { SignedIn, SignUp, SignedOut, UserButton } from '@clerk/nextjs'
 import cn from 'clsx'
 
 const apfel = localFont({
