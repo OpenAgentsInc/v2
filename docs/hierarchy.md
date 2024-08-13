@@ -1,5 +1,10 @@
 # Hierarchy of important files & folders
 
+- .env.example - Example environment variables file
+- .eslintrc.json - ESLint configuration file
+- .gitignore - Git ignore file
+- LICENSE - Project license file
+- README.md - Project readme file
 - app/
   - [[...rest]]/
     - page.tsx - Main application page
@@ -16,6 +21,8 @@
         - Returns existing empty thread or creates a new one
   - globals.css - Global CSS styles
   - layout.tsx - Main application layout
+- auth.ts - Authentication configuration file
+- components.json - Component configuration file
 - components/ - React components
   - canvas/ - Canvas-related components
     - Scene.tsx - Main scene component for 3D rendering
@@ -77,6 +84,7 @@
   - init-db.ts - Initializes the database and seeds initial data
   - seed.ts - Seeds the database with initial data
 - docs/ - Documentation files
+  - hierarchy.md - This file, describing the project structure
   - hud.md - Describes the HUD overlay and its components
   - journal.md - Development journal for tracking progress and reflections
   - pull-request-flow.md - Details the pull request workflow and tools
@@ -87,22 +95,30 @@
   - useChatScroll.ts - Hook for managing chat scrolling behavior
   - usePostprocess.jsx - Hook for applying post-processing effects in a 3D scene
   - useThreadCreation.ts - Hook for creating new chat threads
+- index.d.ts - TypeScript declaration file
 - lib/ - Utility functions and modules
   - fonts.ts - Configures and exports the JetBrains Mono font
   - github/ - GitHub integration utilities
-  - githubUtils.ts - (still needs to be summarized)
+  - githubUtils.ts - GitHub utility functions
   - models.ts - Defines and exports available models
   - systemPrompt.ts - Generates system prompts based on user context
   - types.ts - TypeScript type definitions
   - utils.ts - General utility functions
+- middleware.ts - Next.js middleware configuration
+- next-env.d.ts - Next.js TypeScript declarations
+- next.config.js - Next.js configuration file
+- package.json - Project dependencies and scripts
+- pnpm-lock.yaml - pnpm lock file
+- postcss.config.js - PostCSS configuration
+- prettier.config.cjs - Prettier configuration
 - public/ - Public assets
-- scripts/ - Build and maintenance scripts
 - store/ - State management
   - hud.ts - Zustand store for managing HUD state
   - models.ts - Zustand store for managing model state
   - repo.ts - Zustand store for managing repository state
   - tools.ts - Zustand store for managing tools state
   - user.ts - Zustand store for managing user state
+- tailwind.config.ts - Tailwind CSS configuration
 - tools/ - Custom tools and integrations
   - create-branch.ts - Tool for creating a new branch in the repository
   - create-file.ts - Tool for creating a new file in the repository
@@ -114,6 +130,7 @@
   - search-codebase.ts - Tool for searching the codebase using the Greptile API
   - view-file.ts - Tool for viewing file contents
   - view-hierarchy.ts - Tool for viewing file/folder hierarchy
+- tsconfig.json - TypeScript configuration file
 - types/ - TypeScript type definitions
   - attachment.ts - Defines the Attachment interface for file attachments
   - chat.ts - Defines the Chat interface for chat threads
