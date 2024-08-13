@@ -1,3 +1,4 @@
+import { currentUser } from '@clerk/nextjs/server'
 import dynamic from 'next/dynamic'
 import { Providers } from '@/components/providers'
 import { jetbrainsMono } from '@/lib/fonts'
@@ -31,6 +32,7 @@ export const viewport = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const user = await currentUser()
     return (
         <html lang='en' className='antialiased' suppressHydrationWarning>
             {/*
@@ -51,17 +53,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <Scene
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100vw',
-                            height: '100vh',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                        }}
-                    />
+                    {!!user && (
+                        <Scene
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                width: '100vw',
+                                height: '100vh',
+                                pointerEvents: 'none',
+                                zIndex: 0,
+                            }}
+                        />
+                    )}
                     {children}
                 </Providers>
             </body>
