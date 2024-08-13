@@ -47,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Toaster position='top-right' />
                 <Providers
                     attribute="class"
-                    defaultTheme="system"
+                    defaultTheme="dark"
                     enableSystem
                     disableTransitionOnChange
                 >

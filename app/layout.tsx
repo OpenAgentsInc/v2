@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { ThemeProvider } from "next-themes"
+import { Providers } from "@/components/providers"
 import { apfel, jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
@@ -39,9 +39,14 @@ export default function RootLayout({
             <body
                 className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black fixed w-screen`}
             >
-                <ThemeProvider defaultTheme="dark" attribute="class">
+                <Providers
+                    attribute="class"
+                    defaultTheme="dark"
+                    enableSystem
+                    disableTransitionOnChange
+                >
                     {children}
-                </ThemeProvider>
+                </Providers>
             </body>
         </html>
     )

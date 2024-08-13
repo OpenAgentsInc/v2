@@ -2,6 +2,7 @@ import { RiPlayCircleFill } from "@remixicon/react"
 import Link from "next/link"
 import { Button } from "../Button"
 import HeroImage from "./HeroImage"
+import { SignInButton, SignUpButton } from "@clerk/nextjs"
 
 export default function Hero() {
     return (
@@ -26,9 +27,11 @@ export default function Hero() {
                 className="mt-8 flex w-full animate-slide-up-fade flex-col justify-center gap-3 px-3 sm:flex-row"
                 style={{ animationDuration: "1100ms" }}
             >
-                <Button variant="primary" className="font-semibold bg-black border-white text-white hover:bg-white/10">
-                    <Link href="#">Try for free</Link>
-                </Button>
+                <SignUpButton mode="modal">
+                    <Button variant="primary" className="font-semibold bg-black border-white text-white hover:bg-white/10">
+                        Try for free
+                    </Button>
+                </SignUpButton>
                 <Button
                     asChild
                     variant="light"
