@@ -27,7 +27,7 @@ export default function Hero() {
                 className="mt-8 flex w-full animate-slide-up-fade flex-col justify-center gap-3 px-3 sm:flex-row"
                 style={{ animationDuration: "1100ms" }}
             >
-                <SignUpButton mode="modal">
+                <SignUpButton mode="modal" forceRedirectUrl="/">
                     <Button variant="primary" className="font-semibold bg-black border-white text-white hover:bg-white/10">
                         Try for free
                     </Button>

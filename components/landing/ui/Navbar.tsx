@@ -47,7 +47,7 @@ export function Navigation() {
                             <h1 className="font-mono text-lg font-bold">OpenAgents</h1>
                         </div>
                     </Link>
-                    <SignInButton mode="modal">
+                    <SignInButton mode="modal" forceRedirectUrl="/">
                         <Button className="hidden h-10 font-semibold md:flex">
                             Sign in
                         </Button>
