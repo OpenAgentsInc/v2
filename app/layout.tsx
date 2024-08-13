@@ -37,7 +37,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning className="dark">
             <body
-                className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black fixed w-screen`}
+                className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black`}
             >
                 <ThemeProvider defaultTheme="dark" attribute="class">
                     {children}
