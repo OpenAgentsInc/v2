@@ -8,7 +8,7 @@ import Link from "next/link"
 import React from "react"
 import { IconOpenAgents } from "@/components/ui/icons"
 import { Button } from "../Button"
-import { SignInButton, SignUpButton } from "@clerk/nextjs"
+import { SignInButton } from "@clerk/nextjs"
 
 export function Navigation() {
     const scrolled = useScroll(15)
@@ -49,11 +49,11 @@ export function Navigation() {
                     </Link>
                     <SignInButton mode="modal">
                         <Button className="hidden h-10 font-semibold md:flex">
-                            Log in
+                            Sign in
                         </Button>
                     </SignInButton>
                     <div className="flex gap-x-2 md:hidden">
-                        <Button>Log in</Button>
+                        <Button>Sign in</Button>
                         <Button
                             onClick={() => setOpen(!open)}
                             variant="light"
