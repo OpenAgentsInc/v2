@@ -2,7 +2,7 @@ import { RiPlayCircleFill } from "@remixicon/react"
 import Link from "next/link"
 import { Button } from "../Button"
 import HeroImage from "./HeroImage"
-import { SignInButton, SignUpButton } from "@clerk/nextjs"
+import { SignUpButton } from "@clerk/nextjs"
 
 export default function Hero() {
     return (
