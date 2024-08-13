@@ -7,7 +7,7 @@ export default function Hero() {
     return (
         <section
             aria-labelledby="hero-title"
-            className="font-mono mt-32 flex flex-col items-center justify-center text-center sm:mt-40 bg-black text-white"
+            className="select-none font-mono mt-32 flex flex-col items-center justify-center text-center sm:mt-40 bg-black text-white"
         >
             <h1
                 id="hero-title"

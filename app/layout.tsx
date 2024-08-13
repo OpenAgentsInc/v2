@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
 import { apfel, jetbrainsMono } from '@/lib/fonts'
-import "../globals.css"
-import { siteConfig } from "../siteConfig"
+import "./globals.css"
+import { siteConfig } from "./siteConfig"
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://openagents.com"),
