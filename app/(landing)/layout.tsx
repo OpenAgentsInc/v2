@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { ThemeProvider } from "next-themes"
-import { jetbrainsMono } from '@/lib/fonts'
-import "./globals.css"
-import { siteConfig } from "./siteConfig"
+import { apfel, jetbrainsMono } from '@/lib/fonts'
+import "../globals.css"
+import { siteConfig } from "../siteConfig"
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://openagents.com"),
@@ -37,7 +37,7 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning className="dark">
             <body
-                className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black`}
+                className={`${jetbrainsMono.variable} ${apfel.className} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black fixed w-screen`}
             >
                 <ThemeProvider defaultTheme="dark" attribute="class">
                     {children}

@@ -1,4 +1,4 @@
-// Tremor Raw Button [v0.1.1]
+// Tremor Raw Button [v0.1.1] - Black and White Theme
 
 import { cx, focusRing } from "./utils"
 import { Slot } from "@radix-ui/react-slot"
@@ -21,27 +21,25 @@ const buttonVariants = tv({
                 // border
                 "border-transparent",
                 // text color
-                "text-white dark:text-white",
+                "text-black",
                 // background color
-                "bg-indigo-600 dark:bg-indigo-500",
+                "bg-white",
                 // hover color
-                "hover:bg-indigo-700 dark:hover:bg-indigo-400",
+                "hover:bg-gray-200",
                 // disabled
-                "disabled:bg-indigo-100 disabled:text-indigo-400",
-                "disabled:dark:bg-indigo-800 disabled:dark:text-indigo-600",
+                "disabled:bg-gray-300 disabled:text-gray-500",
             ],
             secondary: [
                 // border
-                "border-gray-300 dark:border-gray-800",
+                "border-white",
                 // text color
-                "text-gray-900 dark:text-gray-50",
+                "text-white",
                 // background color
-                "bg-white dark:bg-gray-950",
+                "bg-black",
                 //hover color
-                "hover:bg-gray-50 dark:hover:bg-gray-900/60",
+                "hover:bg-gray-900",
                 // disabled
-                "disabled:text-gray-400",
-                "disabled:dark:text-gray-600",
+                "disabled:text-gray-500",
             ],
             light: [
                 // base
@@ -49,14 +47,13 @@ const buttonVariants = tv({
                 // border
                 "border-transparent",
                 // text color
-                "text-gray-900 dark:text-gray-50",
+                "text-black",
                 // background color
-                "bg-gray-200 dark:bg-gray-900",
+                "bg-gray-200",
                 // hover color
-                "hover:bg-gray-300/70 dark:hover:bg-gray-800/80",
+                "hover:bg-gray-300",
                 // disabled
                 "disabled:bg-gray-100 disabled:text-gray-400",
-                "disabled:dark:bg-gray-800 disabled:dark:text-gray-600",
             ],
             ghost: [
                 // base
@@ -64,25 +61,23 @@ const buttonVariants = tv({
                 // border
                 "border-transparent",
                 // text color
-                "text-gray-900 dark:text-gray-50",
+                "text-white",
                 // hover color
-                "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800/80",
+                "bg-transparent hover:bg-white hover:text-black",
                 // disabled
-                "disabled:text-gray-400",
-                "disabled:dark:text-gray-600",
+                "disabled:text-gray-500",
             ],
             destructive: [
                 // text color
-                "text-white",
+                "text-black",
                 // border
                 "border-transparent",
                 // background color
-                "bg-red-600 dark:bg-red-700",
+                "bg-white",
                 // hover color
-                "hover:bg-red-700 dark:hover:bg-red-600",
+                "hover:bg-gray-200",
                 // disabled
-                "disabled:bg-red-300 disabled:text-white",
-                "disabled:dark:bg-red-950 disabled:dark:text-red-400",
+                "disabled:bg-gray-300 disabled:text-gray-500",
             ],
         },
     },
