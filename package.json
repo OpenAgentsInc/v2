@@ -76,6 +76,7 @@
     "react-wrap-balancer": "^1.1.1",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "resend": "^3.5.0",
     "server-only": "0.0.1",
     "sonner": "^1.5.0",
     "stripe": "14.8.0",
