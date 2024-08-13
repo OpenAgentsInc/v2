@@ -12,7 +12,7 @@ export default function Hero() {
         >
             <h1
                 id="hero-title"
-                className="font-mono font-extrabold inline-block animate-slide-up-fade bg-white bg-clip-text p-2 text-4xl font-bold tracking-tight text-transparent sm:text-6xl md:text-7xl"
+                className="font-mono font-extrabold inline-block animate-slide-up-fade bg-white bg-clip-text p-2 text-4xl tracking-tight text-transparent sm:text-6xl md:text-7xl"
                 style={{ animationDuration: "700ms" }}
             >
                 BUILD FASTER.
