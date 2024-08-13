@@ -2,7 +2,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import dynamic from 'next/dynamic'
 import { Providers } from '@/components/providers'
 import { Toaster } from '@/components/ui/sonner'
-import '@/app/globals.css'
+import './globals.css'
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 

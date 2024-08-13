@@ -214,7 +214,7 @@ export const useHudStore = create<HudStore>()(
             })),
         }),
         {
-            name: 'openagents-hud-storage-1525',
+            name: 'openagents-hud-storage-1525' + Math.random(), // remove random after we can reset bad positions
             partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
         }
     )
