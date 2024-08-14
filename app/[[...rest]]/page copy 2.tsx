@@ -1,21 +1,20 @@
-"use client"
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
-import { useConvexAuth } from "convex/react";
-import { useClerk } from '@clerk/nextjs'
+'use client'
 
-export default function App() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
-  const { signOut } = useClerk()
-  // pull in what we need to log out
-  console.log(isLoading, isAuthenticated)
-  // if (!isAuthenticated) {
-  //   signOut()
-  // }
+import { SignInButton, UserButton } from "@clerk/nextjs";
+import { Authenticated, Unauthenticated } from "convex/react";
+
+export default function Home() {
+
+
+
   return (
-    <div className="App">
-      <Authenticated>Logged in</Authenticated>
-      <Unauthenticated>Logged out</Unauthenticated>
-      <AuthLoading>Still loading</AuthLoading>
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Unauthenticated>
+        <SignInButton />
+      </Unauthenticated>
+      <Authenticated>
+        <UserButton />
+      </Authenticated>
+    </main>
   );
 }
