@@ -29,6 +29,9 @@ dependencies:
   '@clerk/themes':
     specifier: ^2.1.18
     version: 2.1.18
+  '@hookform/resolvers':
+    specifier: ^3.9.0
+    version: 3.9.0(react-hook-form@7.52.2)
   '@octokit/rest':
     specifier: ^21.0.1
     version: 21.0.1
@@ -179,6 +182,9 @@ dependencies:
   react-email:
     specifier: ^2.1.6
     version: 2.1.6(eslint@8.57.0)
+  react-hook-form:
+    specifier: ^7.52.2
+    version: 7.52.2(react@18.3.1)
   react-intersection-observer:
     specifier: ^9.10.3
     version: 9.10.3(react-dom@18.3.1)(react@18.3.1)
@@ -1812,6 +1818,14 @@ packages:
 
   /@floating-ui/utils@0.2.4:
     resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
+    dev: false
+
+  /@hookform/resolvers@3.9.0(react-hook-form@7.52.2):
+    resolution: {integrity: sha512-bU0Gr4EepJ/EQsH/IwEzYLsT/PEj5C0ynLQ4m+GSHS+xKH4TfSelhluTgOaoc4kA5s7eCsQbM4wvZLzELmWzUg==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.52.2(react@18.3.1)
     dev: false
 
   /@humanwhocodes/config-array@0.11.14:
@@ -9416,6 +9430,15 @@ packages:
       - uglify-js
       - utf-8-validate
       - webpack-cli
+    dev: false
+
+  /react-hook-form@7.52.2(react@18.3.1):
+    resolution: {integrity: sha512-pqfPEbERnxxiNMPd0bzmt1tuaPcVccywFDpyk2uV5xCIBphHV5T8SVnX9/o3kplPE1zzKt77+YIoq+EMwJp56A==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    dependencies:
+      react: 18.3.1
     dev: false
 
   /react-intersection-observer@9.10.3(react-dom@18.3.1)(react@18.3.1):
