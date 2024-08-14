@@ -8,3 +8,4 @@ We have a basic email template at `components/email/email-template.tsx` and demo
 
 We need to think about styling this email template. I heard Resend uses `react-email` but don't see any relevant docs.
 
+...
