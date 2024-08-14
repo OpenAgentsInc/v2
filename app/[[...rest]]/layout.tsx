@@ -14,7 +14,7 @@ export const viewport = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // const user = await currentUser()
+  const user = await currentUser()
   return (
     <div>
       <Toaster position='top-right' />
@@ -24,19 +24,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         enableSystem
         disableTransitionOnChange
       >
-        {/* {!!user && (
-                    <Scene
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100vw',
-                            height: '100vh',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                        }}
-                    />
-                )} */}
+        {!!user && (
+          <Scene
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+        )}
         {children}
       </Providers>
     </div>
