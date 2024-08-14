@@ -10,7 +10,7 @@ export default function Page() {
         <Lander />
       </Unauthenticated>
       <Authenticated>
-        authed
+        <HomeAuthed />
       </Authenticated>
     </>
   )
