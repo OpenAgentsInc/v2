@@ -1,17 +1,17 @@
-"use client"
-import { Authenticated, Unauthenticated } from "convex/react";
-import { HomeAuthed } from '@/components/home'
-import { Lander } from '@/components/landing/Lander'
+'use client'
 
-export default function Page() {
+import { SignInButton, UserButton } from "@clerk/nextjs";
+import { Authenticated, Unauthenticated } from "convex/react";
+
+export default function Home() {
   return (
-    <>
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Unauthenticated>
-        <Lander />
+        <SignInButton />
       </Unauthenticated>
       <Authenticated>
-        <HomeAuthed />
+        <UserButton />
       </Authenticated>
-    </>
-  )
+    </main>
+  );
 }

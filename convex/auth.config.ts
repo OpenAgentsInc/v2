@@ -1,7 +1,7 @@
 export default {
   providers: [
     {
-      domain: "https://clerk.openagents.com",
+      domain: process.env.CLERK_JWT_URL,
       applicationID: "convex",
     },
   ]

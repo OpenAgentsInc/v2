@@ -7,24 +7,24 @@ import './globals.css'
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
 export const viewport = {
-    themeColor: [
-        { media: '(prefers-color-scheme: light)', color: 'white' },
-        { media: '(prefers-color-scheme: dark)', color: 'black' }
-    ]
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' }
+  ]
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-    const user = await currentUser()
-    return (
-        <div>
-            <Toaster position='top-right' />
-            <Providers
-                attribute="class"
-                defaultTheme="dark"
-                enableSystem
-                disableTransitionOnChange
-            >
-                {!!user && (
+  // const user = await currentUser()
+  return (
+    <div>
+      <Toaster position='top-right' />
+      <Providers
+        attribute="class"
+        defaultTheme="dark"
+        enableSystem
+        disableTransitionOnChange
+      >
+        {/* {!!user && (
                     <Scene
                         style={{
                             position: 'fixed',
@@ -36,9 +36,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                             zIndex: 0,
                         }}
                     />
-                )}
-                {children}
-            </Providers>
-        </div>
-    )
+                )} */}
+        {children}
+      </Providers>
+    </div>
+  )
 }
