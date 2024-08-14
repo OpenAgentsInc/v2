@@ -2,6 +2,7 @@ import { api } from "@/convex/_generated/api"
 import { useQuery } from "convex/react"
 import { CreateDocumentButton } from "./CreateDocumentButton"
 import { DocumentCard } from "./DocumentCard"
+import UploadDocumentButton from "./UploadDocumentButton"
 
 export const Knowledge = () => {
   const documents = useQuery(api.documents.getDocuments)
@@ -9,7 +10,7 @@ export const Knowledge = () => {
     <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-bold">My Documents</h1>
-        <CreateDocumentButton />
+        <UploadDocumentButton />
       </div>
 
       <div className="grid grid-cols-4 gap-8">
