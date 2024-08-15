@@ -16,7 +16,7 @@ export const viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await currentUser()
   return (
-    <div>
+    <div className="size-full fixed w-screen">
       <Toaster position='top-right' />
       <Providers
         attribute="class"

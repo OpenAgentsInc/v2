@@ -15,7 +15,6 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as documents from "../documents.js";
-import type * as getUserBalance from "../getUserBalance.js";
 import type * as messages from "../messages.js";
 import type * as swebench from "../swebench.js";
 import type * as threads from "../threads.js";
@@ -32,7 +31,6 @@ import type * as utils from "../utils.js";
  */
 declare const fullApi: ApiFromModules<{
   documents: typeof documents;
-  getUserBalance: typeof getUserBalance;
   messages: typeof messages;
   swebench: typeof swebench;
   threads: typeof threads;

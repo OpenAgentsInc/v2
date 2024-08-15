@@ -19,7 +19,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
             image: user.imageUrl,
           })
           setIsHandled(true)
-          console.log('User created or retrieved successfully:', result)
+          // console.log('User created or retrieved successfully:', result)
         } catch (error) {
           console.error('Error creating/getting user:', error)
           toast.error('Failed to initialize user data. Please try refreshing the page.')

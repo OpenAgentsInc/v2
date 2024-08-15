@@ -101,7 +101,7 @@ export const saveMessageAndUpdateBalance = mutation({
     }),
   },
   async handler(ctx, args) {
-    console.log("saveMessageAndUpdateBalance called with args:", JSON.stringify(args));
+    // console.log("saveMessageAndUpdateBalance called with args:", JSON.stringify(args));
     const { clerk_user_id, model_id, usage } = args;
 
     const model = models.find(m => m.id === model_id);
@@ -109,10 +109,10 @@ export const saveMessageAndUpdateBalance = mutation({
       console.error(`Model with id ${model_id} not found`);
       throw new Error(`Model with id ${model_id} not found`);
     }
-    console.log("Found model:", JSON.stringify(model));
+    // console.log("Found model:", JSON.stringify(model));
 
     const cost_in_cents = calculateMessageCost(model, usage);
-    console.log("Calculated cost_in_cents:", cost_in_cents);
+    // console.log("Calculated cost_in_cents:", cost_in_cents);
 
     // Save the message to the database
     // This is a placeholder - you need to implement the actual message saving logic
