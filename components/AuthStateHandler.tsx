@@ -1,16 +1,23 @@
 import { useUser } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
-import { createOrGetUser } from '@/db/actions' // Adjust import path as needed
+import { useMutation } from '../convex/_generated/react'
 
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
     const { user, isLoaded } = useUser()
     const [isHandled, setIsHandled] = useState(false)
+    const createOrGetUser = useMutation('users:createOrGet')
 
     useEffect(() => {
         const handleUserCreation = async () => {
             if (isLoaded && user && !isHandled) {
                 try {
-                    await createOrGetUser()
+                    await createOrGetUser({
+                        clerk_user_id: user.id,
+                        email: user.emailAddresses[0].emailAddress,
+                        image: user.imageUrl,
+                        credits: 0,
+                        createdAt: new Date().toISOString(),
+                    })
                     setIsHandled(true)
                 } catch (error) {
                     console.error('Error creating/getting user:', error)
@@ -20,7 +27,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
         }
 
         handleUserCreation()
-    }, [isLoaded, user, isHandled])
+    }, [isLoaded, user, isHandled, createOrGetUser])
 
     return <>{children}</>
 }
