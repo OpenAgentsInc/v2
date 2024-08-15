@@ -6,7 +6,7 @@ import { useChatStore } from './useChatStore';
 import { Message } from '@/types';
 import { Id } from '../convex/_generated/dataModel';
 
-export function useMessageHandling(threadId: string | null, vercelChatProps: any) {
+export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId: string) {
     const convex = useConvex();
     const { setMessages, getThreadData } = useChatStore();
 
@@ -16,7 +16,12 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             return;
         }
 
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user', createdAt: Date.now() };
+        const userMessage: Message = { 
+            id: Date.now().toString(), 
+            content: message, 
+            role: 'user', 
+            createdAt: new Date().toISOString() 
+        };
         const threadData = getThreadData(threadId);
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
@@ -25,15 +30,17 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             vercelChatProps.append(userMessage);
             await convex.mutation(api.messages.saveChatMessage, {
                 thread_id: threadId as Id<"threads">,
+                clerk_user_id: clerkUserId,
                 role: userMessage.role,
                 content: userMessage.content,
+                created_at: userMessage.createdAt,
             });
         } catch (error) {
             console.error('Error sending message:', error);
             toast.error('Failed to send message. Please try again.');
             setMessages(threadId, threadData.messages);
         }
-    }, [threadId, vercelChatProps, convex, setMessages, getThreadData]);
+    }, [threadId, vercelChatProps, convex, setMessages, getThreadData, clerkUserId]);
 
     return { sendMessage };
 }
