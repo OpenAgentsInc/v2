@@ -80,3 +80,22 @@ export const updateThreadData = mutation({
     await ctx.db.patch(args.thread_id, { metadata: args.metadata });
   },
 });
+
+export const shareThread = mutation({
+  args: { thread_id: v.id("threads") },
+  async handler(ctx, args) {
+    const thread = await ctx.db.get(args.thread_id);
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+
+    // Generate a unique share token (you might want to use a more sophisticated method)
+    const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+    // Update the thread with the share token
+    await ctx.db.patch(args.thread_id, { shareToken });
+
+    // Return the share token
+    return shareToken;
+  },
+});
