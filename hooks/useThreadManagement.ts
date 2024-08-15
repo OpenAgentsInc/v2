@@ -8,49 +8,51 @@ import { Message } from '@/types';
 import { useUser } from '@clerk/nextjs';
 
 export function useThreadManagement(propsId?: string) {
-    const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
-    const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId);
-    const { user } = useUser();
+  return { threadId: null, setThreadId: () => { } };
+  return null
+  const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
+  const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId);
+  const { user } = useUser();
 
-    const createNewThread = useMutation(api.threads.createNewThread);
-    const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
+  const createNewThread = useMutation(api.threads.createNewThread);
+  const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
 
-    useEffect(() => {
-        if (propsId) {
-            setThreadId(propsId);
-            setCurrentThreadId(propsId);
-        } else if (!threadId && user) {
-            createNewThread({
-                user_id: user.id as Id<"users">,
-                clerk_user_id: user.id,
-                metadata: {} // You can add any additional metadata here if needed
-            })
-                .then((newThread) => {
-                    if (newThread && newThread._id) {
-                        setThreadId(newThread._id);
-                        setCurrentThreadId(newThread._id);
-                    } else {
-                        console.error('Unexpected thread response:', newThread);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error creating new thread:', error);
-                    toast.error('Failed to create a new chat thread. Please try again.');
-                });
-        }
-    }, [propsId, threadId, setCurrentThreadId, createNewThread, user]);
+  useEffect(() => {
+    if (propsId) {
+      setThreadId(propsId);
+      setCurrentThreadId(propsId);
+    } else if (!threadId && user) {
+      createNewThread({
+        user_id: user.id as Id<"users">,
+        clerk_user_id: user.id,
+        metadata: {} // You can add any additional metadata here if needed
+      })
+        .then((newThread) => {
+          if (newThread && newThread._id) {
+            setThreadId(newThread._id);
+            setCurrentThreadId(newThread._id);
+          } else {
+            console.error('Unexpected thread response:', newThread);
+          }
+        })
+        .catch(error => {
+          console.error('Error creating new thread:', error);
+          toast.error('Failed to create a new chat thread. Please try again.');
+        });
+    }
+  }, [propsId, threadId, setCurrentThreadId, createNewThread, user]);
 
-    useEffect(() => {
-        if (threadId && fetchThreadMessages) {
-            const formattedMessages: Message[] = fetchThreadMessages.map((msg: any) => ({
-                id: msg._id,
-                content: msg.content,
-                role: msg.role,
-                createdAt: msg._creationTime,
-            }));
-            setMessages(threadId, formattedMessages);
-        }
-    }, [threadId, fetchThreadMessages, setMessages]);
+  useEffect(() => {
+    if (threadId && fetchThreadMessages) {
+      const formattedMessages: Message[] = fetchThreadMessages.map((msg: any) => ({
+        id: msg._id,
+        content: msg.content,
+        role: msg.role,
+        createdAt: msg._creationTime,
+      }));
+      setMessages(threadId, formattedMessages);
+    }
+  }, [threadId, fetchThreadMessages, setMessages]);
 
-    return { threadId, setThreadId };
+  return { threadId, setThreadId };
 }

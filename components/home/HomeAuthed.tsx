@@ -16,9 +16,9 @@ export const HomeAuthed = () => {
       <Pane title="Chat History" id={0} x={20} y={190} height={350} width={260} dismissable={false}>
         <ChatHistory userId={userId} />
       </Pane>
-      <Pane title="Knowledge" id={-1} x={350} y={90} height={650} width={860} dismissable={false}>
+      {/* <Pane title="Knowledge" id={-1} x={350} y={90} height={650} width={860} dismissable={false}>
         <Knowledge />
-      </Pane>
+      </Pane> */}
       <Hud />
     </main>
   )
