@@ -1,5 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { calculateMessageCost } from './utils';
+import { Model, CompletionTokenUsage } from '../types';
 
 export const createOrGetUser = mutation({
   args: {
@@ -85,5 +87,50 @@ export const updateUserBalance = mutation({
     }
 
     await ctx.db.patch(user._id, { credits: user.credits - args.cost_in_cents / 100 });
+  },
+});
+
+export const saveMessageAndUpdateBalance = mutation({
+  args: {
+    clerk_user_id: v.string(),
+    model_id: v.string(),
+    usage: v.object({
+      promptTokens: v.number(),
+      completionTokens: v.number(),
+      totalTokens: v.number(),
+    }),
+  },
+  async handler(ctx, args) {
+    const { clerk_user_id, model_id, usage } = args;
+
+    // You need to define these values based on your pricing
+    const providerCentsPerMillionInputTokens = 0;
+    const providerCentsPerMillionOutputTokens = 0;
+
+    const model: Model = {
+      id: model_id,
+      providerCentsPerMillionInputTokens,
+      providerCentsPerMillionOutputTokens,
+    };
+
+    const cost_in_cents = calculateMessageCost(model, usage);
+
+    // Save the message to the database
+    // This is a placeholder - you need to implement the actual message saving logic
+    // const messageId = await ctx.db.insert('messages', { /* message data */ });
+
+    // Update user balance
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_clerk_user_id', (q) => q.eq('clerk_user_id', clerk_user_id))
+      .first();
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    await ctx.db.patch(user._id, { credits: user.credits - cost_in_cents });
+
+    return { cost_in_cents, newBalance: user.credits - cost_in_cents };
   },
 });
