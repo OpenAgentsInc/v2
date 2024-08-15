@@ -44,10 +44,19 @@ export function useThreadManagement(propsId?: string) {
   useEffect(() => {
     if (threadId && fetchThreadMessages) {
       const formattedMessages: Message[] = fetchThreadMessages.map((msg: any) => ({
-        id: msg._id,
+        _id: msg._id,
         content: msg.content,
         role: msg.role,
-        createdAt: msg._creationTime,
+        _creationTime: msg._creationTime,
+        thread_id: msg.thread_id,
+        clerk_user_id: msg.clerk_user_id,
+        tool_invocations: msg.tool_invocations,
+        finish_reason: msg.finish_reason,
+        total_tokens: msg.total_tokens,
+        prompt_tokens: msg.prompt_tokens,
+        completion_tokens: msg.completion_tokens,
+        model_id: msg.model_id,
+        cost_in_cents: msg.cost_in_cents
       }));
       setMessages(threadId, formattedMessages);
     }
