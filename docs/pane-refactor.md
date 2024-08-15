@@ -34,6 +34,14 @@ This document logs the actions taken to refactor the components in the `componen
 5. Moved `components/hud/pane.tsx` to `panes/Pane.tsx`
    - No changes to import statements were necessary for this file
 
+6. Refactored `components/home/HomeAuthed.tsx`
+   - Updated import statements:
+     - Changed `import { Pane } from '@/components/hud/pane'` to `import { Pane } from '@/panes/Pane'`
+     - Changed `import { Hud } from '../hud/hud'` to `import { PaneManager } from '@/panes/PaneManager'`
+     - Added `import { usePaneStore } from '@/store/pane'`
+   - Replaced static `Pane` component with dynamic pane creation using `usePaneStore`
+   - Replaced `<Hud />` with `<PaneManager />`
+
 ## Next Steps:
 
 1. Update any remaining import statements in other files that may still be referencing the old `components/hud/` path or `Hud` component
