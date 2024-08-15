@@ -4,13 +4,13 @@ import { api } from '../convex/_generated/api'
 import { toast } from 'sonner'
 import { useUser } from '@clerk/nextjs'
 import { Message } from '@/types'
-import { useChatStore } from './useChatStore'
+import { useChatStore } from '../store/chat'
 import { Id } from '../convex/_generated/dataModel'
 
 export function useChat(threadId: Id<"threads"> | null) {
   const { user } = useUser()
   const [isLoading, setIsLoading] = useState(false)
-  const { messages, setMessages } = useChatStore()
+  const { threads, addMessageToThread, setThread } = useChatStore()
   const sendMessageMutation = useMutation(api.messages.saveChatMessage)
   const fetchMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
 
@@ -29,7 +29,7 @@ export function useChat(threadId: Id<"threads"> | null) {
       _creationTime: Date.now(),
     }
 
-    setMessages(threadId, [...(messages[threadId] || []), newMessage])
+    addMessageToThread(threadId, newMessage)
 
     try {
       const result = await sendMessageMutation({
@@ -40,9 +40,8 @@ export function useChat(threadId: Id<"threads"> | null) {
       })
 
       if (result) {
-        setMessages(threadId, messages[threadId].map(msg => 
-          msg._id === tempId ? { ...msg, _id: result } : msg
-        ))
+        const updatedMessage = { ...newMessage, _id: result }
+        addMessageToThread(threadId, updatedMessage)
       }
     } catch (error) {
       console.error('Failed to send message:', error)
@@ -50,16 +49,21 @@ export function useChat(threadId: Id<"threads"> | null) {
     } finally {
       setIsLoading(false)
     }
-  }, [user, threadId, messages, setMessages, sendMessageMutation])
+  }, [user, threadId, addMessageToThread, sendMessageMutation])
 
   useEffect(() => {
-    if (fetchMessages) {
-      setMessages(threadId!, fetchMessages)
+    if (fetchMessages && threadId) {
+      setThread(threadId, {
+        id: threadId,
+        title: 'New Chat', // You might want to update this with the actual title
+        messages: fetchMessages,
+        createdAt: new Date(),
+      })
     }
-  }, [fetchMessages, setMessages, threadId])
+  }, [fetchMessages, setThread, threadId])
 
   return {
-    messages: messages[threadId || ''] || [],
+    messages: threads[threadId || '']?.messages || [],
     sendMessage: handleSendMessage,
     isLoading,
   }
@@ -80,7 +84,7 @@ export function useChatActions() {
       })
 
       if (newThread) {
-        setCurrentThreadId(newThread as unknown as string)
+        setCurrentThreadId(newThread as Id<"threads">)
         return newThread
       } else {
         console.error('Unexpected thread response:', newThread)
@@ -100,7 +104,7 @@ export function useChatActions() {
 
 export function useThreadList() {
   const { user } = useUser()
-  const listThreads = useQuery(api.threads.getThreads, user ? { clerk_user_id: user.id } : "skip")
+  const listThreads = useQuery(api.threads.listThreads, user ? { clerk_user_id: user.id } : "skip")
   const [threads, setThreads] = useState<Array<{
     id: Id<"threads">,
     title: string,
