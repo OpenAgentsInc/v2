@@ -34,13 +34,17 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
     )
     const shouldAnimate = isNew && index === 0
 
-    console.log(`SidebarItem: Chat ID ${chat.id}, IsActive: ${isActive}, IsOpen: ${isOpen}`);
+    React.useEffect(() => {
+        console.log(`SidebarItem useEffect: Chat ID ${chat.id}, IsActive: ${isActive}, IsOpen: ${isOpen}`);
+    }, [chat.id, isActive, isOpen]);
 
     if (!chat?.id) return null
 
     const handleClick = React.useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         const existingPane = panes.find(pane => pane.id === Number(chat.id) && pane.type === 'chat')
+
+        console.log('SidebarItem handleClick', { chatId: chat.id, existingPane });
 
         if (existingPane) {
             console.log('Bringing existing pane to front:', existingPane);
