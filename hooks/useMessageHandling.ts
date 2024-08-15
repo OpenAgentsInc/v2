@@ -33,7 +33,7 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
                 clerk_user_id: clerkUserId,
                 role: userMessage.role,
                 content: userMessage.content,
-                createdAt: userMessage.createdAt.toISOString(),
+                created_at: userMessage.createdAt.toISOString(),
             });
         } catch (error) {
             console.error('Error sending message:', error);
