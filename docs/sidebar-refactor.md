@@ -94,3 +94,45 @@ We want to have all our panes consolidated into a new top-level `panes` folder. 
   - user/
   - pane.tsx
 ```
+
+## Pane Usage in HUD
+
+The HUD (Heads-Up Display) system in the application uses a pane-based architecture to manage different UI components. Here's an overview of how panes are used:
+
+1. Pane Management:
+   - The HUD store (store/hud.ts) manages the state of all panes using Zustand.
+   - Panes are stored in an array, allowing for multiple panes to be open simultaneously.
+   - Each pane has properties like position (x, y), size (width, height), and a unique ID.
+
+2. Pane Actions:
+   - addPane: Adds a new pane to the HUD, with an option to tile it alongside existing panes.
+   - removePane: Removes a pane from the HUD based on its ID.
+   - updatePanePosition: Updates the position of a specific pane.
+   - updatePaneSize: Updates the size of a specific pane.
+   - openChatPane: Specifically opens a chat pane, likely with pre-configured settings.
+   - bringPaneToFront: Moves a pane to the top of the visual stack.
+   - setActivePane: Sets a specific pane as the active (focused) pane.
+
+3. Chat Integration:
+   - The HUD store tracks whether the chat is open (isChatOpen).
+   - It provides a method to open chat panes (openChatPane), which is likely used when starting new conversations.
+
+4. Terminal Integration:
+   - The HUD store keeps track of the active terminal ID (activeTerminalId).
+   - This suggests that terminal functionality is integrated into the pane system, allowing for multiple terminal instances.
+
+5. Input Handling:
+   - The store tracks whether an input is focused (isInputFocused) and whether the repo input is open (isRepoInputOpen).
+   - These states help manage focus and keyboard interactions across different panes and inputs.
+
+6. Persistence:
+   - The HUD store uses Zustand's persist middleware to save certain state (panes and lastPanePosition) to local storage.
+   - This allows the application to restore the user's workspace layout on page reload or revisit.
+
+7. Pane Positioning:
+   - The calculatePanePosition utility is exported, suggesting that there's logic to automatically position new panes based on existing ones.
+
+8. Component Integration:
+   - The components in the components/hud/ directory (UserStatus.tsx, balance.tsx, hud.tsx, pane.tsx) likely use the HUD store to render and manage individual panes and their contents.
+
+This pane-based architecture allows for a flexible and dynamic user interface, where users can open, close, move, and resize different components of the application as needed. The ChatsPane refactor should integrate seamlessly with this existing pane management system, utilizing the HUD store for state management and pane operations.
