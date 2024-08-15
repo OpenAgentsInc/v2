@@ -95,7 +95,8 @@ export const deleteThread = mutation({
     // Check if the thread exists
     const thread = await ctx.db.get(args.thread_id);
     if (!thread) {
-      throw new Error(`Thread with ID ${args.thread_id} not found.`);
+      // Instead of throwing an error, return a result indicating the thread was not found
+      return { success: false, reason: "not_found" };
     }
 
     // Delete all messages associated with the thread
@@ -110,6 +111,8 @@ export const deleteThread = mutation({
 
     // Delete the thread
     await ctx.db.delete(args.thread_id);
+
+    return { success: true };
   },
 });
 
