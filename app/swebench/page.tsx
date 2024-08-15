@@ -14,7 +14,7 @@ import {
 import SWEBenchModal from "@/components/swebench/SWEBenchModal";
 
 const truncate = (str: string, n: number) => {
-  return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+  return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 };
 
 const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => {
@@ -73,7 +73,7 @@ export default function SWEBenchPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold text-white mb-4">SWE-Bench Verified (psf/requests)</h1>
+      <h1 className="text-2xl font-bold text-white mb-4">SWE-Bench Verified Samples (psf/requests)</h1>
       <div onClick={(e) => {
         const target = e.target as HTMLElement;
         const row = target.closest('tr');
