@@ -22,13 +22,9 @@ interface SidebarItemProps {
 }
 
 export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
-    const { panes, addPane, setChatOpen } = useHudStore()
+    const { panes, addPane, setChatOpen, bringPaneToFront } = useHudStore()
     const { setCurrentThreadId } = useChatStore()
-    const isActive = panes.some(pane => {
-        const match = pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive;
-        console.log(`Pane ID: ${pane.id}, Chat ID: ${chat.id}, Type: ${pane.type}, IsActive: ${pane.isActive}, Match: ${match}`);
-        return match;
-    })
+    const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
     const shouldAnimate = isNew && index === 0
 
@@ -38,16 +34,21 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
-        const newPane = {
-            id: Number(chat.id),
-            title: chat.title,
-            type: 'chat' as const,
-            content: { id: chat.id, oldContent: chat.messages?.join('\n') }
-        }
+        const existingPane = panes.find(pane => pane.id === Number(chat.id) && pane.type === 'chat')
 
-        console.log('Clicking chat:', newPane);
-        // Use tiling (true) if Command/Ctrl is pressed, otherwise false
-        addPane(newPane, e.metaKey || e.ctrlKey)
+        if (existingPane) {
+            console.log('Bringing existing pane to front:', existingPane);
+            bringPaneToFront(existingPane.id)
+        } else {
+            console.log('Adding new pane:', chat);
+            const newPane = {
+                id: Number(chat.id),
+                title: chat.title,
+                type: 'chat' as const,
+                content: { id: chat.id, oldContent: chat.messages?.join('\n') }
+            }
+            addPane(newPane, e.metaKey || e.ctrlKey)
+        }
         setChatOpen(true)
         setCurrentThreadId(chat.id)
     }
