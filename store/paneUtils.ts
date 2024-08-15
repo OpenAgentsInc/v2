@@ -1,4 +1,4 @@
-import { Pane, PaneInput } from './types'
+import { Pane, PaneInput } from '@/types/hud'
 
 const PANE_OFFSET = 45 // Offset for new panes when tiling
 
