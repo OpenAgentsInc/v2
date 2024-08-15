@@ -22,7 +22,7 @@ const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
     <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[80px]">ID</TableHead>
+        <TableHead className="w-[140px]">ID</TableHead>
         <TableHead>Problem Statement</TableHead>
         <TableHead className="w-[100px]">Created</TableHead>
         <TableHead className="w-[80px]">Version</TableHead>
@@ -32,7 +32,7 @@ const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
       {data.map((item) => (
         <TableRow key={item._id} className="cursor-pointer">
           <TableCell className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">
-            {truncate(item.instance_id, 10)}
+            {item.instance_id}
           </TableCell>
           <TableCell className="max-w-0 w-full">
             <div className="truncate">
