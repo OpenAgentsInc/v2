@@ -4,6 +4,7 @@ module.exports = {
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
+    './panes/**/*.{ts,tsx}',
   ],
   prefix: '',
   theme: {
