@@ -74,9 +74,9 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
         path: `/chat/${thread.id}`,
         createdAt: thread.createdAt,
         messages: thread.messages,
-        userId: thread.userId,
+        userId: clerkUserId,
       }))
-  }, [threads])
+  }, [threads, clerkUserId])
 
   return (
     <div className="flex flex-col h-full">
