@@ -74,11 +74,12 @@ export const useHudStore = create<HudStore>()(
 
         const existingPane = state.panes.find(pane => pane.id === paneId)
         if (existingPane) {
+          updatedPanes = state.panes.map(pane => ({
+            ...pane,
+            isActive: pane.id === paneId
+          }))
           return {
-            panes: [
-              ...state.panes.filter(pane => pane.id !== paneId).map(pane => ({ ...pane, isActive: false })),
-              { ...existingPane, isActive: true }
-            ],
+            panes: updatedPanes,
             isChatOpen: true,
             lastPanePosition: { x: existingPane.x, y: existingPane.y, width: existingPane.width, height: existingPane.height }
           }
@@ -129,7 +130,7 @@ export const useHudStore = create<HudStore>()(
         }
 
         return {
-          panes: [...updatedPanes, newPaneWithPosition],
+          panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
           isChatOpen: true,
           lastPanePosition: adjustedPosition
         }
