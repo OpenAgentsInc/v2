@@ -41,7 +41,7 @@ export function SidebarActions({
       const result = await shareChat({
         id: chat.id
       })
-      if (result.error) {
+      if (!result.success) {
         console.error(result.error)
         return
       }
@@ -88,7 +88,7 @@ export function SidebarActions({
                     path: chat.path
                   })
 
-                  if (result.error) {
+                  if (!result.success) {
                     console.error(result.error)
                     return
                   }
@@ -117,7 +117,7 @@ function IconShare({ className, ...props }: React.ComponentProps<'svg'>) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn('h-4 w-4', className)}
+      className={cn('h-4 w-4', className || '')}
       {...props}
     >
       <path
@@ -137,7 +137,7 @@ function IconTrash({ className, ...props }: React.ComponentProps<'svg'>) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn('h-4 w-4', className)}
+      className={cn('h-4 w-4', className || '')}
       {...props}
     >
       <path
