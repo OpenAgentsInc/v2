@@ -38,9 +38,11 @@ export default defineSchema({
     clerk_user_id: v.string(),
     metadata: v.optional(v.object({})),
     createdAt: v.string(),
+    shareToken: v.optional(v.string()),
   })
     .index('by_user_id', ['user_id'])
-    .index('by_clerk_user_id', ['clerk_user_id']),
+    .index('by_clerk_user_id', ['clerk_user_id'])
+    .index('by_shareToken', ['shareToken']),
 
   messages: defineTable({
     thread_id: v.id("threads"),
