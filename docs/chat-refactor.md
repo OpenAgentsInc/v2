@@ -59,8 +59,8 @@ This document outlines the plan for refactoring the chat-related components and 
 2. Create a new file `panes/chat/ToolResult.tsx` (DONE)
 3. Move the `ToolResult` component code to the new file (DONE)
 4. Update import statements in the `ToolResult` component (DONE)
-5. Update any files that import the `ToolResult` component to use the new path (TODO)
-6. Remove the old `tool-result.tsx` file from `components/chat/` (TODO)
+5. Update any files that import the `ToolResult` component to use the new path (DONE)
+6. Remove the old `tool-result.tsx` file from `components/chat/` (DONE)
 
 ## Progress Log
 
@@ -81,12 +81,12 @@ The chat refactor has been completed successfully. Here's a summary of the chang
 4. Updated `panes/chat/Chat.tsx` to use the refactored hooks and utilities
 5. Added comprehensive comments and documentation to all refactored files
 6. Moved and updated the `ToolResult` component to the new structure
+7. Updated all files that import the `ToolResult` component to use the new path
+8. Removed the old `tool-result.tsx` file from `components/chat/`
 
 Next steps:
-1. Update any remaining files that import the `ToolResult` component to use the new path
-2. Remove the old `tool-result.tsx` file from `components/chat/`
-3. Conduct a final code review to ensure all changes are correct and follow best practices
-4. Update any remaining project documentation that may reference the old chat structure
-5. Consider any performance optimizations or further improvements that could be made to the chat functionality
+1. Conduct a final code review to ensure all changes are correct and follow best practices
+2. Update any remaining project documentation that may reference the old chat structure
+3. Consider any performance optimizations or further improvements that could be made to the chat functionality
 
 With these changes, the chat functionality should now be more maintainable, easier to understand, and better organized within the project structure.
