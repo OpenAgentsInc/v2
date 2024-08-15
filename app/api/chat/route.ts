@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
   // Update user balance after processing the message
   try {
-    const cost_in_cents = result.cost_in_cents || 0;
+    const cost_in_cents = (result as any).cost_in_cents ?? 0;
     await convex.mutation(api.users.updateUserBalance, { clerk_user_id: userId, cost_in_cents });
   } catch (error) {
     console.error('Error updating user balance:', error);
