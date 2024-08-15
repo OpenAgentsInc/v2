@@ -21,9 +21,9 @@ export function useThreadManagement(propsId?: string) {
       setCurrentThreadId(propsId);
     } else if (!threadId && user) {
       createNewThread({
-        user_id: user.id as Id<"users">,
         clerk_user_id: user.id,
-        metadata: {} // You can add any additional metadata here if needed
+        metadata: {}, // You can add any additional metadata here if needed
+        createdAt: new Date().toISOString() // Add the createdAt field
       })
         .then((newThread) => {
           if (newThread && newThread._id) {
