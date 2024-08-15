@@ -4,14 +4,9 @@ import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
 import { useHudStore } from "@/store/hud"
 import { X } from 'lucide-react'
+import { Pane as PaneType } from '@/types/pane'
 
-interface PaneProps {
-    id: string
-    title: string
-    x: number
-    y: number
-    width: number
-    height: number
+type PaneProps = PaneType & {
     children?: React.ReactNode
     titleBarButtons?: React.ReactNode
     dismissable?: boolean
@@ -101,7 +96,20 @@ const useResizeHandlers = (
     return { position, size, setPosition, setSize, resizeHandlers }
 }
 
-export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY, width: initialWidth, height: initialHeight, children, titleBarButtons, dismissable = true }) => {
+export const Pane: React.FC<PaneProps> = ({ 
+    id, 
+    title, 
+    x: initialX, 
+    y: initialY, 
+    width: initialWidth, 
+    height: initialHeight, 
+    type,
+    content,
+    isActive,
+    children, 
+    titleBarButtons, 
+    dismissable = true 
+}) => {
     const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
     const updatePanePosition = useHudStore(state => state.updatePanePosition)
     const updatePaneSize = useHudStore(state => state.updatePaneSize)
@@ -158,8 +166,9 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 top: position.y,
                 width: size.width,
                 height: size.height,
+                zIndex: isActive ? 50 : 49,
             }}
-            className="pointer-events-auto z-[49] absolute bg-black/90 border border-white rounded-lg overflow-hidden shadow-lg transition-colors duration-200"
+            className={`pointer-events-auto absolute bg-black/90 border border-white rounded-lg overflow-hidden shadow-lg transition-colors duration-200 ${isActive ? 'border-blue-500' : ''}`}
             onClick={handlePaneClick}
         >
             <div
@@ -180,6 +189,14 @@ export const Pane: React.FC<PaneProps> = ({ id, title, x: initialX, y: initialY,
                 </div>
             </div>
             <div className="text-white h-[calc(100%-2.5rem)] overflow-auto">
+                {type === 'diff' && content && (
+                    <div>
+                        <h3>Old Content:</h3>
+                        <pre>{content.oldContent}</pre>
+                        <h3>New Content:</h3>
+                        <pre>{content.newContent}</pre>
+                    </div>
+                )}
                 {children}
             </div>
             <div className="absolute inset-0 pointer-events-none border border-white rounded-lg opacity-50"></div>
