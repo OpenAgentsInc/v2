@@ -95,8 +95,7 @@ export const deleteThread = mutation({
     // Check if the thread exists
     const thread = await ctx.db.get(args.thread_id);
     if (!thread) {
-      console.log(`Thread with ID ${args.thread_id} not found. Skipping deletion.`);
-      return;
+      throw new Error(`Thread with ID ${args.thread_id} not found.`);
     }
 
     // Delete all messages associated with the thread
