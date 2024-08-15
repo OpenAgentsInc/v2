@@ -71,11 +71,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         clerk_user_id: user.id,
                         role: message.role,
                         content: message.content,
-                        tool_invocations: options.toolInvocations ? JSON.stringify(options.toolInvocations) : undefined,
+                        tool_invocations: (options as any).toolInvocations ? JSON.stringify((options as any).toolInvocations) : undefined,
                         finish_reason: options.finishReason,
-                        total_tokens: options.usage?.total_tokens,
-                        prompt_tokens: options.usage?.prompt_tokens,
-                        completion_tokens: options.usage?.completion_tokens,
+                        total_tokens: options.usage?.totalTokens,
+                        prompt_tokens: options.usage?.promptTokens,
+                        completion_tokens: options.usage?.completionTokens,
                         model_id: currentModelRef.current.id,
                     });
                     if (result.newBalance) {
