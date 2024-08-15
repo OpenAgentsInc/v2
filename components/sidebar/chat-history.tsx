@@ -4,7 +4,6 @@ import * as React from 'react'
 import { SidebarList } from './sidebar-list'
 import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
-import { useChatStore } from '@/store/chat'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
@@ -17,43 +16,27 @@ interface ChatHistoryProps {
 }
 
 export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
-  const { threads, setThread } = useChatStore()
-  const [isLoading, setIsLoading] = React.useState(true)
   const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
   const { user } = useUser();
 
-  const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: clerkUserId })
+  const threads = useQuery(api.threads.getUserThreads, { clerk_user_id: clerkUserId })
   const removeThreadMutation = useMutation(api.threads.deleteThread)
   const shareThreadMutation = useMutation(api.threads.shareThread)
+  const createNewThreadMutation = useMutation(api.threads.createNewThread)
 
-  React.useEffect(() => {
-    if (fetchedThreads) {
-      fetchedThreads.forEach((thread) => {
-        setThread(thread._id, {
-          id: thread._id,
-          title: (thread.metadata as { title?: string })?.title || 'Untitled Thread',
-          messages: [],
-          createdAt: new Date(thread.createdAt),
-        })
-      })
-      setIsLoading(false)
-    }
-  }, [fetchedThreads, setThread])
-
-  const addChat = React.useCallback((newChat: Chat) => {
-    setThread(newChat.id, {
-      id: newChat.id,
-      title: newChat.title,
-      messages: [],
-      createdAt: new Date(),
+  const addChat = React.useCallback(async (newChat: Chat) => {
+    const result = await createNewThreadMutation({
+      clerk_user_id: clerkUserId,
+      metadata: { title: newChat.title }
     })
-    setNewChatId(newChat.id)
-  }, [setThread, setNewChatId])
+    if (result) {
+      setNewChatId(result._id)
+    }
+  }, [createNewThreadMutation, clerkUserId, setNewChatId])
 
   const removeChat = React.useCallback(async (args: { id: Id<'threads'>; path: string }): Promise<ServerActionResult<void>> => {
-    await removeThreadMutation({ thread_id: args.id })
-    // Update local state or trigger a refetch
-    return { success: true, data: undefined }
+    const result = await removeThreadMutation({ thread_id: args.id })
+    return { success: result.success, data: undefined }
   }, [removeThreadMutation])
 
   const shareChat = React.useCallback(async (args: { id: Id<'threads'> }): Promise<ServerActionResult<string>> => {
@@ -62,18 +45,15 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
   }, [shareThreadMutation])
 
   const sortedChats = React.useMemo(() => {
-    return Object.values(threads)
-      .sort((a, b) => {
-        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 0;
-        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 0;
-        return timeB - timeA;
-      })
+    if (!threads) return []
+    return threads
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .map(thread => ({
-        id: thread.id,
-        title: thread.title,
-        path: `/chat/${thread.id}`,
-        createdAt: thread.createdAt,
-        messages: thread.messages,
+        id: thread._id,
+        title: (thread.metadata as { title?: string })?.title || 'Untitled Thread',
+        path: `/chat/${thread._id}`,
+        createdAt: new Date(thread.createdAt),
+        messages: [], // You might want to fetch messages separately if needed
         userId: clerkUserId,
       }))
   }, [threads, clerkUserId])
@@ -89,7 +69,7 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
           chats={sortedChats as Chat[]}
         />
       </div>
-      {isLoading ? (
+      {threads === undefined ? (
         <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
           {Array.from({ length: 10 }).map((_, i) => (
             <div
