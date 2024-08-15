@@ -31,13 +31,22 @@
 - Adds the new chat to the list and opens a new chat pane
 - Integrates with HUD store for opening chat panes
 
+### sidebar-actions.tsx
+- Provides action buttons for each chat item (delete and share)
+- Uses AlertDialog for delete confirmation
+- Implements share functionality with clipboard API
+- Handles loading states for both delete and share actions
+- Integrates with Next.js router for navigation after delete
+
 ## Thoughts on Condensing
-- Combine SidebarItemButton, SidebarItemIcon, chat-history, and new-chat-button into the main ChatsPane component
+- Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, and sidebar-actions into the main ChatsPane component
 - Keep the core functionality of chat-history and new-chat-button (data fetching, mutations, sorting) in the new ChatsPane
-- Simplify the component structure by integrating NewChatButton directly into ChatsPane
+- Simplify the component structure by integrating NewChatButton and SidebarActions directly into ChatsPane
 - Move the chat creation logic from new-chat-button into a custom hook or utility function
 - Consider using more generic names for sub-components (e.g., "ChatItem" instead of "SidebarItem")
-- Maintain the loading state handling for both chat list and new chat creation
+- Maintain the loading state handling for chat list, new chat creation, and chat actions
 - Ensure that the HUD store integration for opening chat panes is preserved in the new component
-- Tooltip functionality can be kept, but may need to be adjusted for the new component structure
+- Keep the AlertDialog for delete confirmation, but consider moving it to a separate component for reusability
 - Optimize the component to reduce prop drilling by using context or custom hooks where appropriate
+- Consolidate icon components (IconShare, IconTrash) into a shared icon library if not already done
+- Consider creating a custom hook for handling chat actions (delete, share) to simplify the main component
