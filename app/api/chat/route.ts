@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   // Check user balance is > 0, but skip for GPT-4o Mini
   if (body.model !== 'gpt-4o-mini') {
     try {
-      const userBalance = await convex.query(api.getUserBalance, userId);
+      const userBalance = await convex.query(api.getUserBalance, { clerk_user_id: userId });
       if (userBalance <= 0) {
         return new Response('Insufficient credits', { status: 403 });
       }
