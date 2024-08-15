@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import {
@@ -17,39 +17,45 @@ const truncate = (str: string, n: number) => {
   return (str.length > n) ? str.substr(0, n-1) + '...' : str;
 };
 
-const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
-  <Table>
-    <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
-    <TableHeader>
-      <TableRow>
-        <TableHead className="w-[140px]">ID</TableHead>
-        <TableHead>Problem Statement</TableHead>
-        <TableHead className="w-[100px]">Created</TableHead>
-        <TableHead className="w-[80px]">Version</TableHead>
-      </TableRow>
-    </TableHeader>
-    <TableBody>
-      {data.map((item) => (
-        <TableRow key={item._id} className="cursor-pointer">
-          <TableCell className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">
-            {item.instance_id}
-          </TableCell>
-          <TableCell className="max-w-0 w-full">
-            <div className="truncate">
-              {item.problem_statement}
-            </div>
-          </TableCell>
-          <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">
-            {new Date(item.created_at).toLocaleDateString()}
-          </TableCell>
-          <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">
-            {truncate(item.version, 10)}
-          </TableCell>
+const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => {
+  const sortedData = useMemo(() => {
+    return [...data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [data]);
+
+  return (
+    <Table>
+      <TableCaption>A list of SWE Bench data entries for psf/requests (newest to oldest).</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[140px]">ID</TableHead>
+          <TableHead>Problem Statement</TableHead>
+          <TableHead className="w-[100px]">Created</TableHead>
+          <TableHead className="w-[80px]">Version</TableHead>
         </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-);
+      </TableHeader>
+      <TableBody>
+        {sortedData.map((item) => (
+          <TableRow key={item._id} className="cursor-pointer">
+            <TableCell className="font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+              {item.instance_id}
+            </TableCell>
+            <TableCell className="max-w-0 w-full">
+              <div className="truncate">
+                {item.problem_statement}
+              </div>
+            </TableCell>
+            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">
+              {new Date(item.created_at).toLocaleDateString()}
+            </TableCell>
+            <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis">
+              {truncate(item.version, 10)}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
 
 export default function SWEBenchPage() {
   const sweData = useQuery(api.swebench.getAllSWEData);
