@@ -19,6 +19,8 @@ export function useThreadManagement(propsId?: string) {
     if (propsId) {
       setThreadId(propsId);
       setCurrentThreadId(propsId);
+    } else if (currentThreadId) {
+      setThreadId(currentThreadId);
     } else if (!threadId && user) {
       createNewThread({
         clerk_user_id: user.id,
@@ -37,7 +39,7 @@ export function useThreadManagement(propsId?: string) {
           toast.error('Failed to create a new chat thread. Please try again.');
         });
     }
-  }, [propsId, threadId, setCurrentThreadId, createNewThread, user]);
+  }, [propsId, threadId, currentThreadId, setCurrentThreadId, createNewThread, user]);
 
   useEffect(() => {
     if (threadId && fetchThreadMessages) {
