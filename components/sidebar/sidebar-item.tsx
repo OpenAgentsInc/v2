@@ -36,7 +36,8 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
 
     React.useEffect(() => {
         console.log(`SidebarItem useEffect: Chat ID ${chat.id}, IsActive: ${isActive}, IsOpen: ${isOpen}`);
-    }, [chat.id, isActive, isOpen]);
+        console.log('Current panes:', panes);
+    }, [chat.id, isActive, isOpen, panes]);
 
     if (!chat?.id) return null
 
@@ -44,7 +45,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
         e.preventDefault()
         const existingPane = panes.find(pane => pane.id === chat.id && pane.type === 'chat')
 
-        console.log('SidebarItem handleClick', { chatId: chat.id, existingPane });
+        console.log('SidebarItem handleClick', { chatId: chat.id, existingPane, allPanes: panes });
 
         if (existingPane) {
             console.log('Bringing existing pane to front:', existingPane);
