@@ -4,9 +4,10 @@ import * as React from 'react'
 import { SidebarList } from './sidebar-list'
 import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
-import { fetchUserThreads } from '@/db/actions'
 import { useChatStore } from '@/store/chat'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
+import { useQuery } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 
 interface ChatHistoryProps {
     userId: string
@@ -15,29 +16,23 @@ interface ChatHistoryProps {
 export function ChatHistory({ userId }: ChatHistoryProps) {
     const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
-    const [newChatId, setNewChatId] = useLocalStorage<number | null>('newChatId2', null)
+    const [newChatId, setNewChatId] = useLocalStorage<string | null>('newChatId2', null)
+
+    const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: userId })
 
     React.useEffect(() => {
-        async function loadInitialChats() {
-            try {
-                const fetchedThreads = await fetchUserThreads(userId)
-                fetchedThreads.forEach((thread) => {
-                    setThread(thread.id, {
-                        id: thread.id,
-                        title: thread.metadata?.title || 'Untitled Thread',
-                        messages: [],
-                        createdAt: new Date(thread.createdAt),
-                    })
+        if (fetchedThreads) {
+            fetchedThreads.forEach((thread) => {
+                setThread(thread._id, {
+                    id: thread._id,
+                    title: thread.metadata?.title || 'Untitled Thread',
+                    messages: [],
+                    createdAt: new Date(thread.createdAt),
                 })
-            } catch (error) {
-                console.error('Error fetching initial chats:', error)
-            } finally {
-                setIsLoading(false)
-            }
+            })
+            setIsLoading(false)
         }
-
-        loadInitialChats()
-    }, [userId, setThread])
+    }, [fetchedThreads, setThread])
 
     const addChat = React.useCallback((newChat: Chat) => {
         setThread(newChat.id, {
