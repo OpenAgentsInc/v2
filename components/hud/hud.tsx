@@ -16,7 +16,7 @@ export const Hud = () => {
         <Pane
           key={pane.id.toString()}
           title={pane.title}
-          id={pane.id.toString()}
+          id={pane.id}
           x={pane.x}
           y={pane.y}
           height={pane.height}
