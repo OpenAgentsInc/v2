@@ -16,3 +16,6 @@ This document logs the actions taken to refactor the components in the `componen
    - Updated import statements:
      - Changed `import { Balance } from '@/components/hud/balance'` to `import { Balance } from '@/panes/user/Balance'`
      - Changed `import { Pane } from '@/components/hud/pane'` to `import { Pane } from '@/panes/Pane'`
+
+2. Moved `components/hud/balance.tsx` to `panes/user/Balance.tsx`
+   - No changes to import statements were necessary for this file
