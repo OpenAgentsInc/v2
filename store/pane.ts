@@ -1,8 +1,9 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { Pane, PaneInput } from '@/types/pane'
 import { calculatePanePosition } from './paneUtils'
 import * as actions from './hudActions'
-import { PaneStore, PaneInput } from './types'
+import { PaneStore } from './types'
 
 export const usePaneStore = create<PaneStore>()(
   persist(
@@ -11,7 +12,7 @@ export const usePaneStore = create<PaneStore>()(
       isChatOpen: true,
       activeTerminalId: null,
       lastPanePosition: null,
-      addPane: (pane, shouldTile = false) => actions.addPane(set, pane, shouldTile),
+      addPane: (newPane: PaneInput, shouldTile = false) => actions.addPane(set, newPane, shouldTile),
       removePane: (id) => actions.removePane(set, id),
       updatePanePosition: (id, x, y) => actions.updatePanePosition(set, id, x, y),
       updatePaneSize: (id, width, height) => actions.updatePaneSize(set, id, width, height),
@@ -21,7 +22,7 @@ export const usePaneStore = create<PaneStore>()(
       setInputFocused: (isFocused: boolean) => set({ isInputFocused: isFocused }),
       isRepoInputOpen: false,
       setRepoInputOpen: (isOpen: boolean) => set({ isRepoInputOpen: isOpen }),
-      openChatPane: (pane) => actions.openChatPane(set, pane),
+      openChatPane: (newPane: PaneInput) => actions.openChatPane(set, newPane),
       bringPaneToFront: (id) => actions.bringPaneToFront(set, id),
       setActivePane: (id) => actions.setActivePane(set, id),
     }),
