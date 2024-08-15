@@ -92,6 +92,13 @@ export const getLastEmptyThread = query({
 export const deleteThread = mutation({
   args: { thread_id: v.id("threads") },
   async handler(ctx, args) {
+    // Check if the thread exists
+    const thread = await ctx.db.get(args.thread_id);
+    if (!thread) {
+      console.log(`Thread with ID ${args.thread_id} not found. Skipping deletion.`);
+      return;
+    }
+
     // Delete all messages associated with the thread
     const messages = await ctx.db
       .query("messages")
