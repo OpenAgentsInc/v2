@@ -55,7 +55,7 @@ export function NewChatButton({ addChat, clerkUserId, userEmail, userImage, chat
                 addChat(newChat)
 
                 const newPane = {
-                    id: newThread._id,
+                    id: `chat-${newThread._id}`,
                     title: 'New Chat',
                     type: 'chat' as const,
                 }
