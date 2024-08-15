@@ -16,7 +16,7 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             return;
         }
 
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
+        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user', createdAt: Date.now() };
         const threadData = getThreadData(threadId);
         const updatedMessages = [...threadData.messages, userMessage];
         setMessages(threadId, updatedMessages);
