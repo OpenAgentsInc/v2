@@ -1,105 +1,114 @@
 # Hierarchy of important files & folders
 
-- .env.example - Example environment variables file
-- .eslintrc.json - ESLint configuration file
-- .gitignore - Git ignore file
-- LICENSE - Project license file
-- README.md - Project readme file
+- .env.example
+- .eslintrc.json
+- .gitignore
+- LICENSE
+- README.md
 - app/
-  - [[...rest]]/ - Catch-all route
-  - api/ - API routes
-  - documents/ - Document-related pages
-  - fonts/ - Font files
-  - globals.css - Global CSS styles
-  - layout.tsx - Main application layout
-  - opengraph-image.png - OpenGraph image for social sharing
-  - siteConfig.ts - Site configuration
-  - swebench/ - SWEBench related pages
-  - twitter-image.png - Twitter card image
-- auth.ts - Authentication configuration file
-- components.json - Component configuration file
-- components/ - React components
-  - auth/ - Authentication related components
-  - canvas/ - Canvas related components
-  - credits/ - Credit system related components
-  - dom/ - DOM related components
-  - email/ - Email related components
-  - home/ - Home page components
-  - input/ - Input related components
-  - knowledge/ - Knowledge base related components
-  - landing/ - Landing page components
-  - providers.tsx - Provider components
-  - swebench/ - SWEBench related components
-  - ui/ - UI components
-- convex/ - Convex database and backend related files
-  - _generated/ - Generated Convex files
-  - auth.config.ts - Authentication configuration
-  - documents.ts - Document related functions
-  - messages.ts - Message related functions
-  - schema.ts - Database schema
-  - swebench.ts - SWEBench related functions
-  - threads.ts - Thread related functions
-  - users.ts - User related functions
-  - utils.ts - Utility functions
-- docs/ - Documentation files
-  - hierarchy.md - This file, describing the project structure
-  - hud.md - Describes the HUD overlay and its components
-  - journal.md - Development journal for tracking progress and reflections
-  - pull-request-flow.md - Details the pull request workflow and tools
-  - request-lifecycle.md - Documents the lifecycle of core requests
-- hooks/ - Custom React hooks
-  - useCameraAnimation.ts - Hook for camera animation
-  - useChat.ts - Hook for chat functionality
-  - useChatScroll.ts - Hook for chat scrolling
-  - useChatStore.ts - Hook for chat store
-  - useEnsureUser.ts - Hook for ensuring user existence
-  - useMessageHandling.ts - Hook for message handling
-  - usePostprocess.jsx - Hook for post-processing
-  - useThreadManagement.ts - Hook for thread management
-- index.d.ts - TypeScript declaration file
-- lib/ - Utility functions and modules
-  - calculateMessageCost.ts - Function to calculate message cost
-  - deductUserCredits.ts - Function to deduct user credits
-  - fonts.ts - Font configuration
-  - github/ - GitHub related utilities
-  - githubUtils.ts - GitHub utility functions
-  - hooks/ - Custom hooks
-  - models.ts - Model definitions
-  - stripe/ - Stripe related utilities
-  - systemPrompt.ts - System prompt generation
-  - util/ - General utility functions
-  - utils.ts - Utility functions
-- middleware.ts - Next.js middleware configuration
-- next-env.d.ts - Next.js TypeScript declarations
-- next.config.js - Next.js configuration file
-- package.json - Project dependencies and scripts
-- panes/ - Pane components for the application
-  - Hud.tsx - HUD component
-  - Pane.tsx - Pane component
-  - PaneManager.tsx - Pane manager component
-  - chat/ - Chat pane components
-  - chats/ - Chats pane components
-  - index.ts - Pane exports
-  - user/ - User pane components
-- pnpm-lock.yaml - pnpm lock file
-- postcss.config.js - PostCSS configuration
-- prettier.config.cjs - Prettier configuration
-- public/ - Public assets
-- store/ - State management
-  - balance.ts - Balance management
-  - chat.ts - Chat state management
-  - hudActions.ts - HUD actions
-  - models.ts - Model state management
-  - pane.ts - Pane state management
-  - paneUtils.ts - Pane utility functions
-  - repo.ts - Repository state management
-  - tools.ts - Tools state management
-  - types.ts - Type definitions for store
-- tailwind.config.ts - Tailwind CSS configuration
-- tools/ - Custom tools and integrations
-- tsconfig.json - TypeScript configuration file
-- types/ - TypeScript type definitions
-
-This hierarchy provides an overview of the main folders and files in the project, focusing on the most important and frequently accessed components. It omits less relevant files such as images and fonts.
-
-Note: Some folders may contain additional files and subfolders not listed here for brevity.
+  - [[...rest]]/
+  - api/
+  - documents/
+  - fonts/
+  - globals.css
+  - layout.tsx
+  - opengraph-image.png
+  - siteConfig.ts
+  - swebench/
+  - twitter-image.png
+- auth.ts
+- components.json
+- components/
+  - auth/
+  - canvas/
+  - credits/
+  - dom/
+  - email/
+  - home/
+  - input/
+  - knowledge/
+  - landing/
+  - providers.tsx
+  - swebench/
+  - ui/
+- convex/
+  - _generated/
+  - auth.config.ts
+  - documents.ts
+  - messages.ts
+  - schema.ts
+  - swebench.ts
+  - threads.ts
+  - users.ts
+  - utils.ts
+- docs/
+  - hierarchy.md
+  - hud.md
+  - journal.md
+  - pull-request-flow.md
+  - request-lifecycle.md
+- hooks/
+  - useCameraAnimation.ts
+  - useChat.ts
+  - useChatScroll.ts
+  - useChatStore.ts
+  - useEnsureUser.ts
+  - useMessageHandling.ts
+  - usePostprocess.jsx
+  - useThreadManagement.ts
+- index.d.ts
+- lib/
+  - calculateMessageCost.ts
+  - deductUserCredits.ts
+  - fonts.ts
+  - github/
+  - githubUtils.ts
+  - hooks/
+  - models.ts
+  - stripe/
+  - systemPrompt.ts
+  - util/
+  - utils.ts
+- middleware.ts
+- next-env.d.ts
+- next.config.js
+- package.json
+- panes/
+  - Hud.tsx
+  - Pane.tsx
+  - PaneManager.tsx
+  - chat/
+    - ChatPane.tsx
+    - ChatPaneHeader.tsx
+    - ChatPaneInput.tsx
+    - ChatPaneMessages.tsx
+    - ChatPaneSettings.tsx
+    - ChatPaneToolbar.tsx
+  - chats/
+    - ChatsPane.tsx
+    - ChatsPaneHeader.tsx
+    - ChatsPaneList.tsx
+    - ChatsPaneToolbar.tsx
+  - index.ts
+  - user/
+    - UserPane.tsx
+    - UserPaneHeader.tsx
+    - UserPaneSettings.tsx
+- pnpm-lock.yaml
+- postcss.config.js
+- prettier.config.cjs
+- public/
+- store/
+  - balance.ts
+  - chat.ts
+  - hudActions.ts
+  - models.ts
+  - pane.ts
+  - paneUtils.ts
+  - repo.ts
+  - tools.ts
+  - types.ts
+- tailwind.config.ts
+- tools/
+- tsconfig.json
+- types/
