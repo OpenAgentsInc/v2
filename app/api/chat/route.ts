@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   // Check user balance is > 0, but skip for GPT-4o Mini
   if (body.model !== 'gpt-4o-mini') {
     try {
-      const userBalance = await convex.query(api.getUserBalance, { clerk_user_id: userId });
+      const userBalance = await convex.query(api.users.getUserBalance, { clerk_user_id: userId });
       if (userBalance <= 0) {
         return new Response('Insufficient credits', { status: 403 });
       }
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   // Update user balance after processing the message
   try {
     const cost_in_cents = result.cost_in_cents || 0;
-    await convex.mutation(api.updateUserBalance, { clerk_user_id: userId, cost_in_cents });
+    await convex.mutation(api.users.updateUserBalance, { clerk_user_id: userId, cost_in_cents });
   } catch (error) {
     console.error('Error updating user balance:', error);
   }
