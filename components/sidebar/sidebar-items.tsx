@@ -3,15 +3,16 @@
 import { Chat } from '@/types'
 import { SidebarActions } from '@/components/sidebar/sidebar-actions'
 import { SidebarItem } from '@/components/sidebar/sidebar-item'
-import { removeChat, shareChat } from '@/app/actions'
 import { Id } from '@/convex/_generated/dataModel'
 
 interface SidebarItemsProps {
   chats?: Chat[]
   setChats: React.Dispatch<React.SetStateAction<Chat[]>>
+  removeChat: (args: { id: Id<'threads'>; path: string }) => Promise<{ success: boolean; error?: string }>
+  shareChat: (args: { id: Id<'threads'> }) => Promise<{ success: boolean; data?: string; error?: string }>
 }
 
-export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
+export function SidebarItems({ chats, setChats, removeChat, shareChat }: SidebarItemsProps) {
   if (!chats?.length) return null
 
   return (
