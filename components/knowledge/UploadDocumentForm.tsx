@@ -16,15 +16,19 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LoadingButton } from "@/components/LoadingButton"
+import { Id } from "@/convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(1).max(250),
+  fileId: z.string(),
 });
 
 export function UploadDocumentForm({
   onUpload,
+  fileId,
 }: {
   onUpload: () => void;
+  fileId: Id<"_storage">;
 }) {
   const createDocument = useMutation(api.documents.createDocument);
 
@@ -32,11 +36,15 @@ export function UploadDocumentForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      fileId: fileId,
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await createDocument(values);
+    await createDocument({
+      title: values.title,
+      fileId: values.fileId as Id<"_storage">,
+    });
     onUpload();
   }
 
