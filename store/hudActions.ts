@@ -4,7 +4,7 @@ import { Id } from '../convex/_generated/dataModel'
 
 export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, newPane: PaneInput, shouldTile = false) {
   return set((state) => {
-    const paneId = newPane.id || Math.random().toString(36).substr(2, 9);
+    const paneId = typeof newPane.id === 'number' ? newPane.id : state.panes.length + 1;
     let updatedPanes: Pane[]
     let panePosition
 
@@ -37,7 +37,7 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId as Id<"threads"> | number, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -93,7 +93,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
     const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
     const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
 
-    const paneId = newPane.id || Math.random().toString(36).substr(2, 9);
+    const paneId = typeof newPane.id === 'number' ? newPane.id : state.panes.length + 1;
 
     const newPaneWithPosition: Pane = {
       ...newPane,
@@ -102,7 +102,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: paneId as Id<"threads"> | number,
+      id: paneId,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
     }
