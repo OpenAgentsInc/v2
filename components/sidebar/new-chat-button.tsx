@@ -12,22 +12,31 @@ import { Id } from '@/convex/_generated/dataModel'
 
 interface NewChatButtonProps {
     addChat: (newChat: Chat) => void
-    userId: Id<"users">
     clerkUserId: string
+    userEmail: string
+    userImage?: string
     chats: Chat[]
 }
 
-export function NewChatButton({ addChat, userId, clerkUserId, chats }: NewChatButtonProps) {
+export function NewChatButton({ addChat, clerkUserId, userEmail, userImage, chats }: NewChatButtonProps) {
     const { openChatPane } = useHudStore()
     const [isCreating, setIsCreating] = useState(false)
+    const createOrGetUser = useMutation(api.threads.createOrGetUser)
     const createNewThread = useMutation(api.threads.createNewThread)
 
     const handleNewChat = async (event: React.MouseEvent) => {
         setIsCreating(true)
         try {
+            console.log('Attempting to create or get user');
+            const userId = await createOrGetUser({
+                clerk_user_id: clerkUserId,
+                email: userEmail,
+                image: userImage
+            });
+            console.log('User ID:', userId);
+
             console.log('Attempting to create new thread');
             const newThread = await createNewThread({
-                user_id: userId,
                 clerk_user_id: clerkUserId,
                 metadata: {}
             })
