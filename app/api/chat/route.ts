@@ -55,11 +55,13 @@ export async function POST(req: Request) {
       totalTokens: result.usage?.totalTokens || 0,
     };
     
-    await convex.mutation(api.users.saveMessageAndUpdateBalance, {
+    const { cost_in_cents, newBalance } = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
       clerk_user_id: userId,
       model_id: toolContext.model,
       usage,
     });
+
+    console.log(`Message cost: ${cost_in_cents} cents. New balance: ${newBalance}`);
   } catch (error) {
     console.error('Error saving message and updating user balance:', error);
   }
