@@ -24,3 +24,9 @@ This document logs the actions taken to refactor the components in the `componen
    - Updated import statements:
      - Changed `import { Pane as PaneComponent } from '@/components/hud/pane'` to `import { Pane as PaneComponent } from '@/panes/Pane'`
      - Changed `import { UserStatus } from './UserStatus'` to `import { UserStatus } from '@/panes/user/UserStatus'`
+
+4. Moved `components/hud/index.ts` to `panes/index.ts`
+   - Updated export statements:
+     - Changed `export * from './hud'` to `export * from './Hud'`
+     - Changed `export * from './pane'` to `export * from './Pane'`
+     - Changed `export * from './UserStatus'` to `export * from './user/UserStatus'`
