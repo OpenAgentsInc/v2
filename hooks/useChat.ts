@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
-import { useConvex } from 'convex/react';
+import { useConvex, useQuery } from 'convex/react';
 import { api } from '../convex/_generated/api';
 import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
@@ -48,7 +48,8 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         currentModelRef.current = model;
     }, [model]);
 
-    const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
+    const messages = useQuery(api.messages.getMessagesByThreadId, threadId ? { threadId: threadId as Id<"threads"> } : "skip");
+    const threadData = threadId ? { messages: messages || [], input: '' } : { messages: [], input: '' };
 
     const body: any = { model: model.id, tools, threadId };
     if (repo) {
@@ -59,7 +60,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
-        initialMessages: threadData.messages as VercelMessage[],
+        initialMessages: messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message, options) => {
