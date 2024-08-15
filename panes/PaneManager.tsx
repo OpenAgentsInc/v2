@@ -1,10 +1,7 @@
 "use client"
 
 import { usePaneStore } from '@/store/pane'
-import { Chat } from '@/panes/chat/Chat'
-import { Pane as PaneComponent } from '@/panes/Pane'
-import { UserStatus } from '@/panes/user/UserStatus'
-import { Id } from '@/convex/_generated/dataModel'
+import { Chat, Pane as PaneComponent, UserStatus } from '@/panes'
 import { Pane } from '@/types/pane'
 
 export const PaneManager = () => {
