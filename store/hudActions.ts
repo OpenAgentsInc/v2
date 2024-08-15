@@ -7,7 +7,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
     let updatedPanes: Pane[]
     let panePosition
 
-    const existingPane = state.panes.find(pane => pane.id.toString() === newPane.id?.toString())
+    const existingPane = state.panes.find(pane => pane.id === newPane.id)
     if (existingPane) {
       updatedPanes = state.panes.map(pane => ({
         ...pane,
@@ -36,7 +36,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id.toString(), adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id as Id<"threads"> | number, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -46,10 +46,10 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
   })
 }
 
-export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Pane['id']) {
+export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
   return set((state) => {
-    const removedPane = state.panes.find(pane => pane.id.toString() === id.toString())
-    const remainingPanes = state.panes.filter(pane => pane.id.toString() !== id.toString())
+    const removedPane = state.panes.find(pane => pane.id === id)
+    const remainingPanes = state.panes.filter(pane => pane.id !== id)
     const newActivePaneId = remainingPanes.length > 0 ? remainingPanes[remainingPanes.length - 1].id : null
 
     return {
@@ -63,24 +63,24 @@ export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) =
   })
 }
 
-export function updatePanePosition(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Pane['id'], x: number, y: number) {
+export function updatePanePosition(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number, x: number, y: number) {
   return set((state) => {
-    const updatedPane = state.panes.find(pane => pane.id.toString() === id.toString())
+    const updatedPane = state.panes.find(pane => pane.id === id)
     return {
       panes: state.panes.map(pane =>
-        pane.id.toString() === id.toString() ? { ...pane, x, y } : pane
+        pane.id === id ? { ...pane, x, y } : pane
       ),
       lastPanePosition: updatedPane ? { ...updatedPane, x, y } : state.lastPanePosition
     }
   })
 }
 
-export function updatePaneSize(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Pane['id'], width: number, height: number) {
+export function updatePaneSize(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number, width: number, height: number) {
   return set((state) => {
-    const updatedPane = state.panes.find(pane => pane.id.toString() === id.toString())
+    const updatedPane = state.panes.find(pane => pane.id === id)
     return {
       panes: state.panes.map(pane =>
-        pane.id.toString() === id.toString() ? { ...pane, width, height } : pane
+        pane.id === id ? { ...pane, width, height } : pane
       ),
       lastPanePosition: updatedPane ? { ...updatedPane, width, height } : state.lastPanePosition
     }
@@ -104,7 +104,7 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: newPane.id,
+      id: newPane.id as Id<"threads"> | number,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
     }
@@ -123,14 +123,14 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
   })
 }
 
-export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Pane['id']) {
+export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
   return set((state) => {
-    const paneToMove = state.panes.find(pane => pane.id.toString() === id.toString())
+    const paneToMove = state.panes.find(pane => pane.id === id)
     if (!paneToMove) return state
 
     // Deactivate all panes and activate the one being brought to front
     const updatedPanes = [
-      ...state.panes.filter(pane => pane.id.toString() !== id.toString()).map(pane => ({ ...pane, isActive: false })),
+      ...state.panes.filter(pane => pane.id !== id).map(pane => ({ ...pane, isActive: false })),
       { ...paneToMove, isActive: true }
     ]
 
@@ -141,11 +141,11 @@ export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneSto
   })
 }
 
-export function setActivePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Pane['id']) {
+export function setActivePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
   return set((state) => ({
     panes: state.panes.map(pane => ({
       ...pane,
-      isActive: pane.id.toString() === id.toString()
+      isActive: pane.id === id
     }))
   }))
 }
