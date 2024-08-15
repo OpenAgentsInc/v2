@@ -86,7 +86,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
                     buttonVariants({ variant: 'ghost' }),
                     'group w-full px-8 transition-colors hover:bg-white/10',
                     isOpen && 'bg-zinc-200 dark:bg-zinc-800',
-                    isActive && 'bg-zinc-300 dark:bg-zinc-700 font-semibold',
+                    isActive && 'pr-16 font-semibold',
                     'text-left'
                 )}
             >
