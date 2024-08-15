@@ -24,9 +24,15 @@ interface SidebarItemProps {
 export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
     const { setCurrentThreadId } = useChatStore()
-    const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
+    const isActive = panes.some(pane => {
+        const match = pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive;
+        console.log(`Pane ID: ${pane.id}, Chat ID: ${chat.id}, Type: ${pane.type}, IsActive: ${pane.isActive}, Match: ${match}`);
+        return match;
+    })
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
     const shouldAnimate = isNew && index === 0
+
+    console.log(`SidebarItem: Chat ID ${chat.id}, IsActive: ${isActive}, IsOpen: ${isOpen}`);
 
     if (!chat?.id) return null
 
@@ -39,6 +45,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
             content: { id: chat.id, oldContent: chat.messages?.join('\n') }
         }
 
+        console.log('Clicking chat:', newPane);
         // Use tiling (true) if Command/Ctrl is pressed, otherwise false
         addPane(newPane, e.metaKey || e.ctrlKey)
         setChatOpen(true)
