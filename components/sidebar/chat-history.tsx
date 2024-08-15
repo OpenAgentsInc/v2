@@ -52,7 +52,7 @@ export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
   const removeChat = React.useCallback(async (args: { id: Id<'threads'>; path: string }): Promise<ServerActionResult<void>> => {
     await removeThreadMutation({ thread_id: args.id })
     // Update local state or trigger a refetch
-    return { success: true }
+    return { success: true, data: undefined }
   }, [removeThreadMutation])
 
   const shareChat = React.useCallback(async (args: { id: Id<'threads'> }): Promise<ServerActionResult<string>> => {
