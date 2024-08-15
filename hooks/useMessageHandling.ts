@@ -16,14 +16,15 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             return;
         }
 
-        const userMessage: Message = { 
-            id: Date.now().toString(), 
+        const userMessage: Partial<Message> = { 
             content: message, 
             role: 'user', 
-            createdAt: new Date()
+            _creationTime: Date.now(),
+            thread_id: threadId as Id<"threads">,
+            clerk_user_id: clerkUserId
         };
         const threadData = getThreadData(threadId);
-        const updatedMessages = [...threadData.messages, userMessage];
+        const updatedMessages = [...threadData.messages, userMessage as Message];
         setMessages(threadId, updatedMessages);
 
         try {
