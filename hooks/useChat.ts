@@ -8,7 +8,7 @@ import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message } from '@/types';
+import { Message } from '@/types/message';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 import { useDebounce } from 'use-debounce';
