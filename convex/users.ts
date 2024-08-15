@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { calculateMessageCost } from './utils';
-import { Model, CompletionTokenUsage } from '../types';
 import { models } from '../lib/models';
 
 export const createOrGetUser = mutation({
@@ -125,8 +124,9 @@ export const saveMessageAndUpdateBalance = mutation({
       throw new Error('User not found');
     }
 
-    await ctx.db.patch(user._id, { credits: user.credits - cost_in_cents });
+    const newBalance = user.credits - cost_in_cents;
+    await ctx.db.patch(user._id, { credits: newBalance });
 
-    return { cost_in_cents, newBalance: user.credits - cost_in_cents };
+    return { cost_in_cents, newBalance };
   },
 });
