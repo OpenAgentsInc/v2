@@ -36,7 +36,7 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id || '', adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
