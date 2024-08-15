@@ -1,5 +1,7 @@
+import { Id } from '@/convex/_generated/dataModel'
+
 export type Pane = {
-  id: string
+  id: Id<"threads"> | number
   title: string
   x: number
   y: number
@@ -14,7 +16,7 @@ export type Pane = {
 }
 
 export type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
-  id?: string;
+  id?: Id<"threads"> | number;
   paneProps?: {
     x: number
     y: number
