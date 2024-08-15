@@ -5,10 +5,11 @@ import { toast } from 'sonner';
 import { useChatStore } from './useChatStore';
 import { Message } from '@/types';
 import { useUser } from '@clerk/nextjs';
+import { Id } from '../convex/_generated/dataModel';
 
 export function useThreadManagement(propsId?: string) {
   const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
-  const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId);
+  const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId as Id<"threads"> || currentThreadId as Id<"threads">);
   const { user } = useUser();
 
   const createNewThread = useMutation(api.threads.createNewThread);
@@ -16,10 +17,10 @@ export function useThreadManagement(propsId?: string) {
 
   useEffect(() => {
     if (propsId) {
-      setThreadId(propsId);
+      setThreadId(propsId as Id<"threads">);
       setCurrentThreadId(propsId);
     } else if (currentThreadId) {
-      setThreadId(currentThreadId);
+      setThreadId(currentThreadId as Id<"threads">);
     } else if (!threadId && user) {
       createNewThread({
         clerk_user_id: user.id,
@@ -27,7 +28,7 @@ export function useThreadManagement(propsId?: string) {
       })
         .then((newThread) => {
           if (newThread && newThread._id) {
-            const newThreadId = `chat-${newThread._id}`;
+            const newThreadId = newThread._id;
             setThreadId(newThreadId);
             setCurrentThreadId(newThreadId);
           } else {
