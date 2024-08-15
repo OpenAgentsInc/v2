@@ -1,6 +1,6 @@
-import { Pane, PaneInput, HudStore } from '@/types/hud'
+import { Pane, PaneInput } from '@/types/pane'
+import { HudStore } from './hud'
 import { calculatePanePosition, adjustPanePosition, createNewPaneWithPosition, PANE_OFFSET } from './paneUtils'
-import { Id } from '../convex/_generated/dataModel'
 
 export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, newPane: PaneInput, shouldTile = false) {
   return set((state) => {
