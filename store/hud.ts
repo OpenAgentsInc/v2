@@ -1,9 +1,28 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { Id } from '@/convex/_generated/dataModel'
-import { Pane, PaneInput, HudStore } from './types'
+import { Pane, PaneInput } from '@/types/pane'
 import { calculatePanePosition } from './paneUtils'
 import * as actions from './hudActions'
+
+export type HudStore = {
+  panes: Pane[]
+  isChatOpen: boolean
+  activeTerminalId: string | null
+  lastPanePosition: { x: number; y: number; width: number; height: number } | null
+  addPane: (pane: PaneInput, shouldTile?: boolean) => void
+  removePane: (id: string) => void
+  updatePanePosition: (id: string, x: number, y: number) => void
+  updatePaneSize: (id: string, width: number, height: number) => void
+  setChatOpen: (isOpen: boolean) => void
+  setActiveTerminalId: (id: string | null) => void
+  isInputFocused: boolean
+  setInputFocused: (isFocused: boolean) => void
+  isRepoInputOpen: boolean
+  setRepoInputOpen: (isOpen: boolean) => void
+  openChatPane: (pane: PaneInput) => void
+  bringPaneToFront: (id: string) => void
+  setActivePane: (id: string) => void
+}
 
 export const useHudStore = create<HudStore>()(
   persist(
