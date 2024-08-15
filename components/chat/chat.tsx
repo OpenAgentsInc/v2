@@ -5,9 +5,10 @@ import { ChatList } from './chat-list'
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { Message } from '@/types';
 import { useMemo } from 'react';
+import { Id } from '@/convex/_generated/dataModel'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
-    threadId: number
+    threadId: Id<"threads">
 }
 
 export const Chat = ({ threadId, className }: ChatProps) => {
@@ -16,7 +17,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
         sendMessage,
         isLoading,
         error
-    } = useChat({ id: threadId.toString() })
+    } = useChat({ id: threadId })
 
     // Append error message to messages if it exists
     const messagesWithError = useMemo(() => {
