@@ -3,7 +3,7 @@ import { calculatePanePosition, adjustPanePosition, createNewPaneWithPosition, P
 
 export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, newPane: PaneInput, shouldTile = false) {
   return set((state) => {
-    const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => typeof p.id === 'number' ? p.id : 0)) + 1;
+    const paneId = newPane.id || Math.random().toString(36).substr(2, 9);
     let updatedPanes: Pane[]
     let panePosition
 
@@ -97,7 +97,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
     const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
     const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
 
-    const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => typeof p.id === 'number' ? p.id : 0)) + 1
+    const paneId = newPane.id || Math.random().toString(36).substr(2, 9);
 
     const newPaneWithPosition: Pane = {
       ...newPane,
