@@ -11,7 +11,7 @@ export interface Message extends Partial<SDKMessage> {
     /**
      * The timestamp of the message.
      */
-    createdAt?: Date | string;
+    createdAt?: Date;
 
     /**
      * Text content of the message.
