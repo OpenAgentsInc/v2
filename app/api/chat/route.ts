@@ -5,8 +5,6 @@ import { auth } from '@clerk/nextjs/server';
 import { Id } from '@/convex/_generated/dataModel';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
-import { calculateMessageCost } from '@/convex/utils';
-import { Model, CompletionTokenUsage } from '@/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -49,24 +47,21 @@ export async function POST(req: Request) {
     tools,
   });
 
-  // Calculate the cost based on the model and usage
-  const usage: CompletionTokenUsage = {
-    promptTokens: result.usage?.promptTokens || 0,
-    completionTokens: result.usage?.completionTokens || 0,
-    totalTokens: result.usage?.totalTokens || 0,
-  };
-  const model: Model = {
-    id: toolContext.model,
-    providerCentsPerMillionInputTokens: 0, // You need to set these values based on your pricing
-    providerCentsPerMillionOutputTokens: 0, // You need to set these values based on your pricing
-  };
-  const cost_in_cents = calculateMessageCost(model, usage);
-
-  // Update user balance after processing the message
+  // Save message and update user balance
   try {
-    await convex.mutation(api.users.updateUserBalance, { clerk_user_id: userId, cost_in_cents });
+    const usage = {
+      promptTokens: result.usage?.promptTokens || 0,
+      completionTokens: result.usage?.completionTokens || 0,
+      totalTokens: result.usage?.totalTokens || 0,
+    };
+    
+    await convex.mutation(api.users.saveMessageAndUpdateBalance, {
+      clerk_user_id: userId,
+      model_id: toolContext.model,
+      usage,
+    });
   } catch (error) {
-    console.error('Error updating user balance:', error);
+    console.error('Error saving message and updating user balance:', error);
   }
 
   return result.toAIStreamResponse();
