@@ -5,21 +5,12 @@ import { Pane, PaneInput, HudStore } from './types'
 import { calculatePanePosition } from './paneUtils'
 import * as actions from './hudActions'
 
-const initialChatPane: Pane = {
-  id: 0,
-  title: 'Chat',
-  x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 300,
-  y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.05,
-  width: 800,
-  height: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.9,
-  type: 'chat',
-  isActive: true
-}
+// Remove the initialChatPane as it's not needed and could cause issues
 
 export const useHudStore = create<HudStore>()(
   persist(
     (set) => ({
-      panes: [initialChatPane],
+      panes: [],
       isChatOpen: true,
       activeTerminalId: null,
       lastPanePosition: null,
@@ -38,7 +29,7 @@ export const useHudStore = create<HudStore>()(
       setActivePane: (id: Id<"threads"> | number) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage-15290' + Math.random(), // remove random after we can reset bad positions
+      name: 'openagents-hud-storage-15290', // Remove the random part
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
