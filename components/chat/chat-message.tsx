@@ -5,7 +5,7 @@ import { CodeBlock } from '@/components/ui/codeblock';
 import { MemoizedReactMarkdown } from './markdown';
 import { IconOpenAgents, IconUser } from '@/components/ui/icons';
 import { ChatMessageActions } from './chat-message-actions';
-import { ToolResult } from './tool-result';
+import { ToolResult } from '@/components/chat/tool-results/tool-result';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 
