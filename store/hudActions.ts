@@ -13,7 +13,6 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
         ...pane,
         isActive: pane.id === paneId
       }))
-      console.log('addPane: Updating existing pane', { paneId, updatedPanes })
       return {
         panes: updatedPanes,
         isChatOpen: true,
@@ -39,7 +38,6 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     const adjustedPosition = adjustPanePosition(panePosition)
     const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId, adjustedPosition)
 
-    console.log('addPane: Adding new pane', { newPaneWithPosition, updatedPanes })
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
       isChatOpen: true,
@@ -54,7 +52,6 @@ export function removePane(set: (fn: (state: HudStore) => Partial<HudStore>) => 
     const remainingPanes = state.panes.filter(pane => pane.id !== id)
     const newActivePaneId = remainingPanes.length > 0 ? remainingPanes[remainingPanes.length - 1].id : null
 
-    console.log('removePane', { id, removedPane, remainingPanes, newActivePaneId })
     return {
       panes: remainingPanes.map(pane => ({
         ...pane,
@@ -69,7 +66,6 @@ export function removePane(set: (fn: (state: HudStore) => Partial<HudStore>) => 
 export function updatePanePosition(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id'], x: number, y: number) {
   return set((state) => {
     const updatedPane = state.panes.find(pane => pane.id === id)
-    console.log('updatePanePosition', { id, x, y, updatedPane })
     return {
       panes: state.panes.map(pane =>
         pane.id === id ? { ...pane, x, y } : pane
@@ -82,7 +78,6 @@ export function updatePanePosition(set: (fn: (state: HudStore) => Partial<HudSto
 export function updatePaneSize(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id'], width: number, height: number) {
   return set((state) => {
     const updatedPane = state.panes.find(pane => pane.id === id)
-    console.log('updatePaneSize', { id, width, height, updatedPane })
     return {
       panes: state.panes.map(pane =>
         pane.id === id ? { ...pane, width, height } : pane
@@ -110,7 +105,6 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
     }
-    console.log('openChatPane', { newPaneWithPosition })
     return {
       panes: [newPaneWithPosition],
       isChatOpen: true,
@@ -122,11 +116,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
 export function bringPaneToFront(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id']) {
   return set((state) => {
     const paneToMove = state.panes.find(pane => pane.id === id)
-    if (!paneToMove) {
-      console.log('bringPaneToFront: Pane not found', { id })
-      return state
-    }
-    console.log('bringPaneToFront', { id, paneToMove })
+    if (!paneToMove) return state
     return {
       panes: [
         ...state.panes.filter(pane => pane.id !== id).map(pane => ({ ...pane, isActive: false })),
@@ -138,13 +128,10 @@ export function bringPaneToFront(set: (fn: (state: HudStore) => Partial<HudStore
 }
 
 export function setActivePane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id']) {
-  return set((state) => {
-    console.log('setActivePane', { id })
-    return {
-      panes: state.panes.map(pane => ({
-        ...pane,
-        isActive: pane.id === id
-      }))
-    }
-  })
+  return set((state) => ({
+    panes: state.panes.map(pane => ({
+      ...pane,
+      isActive: pane.id === id
+    }))
+  }))
 }
