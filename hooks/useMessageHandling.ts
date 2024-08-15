@@ -18,7 +18,7 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
 
         const userMessage: Partial<Message> = { 
             content: message, 
-            role: 'user', 
+            role: 'user' as const, 
             _creationTime: Date.now(),
             thread_id: threadId as Id<"threads">,
             clerk_user_id: clerkUserId
