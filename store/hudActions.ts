@@ -108,8 +108,15 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
     }
+
+    // Deactivate all existing panes and add the new active pane
+    const updatedPanes = [
+      ...state.panes.map(pane => ({ ...pane, isActive: false })),
+      newPaneWithPosition
+    ]
+
     return {
-      panes: [newPaneWithPosition],
+      panes: updatedPanes,
       isChatOpen: true,
       lastPanePosition: panePosition
     }
@@ -120,11 +127,15 @@ export function bringPaneToFront(set: (fn: (state: HudStore) => Partial<HudStore
   return set((state) => {
     const paneToMove = state.panes.find(pane => pane.id.toString() === id.toString())
     if (!paneToMove) return state
+
+    // Deactivate all panes and activate the one being brought to front
+    const updatedPanes = [
+      ...state.panes.filter(pane => pane.id.toString() !== id.toString()).map(pane => ({ ...pane, isActive: false })),
+      { ...paneToMove, isActive: true }
+    ]
+
     return {
-      panes: [
-        ...state.panes.filter(pane => pane.id.toString() !== id.toString()).map(pane => ({ ...pane, isActive: false })),
-        { ...paneToMove, isActive: true }
-      ],
+      panes: updatedPanes,
       lastPanePosition: { x: paneToMove.x, y: paneToMove.y, width: paneToMove.width, height: paneToMove.height }
     }
   })
