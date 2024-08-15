@@ -49,8 +49,16 @@
 - Accepts children and className props
 - Applies default styling for flex layout and padding
 
+### sidebar-item.tsx
+- Renders individual chat items in the sidebar
+- Handles chat selection, opening, and deletion
+- Uses Framer Motion for animations
+- Integrates with HUD store for pane management
+- Displays icons for shared chats and delete action
+- Implements click handlers for opening chats and deleting threads
+
 ## Thoughts on Condensing
-- Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, sidebar-actions, and sidebar-footer into the main ChatsPane component
+- Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, sidebar-actions, sidebar-footer, and sidebar-item into the main ChatsPane component
 - Keep the core functionality of chat-history and new-chat-button (data fetching, mutations, sorting) in the new ChatsPane
 - Simplify the component structure by integrating NewChatButton and SidebarActions directly into ChatsPane
 - Move the chat creation logic from new-chat-button into a custom hook or utility function
@@ -64,3 +72,6 @@
 - Retain the server-side rendering approach for the desktop sidebar, but integrate it with the new ChatsPane component
 - Ensure that the responsive styling for desktop view is maintained in the new component structure
 - Incorporate the footer functionality directly into the ChatsPane component, allowing for flexible content in the footer area
+- Merge the animation logic from SidebarItem into the new ChatItem component within ChatsPane
+- Implement a single handleChatAction function in ChatsPane to manage opening, deleting, and sharing chats
+- Use a custom hook (e.g., useChatActions) to encapsulate the logic for chat operations and state management
