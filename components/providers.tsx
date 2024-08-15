@@ -7,7 +7,7 @@ import { SidebarProvider } from '@/lib/hooks/use-sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ClerkProvider, useAuth } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
-import { AuthStateHandler } from '@/components/AuthStateHandler'
+import { AuthStateHandler } from '@/components/auth/AuthStateHandler'
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 
