@@ -77,22 +77,24 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                         prompt_tokens: options.usage?.promptTokens,
                         completion_tokens: options.usage?.completionTokens,
                         model_id: currentModelRef.current.id,
-                    });
-                    if (result.newBalance) {
+                    }) as { newBalance?: number } | null;
+
+                    if (result && result.newBalance !== undefined) {
                         setBalance(result.newBalance);
                     }
                     setError(null);
 
-                    if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-                        try {
-                            const title = await convex.mutation(api.threads.generateTitle, { thread_id: threadId as Id<"threads"> });
-                            if (typeof title === 'string') {
-                                updateThreadTitle(threadId, title);
-                            }
-                        } catch (error) {
-                            console.error('Error generating title:', error);
-                        }
-                    }
+                    // Commented out due to missing API function
+                    // if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+                    //     try {
+                    //         const title = await convex.mutation(api.threads.generateTitle, { thread_id: threadId as Id<"threads"> });
+                    //         if (typeof title === 'string') {
+                    //             updateThreadTitle(Number(threadId), title);
+                    //         }
+                    //     } catch (error) {
+                    //         console.error('Error generating title:', error);
+                    //     }
+                    // }
 
                 } catch (error: any) {
                     console.log('error message is:', error.message);
