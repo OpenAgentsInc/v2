@@ -37,13 +37,12 @@ export default function SWEBenchPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold text-white mb-4">SWE-Bench Verified</h1>
+      <h1 className="text-2xl font-bold text-white mb-4">SWE-Bench Verified (psf/requests)</h1>
       <Table>
-        <TableCaption>A list of SWE Bench data entries.</TableCaption>
+        <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">Instance ID</TableHead>
-            <TableHead>Repo</TableHead>
             <TableHead>Base Commit</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Version</TableHead>
@@ -53,7 +52,6 @@ export default function SWEBenchPage() {
           {sweData.map((item) => (
             <TableRow key={item._id} onClick={() => handleRowClick(item)} className="cursor-pointer">
               <TableCell className="font-medium">{item.instance_id}</TableCell>
-              <TableCell>{item.repo}</TableCell>
               <TableCell>{item.base_commit}</TableCell>
               <TableCell>{item.created_at}</TableCell>
               <TableCell>{item.version}</TableCell>
