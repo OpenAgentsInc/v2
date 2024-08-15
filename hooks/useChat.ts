@@ -58,56 +58,61 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body.repoBranch = repo.branch;
     }
 
+    const saveMessageAndUpdateBalance = async (message: Message, options: any) => {
+        if (threadId && user) {
+            const updatedMessages = [...threadData.messages, message];
+            setMessages(threadId, updatedMessages);
+
+            try {
+                const result = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
+                    clerk_user_id: user.id,
+                    model_id: currentModelRef.current.id,
+                    usage: {
+                        promptTokens: options.usage?.promptTokens || 0,
+                        completionTokens: options.usage?.completionTokens || 0,
+                        totalTokens: options.usage?.totalTokens || 0,
+                    },
+                }) as { cost_in_cents: number, newBalance: number } | null;
+
+                if (result) {
+                    setBalance(result.newBalance);
+                    console.log(`Message cost: ${result.cost_in_cents} cents. New balance: ${result.newBalance}`);
+                }
+                setError(null);
+
+                // Save the message to the database
+                await convex.mutation(api.messages.saveChatMessage, {
+                    thread_id: threadId as Id<"threads">,
+                    clerk_user_id: user.id,
+                    role: message.role,
+                    content: message.content,
+                    tool_invocations: options.toolInvocations ? JSON.stringify(options.toolInvocations) : undefined,
+                    finish_reason: options.finishReason,
+                    total_tokens: options.usage?.totalTokens,
+                    prompt_tokens: options.usage?.promptTokens,
+                    completion_tokens: options.usage?.completionTokens,
+                    model_id: currentModelRef.current.id,
+                    cost_in_cents: result?.cost_in_cents,
+                });
+
+            } catch (error: any) {
+                console.log('error message is:', error.message);
+                if (error instanceof Error && error.message === 'Insufficient credits') {
+                    toast.error('Insufficient credits. Please add more credits to continue chatting.');
+                } else {
+                    toast.error('Unknown error. Try again or try a different model.');
+                }
+            }
+        }
+    };
+
     const vercelChatProps = useVercelChat({
         id: threadId?.toString(),
         initialMessages: messages as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message, options) => {
-            if (threadId && user) {
-                const updatedMessages = [...threadData.messages, message as Message];
-                setMessages(threadId, updatedMessages);
-
-                try {
-                    const result = await convex.mutation(api.messages.saveChatMessage, {
-                        thread_id: threadId as Id<"threads">,
-                        clerk_user_id: user.id,
-                        role: message.role,
-                        content: message.content,
-                        tool_invocations: (options as any).toolInvocations ? JSON.stringify((options as any).toolInvocations) : undefined,
-                        finish_reason: options.finishReason,
-                        total_tokens: options.usage?.totalTokens,
-                        prompt_tokens: options.usage?.promptTokens,
-                        completion_tokens: options.usage?.completionTokens,
-                        model_id: currentModelRef.current.id,
-                    }) as { newBalance?: number } | null;
-
-                    if (result && result.newBalance !== undefined) {
-                        setBalance(result.newBalance);
-                    }
-                    setError(null);
-
-                    // Commented out due to missing API function
-                    // if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-                    //     try {
-                    //         const title = await convex.mutation(api.threads.generateTitle, { thread_id: threadId as Id<"threads"> });
-                    //         if (typeof title === 'string') {
-                    //             updateThreadTitle(Number(threadId), title);
-                    //         }
-                    //     } catch (error) {
-                    //         console.error('Error generating title:', error);
-                    //     }
-                    // }
-
-                } catch (error: any) {
-                    console.log('error message is:', error.message);
-                    if (error instanceof Error && error.message === 'Insufficient credits') {
-                        toast.error('Insufficient credits. Please add more credits to continue chatting.');
-                    } else {
-                        toast.error('Unknown error. Try again or try a different model.');
-                    }
-                }
-            }
+            await saveMessageAndUpdateBalance(message as Message, options);
         },
         onError: (error) => {
             if (error.message === 'Insufficient credits') {
