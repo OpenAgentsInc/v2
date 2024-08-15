@@ -36,7 +36,7 @@ export function adjustPanePosition(panePosition: { x: number; y: number; width: 
   }
 }
 
-export function createNewPaneWithPosition(newPane: PaneInput, paneId: number, panePosition: { x: number; y: number; width: number; height: number }): Pane {
+export function createNewPaneWithPosition(newPane: PaneInput, paneId: string, panePosition: { x: number; y: number; width: number; height: number }): Pane {
   return {
     ...newPane,
     id: paneId,
