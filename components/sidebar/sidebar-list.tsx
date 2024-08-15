@@ -59,6 +59,7 @@ export function SidebarList({
           onDelete={handleDelete}
         >
           {/* Additional actions can be added here */}
+          <button onClick={() => shareChat({ id: chat.id })}>Share</button>
         </SidebarItem>
       ))}
     </div>
