@@ -5,6 +5,7 @@ import { useDrag } from '@use-gesture/react'
 import { usePaneStore } from "@/store/hud"
 import { X } from 'lucide-react'
 import { Pane as PaneType } from '@/types/pane'
+import { Id } from '../convex/_generated/dataModel'
 
 type PaneProps = PaneType & {
   children?: React.ReactNode
@@ -13,11 +14,11 @@ type PaneProps = PaneType & {
 }
 
 const useResizeHandlers = (
-  id: string,
+  id: Id<"threads"> | number,
   initialPosition: { x: number; y: number },
   initialSize: { width: number; height: number },
-  updatePanePosition: (id: string, x: number, y: number) => void,
-  updatePaneSize: (id: string, width: number, height: number) => void
+  updatePanePosition: (id: Id<"threads"> | number, x: number, y: number) => void,
+  updatePaneSize: (id: Id<"threads"> | number, width: number, height: number) => void
 ) => {
   const [position, setPosition] = useState(initialPosition)
   const [size, setSize] = useState(initialSize)
