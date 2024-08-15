@@ -17,7 +17,15 @@ const truncate = (str: string, n: number) => {
   return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 };
 
-const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => {
+interface SWEBenchItem {
+  _id: string;
+  instance_id: string;
+  problem_statement: string;
+  created_at: string;
+  version: string;
+}
+
+const SWEBenchTable: React.FC<{ data: SWEBenchItem[] }> = ({ data }) => {
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [data]);
@@ -59,14 +67,14 @@ const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => {
 
 export default function SWEBenchPage() {
   const sweData = useQuery(api.swebench.getAllSWEData);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<SWEBenchItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   if (sweData === undefined) {
     return <p className="text-white">Loading...</p>;
   }
 
-  const handleRowClick = (item) => {
+  const handleRowClick = (item: SWEBenchItem) => {
     setSelectedItem(item);
     setIsDialogOpen(true);
   };
@@ -77,7 +85,7 @@ export default function SWEBenchPage() {
       <div onClick={(e) => {
         const target = e.target as HTMLElement;
         const row = target.closest('tr');
-        if (row) {
+        if (row && row.parentNode) {
           const index = Array.from(row.parentNode.children).indexOf(row);
           handleRowClick(sweData[index]);
         }
