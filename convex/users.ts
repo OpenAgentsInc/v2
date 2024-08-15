@@ -2,6 +2,7 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { calculateMessageCost } from './utils';
 import { Model, CompletionTokenUsage } from '../types';
+import { models } from '../lib/models';
 
 export const createOrGetUser = mutation({
   args: {
@@ -103,15 +104,10 @@ export const saveMessageAndUpdateBalance = mutation({
   async handler(ctx, args) {
     const { clerk_user_id, model_id, usage } = args;
 
-    // You need to define these values based on your pricing
-    const providerCentsPerMillionInputTokens = 0;
-    const providerCentsPerMillionOutputTokens = 0;
-
-    const model: Model = {
-      id: model_id,
-      providerCentsPerMillionInputTokens,
-      providerCentsPerMillionOutputTokens,
-    };
+    const model = models.find(m => m.id === model_id);
+    if (!model) {
+      throw new Error(`Model with id ${model_id} not found`);
+    }
 
     const cost_in_cents = calculateMessageCost(model, usage);
 
