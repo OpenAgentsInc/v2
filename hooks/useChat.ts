@@ -60,8 +60,11 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
     const saveMessageAndUpdateBalance = async (message: Message, options: any) => {
         if (threadId && user) {
-            const updatedMessages = [...threadData.messages, message];
-            setMessages(threadId, updatedMessages);
+            const updatedMessages = [...threadData.messages, message].map(msg => ({
+                ...msg,
+                role: msg.role as 'system' | 'user' | 'assistant' | 'data'
+            }));
+            setMessages(threadId, updatedMessages as Message[]);
 
             try {
                 const result = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
