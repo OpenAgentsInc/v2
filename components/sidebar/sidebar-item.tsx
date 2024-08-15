@@ -13,6 +13,7 @@ import { type Chat } from '@/types'
 import { cn } from '@/lib/utils'
 import { useHudStore } from '@/store/hud'
 import { useChatStore } from '@/hooks/useChatStore'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface SidebarItemProps {
     index: number
@@ -25,11 +26,11 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
     const { panes, addPane, setChatOpen, bringPaneToFront } = useHudStore()
     const { setCurrentThreadId } = useChatStore()
     const isActive = React.useMemo(() => 
-        panes.some(pane => pane.id === chat.id && pane.type === 'chat' && pane.isActive),
+        panes.some(pane => pane.id.toString() === chat.id.toString() && pane.type === 'chat' && pane.isActive),
         [panes, chat.id]
     )
     const isOpen = React.useMemo(() => 
-        panes.some(pane => pane.id === chat.id && pane.type === 'chat'),
+        panes.some(pane => pane.id.toString() === chat.id.toString() && pane.type === 'chat'),
         [panes, chat.id]
     )
     const shouldAnimate = isNew && index === 0
@@ -38,13 +39,13 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
 
     const handleClick = React.useCallback((e: React.MouseEvent) => {
         e.preventDefault()
-        const existingPane = panes.find(pane => pane.id === chat.id && pane.type === 'chat')
+        const existingPane = panes.find(pane => pane.id.toString() === chat.id.toString() && pane.type === 'chat')
 
         if (existingPane) {
             bringPaneToFront(existingPane.id)
         } else {
             const newPane = {
-                id: chat.id,
+                id: chat.id as Id<"threads">,
                 title: chat.title,
                 type: 'chat' as const,
                 content: { id: chat.id, oldContent: chat.messages?.join('\n') }
@@ -52,7 +53,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
             addPane(newPane, e.metaKey || e.ctrlKey)
         }
         setChatOpen(true)
-        setCurrentThreadId(chat.id)
+        setCurrentThreadId(chat.id as Id<"threads">)
     }, [panes, chat, bringPaneToFront, addPane, setChatOpen, setCurrentThreadId])
 
     return (
