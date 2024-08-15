@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
 import { useHudStore } from "@/store/hud"
 import { X } from 'lucide-react'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface PaneProps {
-    id: number
+    id: Id<"threads"> | number
     title: string
     x: number
     y: number
@@ -18,11 +19,11 @@ interface PaneProps {
 }
 
 const useResizeHandlers = (
-    id: number,
+    id: Id<"threads"> | number,
     initialPosition: { x: number; y: number },
     initialSize: { width: number; height: number },
-    updatePanePosition: (id: number, x: number, y: number) => void,
-    updatePaneSize: (id: number, width: number, height: number) => void
+    updatePanePosition: (id: Id<"threads"> | number, x: number, y: number) => void,
+    updatePaneSize: (id: Id<"threads"> | number, width: number, height: number) => void
 ) => {
     const [position, setPosition] = useState(initialPosition)
     const [size, setSize] = useState(initialSize)
