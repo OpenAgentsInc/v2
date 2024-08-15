@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
-import { useHudStore } from "@/store/hud"
+import { usePaneStore } from "@/store/hud"
 import { X } from 'lucide-react'
 import { Pane as PaneType } from '@/types/pane'
 
@@ -111,10 +111,10 @@ export const Pane: React.FC<PaneProps> = ({
   dismissable = true
 }) => {
   const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
-  const updatePanePosition = useHudStore(state => state.updatePanePosition)
-  const updatePaneSize = useHudStore(state => state.updatePaneSize)
-  const removePane = useHudStore(state => state.removePane)
-  const bringPaneToFront = useHudStore(state => state.bringPaneToFront)
+  const updatePanePosition = usePaneStore(state => state.updatePanePosition)
+  const updatePaneSize = usePaneStore(state => state.updatePaneSize)
+  const removePane = usePaneStore(state => state.removePane)
+  const bringPaneToFront = usePaneStore(state => state.bringPaneToFront)
 
   const { position, size, setPosition, setSize, resizeHandlers } = useResizeHandlers(
     id,

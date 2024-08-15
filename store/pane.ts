@@ -4,7 +4,7 @@ import { Pane, PaneInput } from '@/types/pane'
 import { calculatePanePosition } from './paneUtils'
 import * as actions from './hudActions'
 
-export type HudStore = {
+export type PaneStore = {
   panes: Pane[]
   isChatOpen: boolean
   activeTerminalId: string | null
@@ -24,7 +24,7 @@ export type HudStore = {
   setActivePane: (id: string) => void
 }
 
-export const useHudStore = create<HudStore>()(
+export const usePaneStore = create<PaneStore>()(
   persist(
     (set) => ({
       panes: [],

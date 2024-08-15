@@ -25,7 +25,7 @@ export type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
   }
 }
 
-export type HudStore = {
+export type PaneStore = {
   panes: Pane[]
   isChatOpen: boolean
   activeTerminalId: number | null

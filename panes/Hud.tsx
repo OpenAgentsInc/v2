@@ -1,6 +1,6 @@
 "use client"
 
-import { useHudStore } from '@/store/hud'
+import { usePaneStore } from '@/store/hud'
 import { Chat } from '@/components/chat'
 import { Pane as PaneComponent } from '@/panes/Pane'
 import { UserStatus } from '@/panes/user/UserStatus'
@@ -8,7 +8,7 @@ import { Id } from '@/convex/_generated/dataModel'
 import { Pane } from '@/types/pane'
 
 export const Hud = () => {
-  const { panes } = useHudStore()
+  const { panes } = usePaneStore()
 
   const stripChatPrefix = (id: string): string => {
     // Remove 'chat-' prefix up to two times

@@ -8,14 +8,14 @@ This document contains detailed information about the specific file updates made
 
 ```typescript
 import { useState } from 'react'
-import { useHudStore } from '@/store/hud'
+import { usePaneStore } from '@/store/hud'
 import { useChatStore } from '@/store/chat'
 import { buttonVariants } from '@/components/ui/button'
 import { IconPlus } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 export function NewChatButton() {
-    const { addPane } = useHudStore()
+    const { addPane } = usePaneStore()
     const { setCurrentThreadId } = useChatStore()
     const [isCreating, setIsCreating] = useState(false)
 
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { messages, threadId } = await req.json()
-    
+
     if (!threadId || isNaN(Number(threadId))) {
         return NextResponse.json({ error: 'Invalid thread ID' }, { status: 400 })
     }

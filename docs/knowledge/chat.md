@@ -22,7 +22,7 @@ This document provides a comprehensive overview of the chat implementation, incl
 5. Server component `components/dashboard/HomeDashboard.tsx` renders a pane with the user's chat history and the HUD
 6. Client component `components/hud/hud.tsx` renders all chat panes managed by the hud store
    - Panes are defined in `components/hud/pane.tsx` and managed in `store/hud.ts`
-7. Each chat pane has a child Chat component defined in `components/chat.tsx` 
+7. Each chat pane has a child Chat component defined in `components/chat.tsx`
    - The Chat component receives the `id` prop, which corresponds to the thread ID
 
 ## New Chat Functionality
@@ -30,7 +30,7 @@ This document provides a comprehensive overview of the chat implementation, incl
 The "New Chat" button in the sidebar creates a new chat pane with a fresh thread:
 
 1. The `NewChatButton` component (`components/new-chat-button.tsx`) is rendered in the `ChatHistory` component (`components/chat-history.tsx`)
-2. When clicked, the `NewChatButton` uses the `addPane` function from the `useHudStore` (defined in `store/hud.ts`) to create a new chat pane
+2. When clicked, the `NewChatButton` uses the `addPane` function from the `usePaneStore` (defined in `store/hud.ts`) to create a new chat pane
 3. The `HUD` component (`components/hud/hud.tsx`) renders all chat panes, including the newly created one
 4. Each chat pane renders a `Chat` component with a unique `id` prop, ensuring that each chat has its own thread
 

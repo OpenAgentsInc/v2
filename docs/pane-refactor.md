@@ -23,7 +23,7 @@ This document logs the actions taken to refactor the components in the `componen
 3. Moved and renamed `components/hud/hud.tsx` to `panes/PaneManager.tsx`
    - Updated component name from `Hud` to `PaneManager`
    - Updated import statements:
-     - Changed `import { useHudStore } from '@/store/hud'` to `import { usePaneStore } from '@/store/pane'`
+     - Changed `import { usePaneStore } from '@/store/hud'` to `import { usePaneStore } from '@/store/pane'`
      - Changed `import { Pane as PaneComponent } from '@/components/hud/pane'` to `import { Pane as PaneComponent } from '@/panes/Pane'`
      - Changed `import { UserStatus } from './UserStatus'` to `import { UserStatus } from '@/panes/user/UserStatus'`
    - Removed the outer `<div>` wrapper
@@ -45,7 +45,7 @@ This document logs the actions taken to refactor the components in the `componen
 ## Next Steps:
 
 1. Update any remaining import statements in other files that may still be referencing the old `components/hud/` path or `Hud` component
-2. Rename `useHudStore` to `usePaneStore` in the store file and update all references
+2. Rename `usePaneStore` to `usePaneStore` in the store file and update all references
 3. Remove the now-empty `components/hud/` directory
 4. Test the application thoroughly to ensure all functionality related to these components is working as expected
 5. Update any documentation or comments that may reference the old file structure or "Hud" concept

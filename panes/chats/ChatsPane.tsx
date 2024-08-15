@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { useHudStore } from '../../store/hud';
+import { usePaneStore } from '../../store/hud';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
@@ -15,7 +15,7 @@ export const ChatsPane: React.FC = () => {
   const router = useRouter();
   const chats = useQuery(api.chats.list);
   const deleteChat = useMutation(api.chats.remove);
-  const { openChatPane } = useHudStore();
+  const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();

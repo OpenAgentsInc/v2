@@ -25,14 +25,14 @@
   - Added `input`, `handleInputChange`, and `handleSubmit` props to `PromptForm`
   - Added conditional rendering for `ButtonScrollToBottom`
   - Changed `id` prop type from `string` to `number`
-  - Updated the `useHudStore.setState` call to use `id.toString()` for comparison
+  - Updated the `usePaneStore.setState` call to use `id.toString()` for comparison
   - Fixed import paths for types (Message from '@/types', ServerActionResult and Chat from '@/lib/types')
 
 - Updated `components/chat.tsx`:
   - Changed the `useChat` hook call to parse the `propId` as a number: `id: propId ? parseInt(propId, 10) : undefined`
   - Removed `setInput` prop from `EmptyScreen`
   - Removed `isLoading` prop from `ChatPanel`
-  - Updated `pane.paneProps?.id` to `pane.id` in the `useHudStore.setState` call
+  - Updated `pane.paneProps?.id` to `pane.id` in the `usePaneStore.setState` call
   - Changed `id` prop type in `ChatProps` to `number`
   - Updated `useChat` hook call to directly use `number` type for `id`
   - Ensured all `useEffect` hooks and other logic handle `number` type for `id`

@@ -1,13 +1,13 @@
 import React from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { useHudStore } from '../../store/hud';
+import { usePaneStore } from '../../store/hud';
 import { Button } from '../../components/ui/button';
 
 export const NewChatButton: React.FC = () => {
   const createUser = useMutation(api.users.create);
   const createThread = useMutation(api.threads.create);
-  const { openChatPane } = useHudStore();
+  const { openChatPane } = usePaneStore();
   const [isCreating, setIsCreating] = React.useState(false);
 
   const handleNewChat = async () => {
