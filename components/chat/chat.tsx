@@ -15,32 +15,15 @@ export const Chat = ({ threadId, className }: ChatProps) => {
     const {
         messages,
         sendMessage,
-        isLoading,
-        error
-    } = useChat({ id: threadId })
+        isLoading
+    } = useChat(threadId)
 
-    // Append error message to messages if it exists
-    const messagesWithError = useMemo(() => {
-        if (error) {
-            return [
-                ...messages,
-                {
-                    id: 'error-message',
-                    content: error,
-                    role: 'assistant' as const,
-                    createdAt: new Date()
-                } as Message
-            ];
-        }
-        return messages;
-    }, [messages, error]);
-
-    const chatContainerRef = useChatScroll(messagesWithError);
+    const chatContainerRef = useChatScroll(messages);
 
     return (
         <div className={`flex flex-col h-full ${className}`}>
             <div className="flex-1 overflow-auto" ref={chatContainerRef}>
-                <ChatList messages={messagesWithError as Message[]} />
+                <ChatList messages={messages as Message[]} />
             </div>
             <div className="flex-shrink-0 w-full">
                 <div className="sticky bottom-0 w-full">
