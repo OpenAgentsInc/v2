@@ -3,15 +3,16 @@ import { getSystemPrompt } from '@/lib/systemPrompt';
 import { getTools, getToolContext } from '@/tools';
 import { auth } from '@clerk/nextjs/server';
 import { getUserBalance } from '@/db/actions';
+import { Id } from '@/convex/_generated/dataModel';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const threadId = Number(body.threadId);
+  const threadId = body.threadId as Id<"threads">;
 
-  if (isNaN(threadId)) {
+  if (!threadId) {
     return new Response('Invalid threadId', { status: 400 });
   }
 
