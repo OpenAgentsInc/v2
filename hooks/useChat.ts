@@ -39,7 +39,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         setInput: setStoreInput
     } = useChatStore();
 
-    const { threadId, setThreadId } = useThreadManagement(propsId);
+    const threadManagement = useThreadManagement(propsId);
+    const threadId = threadManagement?.threadId ?? null;
+    const setThreadId = threadManagement?.setThreadId ?? (() => {});
     const currentModelRef = useRef(model);
 
     useEffect(() => {
