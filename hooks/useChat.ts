@@ -48,7 +48,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         currentModelRef.current = model;
     }, [model]);
 
-    const messages = useQuery(api.messages.getMessagesByThreadId, threadId ? { threadId: threadId as Id<"threads"> } : "skip");
+    const messages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
     const threadData = threadId ? { messages: messages || [], input: '' } : { messages: [], input: '' };
 
     const body: any = { model: model.id, tools, threadId };
