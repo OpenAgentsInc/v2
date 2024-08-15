@@ -4,6 +4,7 @@ import { useHudStore } from '@/store/hud'
 import { Chat } from '@/components/chat'
 import { Pane } from '@/components/hud/pane'
 import { UserStatus } from './UserStatus'
+import { Id } from '@/convex/_generated/dataModel'
 
 export const Hud = () => {
   const { panes } = useHudStore()
@@ -13,15 +14,15 @@ export const Hud = () => {
       <UserStatus />
       {panes.map((pane) => (
         <Pane
-          key={pane.id}
+          key={pane.id.toString()}
           title={pane.title}
-          id={pane.id}
+          id={pane.id.toString()}
           x={pane.x}
           y={pane.y}
           height={pane.height}
           width={pane.width}
         >
-          {pane.type === 'chat' && <Chat threadId={pane.id} />}
+          {pane.type === 'chat' && <Chat threadId={pane.id as Id<"threads">} />}
         </Pane>
       ))}
     </div>
