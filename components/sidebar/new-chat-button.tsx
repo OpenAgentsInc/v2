@@ -8,10 +8,11 @@ import { cn } from '@/lib/utils'
 import { Chat } from '@/types'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface NewChatButtonProps {
     addChat: (newChat: Chat) => void
-    userId: string
+    userId: Id<"users">
     clerkUserId: string
     chats: Chat[]
 }
@@ -45,7 +46,7 @@ export function NewChatButton({ addChat, userId, clerkUserId, chats }: NewChatBu
                 addChat(newChat)
 
                 openChatPane({
-                    id: newThread._id,
+                    id: newThread._id.toString(),
                     title: 'New Chat',
                     type: 'chat',
                 })
