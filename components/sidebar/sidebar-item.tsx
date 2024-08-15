@@ -12,6 +12,7 @@ import {
 import { type Chat } from '@/types'
 import { cn } from '@/lib/utils'
 import { useHudStore } from '@/store/hud'
+import { useChatStore } from '@/hooks/useChatStore'
 
 interface SidebarItemProps {
     index: number
@@ -22,6 +23,7 @@ interface SidebarItemProps {
 
 export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
     const { panes, addPane, setChatOpen } = useHudStore()
+    const { setCurrentThreadId } = useChatStore()
     const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
     const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
     const shouldAnimate = isNew && index === 0
@@ -40,6 +42,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
         // Use tiling (true) if Command/Ctrl is pressed, otherwise false
         addPane(newPane, e.metaKey || e.ctrlKey)
         setChatOpen(true)
+        setCurrentThreadId(chat.id)
     }
 
     return (
