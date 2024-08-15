@@ -57,7 +57,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
 
     return (
         <motion.div
-            className="relative h-8"
+            className="relative h-10 mb-1"
             variants={{
                 initial: {
                     height: 0,
@@ -75,33 +75,33 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
                 ease: 'easeIn'
             }}
         >
-            <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
+            <div className="absolute left-2 top-2 flex size-6 items-center justify-center">
                 {chat.sharePath ? (
                     <Tooltip delayDuration={1000}>
                         <TooltipTrigger
                             tabIndex={-1}
                             className="focus:bg-muted focus:ring-1 focus:ring-ring"
                         >
-                            <IconUsers className="mr-2 mt-1 text-zinc-500" />
+                            <IconUsers className="text-zinc-500" />
                         </TooltipTrigger>
                         <TooltipContent>This is a shared chat.</TooltipContent>
                     </Tooltip>
                 ) : (
-                    <IconMessage className="mr-2 mt-1 text-zinc-500" />
+                    <IconMessage className="text-zinc-500" />
                 )}
             </div>
             <button
                 onClick={handleClick}
                 className={cn(
                     buttonVariants({ variant: 'ghost' }),
-                    'group w-full px-8 transition-colors hover:bg-white/10',
+                    'group w-full h-10 px-10 py-2 transition-colors hover:bg-white/10',
                     isOpen && 'bg-zinc-200 dark:bg-zinc-800',
                     isActive && 'pr-16 font-semibold',
                     'text-left'
                 )}
             >
                 <div
-                    className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
+                    className="relative max-h-6 flex-1 select-none overflow-hidden text-ellipsis break-all"
                     title={chat.title}
                 >
                     <span className="whitespace-nowrap">
@@ -137,7 +137,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
                     </span>
                 </div>
             </button>
-            {isActive && <div className="absolute right-2 top-1">{children}</div>}
-        </motion.div >
+            {isActive && <div className="absolute right-2 top-2">{children}</div>}
+        </motion.div>
     )
 }
