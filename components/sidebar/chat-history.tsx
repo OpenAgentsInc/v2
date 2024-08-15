@@ -8,6 +8,7 @@ import { useChatStore } from '@/store/chat'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface ChatHistoryProps {
     userId: string
@@ -16,7 +17,7 @@ interface ChatHistoryProps {
 export function ChatHistory({ userId }: ChatHistoryProps) {
     const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
-    const [newChatId, setNewChatId] = useLocalStorage<string | null>('newChatId2', null)
+    const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
 
     const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: userId })
 
@@ -25,7 +26,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
             fetchedThreads.forEach((thread) => {
                 setThread(thread._id, {
                     id: thread._id,
-                    title: thread.metadata?.title || 'Untitled Thread',
+                    title: thread.metadata?.title as string || 'Untitled Thread',
                     messages: [],
                     createdAt: new Date(thread.createdAt),
                 })
@@ -35,13 +36,13 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
     }, [fetchedThreads, setThread])
 
     const addChat = React.useCallback((newChat: Chat) => {
-        setThread(newChat.id, {
-            id: newChat.id,
+        setThread(newChat.id as Id<'threads'>, {
+            id: newChat.id as Id<'threads'>,
             title: newChat.title,
             messages: [],
             createdAt: new Date(),
         })
-        setNewChatId(newChat.id)
+        setNewChatId(newChat.id as Id<'threads'>)
     }, [setThread, setNewChatId])
 
     const sortedChats = React.useMemo(() => {
