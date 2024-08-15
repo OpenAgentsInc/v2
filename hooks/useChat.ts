@@ -1,77 +1,29 @@
 "use client"
 
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { create } from 'zustand';
+import { useEffect, useRef, useState } from 'react';
 import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
-import { generateTitle } from '@/db/actions';
+import { useConvex } from 'convex/react';
+import { api } from '../convex/_generated/api';
 import { useBalanceStore } from '@/store/balance';
 import { useModelStore } from '@/store/models';
 import { useRepoStore } from '@/store/repo';
 import { useToolStore } from '@/store/tools';
-import { Message, Model } from '@/types';
-import { createNewThread, fetchThreadMessages, saveChatMessage } from '@/db/actions';
+import { Message } from '@/types';
 import { toast } from 'sonner';
 import { useUser } from '@clerk/nextjs';
 import { useDebounce } from 'use-debounce';
 import { useChatStore as useNewChatStore } from '@/store/chat';
-
-interface User {
-    id: string;
-    name: string;
-}
-
-interface ThreadData {
-    id: number;
-    messages: Message[];
-    input: string;
-    user?: User;
-}
-
-interface ChatStore {
-    currentThreadId: number | null;
-    user: User | undefined;
-    threads: Record<number, ThreadData>;
-    setCurrentThreadId: (id: number) => void;
-    setUser: (user: User) => void;
-    getThreadData: (id: number) => ThreadData;
-    setMessages: (id: number, messages: Message[]) => void;
-    setInput: (id: number, input: string) => void;
-}
-
-const useChatStore = create<ChatStore>((set, get) => ({
-    currentThreadId: null,
-    user: undefined,
-    threads: {},
-    setCurrentThreadId: (id: number) => set({ currentThreadId: id }),
-    setUser: (user: User) => set({ user }),
-    getThreadData: (id: number) => {
-        const { threads } = get();
-        if (!threads[id]) {
-            threads[id] = { id, messages: [], input: '' };
-        }
-        return threads[id];
-    },
-    setMessages: (id: number, messages: Message[]) =>
-        set(state => ({
-            threads: {
-                ...state.threads,
-                [id]: { ...state.threads[id], messages }
-            }
-        })),
-    setInput: (id: number, input: string) =>
-        set(state => ({
-            threads: {
-                ...state.threads,
-                [id]: { ...state.threads[id], input }
-            }
-        })),
-}));
+import { useChatStore } from './useChatStore';
+import { useThreadManagement } from './useThreadManagement';
+import { useMessageHandling } from './useMessageHandling';
+import { Id } from '../convex/_generated/dataModel';
 
 interface UseChatProps {
-    id?: number;
+    id?: string;
 }
 
 export function useChat({ id: propsId }: UseChatProps = {}) {
+    const convex = useConvex();
     const model = useModelStore((state) => state.model);
     const repo = useRepoStore((state) => state.repo);
     const tools = useToolStore((state) => state.tools);
@@ -81,50 +33,18 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     const updateThreadTitle = useNewChatStore((state) => state.updateThreadTitle);
 
     const {
-        currentThreadId,
-        setCurrentThreadId,
         setUser,
         getThreadData,
         setMessages,
         setInput: setStoreInput
     } = useChatStore();
 
-    const [threadId, setThreadId] = useState<number | null>(propsId || currentThreadId);
+    const { threadId, setThreadId } = useThreadManagement(propsId);
     const currentModelRef = useRef(model);
 
     useEffect(() => {
         currentModelRef.current = model;
     }, [model]);
-
-    useEffect(() => {
-        if (propsId) {
-            setThreadId(propsId);
-            setCurrentThreadId(propsId);
-        } else if (!threadId && user) {
-            createNewThread()
-                .then(({ threadId: newThreadId }) => {
-                    setThreadId(newThreadId);
-                    setCurrentThreadId(newThreadId);
-                })
-                .catch(error => {
-                    console.error('Error creating new thread:', error);
-                    toast.error('Failed to create a new chat thread. Please try again.');
-                });
-        }
-    }, [propsId, threadId, setCurrentThreadId, user]);
-
-    useEffect(() => {
-        if (threadId) {
-            fetchThreadMessages(threadId)
-                .then((messages) => {
-                    setMessages(threadId, messages);
-                })
-                .catch(error => {
-                    console.error('Error fetching thread messages:', error);
-                    toast.error('Failed to load chat messages. Please try refreshing the page.');
-                });
-        }
-    }, [threadId, setMessages]);
 
     const threadData = threadId ? getThreadData(threadId) : { messages: [], input: '' };
 
@@ -146,28 +66,26 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 setMessages(threadId, updatedMessages);
 
                 try {
-                    const result = await saveChatMessage(threadId, user.id, message as Message, {
-                        ...options,
-                        model: currentModelRef.current
+                    const result = await convex.mutation(api.messages.saveChatMessage, {
+                        thread_id: threadId as Id<"threads">,
+                        role: message.role,
+                        content: message.content,
+                        tool_invocations: options.toolInvocations,
+                        finish_reason: options.finishReason,
+                        total_tokens: options.totalTokens,
+                        prompt_tokens: options.promptTokens,
+                        completion_tokens: options.completionTokens,
+                        model_id: currentModelRef.current.id,
                     });
                     if (result.newBalance) {
                         setBalance(result.newBalance);
                     }
                     setError(null);
 
-                    // Check if this is the first assistant message
-
                     if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-                        console.log(updatedMessages)
                         try {
-                            const title = await generateTitle(threadId);
+                            const title = await convex.mutation(api.threads.generateTitle, { thread_id: threadId as Id<"threads"> });
                             updateThreadTitle(threadId, title);
-                            console.log("updated with tiel", title);
-                            // Update the thread title in the local state
-                            // setThreadData(threadId, { ...threadData, title });
-                            // Notify the sidebar to update
-                            // You'll need to implement this function
-                            // notifySidebarOfTitleChange(threadId, title);
                         } catch (error) {
                             console.error('Error generating title:', error);
                         }
@@ -193,25 +111,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         },
     });
 
-    const sendMessage = useCallback(async (message: string) => {
-        if (!threadId || !user) {
-            console.error('No thread ID or user available');
-            return;
-        }
-
-        const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
-        const updatedMessages = [...threadData.messages, userMessage];
-        setMessages(threadId, updatedMessages);
-
-        try {
-            vercelChatProps.append(userMessage as VercelMessage);
-            await saveChatMessage(threadId, user.id, userMessage);
-        } catch (error) {
-            console.error('Error sending message:', error);
-            toast.error('Failed to send message. Please try again.');
-            setMessages(threadId, threadData.messages);
-        }
-    }, [threadId, user, vercelChatProps, threadData.messages, setMessages]);
+    const { sendMessage } = useMessageHandling(threadId, vercelChatProps);
 
     const setInput = (input: string) => {
         if (threadId) {
@@ -228,7 +128,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         id: threadId,
         threadData,
         user,
-        setCurrentThreadId,
+        setThreadId,
         setUser,
         setInput,
         sendMessage,
