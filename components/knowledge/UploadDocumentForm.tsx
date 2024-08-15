@@ -15,8 +15,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { LoadingButton } from "@/components/LoadingButton"
 import { Id } from "@/convex/_generated/dataModel";
+import { LoadingButton } from "./LoadingButton"
 
 const formSchema = z.object({
   title: z.string().min(1).max(250),
