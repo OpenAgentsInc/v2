@@ -9,7 +9,7 @@ import { Id } from '../convex/_generated/dataModel';
 
 export function useThreadManagement(propsId?: string) {
   const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
-  const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId as Id<"threads"> || currentThreadId as Id<"threads">);
+  const [threadId, setThreadId] = useState<Id<"threads"> | null>(null);
   const { user } = useUser();
 
   const createNewThread = useMutation(api.threads.createNewThread);
@@ -17,10 +17,12 @@ export function useThreadManagement(propsId?: string) {
 
   useEffect(() => {
     if (propsId) {
-      setThreadId(propsId as Id<"threads">);
-      setCurrentThreadId(propsId);
+      const cleanId = propsId.replace(/^chat-/, '') as Id<"threads">;
+      setThreadId(cleanId);
+      setCurrentThreadId(cleanId);
     } else if (currentThreadId) {
-      setThreadId(currentThreadId as Id<"threads">);
+      const cleanId = (typeof currentThreadId === 'string' ? currentThreadId.replace(/^chat-/, '') : currentThreadId) as Id<"threads">;
+      setThreadId(cleanId);
     } else if (!threadId && user) {
       createNewThread({
         clerk_user_id: user.id,
