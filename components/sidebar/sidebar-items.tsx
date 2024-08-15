@@ -1,55 +1,36 @@
 'use client'
 
 import { Chat } from '@/types'
-import { AnimatePresence, motion } from 'framer-motion'
-
-import { SidebarActions } from './sidebar-actions'
-import { SidebarItem } from './sidebar-item'
-import { ServerActionResult } from '@/types'
-import { deleteThread } from '@/db/actions/deleteThread'
+import { SidebarActions } from '@/components/sidebar/sidebar-actions'
+import { SidebarItem } from '@/components/sidebar/sidebar-item'
+import { removeChat, shareChat } from '@/app/actions'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface SidebarItemsProps {
-    chats: Chat[]
-    setChats: React.Dispatch<React.SetStateAction<Chat[]>>
-    newChatId: number | null
+  chats?: Chat[]
+  setChats: React.Dispatch<React.SetStateAction<Chat[]>>
 }
 
-export function SidebarItems({ chats, setChats, newChatId }: SidebarItemsProps) {
-    const removeChatAsync = async (args: { id: number; path: string }): Promise<ServerActionResult<void>> => {
-        const result = await deleteThread(args.id)
-        if (result.success) {
-            setChats(prevChats => prevChats.filter(chat => chat.id !== args.id))
-        }
-        return result
-    }
+export function SidebarItems({ chats, setChats }: SidebarItemsProps) {
+  if (!chats?.length) return null
 
-    if (!chats?.length) return null
-
-    return (
-        <AnimatePresence>
-            {chats.map(
-                (chat, index) =>
-                    chat && (
-                        <motion.div
-                            key={chat?.id || Math.random()}
-                            exit={{
-                                opacity: 0,
-                                height: 0
-                            }}
-                        >
-                            <SidebarItem
-                                index={index}
-                                chat={chat}
-                                isNew={chat.id === newChatId}
-                            >
-                                <SidebarActions
-                                    chat={chat}
-                                    removeChat={removeChatAsync}
-                                />
-                            </SidebarItem>
-                        </motion.div>
-                    )
-            )}
-        </AnimatePresence>
-    )
+  return (
+    <div className="flex-1 overflow-auto">
+      {chats.map(chat => (
+        <SidebarItem key={chat.id} chat={chat}>
+          <SidebarActions
+            chat={chat}
+            removeChat={async ({ id, path }) => {
+              const result = await removeChat({ id, path })
+              if (result.success) {
+                setChats(prevChats => prevChats.filter(chat => chat.id !== id))
+              }
+              return result
+            }}
+            shareChat={shareChat}
+          />
+        </SidebarItem>
+      ))}
+    </div>
+  )
 }
