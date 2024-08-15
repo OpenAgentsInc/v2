@@ -32,8 +32,8 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             await convex.mutation(api.messages.saveChatMessage, {
                 thread_id: threadId as Id<"threads">,
                 clerk_user_id: clerkUserId,
-                role: userMessage.role,
-                content: userMessage.content,
+                role: userMessage.role as string,
+                content: userMessage.content as string,
             });
         } catch (error) {
             console.error('Error sending message:', error);
