@@ -11,7 +11,9 @@ export const Hud = () => {
   const { panes } = useHudStore()
 
   const stripChatPrefix = (id: string): string => {
-    return id.startsWith('chat-') ? id.slice(5) : id
+    // Remove 'chat-' prefix up to two times
+    let strippedId = id.replace(/^chat-/, '').replace(/^chat-/, '')
+    return strippedId
   }
 
   return (
