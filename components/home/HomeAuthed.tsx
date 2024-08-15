@@ -1,10 +1,8 @@
 import React from 'react'
 import { Pane } from '../hud/pane'
-import { ChatHistory } from '../chat/ChatHistory'
 import { UserStatus } from '../hud/UserStatus'
-import { ChatInput } from '../chat/ChatInput'
-import { ChatPane } from '../chat/ChatPane'
 import { useThreadManagement } from '@/hooks/useThreadManagement'
+import { Chat } from '../chat/chat'
 
 export function HomeAuthed() {
   const { threadId } = useThreadManagement()
@@ -12,12 +10,11 @@ export function HomeAuthed() {
   return (
     <div className="relative w-full h-full">
       <UserStatus />
-      <ChatInput />
       <Pane title="Chat History" id="chat-history" x={20} y={190} height={350} width={260} dismissable={false}>
-        <ChatHistory />
+        {/* TODO: Implement ChatHistory component */}
       </Pane>
       {threadId && (
-        <ChatPane threadId={threadId} />
+        <Chat threadId={threadId} />
       )}
     </div>
   )
