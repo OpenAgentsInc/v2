@@ -10,6 +10,10 @@ import { Pane } from '@/types/pane'
 export const Hud = () => {
   const { panes } = useHudStore()
 
+  const stripChatPrefix = (id: string): string => {
+    return id.startsWith('chat-') ? id.slice(5) : id
+  }
+
   return (
     <div>
       <UserStatus />
@@ -17,7 +21,7 @@ export const Hud = () => {
         <PaneComponent
           key={pane.id}
           title={pane.title}
-          id={pane.id}
+          id={stripChatPrefix(pane.id)}
           x={pane.x}
           y={pane.y}
           height={pane.height}
@@ -26,7 +30,7 @@ export const Hud = () => {
           content={pane.content}
           isActive={pane.isActive}
         >
-          {pane.type === 'chat' && <Chat threadId={pane.id as Id<"threads">} />}
+          {pane.type === 'chat' && <Chat threadId={stripChatPrefix(pane.id) as Id<"threads">} />}
           {pane.type === 'diff' && pane.content && (
             <div>
               <h3>Old Content:</h3>
