@@ -1,32 +1,24 @@
-import React from 'react'
-import { Pane } from './pane'
+"use client"
 import { useUser } from '@clerk/nextjs'
-import Image from 'next/image'
+import { Balance } from '@/components/hud/balance'
+import { Pane } from '@/components/hud/pane'
+import { UserButton } from '@clerk/nextjs'
 
-export const UserStatus: React.FC = () => {
+export const UserStatus = () => {
   const { user } = useUser()
-
-  if (!user) return null
-
+  if (!user) {
+    return null
+  }
   return (
-    <>
-      {user && (
-        <Pane title={'You'} id="user-status" x={10} y={10} height={130} width={200} dismissable={false}>
-          <div className="flex items-center space-x-4 p-4">
-            <Image
-              src={user.imageUrl}
-              alt="Profile"
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
-            <div>
-              <p className="font-semibold">{user.fullName}</p>
-              <p className="text-sm text-gray-500">{user.primaryEmailAddress?.emailAddress}</p>
-            </div>
-          </div>
-        </Pane>
-      )}
-    </>
+    <Pane title='You' id="user-status" type="default" x={10} y={10} height={130} width={200} dismissable={false}>
+      <div className="h-full w-full flex flex-col justify-evenly items-center">
+        <div className="h-10 w-full flex justify-center items-center">
+          <UserButton showName={true} />
+        </div>
+        <div className="flex justify-center items-center">
+          <Balance />
+        </div>
+      </div>
+    </Pane>
   )
 }

@@ -81,12 +81,12 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="mt-2 mb-2 px-2">
-        <NewChatButton 
-          addChat={addChat} 
-          clerkUserId={clerkUserId} 
+        <NewChatButton
+          addChat={addChat}
+          clerkUserId={clerkUserId}
           userEmail={user?.emailAddresses[0]?.emailAddress || ''}
           userImage={user?.imageUrl}
-          chats={sortedChats as Chat[]} 
+          chats={sortedChats as Chat[]}
         />
       </div>
       {isLoading ? (
@@ -101,7 +101,7 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
       ) : (
         <SidebarList
           chats={sortedChats as Chat[]}
-          setChats={() => {}}
+          setChats={() => { }}
           newChatId={newChatId}
           removeChat={removeChat}
           shareChat={shareChat}
