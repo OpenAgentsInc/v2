@@ -46,7 +46,7 @@ export function NewChatButton({ addChat, userId, clerkUserId, chats }: NewChatBu
                 addChat(newChat)
 
                 openChatPane({
-                    id: newThread._id.toString(),
+                    id: newThread._id,
                     title: 'New Chat',
                     type: 'chat',
                 })
