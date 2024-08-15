@@ -110,7 +110,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         body,
         maxToolRoundtrips: 20,
         onFinish: async (message, options) => {
-            await saveMessageAndUpdateBalance(message as Message, options);
+            await saveMessageAndUpdateBalance(message as unknown as Message, options);
         },
         onError: (error) => {
             if (error.message === 'Insufficient credits') {
