@@ -48,14 +48,17 @@ export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
     if (!threads) return []
     return threads
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .map(thread => ({
-        id: thread._id,
-        title: (thread.metadata as { title?: string })?.title || 'Untitled Thread',
-        path: `/chat/${thread._id}`,
-        createdAt: new Date(thread.createdAt),
-        messages: [], // You might want to fetch messages separately if needed
-        userId: clerkUserId,
-      }))
+      .map(thread => {
+        const threadId = thread._id.toString()
+        return {
+          id: threadId,
+          title: (thread.metadata as { title?: string })?.title || 'Untitled Thread',
+          path: `/chat/${threadId}`,
+          createdAt: new Date(thread.createdAt),
+          messages: [], // You might want to fetch messages separately if needed
+          userId: clerkUserId,
+        }
+      })
   }, [threads, clerkUserId])
 
   return (
