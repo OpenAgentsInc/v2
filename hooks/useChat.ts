@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import { Message } from '@/types'
 import { useChatStore } from '../store/chat'
 import { Id } from '../convex/_generated/dataModel'
+import { createNewMessage, updateMessageId, Thread } from '@/panes/chat/chatUtils'
 
 export function useChat(threadId: Id<"threads"> | null) {
   const { user } = useUser()
@@ -19,16 +20,7 @@ export function useChat(threadId: Id<"threads"> | null) {
 
     setIsLoading(true)
 
-    const tempId = Date.now().toString()
-    const newMessage: Message = {
-      _id: tempId as Id<"messages">,
-      thread_id: threadId,
-      clerk_user_id: user.id,
-      role: 'user',
-      content,
-      _creationTime: Date.now(),
-    }
-
+    const newMessage = createNewMessage(threadId, user.id, content)
     addMessageToThread(threadId, newMessage)
 
     try {
@@ -40,7 +32,7 @@ export function useChat(threadId: Id<"threads"> | null) {
       })
 
       if (result) {
-        const updatedMessage = { ...newMessage, _id: result }
+        const updatedMessage = updateMessageId(newMessage, result)
         addMessageToThread(threadId, updatedMessage)
       }
     } catch (error) {
@@ -53,12 +45,13 @@ export function useChat(threadId: Id<"threads"> | null) {
 
   useEffect(() => {
     if (fetchMessages && threadId) {
-      setThread(threadId, {
+      const thread: Thread = {
         id: threadId,
         title: 'New Chat', // You might want to update this with the actual title
         messages: fetchMessages,
         createdAt: new Date(),
-      })
+      }
+      setThread(threadId, thread)
     }
   }, [fetchMessages, setThread, threadId])
 
@@ -110,7 +103,7 @@ export function useThreadList() {
     title: string,
     lastMessagePreview: string,
     createdAt: string,
-  }>>([])
+  }>([])
 
   useEffect(() => {
     if (listThreads) {
