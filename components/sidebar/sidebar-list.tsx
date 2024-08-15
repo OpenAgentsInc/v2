@@ -5,6 +5,7 @@ import { SidebarItem } from './sidebar-item'
 import { Chat } from '@/types'
 import { Id } from '@/convex/_generated/dataModel'
 import { ServerActionResult } from '@/types'
+import { toast } from 'sonner'
 
 interface SidebarListProps {
   chats: Chat[]
@@ -24,8 +25,14 @@ export function SidebarList({
   const handleDelete = async (chatId: Id<'threads'>) => {
     const chatToDelete = chats.find(chat => chat.id === chatId)
     if (chatToDelete) {
-      await removeChat({ id: chatId, path: chatToDelete.path })
-      setChats(chats.filter(chat => chat.id !== chatId))
+      try {
+        await removeChat({ id: chatId, path: chatToDelete.path })
+        setChats(chats.filter(chat => chat.id !== chatId))
+        toast.success('Chat deleted successfully')
+      } catch (error) {
+        console.error('Error deleting chat:', error)
+        toast.error('Failed to delete chat. Please try again.')
+      }
     }
   }
 
