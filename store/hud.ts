@@ -1,8 +1,9 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { Id } from '@/convex/_generated/dataModel'
 
 export type Pane = {
-  id: number
+  id: Id<"threads"> | number
   title: string
   x: number
   y: number
@@ -17,7 +18,7 @@ export type Pane = {
 }
 
 type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
-  id?: number;
+  id?: Id<"threads"> | number;
   paneProps?: {
     x: number
     y: number
@@ -32,9 +33,9 @@ type HudStore = {
   activeTerminalId: number | null
   lastPanePosition: { x: number; y: number; width: number; height: number } | null
   addPane: (pane: PaneInput, shouldTile?: boolean) => void
-  removePane: (id: number) => void
-  updatePanePosition: (id: number, x: number, y: number) => void
-  updatePaneSize: (id: number, width: number, height: number) => void
+  removePane: (id: Id<"threads"> | number) => void
+  updatePanePosition: (id: Id<"threads"> | number, x: number, y: number) => void
+  updatePaneSize: (id: Id<"threads"> | number, width: number, height: number) => void
   setChatOpen: (isOpen: boolean) => void
   setActiveTerminalId: (id: number | null) => void
   isInputFocused: boolean
@@ -42,8 +43,8 @@ type HudStore = {
   isRepoInputOpen: boolean
   setRepoInputOpen: (isOpen: boolean) => void
   openChatPane: (pane: PaneInput) => void
-  bringPaneToFront: (id: number) => void
-  setActivePane: (id: number) => void
+  bringPaneToFront: (id: Id<"threads"> | number) => void
+  setActivePane: (id: Id<"threads"> | number) => void
 }
 
 const initialChatPane: Pane = {
@@ -67,7 +68,7 @@ export const useHudStore = create<HudStore>()(
       activeTerminalId: null,
       lastPanePosition: null,
       addPane: (newPane, shouldTile = false) => set((state) => {
-        const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => p.id)) + 1;
+        const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => typeof p.id === 'number' ? p.id : 0)) + 1;
         let updatedPanes: Pane[]
         let panePosition
 
@@ -176,7 +177,7 @@ export const useHudStore = create<HudStore>()(
         const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
 
         // Use the provided ID if it exists, otherwise generate a new one
-        const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => p.id)) + 1
+        const paneId = newPane.id !== undefined ? newPane.id : Math.max(0, ...state.panes.map(p => typeof p.id === 'number' ? p.id : 0)) + 1
 
         const newPaneWithPosition: Pane = {
           ...newPane,
