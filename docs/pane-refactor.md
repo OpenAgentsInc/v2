@@ -30,3 +30,13 @@ This document logs the actions taken to refactor the components in the `componen
      - Changed `export * from './hud'` to `export * from './Hud'`
      - Changed `export * from './pane'` to `export * from './Pane'`
      - Changed `export * from './UserStatus'` to `export * from './user/UserStatus'`
+
+5. Moved `components/hud/pane.tsx` to `panes/Pane.tsx`
+   - No changes to import statements were necessary for this file
+
+## Next Steps:
+
+1. Update any remaining import statements in other files that may still be referencing the old `components/hud/` path
+2. Remove the now-empty `components/hud/` directory
+3. Test the application thoroughly to ensure all functionality related to these components is working as expected
+4. Update any documentation or comments that may reference the old file structure
