@@ -48,7 +48,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         currentModelRef.current = model;
     }, [model]);
 
-    const messages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
+    const messages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
     const threadData = threadId ? { messages: messages || [], input: '' } : { messages: [], input: '' };
 
     const body: any = { model: model.id, tools, threadId };
@@ -84,7 +84,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
                 // Save the message to the database
                 await convex.mutation(api.messages.saveChatMessage, {
-                    thread_id: threadId as Id<"threads">,
+                    thread_id: threadId,
                     clerk_user_id: user.id,
                     role: message.role,
                     content: message.content,
@@ -108,7 +108,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
     };
 
     const vercelChatProps = useVercelChat({
-        id: threadId?.toString(),
+        id: threadId,
         initialMessages: messages as unknown as VercelMessage[],
         body,
         maxToolRoundtrips: 20,
