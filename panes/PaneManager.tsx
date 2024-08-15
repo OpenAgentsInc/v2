@@ -8,10 +8,13 @@ import { Id } from '@/convex/_generated/dataModel'
 export const PaneManager = () => {
   const { panes } = usePaneStore()
 
-  const stripChatPrefix = (id: string): string => {
-    // Remove 'chat-' prefix up to two times
-    let strippedId = id.replace(/^chat-/, '').replace(/^chat-/, '')
-    return strippedId
+  const stripChatPrefix = (id: Id<"threads"> | number): Id<"threads"> | number => {
+    if (typeof id === 'string') {
+      // Remove 'chat-' prefix up to two times
+      let strippedId = id.replace(/^chat-/, '').replace(/^chat-/, '')
+      return strippedId as Id<"threads">
+    }
+    return id
   }
 
   return (
