@@ -86,7 +86,9 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                     if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
                         try {
                             const title = await convex.mutation(api.threads.generateTitle, { thread_id: threadId as Id<"threads"> });
-                            updateThreadTitle(threadId, title);
+                            if (typeof title === 'string') {
+                                updateThreadTitle(threadId, title);
+                            }
                         } catch (error) {
                             console.error('Error generating title:', error);
                         }
@@ -112,7 +114,7 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
         },
     });
 
-    const { sendMessage } = useMessageHandling(threadId, vercelChatProps);
+    const { sendMessage } = useMessageHandling(threadId, vercelChatProps, user?.id || '');
 
     const setInput = (input: string) => {
         if (threadId) {
