@@ -1,5 +1,6 @@
 import { Pane, PaneInput, HudStore } from './types'
 import { calculatePanePosition, adjustPanePosition, createNewPaneWithPosition, PANE_OFFSET } from './paneUtils'
+import { Id } from '../convex/_generated/dataModel'
 
 export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, newPane: PaneInput, shouldTile = false) {
   return set((state) => {
@@ -36,7 +37,7 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId as Id<"threads">, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -101,7 +102,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: paneId,
+      id: paneId as Id<"threads">,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
     }
