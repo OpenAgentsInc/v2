@@ -5,19 +5,13 @@ import { auth } from '@clerk/nextjs/server';
 import { Id } from '@/convex/_generated/dataModel';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '@/convex/_generated/api';
+import { calculateMessageCost } from '@/convex/utils';
+import { Model, CompletionTokenUsage } from '@/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-// Function to calculate cost based on the model and message length
-function calculateCost(model: string, messageLength: number): number {
-  // This is a placeholder implementation. Replace with actual cost calculation logic.
-  const baseCost = model === 'gpt-4' ? 0.03 : 0.002; // Cost per token
-  const estimatedTokens = messageLength / 4; // Rough estimate: 1 token ≈ 4 characters
-  return Math.ceil(baseCost * estimatedTokens * 100); // Convert to cents and round up
-}
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -55,9 +49,18 @@ export async function POST(req: Request) {
     tools,
   });
 
-  // Calculate the cost based on the model and message length
-  const lastMessage = messages[messages.length - 1];
-  const cost_in_cents = calculateCost(toolContext.model, lastMessage.content.length);
+  // Calculate the cost based on the model and usage
+  const usage: CompletionTokenUsage = {
+    promptTokens: result.usage?.promptTokens || 0,
+    completionTokens: result.usage?.completionTokens || 0,
+    totalTokens: result.usage?.totalTokens || 0,
+  };
+  const model: Model = {
+    id: toolContext.model,
+    providerCentsPerMillionInputTokens: 0, // You need to set these values based on your pricing
+    providerCentsPerMillionOutputTokens: 0, // You need to set these values based on your pricing
+  };
+  const cost_in_cents = calculateMessageCost(model, usage);
 
   // Update user balance after processing the message
   try {
