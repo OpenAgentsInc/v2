@@ -47,7 +47,7 @@ export const createNewThread = mutation({
     const newThread = await ctx.db.insert("threads", {
       user_id: user._id,
       clerk_user_id: args.clerk_user_id,
-      metadata: args.metadata,
+      metadata: args.metadata || {}, // Use the provided metadata or an empty object
       createdAt: new Date().toISOString(),
     });
 
