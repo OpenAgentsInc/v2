@@ -17,10 +17,21 @@ interface SidebarItemsProps {
 export function SidebarItems({ chats, setChats, removeChat, shareChat, newChatId }: SidebarItemsProps) {
   if (!chats?.length) return null
 
+  const handleDelete = async (chatId: Id<'threads'>) => {
+    await removeChat({ id: chatId, path: '' }) // Assuming path is not needed for deletion
+    setChats(prevChats => prevChats.filter(chat => chat.id !== chatId))
+  }
+
   return (
     <div className="flex-1 overflow-auto">
       {chats.map((chat, index) => (
-        <SidebarItem key={chat.id} chat={chat} index={index} isNew={chat.id === newChatId}>
+        <SidebarItem 
+          key={chat.id} 
+          chat={chat} 
+          index={index} 
+          isNew={chat.id === newChatId}
+          onDelete={handleDelete}
+        >
           <SidebarActions
             chat={chat}
             removeChat={removeChat}
