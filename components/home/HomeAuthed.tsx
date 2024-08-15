@@ -1,8 +1,8 @@
 import React from 'react'
 import { Pane } from '@/components/hud/pane'
-import { UserStatus } from '@/components/hud/UserStatus'
 import { ChatHistory } from '@/components/sidebar/chat-history'
 import { useUser } from '@clerk/nextjs'
+import { Hud } from '../hud/hud'
 
 export function HomeAuthed() {
   const { user } = useUser()
@@ -10,10 +10,10 @@ export function HomeAuthed() {
 
   return (
     <div className="relative w-full h-full">
-      <UserStatus />
       <Pane title="Chat History" id="chat-history" type="default" x={20} y={190} height={350} width={260} dismissable={false}>
         <ChatHistory clerkUserId={user.id} />
       </Pane>
+      <Hud />
     </div>
   )
 }

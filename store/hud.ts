@@ -46,7 +46,7 @@ export const useHudStore = create<HudStore>()(
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage',
+      name: 'openagents-hud-storage-129376123',
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
