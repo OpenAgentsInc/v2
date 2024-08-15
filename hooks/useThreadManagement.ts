@@ -8,8 +8,6 @@ import { Message } from '@/types';
 import { useUser } from '@clerk/nextjs';
 
 export function useThreadManagement(propsId?: string) {
-  return { threadId: null, setThreadId: () => { } };
-  return null
   const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
   const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId);
   const { user } = useUser();
