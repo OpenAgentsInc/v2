@@ -1,0 +1,69 @@
+import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
+
+export const saveChatMessage = mutation({
+  args: {
+    thread_id: v.id("threads"),
+    clerk_user_id: v.string(),
+    role: v.string(),
+    content: v.string(),
+    tool_invocations: v.optional(v.object({})),
+    finish_reason: v.optional(v.string()),
+    total_tokens: v.optional(v.number()),
+    prompt_tokens: v.optional(v.number()),
+    completion_tokens: v.optional(v.number()),
+    model_id: v.optional(v.string()),
+    cost_in_cents: v.optional(v.number()),
+  },
+  async handler(ctx, args) {
+    const newMessage = await ctx.db.insert("messages", {
+      ...args,
+      created_at: new Date().toISOString(),
+    });
+
+    return await ctx.db.get(newMessage);
+  },
+});
+
+export const fetchThreadMessages = query({
+  args: { thread_id: v.id("threads") },
+  async handler(ctx, args) {
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.thread_id))
+      .order("asc")
+      .collect();
+  },
+});
+
+export const getLastMessage = query({
+  args: { thread_id: v.id("threads") },
+  async handler(ctx, args) {
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.thread_id))
+      .order("desc")
+      .first();
+  },
+});
+
+export const getChatById = query({
+  args: { thread_id: v.id("threads") },
+  async handler(ctx, args) {
+    const thread = await ctx.db.get(args.thread_id);
+    if (!thread) {
+      return null;
+    }
+
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.thread_id))
+      .order("asc")
+      .collect();
+
+    return {
+      thread,
+      messages,
+    };
+  },
+});
