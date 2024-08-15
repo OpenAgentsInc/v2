@@ -5,10 +5,12 @@ import { toast } from 'sonner';
 import { useChatStore } from './useChatStore';
 import { Id } from '../convex/_generated/dataModel';
 import { Message } from '@/types';
+import { useUser } from '@clerk/nextjs';
 
 export function useThreadManagement(propsId?: string) {
     const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
     const [threadId, setThreadId] = useState<string | null>(propsId || currentThreadId);
+    const { user } = useUser();
 
     const createNewThread = useMutation(api.threads.createNewThread);
     const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
@@ -17,14 +19,18 @@ export function useThreadManagement(propsId?: string) {
         if (propsId) {
             setThreadId(propsId);
             setCurrentThreadId(propsId);
-        } else if (!threadId) {
-            createNewThread()
-                .then((newThreadId) => {
-                    if (typeof newThreadId === 'string') {
-                        setThreadId(newThreadId);
-                        setCurrentThreadId(newThreadId);
+        } else if (!threadId && user) {
+            createNewThread({
+                user_id: user.id as Id<"users">,
+                clerk_user_id: user.id,
+                metadata: {} // You can add any additional metadata here if needed
+            })
+                .then((newThread) => {
+                    if (newThread && newThread._id) {
+                        setThreadId(newThread._id);
+                        setCurrentThreadId(newThread._id);
                     } else {
-                        console.error('Unexpected thread ID type:', newThreadId);
+                        console.error('Unexpected thread response:', newThread);
                     }
                 })
                 .catch(error => {
@@ -32,7 +38,7 @@ export function useThreadManagement(propsId?: string) {
                     toast.error('Failed to create a new chat thread. Please try again.');
                 });
         }
-    }, [propsId, threadId, setCurrentThreadId, createNewThread]);
+    }, [propsId, threadId, setCurrentThreadId, createNewThread, user]);
 
     useEffect(() => {
         if (threadId && fetchThreadMessages) {
