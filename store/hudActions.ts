@@ -4,15 +4,14 @@ import { Id } from '../convex/_generated/dataModel'
 
 export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, newPane: PaneInput, shouldTile = false) {
   return set((state) => {
-    const paneId = typeof newPane.id === 'number' ? newPane.id : state.panes.length + 1;
     let updatedPanes: Pane[]
     let panePosition
 
-    const existingPane = state.panes.find(pane => pane.id === paneId)
+    const existingPane = state.panes.find(pane => pane.id.toString() === newPane.id?.toString())
     if (existingPane) {
       updatedPanes = state.panes.map(pane => ({
         ...pane,
-        isActive: pane.id === paneId
+        isActive: pane.id === existingPane.id
       }))
       return {
         panes: updatedPanes,
@@ -37,7 +36,7 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id as Id<"threads">, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -49,8 +48,8 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
 
 export function removePane(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id']) {
   return set((state) => {
-    const removedPane = state.panes.find(pane => pane.id === id)
-    const remainingPanes = state.panes.filter(pane => pane.id !== id)
+    const removedPane = state.panes.find(pane => pane.id.toString() === id.toString())
+    const remainingPanes = state.panes.filter(pane => pane.id.toString() !== id.toString())
     const newActivePaneId = remainingPanes.length > 0 ? remainingPanes[remainingPanes.length - 1].id : null
 
     return {
@@ -66,10 +65,10 @@ export function removePane(set: (fn: (state: HudStore) => Partial<HudStore>) => 
 
 export function updatePanePosition(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id'], x: number, y: number) {
   return set((state) => {
-    const updatedPane = state.panes.find(pane => pane.id === id)
+    const updatedPane = state.panes.find(pane => pane.id.toString() === id.toString())
     return {
       panes: state.panes.map(pane =>
-        pane.id === id ? { ...pane, x, y } : pane
+        pane.id.toString() === id.toString() ? { ...pane, x, y } : pane
       ),
       lastPanePosition: updatedPane ? { ...updatedPane, x, y } : state.lastPanePosition
     }
@@ -78,10 +77,10 @@ export function updatePanePosition(set: (fn: (state: HudStore) => Partial<HudSto
 
 export function updatePaneSize(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id'], width: number, height: number) {
   return set((state) => {
-    const updatedPane = state.panes.find(pane => pane.id === id)
+    const updatedPane = state.panes.find(pane => pane.id.toString() === id.toString())
     return {
       panes: state.panes.map(pane =>
-        pane.id === id ? { ...pane, width, height } : pane
+        pane.id.toString() === id.toString() ? { ...pane, width, height } : pane
       ),
       lastPanePosition: updatedPane ? { ...updatedPane, width, height } : state.lastPanePosition
     }
@@ -119,11 +118,11 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
 
 export function bringPaneToFront(set: (fn: (state: HudStore) => Partial<HudStore>) => void, id: Pane['id']) {
   return set((state) => {
-    const paneToMove = state.panes.find(pane => pane.id === id)
+    const paneToMove = state.panes.find(pane => pane.id.toString() === id.toString())
     if (!paneToMove) return state
     return {
       panes: [
-        ...state.panes.filter(pane => pane.id !== id).map(pane => ({ ...pane, isActive: false })),
+        ...state.panes.filter(pane => pane.id.toString() !== id.toString()).map(pane => ({ ...pane, isActive: false })),
         { ...paneToMove, isActive: true }
       ],
       lastPanePosition: { x: paneToMove.x, y: paneToMove.y, width: paneToMove.width, height: paneToMove.height }
@@ -135,7 +134,7 @@ export function setActivePane(set: (fn: (state: HudStore) => Partial<HudStore>) 
   return set((state) => ({
     panes: state.panes.map(pane => ({
       ...pane,
-      isActive: pane.id === id
+      isActive: pane.id.toString() === id.toString()
     }))
   }))
 }
