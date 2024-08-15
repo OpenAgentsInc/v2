@@ -125,11 +125,16 @@ export function useThreadList() {
     title: string,
     lastMessagePreview: string,
     createdAt: string,
-  }>([])
+  }>>([])
 
   useEffect(() => {
     if (listThreads) {
-      setThreads(listThreads)
+      setThreads(listThreads as Array<{
+        id: Id<"threads">,
+        title: string,
+        lastMessagePreview: string,
+        createdAt: string,
+      }>)
     }
   }, [listThreads])
 
