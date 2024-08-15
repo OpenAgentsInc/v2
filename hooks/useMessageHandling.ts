@@ -6,7 +6,7 @@ import { useChatStore } from './useChatStore';
 import { Message } from '@/types';
 import { Id } from '../convex/_generated/dataModel';
 
-export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId?: string) {
+export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId: string) {
     const convex = useConvex();
     const { setMessages, getThreadData } = useChatStore();
 
