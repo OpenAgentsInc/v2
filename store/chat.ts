@@ -1,22 +1,5 @@
 import { create } from 'zustand';
-import { Message } from '@/types';
-import { Id } from '@/convex/_generated/dataModel';
-
-interface Thread {
-  id: Id<'threads'>;
-  title: string;
-  messages: Message[];
-  createdAt: Date;
-}
-
-interface ChatStore {
-  threads: Record<string, Thread>;
-  currentThreadId: Id<'threads'> | null;
-  setThread: (threadId: Id<'threads'>, thread: Thread) => void;
-  setCurrentThreadId: (threadId: Id<'threads'> | null) => void;
-  updateThreadTitle: (threadId: Id<'threads'>, title: string) => void;
-  addMessageToThread: (threadId: Id<'threads'>, message: Message) => void;
-}
+import { ChatStore, Thread } from '@/panes/chat/chatUtils';
 
 export const useChatStore = create<ChatStore>((set) => ({
   threads: {},
