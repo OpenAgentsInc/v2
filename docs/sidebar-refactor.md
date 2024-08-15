@@ -57,8 +57,14 @@
 - Displays icons for shared chats and delete action
 - Implements click handlers for opening chats and deleting threads
 
+### sidebar-items.tsx
+- Renders a list of SidebarItem components
+- Manages the list of chats and their deletion
+- Passes down props to SidebarItem and SidebarActions components
+- Handles chat deletion and updates the chat list accordingly
+
 ## Thoughts on Condensing
-- Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, sidebar-actions, sidebar-footer, and sidebar-item into the main ChatsPane component
+- Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, sidebar-actions, sidebar-footer, sidebar-item, and sidebar-items into the main ChatsPane component
 - Keep the core functionality of chat-history and new-chat-button (data fetching, mutations, sorting) in the new ChatsPane
 - Simplify the component structure by integrating NewChatButton and SidebarActions directly into ChatsPane
 - Move the chat creation logic from new-chat-button into a custom hook or utility function
@@ -75,3 +81,4 @@
 - Merge the animation logic from SidebarItem into the new ChatItem component within ChatsPane
 - Implement a single handleChatAction function in ChatsPane to manage opening, deleting, and sharing chats
 - Use a custom hook (e.g., useChatActions) to encapsulate the logic for chat operations and state management
+- Combine the functionality of sidebar-items.tsx into the main ChatsPane component, managing the list of chats and their rendering
