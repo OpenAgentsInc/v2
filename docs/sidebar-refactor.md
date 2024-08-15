@@ -38,6 +38,12 @@
 - Handles loading states for both delete and share actions
 - Integrates with Next.js router for navigation after delete
 
+### sidebar-desktop.tsx
+- Server component for rendering the desktop sidebar
+- Uses Clerk for authentication
+- Renders the Sidebar component with ChatHistory
+- Applies responsive styling for desktop view
+
 ## Thoughts on Condensing
 - Combine SidebarItemButton, SidebarItemIcon, chat-history, new-chat-button, and sidebar-actions into the main ChatsPane component
 - Keep the core functionality of chat-history and new-chat-button (data fetching, mutations, sorting) in the new ChatsPane
@@ -50,3 +56,5 @@
 - Optimize the component to reduce prop drilling by using context or custom hooks where appropriate
 - Consolidate icon components (IconShare, IconTrash) into a shared icon library if not already done
 - Consider creating a custom hook for handling chat actions (delete, share) to simplify the main component
+- Retain the server-side rendering approach for the desktop sidebar, but integrate it with the new ChatsPane component
+- Ensure that the responsive styling for desktop view is maintained in the new component structure
