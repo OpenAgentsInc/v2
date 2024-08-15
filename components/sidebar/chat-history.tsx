@@ -10,16 +10,17 @@ import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
 import { ServerActionResult } from '@/types'
+import { useUser } from "@clerk/nextjs";
 
 interface ChatHistoryProps {
-  userId: Id<"users">
   clerkUserId: string
 }
 
-export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
+export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
   const { threads, setThread } = useChatStore()
   const [isLoading, setIsLoading] = React.useState(true)
   const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
+  const { user } = useUser();
 
   const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: clerkUserId })
   const removeThreadMutation = useMutation(api.threads.deleteThread)
@@ -73,14 +74,20 @@ export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
         path: `/chat/${thread.id}`,
         createdAt: thread.createdAt,
         messages: thread.messages,
-        userId: userId,
+        userId: thread.userId,
       }))
-  }, [threads, userId])
+  }, [threads])
 
   return (
     <div className="flex flex-col h-full">
       <div className="mt-2 mb-2 px-2">
-        <NewChatButton addChat={addChat} userId={userId} clerkUserId={clerkUserId} chats={sortedChats as Chat[]} />
+        <NewChatButton 
+          addChat={addChat} 
+          clerkUserId={clerkUserId} 
+          userEmail={user?.emailAddresses[0]?.emailAddress || ''}
+          userImage={user?.imageUrl}
+          chats={sortedChats as Chat[]} 
+        />
       </div>
       {isLoading ? (
         <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
