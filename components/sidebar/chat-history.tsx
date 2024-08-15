@@ -9,6 +9,7 @@ import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
+import { ServerActionResult } from '@/types'
 
 interface ChatHistoryProps {
   userId: Id<"users">
@@ -48,14 +49,15 @@ export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
     setNewChatId(newChat.id)
   }, [setThread, setNewChatId])
 
-  const removeChat = React.useCallback(async (args: { id: Id<'threads'>; path: string }) => {
+  const removeChat = React.useCallback(async (args: { id: Id<'threads'>; path: string }): Promise<ServerActionResult<void>> => {
     await removeThreadMutation({ thread_id: args.id })
     // Update local state or trigger a refetch
+    return { success: true }
   }, [removeThreadMutation])
 
-  const shareChat = React.useCallback(async (args: { id: Id<'threads'> }) => {
+  const shareChat = React.useCallback(async (args: { id: Id<'threads'> }): Promise<ServerActionResult<string>> => {
     const result = await shareThreadMutation({ thread_id: args.id })
-    return result
+    return { success: true, data: result }
   }, [shareThreadMutation])
 
   const sortedChats = React.useMemo(() => {
@@ -92,7 +94,7 @@ export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
       ) : (
         <SidebarList
           chats={sortedChats as Chat[]}
-          setChats={() => { }}
+          setChats={() => {}}
           newChatId={newChatId}
           removeChat={removeChat}
           shareChat={shareChat}
