@@ -6,10 +6,41 @@
 - LICENSE - Project license file
 - README.md - Project readme file
 - app/
+  - [[...rest]]/ - Catch-all route
+  - api/ - API routes
+  - documents/ - Document-related pages
+  - fonts/ - Font files
+  - globals.css - Global CSS styles
+  - layout.tsx - Main application layout
+  - opengraph-image.png - OpenGraph image for social sharing
+  - siteConfig.ts - Site configuration
+  - swebench/ - SWEBench related pages
+  - twitter-image.png - Twitter card image
 - auth.ts - Authentication configuration file
 - components.json - Component configuration file
 - components/ - React components
+  - auth/ - Authentication related components
+  - canvas/ - Canvas related components
+  - credits/ - Credit system related components
+  - dom/ - DOM related components
+  - email/ - Email related components
+  - home/ - Home page components
+  - input/ - Input related components
+  - knowledge/ - Knowledge base related components
+  - landing/ - Landing page components
+  - providers.tsx - Provider components
+  - swebench/ - SWEBench related components
+  - ui/ - UI components
 - convex/ - Convex database and backend related files
+  - _generated/ - Generated Convex files
+  - auth.config.ts - Authentication configuration
+  - documents.ts - Document related functions
+  - messages.ts - Message related functions
+  - schema.ts - Database schema
+  - swebench.ts - SWEBench related functions
+  - threads.ts - Thread related functions
+  - users.ts - User related functions
+  - utils.ts - Utility functions
 - docs/ - Documentation files
   - hierarchy.md - This file, describing the project structure
   - hud.md - Describes the HUD overlay and its components
@@ -17,18 +48,53 @@
   - pull-request-flow.md - Details the pull request workflow and tools
   - request-lifecycle.md - Documents the lifecycle of core requests
 - hooks/ - Custom React hooks
+  - useCameraAnimation.ts - Hook for camera animation
+  - useChat.ts - Hook for chat functionality
+  - useChatScroll.ts - Hook for chat scrolling
+  - useChatStore.ts - Hook for chat store
+  - useEnsureUser.ts - Hook for ensuring user existence
+  - useMessageHandling.ts - Hook for message handling
+  - usePostprocess.jsx - Hook for post-processing
+  - useThreadManagement.ts - Hook for thread management
 - index.d.ts - TypeScript declaration file
 - lib/ - Utility functions and modules
+  - calculateMessageCost.ts - Function to calculate message cost
+  - deductUserCredits.ts - Function to deduct user credits
+  - fonts.ts - Font configuration
+  - github/ - GitHub related utilities
+  - githubUtils.ts - GitHub utility functions
+  - hooks/ - Custom hooks
+  - models.ts - Model definitions
+  - stripe/ - Stripe related utilities
+  - systemPrompt.ts - System prompt generation
+  - util/ - General utility functions
+  - utils.ts - Utility functions
 - middleware.ts - Next.js middleware configuration
 - next-env.d.ts - Next.js TypeScript declarations
 - next.config.js - Next.js configuration file
 - package.json - Project dependencies and scripts
 - panes/ - Pane components for the application
+  - Hud.tsx - HUD component
+  - Pane.tsx - Pane component
+  - PaneManager.tsx - Pane manager component
+  - chat/ - Chat pane components
+  - chats/ - Chats pane components
+  - index.ts - Pane exports
+  - user/ - User pane components
 - pnpm-lock.yaml - pnpm lock file
 - postcss.config.js - PostCSS configuration
 - prettier.config.cjs - Prettier configuration
 - public/ - Public assets
 - store/ - State management
+  - balance.ts - Balance management
+  - chat.ts - Chat state management
+  - hudActions.ts - HUD actions
+  - models.ts - Model state management
+  - pane.ts - Pane state management
+  - paneUtils.ts - Pane utility functions
+  - repo.ts - Repository state management
+  - tools.ts - Tools state management
+  - types.ts - Type definitions for store
 - tailwind.config.ts - Tailwind CSS configuration
 - tools/ - Custom tools and integrations
 - tsconfig.json - TypeScript configuration file
@@ -36,4 +102,4 @@
 
 This hierarchy provides an overview of the main folders and files in the project, focusing on the most important and frequently accessed components. It omits less relevant files such as images and fonts.
 
-Note: The contents of each folder are not fully expanded in this update. You may want to expand on the contents of new folders like 'convex/' and 'panes/' in the future.
+Note: Some folders may contain additional files and subfolders not listed here for brevity.
