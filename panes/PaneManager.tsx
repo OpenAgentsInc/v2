@@ -1,7 +1,7 @@
 "use client"
 
 import { usePaneStore } from '@/store/pane'
-import { Chat } from '@/components/chat'
+import { Chat } from '@/panes/chat/Chat'
 import { Pane as PaneComponent } from '@/panes/Pane'
 import { UserStatus } from '@/panes/user/UserStatus'
 import { Id } from '@/convex/_generated/dataModel'
@@ -32,7 +32,7 @@ export const PaneManager = () => {
           content={pane.content}
           isActive={pane.isActive}
         >
-          {pane.type === 'chat' && <Chat threadId={stripChatPrefix(pane.id) as Id<"threads">} />}
+          {pane.type === 'chat' && <Chat paneId={pane.id} />}
           {pane.type === 'diff' && pane.content && (
             <div>
               <h3>Old Content:</h3>
