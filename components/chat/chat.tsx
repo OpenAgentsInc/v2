@@ -16,7 +16,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
         sendMessage,
         isLoading,
         error
-    } = useChat({ id: threadId })
+    } = useChat({ id: threadId.toString() })
 
     // Append error message to messages if it exists
     const messagesWithError = useMemo(() => {
