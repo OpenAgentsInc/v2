@@ -76,7 +76,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
 
                 if (result) {
                     setBalance(result.newBalance);
-                    console.log(`Message cost: ${result.cost_in_cents} cents. New balance: ${result.newBalance}`);
                 }
                 setError(null);
 
@@ -96,7 +95,6 @@ export function useChat({ id: propsId }: UseChatProps = {}) {
                 });
 
             } catch (error: any) {
-                console.log('error message is:', error.message);
                 if (error instanceof Error && error.message === 'Insufficient credits') {
                     toast.error('Insufficient credits. Please add more credits to continue chatting.');
                 } else {
