@@ -37,7 +37,7 @@ export function addPane(set: (fn: (state: HudStore) => Partial<HudStore>) => voi
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId as Id<"threads">, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, paneId, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -102,7 +102,7 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: paneId as Id<"threads">,
+      id: paneId,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
     }
