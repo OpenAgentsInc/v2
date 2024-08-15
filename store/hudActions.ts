@@ -1,4 +1,4 @@
-import { Pane, PaneInput, HudStore } from './types'
+import { Pane, PaneInput, HudStore } from '@/types/hud'
 import { calculatePanePosition, adjustPanePosition, createNewPaneWithPosition, PANE_OFFSET } from './paneUtils'
 import { Id } from '../convex/_generated/dataModel'
 
