@@ -3,7 +3,6 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../convex/_generated/api';
 import { toast } from 'sonner';
 import { useChatStore } from './useChatStore';
-import { Id } from '../convex/_generated/dataModel';
 import { Message } from '@/types';
 import { useUser } from '@clerk/nextjs';
 
@@ -13,7 +12,7 @@ export function useThreadManagement(propsId?: string) {
   const { user } = useUser();
 
   const createNewThread = useMutation(api.threads.createNewThread);
-  const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId as Id<"threads"> } : "skip");
+  const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
 
   useEffect(() => {
     if (propsId) {
@@ -28,8 +27,9 @@ export function useThreadManagement(propsId?: string) {
       })
         .then((newThread) => {
           if (newThread && newThread._id) {
-            setThreadId(newThread._id);
-            setCurrentThreadId(newThread._id);
+            const newThreadId = `chat-${newThread._id}`;
+            setThreadId(newThreadId);
+            setCurrentThreadId(newThreadId);
           } else {
             console.error('Unexpected thread response:', newThread);
           }
