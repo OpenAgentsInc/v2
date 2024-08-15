@@ -13,13 +13,17 @@ import {
 } from "@/components/ui/table";
 import SWEBenchModal from "@/components/swebench/SWEBenchModal";
 
+const truncate = (str: string, n: number) => {
+  return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+};
+
 const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
   <Table>
     <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
     <TableHeader>
       <TableRow>
         <TableHead className="w-[100px]">Instance ID</TableHead>
-        <TableHead>Base Commit</TableHead>
+        <TableHead className="w-[300px]">Problem Statement</TableHead>
         <TableHead>Created At</TableHead>
         <TableHead>Version</TableHead>
       </TableRow>
@@ -27,10 +31,18 @@ const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
     <TableBody>
       {data.map((item) => (
         <TableRow key={item._id} className="cursor-pointer">
-          <TableCell className="font-medium">{item.instance_id}</TableCell>
-          <TableCell>{item.base_commit}</TableCell>
-          <TableCell>{item.created_at}</TableCell>
-          <TableCell>{item.version}</TableCell>
+          <TableCell className="font-medium whitespace-nowrap overflow-hidden text-ellipsis" style={{maxWidth: '100px'}}>
+            {truncate(item.instance_id, 20)}
+          </TableCell>
+          <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis" style={{maxWidth: '300px'}}>
+            {truncate(item.problem_statement, 100)}
+          </TableCell>
+          <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis" style={{maxWidth: '100px'}}>
+            {truncate(item.created_at, 20)}
+          </TableCell>
+          <TableCell className="whitespace-nowrap overflow-hidden text-ellipsis" style={{maxWidth: '100px'}}>
+            {truncate(item.version, 20)}
+          </TableCell>
         </TableRow>
       ))}
     </TableBody>
