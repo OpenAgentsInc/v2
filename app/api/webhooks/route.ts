@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import type { Stripe } from 'stripe'
 import { stripe } from '@/lib/stripe/stripe'
-import { updateUserCredits } from '@/db/actions'
+import { api } from '@/convex/_generated/api'
+import { ConvexHttpClient } from 'convex/browser'
 
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
 export async function POST(req: Request) {
     console.log('Webhook received')
@@ -47,12 +49,11 @@ export async function POST(req: Request) {
                         if (amountTotal && userId) {
                             const creditsToAdd = Math.floor(amountTotal / 100) // Convert cents to dollars/credits
                             console.log(`Attempting to add ${creditsToAdd} credits to user ${userId}`)
-                            const result = await updateUserCredits(userId, creditsToAdd)
-                            console.log('Update result:', result)
-                            if (result.success) {
-                                console.log(`Added ${creditsToAdd} credits to user ${userId}. New balance: ${result.newBalance}`)
-                            } else {
-                                console.error(`Failed to add credits to user ${userId}: ${result.error}`)
+                            try {
+                                await convex.mutation(api.users.updateUserCredits, { clerk_user_id: userId, credits: creditsToAdd })
+                                console.log(`Added ${creditsToAdd} credits to user ${userId}`)
+                            } catch (error) {
+                                console.error(`Failed to add credits to user ${userId}:`, error)
                             }
                         } else {
                             console.log('Missing amount total or user ID')
