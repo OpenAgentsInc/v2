@@ -58,31 +58,5 @@ export async function POST(req: Request) {
 
   console.log("Stream text result:", JSON.stringify(result, null, 2));
 
-  // Save message and update user balance
-  try {
-    const usage = {
-      promptTokens: result.usage?.promptTokens || 0,
-      completionTokens: result.usage?.completionTokens || 0,
-      totalTokens: result.usage?.totalTokens || 0,
-    };
-    
-    console.log("Calling saveMessageAndUpdateBalance with:", JSON.stringify({
-      clerk_user_id: userId,
-      model_id: toolContext.model,
-      usage,
-    }));
-
-    const { cost_in_cents, newBalance } = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
-      clerk_user_id: userId,
-      model_id: toolContext.model,
-      usage,
-    });
-
-    console.log(`Message cost: ${cost_in_cents} cents. New balance: ${newBalance}`);
-  } catch (error) {
-    console.error('Error saving message and updating user balance:', error);
-    console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-  }
-
   return result.toAIStreamResponse();
 }
