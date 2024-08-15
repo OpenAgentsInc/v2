@@ -6,7 +6,7 @@ import { useChatStore } from './useChatStore';
 import { Message } from '@/types';
 import { Id } from '../convex/_generated/dataModel';
 
-export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId: string) {
+export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId?: string) {
     const convex = useConvex();
     const { setMessages, getThreadData } = useChatStore();
 
@@ -20,7 +20,7 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
             id: Date.now().toString(), 
             content: message, 
             role: 'user', 
-            createdAt: new Date().toISOString() 
+            createdAt: new Date()
         };
         const threadData = getThreadData(threadId);
         const updatedMessages = [...threadData.messages, userMessage];
@@ -33,7 +33,7 @@ export function useMessageHandling(threadId: string | null, vercelChatProps: any
                 clerk_user_id: clerkUserId,
                 role: userMessage.role,
                 content: userMessage.content,
-                created_at: userMessage.createdAt,
+                createdAt: userMessage.createdAt.toISOString(),
             });
         } catch (error) {
             console.error('Error sending message:', error);
