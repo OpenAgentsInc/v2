@@ -77,7 +77,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={sortedChats as Chat[]} setChats={() => { }} newChatId={newChatId as unknown as number | null} />
+                <SidebarList chats={sortedChats as Chat[]} setChats={() => { }} newChatId={newChatId} />
             )}
         </div>
     )
