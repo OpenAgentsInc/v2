@@ -8,6 +8,11 @@ import { useChatStore } from '../store/chat'
 import { Id } from '../convex/_generated/dataModel'
 import { createNewMessage, updateMessageId, Thread } from '@/panes/chat/chatUtils'
 
+/**
+ * Custom hook for managing chat functionality.
+ * @param threadId - The ID of the current chat thread.
+ * @returns An object containing messages, sendMessage function, and loading state.
+ */
 export function useChat(threadId: Id<"threads"> | null) {
   const { user } = useUser()
   const [isLoading, setIsLoading] = useState(false)
@@ -15,6 +20,10 @@ export function useChat(threadId: Id<"threads"> | null) {
   const sendMessageMutation = useMutation(api.messages.saveChatMessage)
   const fetchMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
 
+  /**
+   * Sends a new message in the current thread.
+   * @param content - The content of the message to send.
+   */
   const handleSendMessage = useCallback(async (content: string) => {
     if (!user || !threadId) return
 
@@ -43,6 +52,7 @@ export function useChat(threadId: Id<"threads"> | null) {
     }
   }, [user, threadId, addMessageToThread, sendMessageMutation])
 
+  // Update the thread in the store when messages are fetched
   useEffect(() => {
     if (fetchMessages && threadId) {
       const thread: Thread = {
@@ -62,11 +72,19 @@ export function useChat(threadId: Id<"threads"> | null) {
   }
 }
 
+/**
+ * Custom hook for chat-related actions.
+ * @returns An object containing the createNewThread function.
+ */
 export function useChatActions() {
   const { user } = useUser()
   const createNewThread = useMutation(api.threads.createNewThread)
   const { setCurrentThreadId } = useChatStore()
 
+  /**
+   * Creates a new chat thread.
+   * @returns The ID of the newly created thread, or null if creation failed.
+   */
   const handleCreateNewThread = useCallback(async () => {
     if (!user) return null
 
@@ -95,6 +113,10 @@ export function useChatActions() {
   }
 }
 
+/**
+ * Custom hook for retrieving the list of chat threads.
+ * @returns An array of thread objects.
+ */
 export function useThreadList() {
   const { user } = useUser()
   const listThreads = useQuery(api.threads.listThreads, user ? { clerk_user_id: user.id } : "skip")
