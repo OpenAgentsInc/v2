@@ -30,18 +30,20 @@ export function SidebarList({
     const chatToDelete = chats.find(chat => chat.id === chatId)
     if (chatToDelete) {
       try {
-        await deleteThread({ thread_id: chatId })
-        setChats(chats.filter(chat => chat.id !== chatId))
-        toast.success('Chat deleted successfully')
-      } catch (error) {
-        console.error('Error deleting chat:', error)
-        if (error instanceof Error && error.message.includes('not found')) {
+        const result = await deleteThread({ thread_id: chatId })
+        if (result.success) {
+          setChats(chats.filter(chat => chat.id !== chatId))
+          toast.success('Chat deleted successfully')
+        } else if (result.reason === 'not_found') {
           // If the thread wasn't found in the database, still remove it from the UI
           setChats(chats.filter(chat => chat.id !== chatId))
           toast.success('Chat removed from list')
         } else {
           toast.error('Failed to delete chat. Please try again.')
         }
+      } catch (error) {
+        console.error('Error deleting chat:', error)
+        toast.error('An unexpected error occurred. Please try again.')
       }
     }
   }
