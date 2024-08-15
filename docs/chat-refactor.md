@@ -40,10 +40,36 @@ This document outlines the plan for refactoring the chat-related components and 
 
 ## Step 4: Testing and Verification (IN PROGRESS)
 
-1. Run the application and thoroughly test all chat-related functionality
-2. Ensure that creating, sending, and receiving messages work as expected
-3. Verify that any chat-specific features (e.g., code highlighting, markdown rendering) are still functioning
-4. Check for any console errors or warnings related to the refactored code
+To thoroughly test the refactored chat functionality, please follow these steps:
+
+1. Run the application in a development environment.
+2. Test creating a new chat:
+   - Click on the "New Chat" button or equivalent UI element.
+   - Verify that a new chat thread is created and displayed in the chat list.
+3. Test sending messages:
+   - Type a message in the input bar and send it.
+   - Verify that the message appears in the chat window.
+   - Check if the message is correctly associated with the current user.
+4. Test receiving messages:
+   - If possible, simulate receiving a message from another user or the system.
+   - Verify that the received message appears in the chat window.
+5. Test chat history:
+   - Close the application and reopen it.
+   - Verify that previous chat threads and messages are still available.
+6. Test chat-specific features:
+   - If applicable, test code highlighting by sending a code snippet.
+   - Test markdown rendering by sending messages with markdown syntax.
+7. Test error handling:
+   - Simulate network errors (e.g., disconnect from the internet) and try to send a message.
+   - Verify that appropriate error messages are displayed to the user.
+8. Performance testing:
+   - Create a chat with a large number of messages.
+   - Scroll through the chat history and verify that the performance is acceptable.
+9. Check console for errors:
+   - Open the browser's developer tools.
+   - Verify that there are no unexpected errors or warnings in the console related to the chat functionality.
+
+Please report any issues or unexpected behavior found during testing.
 
 ## Step 5: Code Cleanup and Documentation (TODO)
 
@@ -60,7 +86,8 @@ This document outlines the plan for refactoring the chat-related components and 
 
 ## Next Actions
 
-1. Thoroughly test the chat functionality to ensure it works correctly with the refactored code
-2. Complete Step 4: Testing and Verification
+1. Complete Step 4: Testing and Verification
+2. Address any issues found during testing
 3. Proceed with Step 5: Code Cleanup and Documentation
 4. Update any remaining files that may be affected by the refactor (if any are found during testing)
+5. Final review of the refactored code and documentation
