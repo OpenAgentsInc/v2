@@ -6,20 +6,23 @@ import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
 import { useChatStore } from '@/store/chat'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
+import { ServerActionResult } from '@/types'
 
 interface ChatHistoryProps {
     userId: string
 }
 
 export function ChatHistory({ userId }: ChatHistoryProps) {
-    const { threads, setThread } = useChatStore()
+    const { threads, setThread, removeThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
     const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
 
     const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: userId })
+    const deleteThread = useMutation(api.threads.deleteThread)
+    const shareThreadMutation = useMutation(api.threads.shareThread)
 
     React.useEffect(() => {
         if (fetchedThreads) {
@@ -44,6 +47,31 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
         })
         setNewChatId(newChat.id)
     }, [setThread, setNewChatId])
+
+    const removeChat = React.useCallback(async ({ id, path }: { id: Id<'threads'>; path: string }): Promise<ServerActionResult<void>> => {
+        try {
+            await deleteThread({ threadId: id })
+            removeThread(id)
+            return { success: true }
+        } catch (error) {
+            console.error('Failed to remove chat:', error)
+            return { success: false, error: 'Failed to remove chat' }
+        }
+    }, [deleteThread, removeThread])
+
+    const shareChat = React.useCallback(async ({ id }: { id: Id<'threads'> }): Promise<ServerActionResult<string>> => {
+        try {
+            const shareResult = await shareThreadMutation({ threadId: id })
+            if (typeof shareResult === 'string') {
+                return { success: true, data: shareResult }
+            } else {
+                throw new Error('Invalid share result')
+            }
+        } catch (error) {
+            console.error('Failed to share chat:', error)
+            return { success: false, error: 'Failed to share chat' }
+        }
+    }, [shareThreadMutation])
 
     const sortedChats = React.useMemo(() => {
         return Object.values(threads)
@@ -77,7 +105,13 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={sortedChats as Chat[]} setChats={() => { }} newChatId={newChatId} />
+                <SidebarList 
+                    chats={sortedChats as Chat[]} 
+                    setChats={() => { }} 
+                    newChatId={newChatId} 
+                    removeChat={removeChat}
+                    shareChat={shareChat}
+                />
             )}
         </div>
     )
