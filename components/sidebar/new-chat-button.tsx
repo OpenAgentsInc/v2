@@ -54,11 +54,13 @@ export function NewChatButton({ addChat, clerkUserId, userEmail, userImage, chat
                 }
                 addChat(newChat)
 
-                openChatPane({
+                const newPane = {
                     id: newThread._id,
                     title: 'New Chat',
-                    type: 'chat',
-                })
+                    type: 'chat' as const,
+                }
+                console.log('Opening new chat pane:', newPane);
+                openChatPane(newPane)
             } else {
                 console.error('Failed to create new thread');
             }
