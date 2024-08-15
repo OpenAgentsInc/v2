@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { motion } from 'framer-motion'
 import { buttonVariants } from '@/components/ui/button'
-import { IconMessage, IconUsers } from '@/components/ui/icons'
+import { IconMessage, IconUsers, IconTrash } from '@/components/ui/icons'
 import {
     Tooltip,
     TooltipContent,
@@ -14,17 +14,22 @@ import { cn } from '@/lib/utils'
 import { useHudStore } from '@/store/hud'
 import { useChatStore } from '@/hooks/useChatStore'
 import { Id } from '@/convex/_generated/dataModel'
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 
 interface SidebarItemProps {
     index: number
     chat: Chat
     children: React.ReactNode
     isNew: boolean
+    onDelete: (chatId: Id<"threads">) => void
 }
 
-export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
+export function SidebarItem({ index, chat, children, isNew, onDelete }: SidebarItemProps) {
     const { panes, addPane, setChatOpen, bringPaneToFront } = useHudStore()
     const { setCurrentThreadId } = useChatStore()
+    const deleteThread = useMutation(api.threads.deleteThread)
+
     const isActive = React.useMemo(() => 
         panes.some(pane => pane.id.toString() === chat.id.toString() && pane.type === 'chat' && pane.isActive),
         [panes, chat.id]
@@ -55,6 +60,16 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
         setChatOpen(true)
         setCurrentThreadId(chat.id as Id<"threads">)
     }, [panes, chat, bringPaneToFront, addPane, setChatOpen, setCurrentThreadId])
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        try {
+            await deleteThread({ thread_id: chat.id as Id<"threads"> })
+            onDelete(chat.id as Id<"threads">)
+        } catch (error) {
+            console.error('Error deleting thread:', error)
+        }
+    }
 
     return (
         <motion.div
@@ -138,7 +153,18 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
                     </span>
                 </div>
             </button>
-            {isActive && <div className="absolute right-2 top-2">{children}</div>}
+            {isActive && (
+                <div className="absolute right-2 top-2 flex">
+                    <button
+                        onClick={handleDelete}
+                        className="p-1 hover:bg-red-500 hover:text-white rounded"
+                        title="Delete chat"
+                    >
+                        <IconTrash className="h-4 w-4" />
+                    </button>
+                    {children}
+                </div>
+            )}
         </motion.div>
     )
 }
