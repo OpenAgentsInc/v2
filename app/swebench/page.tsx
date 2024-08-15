@@ -11,15 +11,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import SWEBenchModal from "@/components/swebench/SWEBenchModal";
+
+const SWEBenchTable: React.FC<{ data: any[] }> = ({ data }) => (
+  <Table>
+    <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-[100px]">Instance ID</TableHead>
+        <TableHead>Base Commit</TableHead>
+        <TableHead>Created At</TableHead>
+        <TableHead>Version</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {data.map((item) => (
+        <TableRow key={item._id} className="cursor-pointer">
+          <TableCell className="font-medium">{item.instance_id}</TableCell>
+          <TableCell>{item.base_commit}</TableCell>
+          <TableCell>{item.created_at}</TableCell>
+          <TableCell>{item.version}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+);
 
 export default function SWEBenchPage() {
   const sweData = useQuery(api.swebench.getAllSWEData);
@@ -38,52 +54,21 @@ export default function SWEBenchPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-white mb-4">SWE-Bench Verified (psf/requests)</h1>
-      <Table>
-        <TableCaption>A list of SWE Bench data entries for psf/requests.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Instance ID</TableHead>
-            <TableHead>Base Commit</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Version</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sweData.map((item) => (
-            <TableRow key={item._id} onClick={() => handleRowClick(item)} className="cursor-pointer">
-              <TableCell className="font-medium">{item.instance_id}</TableCell>
-              <TableCell>{item.base_commit}</TableCell>
-              <TableCell>{item.created_at}</TableCell>
-              <TableCell>{item.version}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-[90vw] w-full max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>SWE Bench Entry Details</DialogTitle>
-            <DialogDescription>
-              Detailed information for the selected SWE Bench entry.
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="h-[calc(80vh-120px)] pr-4">
-            <div className="grid gap-4 py-4">
-              {selectedItem && Object.entries(selectedItem).map(([key, value]) => (
-                <div key={key} className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor={key} className="text-right">
-                    {key}
-                  </Label>
-                  <div id={key} className="col-span-3 break-words">
-                    {typeof value === 'string' ? value : JSON.stringify(value)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      <div onClick={(e) => {
+        const target = e.target as HTMLElement;
+        const row = target.closest('tr');
+        if (row) {
+          const index = Array.from(row.parentNode.children).indexOf(row);
+          handleRowClick(sweData[index]);
+        }
+      }}>
+        <SWEBenchTable data={sweData} />
+      </div>
+      <SWEBenchModal
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        selectedItem={selectedItem}
+      />
     </div>
   );
 }
