@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { toast } from 'sonner'
 import { useUser } from '@clerk/nextjs'
@@ -10,8 +10,9 @@ import { Id } from '../convex/_generated/dataModel'
 export function useChat(threadId: Id<"threads"> | null) {
   const { user } = useUser()
   const [isLoading, setIsLoading] = useState(false)
-  const { messages, addMessage, updateMessage } = useChatStore()
-  const sendMessage = useMutation(api.messages.sendMessage)
+  const { getMessages, addMessage, updateMessage } = useChatStore()
+  const sendMessageMutation = useMutation(api.messages.saveChatMessage)
+  const fetchMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
 
   const handleSendMessage = useCallback(async (content: string) => {
     if (!user || !threadId) return
@@ -20,7 +21,7 @@ export function useChat(threadId: Id<"threads"> | null) {
 
     const tempId = Date.now().toString()
     const newMessage: Message = {
-      _id: tempId,
+      _id: tempId as Id<"messages">,
       thread_id: threadId,
       clerk_user_id: user.id,
       role: 'user',
@@ -31,17 +32,17 @@ export function useChat(threadId: Id<"threads"> | null) {
     addMessage(threadId, newMessage)
 
     try {
-      const result = await sendMessage({
+      const result = await sendMessageMutation({
         thread_id: threadId,
         clerk_user_id: user.id,
         content,
+        role: 'user',
       })
 
       if (result) {
         updateMessage(threadId, tempId, {
           ...newMessage,
-          _id: result._id,
-          _creationTime: result._creationTime,
+          _id: result,
         })
       }
     } catch (error) {
@@ -50,10 +51,10 @@ export function useChat(threadId: Id<"threads"> | null) {
     } finally {
       setIsLoading(false)
     }
-  }, [user, threadId, addMessage, sendMessage, updateMessage])
+  }, [user, threadId, addMessage, sendMessageMutation, updateMessage])
 
   return {
-    messages: messages[threadId || ''] || [],
+    messages: fetchMessages || [],
     sendMessage: handleSendMessage,
     isLoading,
   }
@@ -73,9 +74,9 @@ export function useChatActions() {
         metadata: {},
       })
 
-      if (newThread && newThread._id) {
-        setCurrentThreadId(newThread._id)
-        return newThread._id
+      if (newThread) {
+        setCurrentThreadId(newThread)
+        return newThread
       } else {
         console.error('Unexpected thread response:', newThread)
         return null
@@ -94,7 +95,7 @@ export function useChatActions() {
 
 export function useThreadList() {
   const { user } = useUser()
-  const listThreads = useMutation(api.threads.listThreads)
+  const listThreads = useQuery(api.threads.listThreads, user ? { clerk_user_id: user.id } : "skip")
   const [threads, setThreads] = useState<Array<{
     id: Id<"threads">,
     title: string,
@@ -103,20 +104,10 @@ export function useThreadList() {
   }>>([])
 
   useEffect(() => {
-    const fetchThreads = async () => {
-      if (!user) return
-
-      try {
-        const threadList = await listThreads({ clerk_user_id: user.id })
-        setThreads(threadList)
-      } catch (error) {
-        console.error('Error fetching threads:', error)
-        toast.error('Failed to fetch chat threads. Please try again.')
-      }
+    if (listThreads) {
+      setThreads(listThreads)
     }
-
-    fetchThreads()
-  }, [user, listThreads])
+  }, [listThreads])
 
   return threads
 }
