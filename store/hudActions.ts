@@ -37,7 +37,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id as Id<"threads"> | number, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -105,7 +105,7 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: newPane.id as Id<"threads"> | number,
+      id: newPane.id,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
     }
