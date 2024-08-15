@@ -46,7 +46,6 @@ export function NewChatButton({ addChat, clerkUserId, userEmail, userImage, chat
                 console.log('Creating new chat for thread:', newThread._id);
                 const newChat: Chat = {
                     id: newThread._id,
-                    title: 'New Chat',
                     path: `/chat/${newThread._id}`,
                     createdAt: new Date(newThread.createdAt),
                     messages: [],
