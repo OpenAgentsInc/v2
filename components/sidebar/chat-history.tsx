@@ -6,20 +6,23 @@ import { NewChatButton } from './new-chat-button'
 import { Chat } from '@/types'
 import { useChatStore } from '@/store/chat'
 import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
 
 interface ChatHistoryProps {
-  userId: string
+  userId: Id<"users">
+  clerkUserId: string
 }
 
-export function ChatHistory({ userId }: ChatHistoryProps) {
+export function ChatHistory({ userId, clerkUserId }: ChatHistoryProps) {
   const { threads, setThread } = useChatStore()
   const [isLoading, setIsLoading] = React.useState(true)
   const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
 
-  const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: userId })
+  const fetchedThreads = useQuery(api.threads.getUserThreads, { clerk_user_id: clerkUserId })
+  const removeThreadMutation = useMutation(api.threads.deleteThread)
+  const shareThreadMutation = useMutation(api.threads.shareThread)
 
   React.useEffect(() => {
     if (fetchedThreads) {
@@ -45,6 +48,16 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
     setNewChatId(newChat.id)
   }, [setThread, setNewChatId])
 
+  const removeChat = React.useCallback(async (args: { id: Id<'threads'>; path: string }) => {
+    await removeThreadMutation({ thread_id: args.id })
+    // Update local state or trigger a refetch
+  }, [removeThreadMutation])
+
+  const shareChat = React.useCallback(async (args: { id: Id<'threads'> }) => {
+    const result = await shareThreadMutation({ thread_id: args.id })
+    return result
+  }, [shareThreadMutation])
+
   const sortedChats = React.useMemo(() => {
     return Object.values(threads)
       .sort((a, b) => {
@@ -65,7 +78,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="mt-2 mb-2 px-2">
-        <NewChatButton addChat={addChat} userId={userId} chats={sortedChats as Chat[]} />
+        <NewChatButton addChat={addChat} userId={userId} clerkUserId={clerkUserId} chats={sortedChats as Chat[]} />
       </div>
       {isLoading ? (
         <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
@@ -81,8 +94,8 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
           chats={sortedChats as Chat[]}
           setChats={() => { }}
           newChatId={newChatId}
-          removeChat={() => { }}
-          shareChat={() => { }}
+          removeChat={removeChat}
+          shareChat={shareChat}
         />
       )}
     </div>
