@@ -93,7 +93,10 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
     const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
     const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
 
-    const paneId = typeof newPane.id === 'number' ? newPane.id : state.panes.length + 1;
+    if (typeof newPane.id !== 'object' || newPane.id === null || !('__brand' in newPane.id)) {
+      console.error('Invalid thread ID provided for chat pane');
+      return state;
+    }
 
     const newPaneWithPosition: Pane = {
       ...newPane,
@@ -102,9 +105,9 @@ export function openChatPane(set: (fn: (state: HudStore) => Partial<HudStore>) =
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: paneId,
+      id: newPane.id as Id<"threads">,
       type: 'chat',
-      title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
+      title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
     }
     return {
       panes: [newPaneWithPosition],
