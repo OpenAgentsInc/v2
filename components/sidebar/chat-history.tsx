@@ -26,7 +26,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
             fetchedThreads.forEach((thread) => {
                 setThread(thread._id, {
                     id: thread._id,
-                    title: thread.metadata?.title as string || 'Untitled Thread',
+                    title: (thread.metadata as { title?: string })?.title || 'Untitled Thread',
                     messages: [],
                     createdAt: new Date(thread.createdAt),
                 })
@@ -36,13 +36,13 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
     }, [fetchedThreads, setThread])
 
     const addChat = React.useCallback((newChat: Chat) => {
-        setThread(newChat.id as Id<'threads'>, {
-            id: newChat.id as Id<'threads'>,
+        setThread(newChat.id, {
+            id: newChat.id,
             title: newChat.title,
             messages: [],
             createdAt: new Date(),
         })
-        setNewChatId(newChat.id as Id<'threads'>)
+        setNewChatId(newChat.id)
     }, [setThread, setNewChatId])
 
     const sortedChats = React.useMemo(() => {
@@ -65,7 +65,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
     return (
         <div className="flex flex-col h-full">
             <div className="mt-2 mb-2 px-2">
-                <NewChatButton addChat={addChat} userId={userId} chats={sortedChats} />
+                <NewChatButton addChat={addChat} userId={userId} chats={sortedChats as Chat[]} />
             </div>
             {isLoading ? (
                 <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
@@ -77,7 +77,7 @@ export function ChatHistory({ userId }: ChatHistoryProps) {
                     ))}
                 </div>
             ) : (
-                <SidebarList chats={sortedChats} setChats={() => { }} newChatId={newChatId} />
+                <SidebarList chats={sortedChats as Chat[]} setChats={() => { }} newChatId={newChatId as unknown as number | null} />
             )}
         </div>
     )
