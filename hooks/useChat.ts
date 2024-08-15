@@ -1,151 +1,122 @@
-"use client"
+import { useState, useCallback, useEffect } from 'react'
+import { useMutation } from 'convex/react'
+import { api } from '../convex/_generated/api'
+import { toast } from 'sonner'
+import { useUser } from '@clerk/nextjs'
+import { Message } from '@/types'
+import { useChatStore } from './useChatStore'
+import { Id } from '../convex/_generated/dataModel'
 
-import { useEffect, useRef, useState } from 'react';
-import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
-import { useConvex, useQuery } from 'convex/react';
-import { api } from '../convex/_generated/api';
-import { useBalanceStore } from '@/store/balance';
-import { useModelStore } from '@/store/models';
-import { useRepoStore } from '@/store/repo';
-import { useToolStore } from '@/store/tools';
-import { Message } from '@/types/message';
-import { toast } from 'sonner';
-import { useUser } from '@clerk/nextjs';
-import { useDebounce } from 'use-debounce';
-import { useChatStore as useNewChatStore } from '@/store/chat';
-import { useChatStore } from './useChatStore';
-import { useThreadManagement } from './useThreadManagement';
-import { useMessageHandling } from './useMessageHandling';
-import { Id } from '../convex/_generated/dataModel';
+export function useChat(threadId: Id<"threads"> | null) {
+  const { user } = useUser()
+  const [isLoading, setIsLoading] = useState(false)
+  const { messages, addMessage, updateMessage } = useChatStore()
+  const sendMessage = useMutation(api.messages.sendMessage)
 
-interface UseChatProps {
-    id?: string;
-}
+  const handleSendMessage = useCallback(async (content: string) => {
+    if (!user || !threadId) return
 
-export function useChat({ id: propsId }: UseChatProps = {}) {
-    const convex = useConvex();
-    const model = useModelStore((state) => state.model);
-    const repo = useRepoStore((state) => state.repo);
-    const tools = useToolStore((state) => state.tools);
-    const setBalance = useBalanceStore((state) => state.setBalance);
-    const { user } = useUser();
-    const [error, setError] = useState<string | null>(null);
-    const updateThreadTitle = useNewChatStore((state) => state.updateThreadTitle);
+    setIsLoading(true)
 
-    const {
-        setUser,
-        getThreadData,
-        setMessages,
-        setInput: setStoreInput
-    } = useChatStore();
-
-    const threadManagement = useThreadManagement(propsId);
-    const threadId = threadManagement?.threadId ?? null;
-    const setThreadId = threadManagement?.setThreadId ?? (() => {});
-    const currentModelRef = useRef(model);
-
-    useEffect(() => {
-        currentModelRef.current = model;
-    }, [model]);
-
-    const messages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
-    const threadData = threadId ? { messages: messages || [], input: '' } : { messages: [], input: '' };
-
-    const body: any = { model: model.id, tools, threadId };
-    if (repo) {
-        body.repoOwner = repo.owner;
-        body.repoName = repo.name;
-        body.repoBranch = repo.branch;
+    const tempId = Date.now().toString()
+    const newMessage: Message = {
+      _id: tempId,
+      thread_id: threadId,
+      clerk_user_id: user.id,
+      role: 'user',
+      content,
+      _creationTime: Date.now(),
     }
 
-    const saveMessageAndUpdateBalance = async (message: Message, options: any) => {
-        if (threadId && user) {
-            const updatedMessages = [...threadData.messages, message].map(msg => ({
-                ...msg,
-                role: msg.role as 'system' | 'user' | 'assistant' | 'data'
-            }));
-            setMessages(threadId, updatedMessages as Message[]);
+    addMessage(threadId, newMessage)
 
-            try {
-                const result = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
-                    clerk_user_id: user.id,
-                    model_id: currentModelRef.current.id,
-                    usage: {
-                        promptTokens: options.usage?.promptTokens || 0,
-                        completionTokens: options.usage?.completionTokens || 0,
-                        totalTokens: options.usage?.totalTokens || 0,
-                    },
-                }) as { cost_in_cents: number, newBalance: number } | null;
+    try {
+      const result = await sendMessage({
+        thread_id: threadId,
+        clerk_user_id: user.id,
+        content,
+      })
 
-                if (result) {
-                    setBalance(result.newBalance);
-                }
-                setError(null);
+      if (result) {
+        updateMessage(threadId, tempId, {
+          ...newMessage,
+          _id: result._id,
+          _creationTime: result._creationTime,
+        })
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error)
+      toast.error('Failed to send message. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user, threadId, addMessage, sendMessage, updateMessage])
 
-                // Save the message to the database
-                await convex.mutation(api.messages.saveChatMessage, {
-                    thread_id: threadId,
-                    clerk_user_id: user.id,
-                    role: message.role,
-                    content: message.content,
-                    tool_invocations: options.toolInvocations ? JSON.stringify(options.toolInvocations) : undefined,
-                    finish_reason: options.finishReason,
-                    total_tokens: options.usage?.totalTokens,
-                    prompt_tokens: options.usage?.promptTokens,
-                    completion_tokens: options.usage?.completionTokens,
-                    model_id: currentModelRef.current.id,
-                    cost_in_cents: result?.cost_in_cents,
-                });
+  return {
+    messages: messages[threadId || ''] || [],
+    sendMessage: handleSendMessage,
+    isLoading,
+  }
+}
 
-            } catch (error: any) {
-                if (error instanceof Error && error.message === 'Insufficient credits') {
-                    toast.error('Insufficient credits. Please add more credits to continue chatting.');
-                } else {
-                    toast.error('Unknown error. Try again or try a different model.');
-                }
-            }
-        }
-    };
+export function useChatActions() {
+  const { user } = useUser()
+  const createNewThread = useMutation(api.threads.createNewThread)
+  const { setCurrentThreadId } = useChatStore()
 
-    const vercelChatProps = useVercelChat({
-        id: threadId,
-        initialMessages: messages as unknown as VercelMessage[],
-        body,
-        maxToolRoundtrips: 20,
-        onFinish: async (message, options) => {
-            await saveMessageAndUpdateBalance(message as unknown as Message, options);
-        },
-        onError: (error) => {
-            if (error.message === 'Insufficient credits') {
-                toast.error('Insufficient credits. Please add more credits to continue chatting.');
-            } else {
-                setError('Error :(');
-                toast.error('Unknown error. Try again or try a different model.');
-            }
-        },
-    });
+  const handleCreateNewThread = useCallback(async () => {
+    if (!user) return null
 
-    const { sendMessage } = useMessageHandling(threadId, vercelChatProps, user?.id || '');
+    try {
+      const newThread = await createNewThread({
+        clerk_user_id: user.id,
+        metadata: {},
+      })
 
-    const setInput = (input: string) => {
-        if (threadId) {
-            setStoreInput(threadId, input);
-        }
-        vercelChatProps.setInput(input);
-    };
+      if (newThread && newThread._id) {
+        setCurrentThreadId(newThread._id)
+        return newThread._id
+      } else {
+        console.error('Unexpected thread response:', newThread)
+        return null
+      }
+    } catch (error) {
+      console.error('Error creating new thread:', error)
+      toast.error('Failed to create a new chat thread. Please try again.')
+      return null
+    }
+  }, [user, createNewThread, setCurrentThreadId])
 
-    const [debouncedMessages] = useDebounce(vercelChatProps.messages, 250, { maxWait: 250 });
+  return {
+    createNewThread: handleCreateNewThread,
+  }
+}
 
-    return {
-        ...vercelChatProps,
-        messages: debouncedMessages,
-        id: threadId,
-        threadData,
-        user,
-        setThreadId,
-        setUser,
-        setInput,
-        sendMessage,
-        error
-    };
+export function useThreadList() {
+  const { user } = useUser()
+  const listThreads = useMutation(api.threads.listThreads)
+  const [threads, setThreads] = useState<Array<{
+    id: Id<"threads">,
+    title: string,
+    lastMessagePreview: string,
+    createdAt: string,
+  }>>([])
+
+  useEffect(() => {
+    const fetchThreads = async () => {
+      if (!user) return
+
+      try {
+        const threadList = await listThreads({ clerk_user_id: user.id })
+        setThreads(threadList)
+      } catch (error) {
+        console.error('Error fetching threads:', error)
+        toast.error('Failed to fetch chat threads. Please try again.')
+      }
+    }
+
+    fetchThreads()
+  }, [user, listThreads])
+
+  return threads
 }
