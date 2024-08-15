@@ -4,8 +4,8 @@ import { InputBar } from '@/components/input/InputBar'
 import { ChatList } from './ChatList'
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { Message } from '@/types';
-import { useMemo } from 'react';
 import { Id } from '@/convex/_generated/dataModel'
+import { Thread } from '@/panes/chat/chatUtils'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
     threadId: Id<"threads">
