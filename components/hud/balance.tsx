@@ -1,30 +1,26 @@
 "use client"
 import { useEffect, useState } from 'react';
 import { useBalanceStore } from '@/store/balance';
-import { getUserBalance } from '@/db/actions/getUserBalance'; // Import the new function
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import AddCreditsForm from '@/components/AddCreditsForm';
 import { useAuth } from '@clerk/nextjs';
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
 
 export const Balance = () => {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const setBalance = useBalanceStore(state => state.setBalance);
     const { userId } = useAuth();
 
+    const balance = useQuery(api.users.getUserBalance, userId ? { clerk_user_id: userId } : "skip");
+
     useEffect(() => {
-        const fetchBalance = async () => {
-            try {
-                const balance = await getUserBalance();
-                setBalance(balance);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchBalance();
-    }, [setBalance]);
+        if (balance !== undefined) {
+            setBalance(balance);
+            setLoading(false);
+        }
+    }, [balance, setBalance]);
 
     const balanceInCents = useBalanceStore(state => state.balance);
     const balanceInDollars = Math.floor(balanceInCents) / 100;
