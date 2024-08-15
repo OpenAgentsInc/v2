@@ -1,25 +1,24 @@
-"use client"
+import React from 'react'
+import { Pane } from '../hud/pane'
+import { ChatHistory } from '../chat/ChatHistory'
+import { UserStatus } from '../hud/UserStatus'
+import { ChatInput } from '../chat/ChatInput'
+import { ChatPane } from '../chat/ChatPane'
+import { useThreadManagement } from '@/hooks/useThreadManagement'
 
-import { Hud } from '@/components/hud/hud'
-import { Pane } from '@/components/hud/pane'
-import { ChatHistory } from '@/components/sidebar/chat-history'
-import { useAuth } from "@clerk/nextjs"
-import { Knowledge } from '../knowledge/Knowledge'
+export function HomeAuthed() {
+  const { threadId } = useThreadManagement()
 
-export const HomeAuthed = () => {
-  const { userId } = useAuth()
-  if (!userId) {
-    return <></>
-  }
   return (
-    <main className="h-screen flex items-center justify-center relative">
-      <Pane title="Chat History" id={0} x={20} y={190} height={350} width={260} dismissable={false}>
-        <ChatHistory clerkUserId={userId} />
+    <div className="relative w-full h-full">
+      <UserStatus />
+      <ChatInput />
+      <Pane title="Chat History" id="chat-history" x={20} y={190} height={350} width={260} dismissable={false}>
+        <ChatHistory />
       </Pane>
-      {/* <Pane title="Knowledge" id={-1} x={350} y={90} height={650} width={860} dismissable={false}>
-        <Knowledge />
-      </Pane> */}
-      <Hud />
-    </main>
+      {threadId && (
+        <ChatPane threadId={threadId} />
+      )}
+    </div>
   )
 }
