@@ -1,12 +1,13 @@
 import { useUser } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
 import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
 
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser()
   const [isHandled, setIsHandled] = useState(false)
-  const createOrGetUser = useMutation('users:createOrGet')
+  const createOrGetUser = useMutation(api.users.createOrGetUser)
 
   useEffect(() => {
     const handleUserCreation = async () => {
