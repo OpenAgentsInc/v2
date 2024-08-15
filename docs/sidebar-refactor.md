@@ -2,6 +2,8 @@
 
 ## Current Components
 
+Found in `components/sidebar/`
+
 ### SidebarItemButton.tsx
 - Renders a button for sidebar items
 - Uses Framer Motion for animations
@@ -82,6 +84,7 @@
 - Implement a single handleChatAction function in ChatsPane to manage opening, deleting, and sharing chats
 - Use a custom hook (e.g., useChatActions) to encapsulate the logic for chat operations and state management
 - Combine the functionality of sidebar-items.tsx into the main ChatsPane component, managing the list of chats and their rendering
+- Use CasingLikeThis.tsx not casing-like-this.tsx
 
 ## New folder structure
 
