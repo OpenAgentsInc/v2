@@ -22,7 +22,7 @@ export function CreateDocumentButton() {
 
   const handleOpenDialog = async () => {
     const newFileId = await generateUploadUrl();
-    setFileId(newFileId);
+    setFileId(newFileId as Id<"_storage">);
     setIsOpen(true);
   };
 
