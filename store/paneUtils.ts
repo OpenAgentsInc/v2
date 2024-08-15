@@ -1,4 +1,5 @@
 import { Pane, PaneInput } from '@/types/pane'
+import { Id } from '../convex/_generated/dataModel'
 
 const PANE_OFFSET = 45 // Offset for new panes when tiling
 
@@ -36,7 +37,7 @@ export function adjustPanePosition(panePosition: { x: number; y: number; width: 
   }
 }
 
-export function createNewPaneWithPosition(newPane: PaneInput, paneId: string, panePosition: { x: number; y: number; width: number; height: number }): Pane {
+export function createNewPaneWithPosition(newPane: PaneInput, paneId: Id<"threads"> | number, panePosition: { x: number; y: number; width: number; height: number }): Pane {
   return {
     ...newPane,
     id: paneId,
