@@ -1,15 +1,51 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+export const createOrGetUser = mutation({
+  args: {
+    clerk_user_id: v.string(),
+    email: v.string(),
+    image: v.optional(v.string()),
+  },
+  async handler(ctx, args) {
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_user_id", (q) => q.eq("clerk_user_id", args.clerk_user_id))
+      .first();
+
+    if (existingUser) {
+      return existingUser._id;
+    }
+
+    const newUserId = await ctx.db.insert("users", {
+      clerk_user_id: args.clerk_user_id,
+      email: args.email,
+      image: args.image,
+      credits: 0, // You can set an initial credit amount here
+      createdAt: new Date().toISOString(),
+    });
+
+    return newUserId;
+  },
+});
+
 export const createNewThread = mutation({
   args: {
-    user_id: v.id("users"),
     clerk_user_id: v.string(),
     metadata: v.optional(v.object({})),
   },
   async handler(ctx, args) {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_user_id", (q) => q.eq("clerk_user_id", args.clerk_user_id))
+      .first();
+
+    if (!user) {
+      throw new Error("User not found. Please ensure the user is created before creating a thread.");
+    }
+
     const newThread = await ctx.db.insert("threads", {
-      user_id: args.user_id,
+      user_id: user._id,
       clerk_user_id: args.clerk_user_id,
       metadata: args.metadata,
       createdAt: new Date().toISOString(),
