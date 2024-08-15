@@ -5,8 +5,8 @@ This document outlines the plan for refactoring the chat-related components and 
 ## Objectives
 
 1. Move and consolidate the `components/chat/` directory to `panes/chat/` (COMPLETED)
-2. Refactor and simplify the duplicates between `store/chat.ts` and `hooks/useChat.ts`
-3. Ensure the chat pane consumes the refactored functionality correctly
+2. Refactor and simplify the duplicates between `store/chat.ts` and `hooks/useChat.ts` (COMPLETED)
+3. Ensure the chat pane consumes the refactored functionality correctly (IN PROGRESS)
 
 ## Step 1: Move and Consolidate `components/chat/` to `panes/chat/` (COMPLETED)
 
@@ -16,22 +16,22 @@ This document outlines the plan for refactoring the chat-related components and 
 4. Update any files that import from `components/chat/` to import from `panes/chat/` instead (DONE)
 5. Remove the now-empty `components/chat/` directory (DONE)
 
-## Step 2: Refactor `store/chat.ts` and `hooks/useChat.ts` (IN PROGRESS)
+## Step 2: Refactor `store/chat.ts` and `hooks/useChat.ts` (COMPLETED)
 
-1. Analyze the contents of both files to identify duplicated functionality
-2. Create a new file `panes/chat/chatUtils.ts` to house shared functionality
-3. Move common functions and types to `chatUtils.ts`
+1. Analyze the contents of both files to identify duplicated functionality (DONE)
+2. Create a new file `panes/chat/chatUtils.ts` to house shared functionality (DONE)
+3. Move common functions and types to `chatUtils.ts` (DONE)
 4. Update `store/chat.ts`:
-   - Import shared functionality from `chatUtils.ts`
-   - Remove any duplicated code
-   - Ensure it only contains store-specific logic
+   - Import shared functionality from `chatUtils.ts` (DONE)
+   - Remove any duplicated code (DONE)
+   - Ensure it only contains store-specific logic (DONE)
 5. Update `hooks/useChat.ts`:
-   - Import shared functionality from `chatUtils.ts`
-   - Remove any duplicated code
-   - Ensure it only contains hook-specific logic
-6. If possible, consider merging `store/chat.ts` into `hooks/useChat.ts` if there's significant overlap
+   - Import shared functionality from `chatUtils.ts` (DONE)
+   - Remove any duplicated code (DONE)
+   - Ensure it only contains hook-specific logic (DONE)
+6. Consider merging `store/chat.ts` into `hooks/useChat.ts` if there's significant overlap (NOT NEEDED)
 
-## Step 3: Update Chat Pane to Use Refactored Functionality (TODO)
+## Step 3: Update Chat Pane to Use Refactored Functionality (IN PROGRESS)
 
 1. Locate the main chat pane component (likely in `panes/chat/Chat.tsx`)
 2. Update imports to use the refactored `useChat` hook and any other necessary imports from `chatUtils.ts`
@@ -54,11 +54,12 @@ This document outlines the plan for refactoring the chat-related components and 
 ## Progress Log
 
 - [Date]: Completed Step 1 - Moved and consolidated `components/chat/` to `panes/chat/`
-- [Current Date]: Started Step 2 - Refactoring `store/chat.ts` and `hooks/useChat.ts`
+- [Current Date]: Completed Step 2 - Refactored `store/chat.ts` and `hooks/useChat.ts`
+- [Current Date]: Started Step 3 - Updating Chat Pane to use refactored functionality
 
 ## Next Actions
 
-1. Analyze `store/chat.ts` and `hooks/useChat.ts` for duplicated functionality
-2. Create `panes/chat/chatUtils.ts` and move shared code
-3. Update `store/chat.ts` and `hooks/useChat.ts` to use the new `chatUtils.ts`
-4. Consider merging `store/chat.ts` into `hooks/useChat.ts` if appropriate
+1. Update the main chat pane component (`panes/chat/Chat.tsx`) to use the refactored `useChat` hook and `chatUtils.ts`
+2. Test the chat functionality to ensure it works correctly with the refactored code
+3. Proceed with Step 4: Testing and Verification
+4. Complete Step 5: Code Cleanup and Documentation
