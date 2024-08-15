@@ -78,12 +78,10 @@
 - Retain the server-side rendering approach for the desktop sidebar, but integrate it with the new ChatsPane component
 - Ensure that the responsive styling for desktop view is maintained in the new component structure
 - Incorporate the footer functionality directly into the ChatsPane component, allowing for flexible content in the footer area
-<<<<<<< HEAD
 - Merge the animation logic from SidebarItem into the new ChatItem component within ChatsPane
 - Implement a single handleChatAction function in ChatsPane to manage opening, deleting, and sharing chats
 - Use a custom hook (e.g., useChatActions) to encapsulate the logic for chat operations and state management
 - Combine the functionality of sidebar-items.tsx into the main ChatsPane component, managing the list of chats and their rendering
-=======
 
 ## New folder structure
 
@@ -94,6 +92,4 @@ We want to have all our panes consolidated into a new top-level `panes` folder. 
   - chat/
   - chats/
   - user/
-  - pane.tsx
 ```
->>>>>>> 86897c6 (new folder structure in doc)
