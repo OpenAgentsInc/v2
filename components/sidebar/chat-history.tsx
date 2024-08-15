@@ -16,6 +16,7 @@ interface ChatHistoryProps {
 }
 
 export function ChatHistory({ clerkUserId }: ChatHistoryProps) {
+  return <></>
   const [newChatId, setNewChatId] = useLocalStorage<Id<'threads'> | null>('newChatId2', null)
   const { user } = useUser();
 
