@@ -15,7 +15,7 @@ interface ChatHistoryProps {
 export function ChatHistory({ userId }: ChatHistoryProps) {
     const { threads, setThread } = useChatStore()
     const [isLoading, setIsLoading] = React.useState(true)
-    const [newChatId, setNewChatId] = useLocalStorage<string | null>('newChatId2', null)
+    const [newChatId, setNewChatId] = useLocalStorage<number | null>('newChatId2', null)
 
     React.useEffect(() => {
         async function loadInitialChats() {
