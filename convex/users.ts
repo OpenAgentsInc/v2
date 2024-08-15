@@ -101,14 +101,18 @@ export const saveMessageAndUpdateBalance = mutation({
     }),
   },
   async handler(ctx, args) {
+    console.log("saveMessageAndUpdateBalance called with args:", JSON.stringify(args));
     const { clerk_user_id, model_id, usage } = args;
 
     const model = models.find(m => m.id === model_id);
     if (!model) {
+      console.error(`Model with id ${model_id} not found`);
       throw new Error(`Model with id ${model_id} not found`);
     }
+    console.log("Found model:", JSON.stringify(model));
 
     const cost_in_cents = calculateMessageCost(model, usage);
+    console.log("Calculated cost_in_cents:", cost_in_cents);
 
     // Save the message to the database
     // This is a placeholder - you need to implement the actual message saving logic
@@ -121,11 +125,14 @@ export const saveMessageAndUpdateBalance = mutation({
       .first();
 
     if (!user) {
+      console.error(`User with clerk_user_id ${clerk_user_id} not found`);
       throw new Error('User not found');
     }
+    console.log("Found user:", JSON.stringify(user));
 
     const newBalance = user.credits - cost_in_cents;
     await ctx.db.patch(user._id, { credits: newBalance });
+    console.log("Updated user balance. New balance:", newBalance);
 
     return { cost_in_cents, newBalance };
   },
