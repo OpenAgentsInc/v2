@@ -92,4 +92,5 @@ We want to have all our panes consolidated into a new top-level `panes` folder. 
   - chat/
   - chats/
   - user/
+  - pane.tsx
 ```
