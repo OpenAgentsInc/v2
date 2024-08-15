@@ -6,6 +6,8 @@ import { Chat } from '@/types'
 import { Id } from '@/convex/_generated/dataModel'
 import { ServerActionResult } from '@/types'
 import { toast } from 'sonner'
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 
 interface SidebarListProps {
   chats: Chat[]
@@ -22,16 +24,24 @@ export function SidebarList({
   removeChat,
   shareChat
 }: SidebarListProps) {
+  const deleteThread = useMutation(api.threads.deleteThread)
+
   const handleDelete = async (chatId: Id<'threads'>) => {
     const chatToDelete = chats.find(chat => chat.id === chatId)
     if (chatToDelete) {
       try {
-        await removeChat({ id: chatId, path: chatToDelete.path })
+        await deleteThread({ thread_id: chatId })
         setChats(chats.filter(chat => chat.id !== chatId))
         toast.success('Chat deleted successfully')
       } catch (error) {
         console.error('Error deleting chat:', error)
-        toast.error('Failed to delete chat. Please try again.')
+        if (error instanceof Error && error.message.includes('not found')) {
+          // If the thread wasn't found in the database, still remove it from the UI
+          setChats(chats.filter(chat => chat.id !== chatId))
+          toast.success('Chat removed from list')
+        } else {
+          toast.error('Failed to delete chat. Please try again.')
+        }
       }
     }
   }
