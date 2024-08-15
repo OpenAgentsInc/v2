@@ -3,7 +3,7 @@ import { useConvex } from 'convex/react';
 import { api } from '../convex/_generated/api';
 import { toast } from 'sonner';
 import { useChatStore } from './useChatStore';
-import { Message } from '@/types';
+import { Message } from '@/types/message';
 import { Id } from '../convex/_generated/dataModel';
 
 export function useMessageHandling(threadId: string | null, vercelChatProps: any, clerkUserId: string) {
