@@ -24,15 +24,21 @@ interface SidebarItemProps {
 export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
     const { panes, addPane, setChatOpen, bringPaneToFront } = useHudStore()
     const { setCurrentThreadId } = useChatStore()
-    const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
-    const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
+    const isActive = React.useMemo(() => 
+        panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive),
+        [panes, chat.id]
+    )
+    const isOpen = React.useMemo(() => 
+        panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat'),
+        [panes, chat.id]
+    )
     const shouldAnimate = isNew && index === 0
 
     console.log(`SidebarItem: Chat ID ${chat.id}, IsActive: ${isActive}, IsOpen: ${isOpen}`);
 
     if (!chat?.id) return null
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = React.useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         const existingPane = panes.find(pane => pane.id === Number(chat.id) && pane.type === 'chat')
 
@@ -51,7 +57,7 @@ export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) 
         }
         setChatOpen(true)
         setCurrentThreadId(chat.id)
-    }
+    }, [panes, chat, bringPaneToFront, addPane, setChatOpen, setCurrentThreadId])
 
     return (
         <motion.div
