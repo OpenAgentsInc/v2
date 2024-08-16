@@ -22,10 +22,10 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   const currentModelRef = useRef<string | null>(null)
 
   const { threads, addMessageToThread, setThread, setCurrentThreadId } = useChatStore()
-  const sendMessageMutation = useMutation(api.messages.saveChatMessage)
-  const fetchMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
-  const createNewThread = useMutation(api.threads.createNewThread)
-  const generateTitle = useAction(api.threads.generateTitle)
+  const sendMessageMutation = useMutation(api.messages.saveChatMessage.saveChatMessage)
+  const fetchMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
+  const createNewThread = useMutation(api.threads.createNewThread.createNewThread)
+  const generateTitle = useAction(api.threads.generateTitle.generateTitle)
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)

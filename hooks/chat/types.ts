@@ -6,7 +6,7 @@ export interface ThreadMetadata {
 }
 
 export interface Thread {
-  id?: Id<"threads">;
+  _id: Id<"threads">;
   metadata?: ThreadMetadata;
   messages: any[];
   createdAt?: Date;

@@ -6,7 +6,7 @@ import { api } from '../convex/_generated/api';
 export function useEnsureUser() {
   const { user, isLoaded: isUserLoaded } = useUser();
   const [isUserEnsured, setIsUserEnsured] = useState(false);
-  const createOrGetUser = useMutation(api.threads.createOrGetUser);
+  const createOrGetUser = useMutation(api.threads.createOrGetUser.createOrGetUser);
 
   useEffect(() => {
     if (isUserLoaded && user) {
