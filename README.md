@@ -57,7 +57,7 @@ The codebase and documentation is optimized for agents to understand and travers
     - generateTitle.ts - Contains the generateTitle action
     - getLastEmptyThread.ts - Contains the getLastEmptyThread query
     - getThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically
-    - getUserThreads.ts - Contains the getUserThreads query
+    - getUserThreads.ts - Fetches all threads associated with a specific user's Clerk ID
     - shareThread.ts - Contains the shareThread mutation
     - updateThreadData.ts - Contains the updateThreadData mutation
     - index.ts - Exports all thread-related functions for easy import
