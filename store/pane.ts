@@ -1,8 +1,8 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { Pane, PaneInput } from '@/types/pane'
-import { calculatePanePosition } from './paneUtils'
-import * as actions from './hudActions'
+import { PaneInput } from '@/types/pane'
+import { calculatePanePosition } from './panes'
+import * as actions from './panes/actions'
 import { PaneStore } from './types'
 
 export const usePaneStore = create<PaneStore>()(

@@ -3,8 +3,9 @@ import { PaneStore, SetFunction } from '../types'
 import { ensureChatsPaneExists } from '../utils/ensureChatsPaneExists'
 import { handleChatPanePosition } from '../utils/handleChatPanePosition'
 
-export function openChatPane(set: SetFunction, newPane: PaneInput) {
+export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
   return set((state: PaneStore) => {
+    console.log("Not doing anything yet with isCommandKeyHeld", isCommandKeyHeld);
     if (!newPane.id) {
       console.error('Invalid thread ID provided for chat pane');
       return state;
@@ -24,7 +25,7 @@ export function openChatPane(set: SetFunction, newPane: PaneInput) {
 
     if (updatedPanes.length > 1) {
       // Replace the existing chat pane, but keep the Chats pane
-      updatedPanes = updatedPanes.map(pane => 
+      updatedPanes = updatedPanes.map(pane =>
         pane.type === 'chat' ? newPaneWithPosition : { ...pane, isActive: false }
       );
     } else {
