@@ -5,12 +5,12 @@ export function handleChatPanePosition(existingPanes: Pane[]): { x: number; y: n
   const chatPanes = existingPanes.filter(pane => pane.type === 'chat');
   
   if (chatPanes.length === 0) {
-    // First chat pane, make it take up most of the screen
+    // First chat pane, set dimensions as requested
     return {
-      x: 50,
-      y: 50,
-      width: window.innerWidth * 0.8,
-      height: window.innerHeight * 0.8
+      x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 300,
+      y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.05,
+      width: 800,
+      height: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.9,
     };
   } else if (chatPanes.length === 1) {
     // Replace the existing chat pane
