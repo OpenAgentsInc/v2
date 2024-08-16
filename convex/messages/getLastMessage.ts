@@ -1,5 +1,5 @@
-import { query } from './_generated/server';
-import { Doc } from './_generated/dataModel';
+import { query } from '@/convex/_generated/server';
+import { Doc } from '@/convex/_generated/dataModel';
 
 export const getLastMessage = query(async ({ db, auth }): Promise<Doc<'messages'> | null> => {
   const identity = await auth.getUserIdentity();

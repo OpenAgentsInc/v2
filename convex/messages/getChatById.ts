@@ -1,5 +1,5 @@
-import { query } from './_generated/server';
-import { Id } from './_generated/dataModel';
+import { query } from '@/convex/_generated/server';
+import { Id } from '@/convex/_generated/dataModel';
 
 export const getChatById = query(async ({ db }, chatId: Id<'messages'>) => {
   const chat = await db.get(chatId);
