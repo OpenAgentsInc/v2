@@ -15,6 +15,10 @@
 - Thread - What we call 'chats' in the front-end
 - User
 
+## UI notes
+- The main authed UI is a full-screen heads-up display (HUD) with a white grid on black background
+- One or more HUD "panes" show on screen. Each is draggable, resizable, and optionally dismissible.
+
 ## Folders & important files
 - app/
 - components/
