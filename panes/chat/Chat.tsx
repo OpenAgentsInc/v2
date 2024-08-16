@@ -1,11 +1,10 @@
 "use client"
-import { useChat } from '@/hooks/useChat'
-import { InputBar } from '@/components/input/InputBar'
-import { ChatList } from './ChatList'
-import { useChatScroll } from '@/hooks/useChatScroll';
-import { Message } from '@/types';
-import { Id } from '@/convex/_generated/dataModel'
-import { Thread } from '@/panes/chat/chatUtils'
+import { InputBar } from "@/components/input/InputBar"
+import { Id } from "@/convex/_generated/dataModel"
+import { useChat } from "@/hooks/useChat"
+import { useChatScroll } from "@/hooks/useChatScroll"
+import { Message } from "@/types"
+import { ChatList } from "./ChatList"
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   threadId: Id<"threads">
