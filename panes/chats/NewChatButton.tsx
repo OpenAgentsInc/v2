@@ -14,12 +14,12 @@ export const NewChatButton: React.FC = () => {
     return null;
   }
 
-  const handleNewChat = async () => {
+  const handleNewChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
     setIsCreating(true);
     try {
       const threadId = await createThread({ clerk_user_id: user.id });
-      console.log("Skipping open chat pane - don't have the right props")
-      // openChatPane(threadId);
+      const isCommandKeyHeld = event.metaKey || event.ctrlKey; // metaKey for Mac, ctrlKey for Windows/Linux
+      openChatPane({ id: threadId, title: 'New Chat' }, isCommandKeyHeld);
     } catch (error) {
       console.error('Error creating new chat:', error);
     } finally {
