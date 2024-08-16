@@ -1,4 +1,3 @@
-import { Id } from '@/convex/_generated/dataModel'
 import { Pane, PaneInput } from '@/types/pane'
 
 export type PaneStore = {
@@ -7,16 +6,15 @@ export type PaneStore = {
   activeTerminalId: number | null
   lastPanePosition: { x: number; y: number; width: number; height: number } | null
   addPane: (pane: PaneInput, shouldTile?: boolean) => void
-  removePane: (id: Id<"threads"> | number) => void
-  updatePanePosition: (id: Id<"threads"> | number, x: number, y: number) => void
-  updatePaneSize: (id: Id<"threads"> | number, width: number, height: number) => void
+  removePane: (id: string) => void
+  updatePanePosition: (id: string, x: number, y: number) => void
+  updatePaneSize: (id: string, width: number, height: number) => void
   setChatOpen: (isOpen: boolean) => void
-  setActiveTerminalId: (id: number | null) => void
   isInputFocused: boolean
   setInputFocused: (isFocused: boolean) => void
   isRepoInputOpen: boolean
   setRepoInputOpen: (isOpen: boolean) => void
   openChatPane: (pane: PaneInput) => void
-  bringPaneToFront: (id: Id<"threads"> | number) => void
-  setActivePane: (id: Id<"threads"> | number) => void
+  bringPaneToFront: (id: string) => void
+  setActivePane: (id: string) => void
 }

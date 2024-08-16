@@ -17,7 +17,6 @@ export const usePaneStore = create<PaneStore>()(
       updatePanePosition: (id: string, x: number, y: number) => actions.updatePanePosition(set, id, x, y),
       updatePaneSize: (id: string, width: number, height: number) => actions.updatePaneSize(set, id, width, height),
       setChatOpen: (isOpen: boolean) => set({ isChatOpen: isOpen }),
-      setActiveTerminalId: (id: string | null) => set({ activeTerminalId: id }),
       isInputFocused: false,
       setInputFocused: (isFocused: boolean) => set({ isInputFocused: isFocused }),
       isRepoInputOpen: false,
