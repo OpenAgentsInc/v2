@@ -53,7 +53,7 @@ The codebase and documentation is optimized for agents to understand and travers
   - threads/
     - createNewThread.ts - Creates a new thread for a user, including optional metadata like title
     - createOrGetUser.ts - Contains the createOrGetUser mutation
-    - deleteThread.ts - Contains the deleteThread mutation
+    - deleteThread.ts - Deletes a thread and all its associated messages
     - generateTitle.ts - Contains the generateTitle action
     - getLastEmptyThread.ts - Contains the getLastEmptyThread query
     - getThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically
