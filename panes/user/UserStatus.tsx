@@ -10,7 +10,7 @@ export const UserStatus = () => {
     return null
   }
   return (
-    <Pane title='You' id={1} type="default" x={10} y={10} height={130} width={200} dismissable={false}>
+    <Pane title='You' id="you" type="default" x={10} y={10} height={130} width={200} dismissable={false}>
       <div className="h-full w-full flex flex-col justify-evenly items-center">
         <div className="h-10 w-full flex justify-center items-center">
           <UserButton showName={true} />
