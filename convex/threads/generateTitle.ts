@@ -10,7 +10,7 @@ import { Doc, Id } from "../_generated/dataModel";
 export const generateTitle = action({
   args: { threadId: v.id("threads") },
   async handler(ctx: ActionCtx, args: { threadId: Id<"threads"> }): Promise<string> {
-    const messages = await ctx.runQuery(api.threads.getThreadMessages as any, args);
+    const messages = await ctx.runQuery(api.threads.getThreadMessages.getThreadMessages, args);
 
     if (messages.length === 0) {
       return "New Thread";
