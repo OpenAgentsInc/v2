@@ -16,17 +16,18 @@ const SEEN_CHATS_KEY = 'seenChatIds';
 
 interface NewChatButtonProps {
   userId: string;
+  onNewChat: (threadId: string) => void;
 }
 
-function NewChatButton({ userId }: NewChatButtonProps) {
+function NewChatButton({ userId, onNewChat }: NewChatButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
   const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
 
   const handleNewChat = async (event: React.MouseEvent) => {
     setIsCreating(true);
     try {
-      await createNewThread({ metadata: {}, clerk_user_id: userId });
-      // Handle successful creation
+      const threadId = await createNewThread({ metadata: {}, clerk_user_id: userId });
+      onNewChat(threadId);
     } catch (error) {
       console.error('Error creating new chat:', error);
       // Handle error
@@ -54,7 +55,7 @@ export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
-  const { panes } = usePaneStore();
+  const { panes, openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
@@ -102,6 +103,14 @@ export const ChatsPane: React.FC = () => {
     }
   };
 
+  const handleNewChat = (threadId: string) => {
+    openChatPane({
+      id: threadId,
+      title: 'New Chat',
+      type: 'chat',
+    });
+  };
+
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
   const isLoading = chats === undefined;
@@ -109,7 +118,7 @@ export const ChatsPane: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="mt-2 mb-2 px-2">
-        {user && <NewChatButton userId={user.id} />}
+        {user && <NewChatButton userId={user.id} onNewChat={handleNewChat} />}
       </div>
       {isLoading ? (
         <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
