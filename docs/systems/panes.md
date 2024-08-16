@@ -15,6 +15,14 @@ The application uses a pane-based system for managing different UI components. E
 - For chat thread panes, the ID format is "thread-[string version of the convex ID]" (no brackets).
 - The Chats pane has a fixed ID of 'chats'.
 
+### Chat Pane Behavior
+
+When a new chat pane is opened:
+- If only one pane was previously open, the new chat pane replaces it, maintaining the same x/y/width/height.
+- If the command button (on macOS) or its equivalent (on other operating systems) is held down while clicking, the new chat pane is tiled with an offset, keeping the previous pane(s) open.
+- The first chat pane opened should take up most of the screen, not inheriting the size of the Chats pane.
+- This behavior applies specifically to chat panes and should not affect other pane types.
+
 ## Implementation Details
 
 - The `PaneManager` component in `panes/PaneManager.tsx` is responsible for rendering all panes.
@@ -47,6 +55,7 @@ The application uses a pane-based system for managing different UI components. E
   - Implemented show/hide functionality for action buttons on hover.
   - Added Framer Motion animations for smooth interactions.
 - Integrated active chat highlighting in the ChatsPane.
+- Updated chat pane behavior to replace existing pane or tile with offset based on user interaction.
 
 ## Usage
 
