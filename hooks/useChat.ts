@@ -58,7 +58,7 @@ export function useChat(threadId: Id<"threads"> | null) {
       const thread: Thread = {
         id: threadId,
         title: 'New Chat', // You might want to update this with the actual title
-        messages: fetchMessages,
+        messages: fetchMessages as Message[],
         createdAt: new Date(),
       }
       setThread(threadId, thread)
