@@ -44,7 +44,7 @@ export const generateTitle = action({
 
     const generatedTitle = text.trim();
 
-    await ctx.runMutation(api.threads.updateThreadData as any, {
+    await ctx.runMutation(api.threads.updateThreadData.updateThreadData, {
       thread_id: args.threadId,
       metadata: { title: generatedTitle },
     });
