@@ -17,8 +17,8 @@ const useResizeHandlers = (
   id: string,
   initialPosition: { x: number; y: number },
   initialSize: { width: number; height: number },
-  updatePanePosition: (id: number | Id<"threads">, x: number, y: number) => void,
-  updatePaneSize: (id: number | Id<"threads">, width: number, height: number) => void
+  updatePanePosition: (id: string, x: number, y: number) => void,
+  updatePaneSize: (id: string, width: number, height: number) => void
 ) => {
   const [position, setPosition] = useState(initialPosition)
   const [size, setSize] = useState(initialSize)
