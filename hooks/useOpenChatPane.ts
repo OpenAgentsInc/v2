@@ -3,7 +3,7 @@ import { usePaneStore } from '@/store/pane'
 import { Id } from '@/convex/_generated/dataModel'
 
 export function useOpenChatPane() {
-  const { openChatPane } = usePaneStore()
+  const openChatPane = usePaneStore(state => state.openChatPane)
 
   const handleOpenChatPane = useCallback((chatId: Id<"threads">, title: string, isCommandKeyHeld: boolean) => {
     const newPane = {
