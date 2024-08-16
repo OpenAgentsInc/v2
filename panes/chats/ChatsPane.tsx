@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { usePaneStore } from '@/store/pane';
@@ -18,6 +18,7 @@ export const ChatsPane: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
+  const [newChatIds, setNewChatIds] = useState<Set<string>>(new Set());
 
   const sortedChats = useMemo(() => {
     if (!chats) return [];
@@ -25,6 +26,15 @@ export const ChatsPane: React.FC = () => {
       .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
       .slice(0, 25);
   }, [chats]);
+
+  useEffect(() => {
+    if (sortedChats.length > 0) {
+      const latestChatId = sortedChats[0]._id;
+      if (!newChatIds.has(latestChatId)) {
+        setNewChatIds(prev => new Set(prev).add(latestChatId));
+      }
+    }
+  }, [sortedChats]);
 
   const confirmDelete = async () => {
     if (chatToDelete) {
@@ -40,10 +50,10 @@ export const ChatsPane: React.FC = () => {
     <div className="flex flex-col h-full">
       <NewChatButton />
       <div className="flex-grow overflow-y-auto">
-        {sortedChats.map((chat, index) => (
+        {sortedChats.map((chat) => (
           <ChatItem
             key={chat._id}
-            index={index}
+            index={sortedChats.indexOf(chat)}
             chat={{
               id: chat._id,
               title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
@@ -51,9 +61,9 @@ export const ChatsPane: React.FC = () => {
               messages: [],
               createdAt: new Date(chat._creationTime),
               userId: chat.user_id,
-              path: '' // Removed chat.path as it doesn't exist
+              path: ''
             }}
-            isNew={index === 0}
+            isNew={newChatIds.has(chat._id)}
           >
             <div className="flex space-x-2">
               <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
