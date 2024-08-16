@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useUser } from '@clerk/nextjs';
 
 export const NewChatButton: React.FC = () => {
-  const createThread = useMutation(api.threads.createNewThread);
+  const createThread = useMutation(api.messages.createNewThread);
   const { openChatPane } = usePaneStore();
   const [isCreating, setIsCreating] = React.useState(false);
   const { user } = useUser();
@@ -19,7 +19,7 @@ export const NewChatButton: React.FC = () => {
     try {
       const threadId = await createThread({ clerk_user_id: user.id });
       const isCommandKeyHeld = event.metaKey || event.ctrlKey; // metaKey for Mac, ctrlKey for Windows/Linux
-      openChatPane({ id: threadId, title: 'New Chat' }, isCommandKeyHeld);
+      openChatPane({ id: threadId, title: 'New Chat' });
     } catch (error) {
       console.error('Error creating new chat:', error);
     } finally {
