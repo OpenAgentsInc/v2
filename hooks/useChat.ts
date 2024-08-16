@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation, useQuery, useAction } from 'convex/react'
 import { api } from '../convex/_generated/api'
 import { toast } from 'sonner'
 import { useUser } from '@clerk/nextjs'
@@ -30,7 +30,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   const sendMessageMutation = useMutation(api.messages.saveChatMessage)
   const fetchMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
   const createNewThread = useMutation(api.threads.createNewThread)
-  const generateTitle = useMutation(api.threads.generateTitle)
+  const generateTitle = useAction(api.threads.generateTitle)
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)
