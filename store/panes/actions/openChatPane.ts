@@ -5,7 +5,6 @@ import { handleChatPanePosition } from '../utils/handleChatPanePosition'
 
 export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
   return set((state: PaneStore) => {
-    console.log("Not doing anything yet with isCommandKeyHeld", isCommandKeyHeld);
     if (!newPane.id) {
       console.error('Invalid thread ID provided for chat pane');
       return state;
@@ -23,7 +22,18 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
       title: newPane.title || `Untitled thread #${updatedPanes.length}`
     };
 
-    if (updatedPanes.length > 1) {
+    if (isCommandKeyHeld) {
+      // Tile the new pane with an offset
+      const lastPane = updatedPanes[updatedPanes.length - 1];
+      newPaneWithPosition.x = lastPane.x + 20;
+      newPaneWithPosition.y = lastPane.y + 20;
+      
+      // Add the new pane and deactivate others, but keep the Chats pane
+      updatedPanes = [
+        ...updatedPanes.map(pane => ({ ...pane, isActive: false })),
+        newPaneWithPosition
+      ];
+    } else if (updatedPanes.length > 1) {
       // Replace the existing chat pane, but keep the Chats pane
       updatedPanes = updatedPanes.map(pane =>
         pane.type === 'chat' ? newPaneWithPosition : { ...pane, isActive: false }
