@@ -22,8 +22,8 @@ interface ChatItemProps {
 
 export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
   const { panes, addPane } = usePaneStore()
-  const isActive = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id && pane.isActive)
-  const isOpen = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id)
+  const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
+  const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const shouldAnimate = isNew && index === 0
 
   if (!chat?.id) return null
