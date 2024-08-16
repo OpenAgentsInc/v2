@@ -14,11 +14,6 @@ import { useModelStore } from '@/store/models'
 import { useRepoStore } from '@/store/repo'
 import { useToolStore } from '@/store/tools'
 
-/**
- * Custom hook for managing chat functionality.
- * @param propsId - The ID of the current chat thread passed as a prop.
- * @returns An object containing messages, sendMessage function, and other chat-related properties.
- */
 export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   const { user } = useUser()
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId || null)
@@ -53,7 +48,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
             clerk_user_id: user.id,
             content: message.content,
             role: message.role,
-            model_id: currentModelRef.current || model.id, // Use model_id instead of model
+            model_id: currentModelRef.current || model.id,
           })
 
           if (result && result.newBalance) {
@@ -136,12 +131,11 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
         clerk_user_id: user.id,
         content,
         role: 'user',
-        model_id: model.id, // Use model_id instead of model
+        model_id: model.id,
       })
     } catch (error) {
       console.error('Error sending message:', error)
       toast.error('Failed to send message. Please try again.')
-      // Remove the message from the thread if it failed to send
       setThreadData({ ...threadData, messages: threadData.messages.filter(m => m.id !== newMessage.id) })
     }
   }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation, model])
@@ -158,19 +152,11 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   }
 }
 
-/**
- * Custom hook for chat-related actions.
- * @returns An object containing the createNewThread function.
- */
 export function useChatActions() {
   const { user } = useUser()
   const createNewThread = useMutation(api.threads.createNewThread)
   const { setCurrentThreadId } = useChatStore()
 
-  /**
-   * Creates a new chat thread.
-   * @returns The ID of the newly created thread, or null if creation failed.
-   */
   const handleCreateNewThread = useCallback(async () => {
     if (!user) return null
 
@@ -205,10 +191,6 @@ interface ThreadMetadata {
   lastMessagePreview?: string;
 }
 
-/**
- * Custom hook for retrieving the list of chat threads.
- * @returns An array of thread objects.
- */
 export function useThreadList() {
   const { user } = useUser()
   const getUserThreads = useQuery(api.threads.getUserThreads, user ? { clerk_user_id: user.id } : "skip")
