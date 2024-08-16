@@ -77,10 +77,13 @@ The chat system is implemented using several React components:
 The majority of the chat logic resides in the `useChat.ts` hook, located in the `hooks/` directory. This hook provides the following functionality:
 
 ### useChat Hook
+- Wraps and extends the Vercel UI useChat hook
 - Manages the state of messages for a specific thread
 - Handles sending new messages
 - Fetches messages for a thread
 - Updates the thread in the store when messages are fetched
+- Integrates with custom backend actions for thread and message management
+- Handles error states and user balance updates
 
 ### useChatActions Hook
 - Handles creating new chat threads
@@ -108,51 +111,85 @@ The chat system leverages several key technologies in the stack:
 - **Convex**: Used for real-time data synchronization and storage of chat-related data.
 - **Clerk**: Handles user authentication, which is crucial for associating chats with users.
 - **Shad UI**: Provides UI components that may be used in building the chat interface.
+- **Vercel AI SDK**: The `useChat` hook from 'ai/react' is used to handle core chat functionality.
 
 ## Key Features
 
-1. **Real-time messaging**: Messages are sent and received in real-time using Convex mutations and queries.
+1. **Real-time messaging**: Messages are sent and received in real-time using the Vercel AI SDK and custom backend actions.
 2. **Thread management**: Users can create new chat threads and switch between existing ones.
-3. **Message persistence**: All messages are stored in the Convex database and can be retrieved for each thread.
+3. **Message persistence**: All messages are stored in the database and can be retrieved for each thread.
 4. **User authentication**: Clerk is used to authenticate users and associate messages with specific users.
 5. **Error handling**: The system includes error handling for message sending and thread creation failures.
 6. **Loading states**: Loading states are managed to provide feedback to users during operations.
 7. **Thread metadata**: Threads can have metadata such as titles and last message previews.
 8. **Auto-scrolling**: The chat interface automatically scrolls to the latest message when new messages are added.
 9. **Responsive design**: The chat interface is designed to be responsive and work well on various screen sizes.
+10. **Credit system integration**: The chat system checks and updates user credits for message interactions.
+11. **Model selection**: Users can select different AI models for their chat interactions.
+12. **Tool integration**: The system supports the use of various tools within the chat context.
+
+## Implementation Details
+
+1. **Vercel AI SDK Integration**: The `useChat` hook wraps the Vercel UI `useChat` hook, extending its functionality with custom logic:
+   ```typescript
+   const vercelChatProps = useVercelChat({
+     id: threadId?.toString(),
+     initialMessages: threadData.messages as VercelMessage[],
+     body,
+     maxToolRoundtrips: 20,
+     onFinish: async (message, options) => {
+       // Custom logic for handling finished messages
+     },
+     onError: (error) => {
+       // Custom error handling
+     },
+   });
+   ```
+
+2. **State Management**: The implementation uses Zustand for state management, with stores for chat, balance, models, and tools:
+   ```typescript
+   const model = useModelStore((state) => state.model);
+   const repo = useRepoStore((state) => state.repo);
+   const tools = useToolStore((state) => state.tools);
+   const setBalance = useBalanceStore((state) => state.setBalance);
+   ```
+
+3. **Backend Integration**: The hook interacts with backend services for various operations:
+   ```typescript
+   createNewThread()
+   fetchThreadMessages(threadId)
+   saveChatMessage(threadId, user.id, message as Message, {...})
+   ```
+
+4. **Error Handling and Notifications**: The system uses toast notifications for user feedback:
+   ```typescript
+   toast.error('Failed to create a new chat thread. Please try again.');
+   ```
+
+5. **Credit System**: The implementation checks and updates user credits:
+   ```typescript
+   if (result.newBalance) {
+     setBalance(result.newBalance);
+   }
+   ```
+
+6. **Thread Title Generation**: The system automatically generates titles for new threads:
+   ```typescript
+   const title = await generateTitle(threadId);
+   updateThreadTitle(threadId, title);
+   ```
+
+7. **Message Debouncing**: To optimize performance, the system debounces message updates:
+   ```typescript
+   const [debouncedMessages] = useDebounce(vercelChatProps.messages, 250, { maxWait: 250 });
+   ```
 
 ## Additional Notes
 
-- The chat system integrates with a credit system, as seen in the `users` table schema.
+- The chat system integrates with a credit system, as seen in the `users` table schema and the balance checks in the `useChat` hook.
 - Messages can include tool invocations, suggesting integration with external tools or AI capabilities.
 - The system tracks token usage and costs, likely for billing or usage monitoring purposes.
 - Threads can be shared via a `shareToken`, indicating a feature for sharing conversations.
 - The `messages` table includes fields for tracking AI model usage, such as `model_id` and token counts.
 
-## Current Implementation and Route File Usage
-
-The current implementation of the chat system is not fully utilizing the `app/api/chat/route.ts` file. Here are some key observations:
-
-1. **Disconnected API Route**: The `route.ts` file defines an API endpoint for chat functionality, but the current front-end implementation (particularly the `useChat` hook) does not appear to be using this endpoint directly.
-
-2. **Vercel UI useChat Hook**: The documentation mentions that the project has not yet pulled in the Vercel UI useChat hook, which would typically connect to the route endpoint. This suggests that the front-end is currently not leveraging the API route for chat operations.
-
-3. **Direct Convex Usage**: The current implementation seems to be using Convex directly for real-time data synchronization and storage, bypassing the API route defined in `route.ts`.
-
-4. **Missing Integration**: The `route.ts` file includes logic for checking user balance, handling authentication, and streaming text responses. However, these features may not be fully integrated into the current chat flow if the route is not being used.
-
-5. **Potential Duplication**: Some of the logic in the `route.ts` file (such as user authentication and balance checking) might be duplicated elsewhere in the codebase if the route is not being utilized.
-
-6. **Unused Streaming Capability**: The `route.ts` file sets up streaming of text responses, which could provide a more responsive chat experience. This feature is not being utilized in the current implementation.
-
-7. **Tool Context and System Prompt**: The route file includes logic for handling tool context and system prompts, which may not be fully integrated into the current chat implementation if the route is bypassed.
-
-To fully leverage the capabilities defined in the `route.ts` file, the project would need to:
-- Integrate the Vercel UI useChat hook or create a custom hook that interacts with the API route.
-- Refactor the existing chat logic to use the API endpoint for operations like sending messages and fetching chat history.
-- Ensure that the streaming capabilities are properly utilized in the front-end for a more responsive user experience.
-- Consolidate any duplicated logic (like authentication and balance checking) to use the centralized implementation in the route file.
-
-By addressing these points, the chat system could potentially benefit from improved consistency, better separation of concerns, and enhanced features like text streaming and centralized tool management.
-
-For more detailed information on specific aspects of the chat system, refer to the relevant files in the codebase, particularly `useChat.ts`, the pane components, and the Convex data files.
+For more detailed information on specific aspects of the chat system, refer to the relevant files in the codebase, particularly `useChat.ts`, the pane components, and the backend action files.
