@@ -5,7 +5,7 @@ The application uses a pane-based system for managing different UI components. E
 ## Pane Types
 
 - **Chat**: Displays an individual chat thread.
-- **Chats**: Shows a list of all chat threads.
+- **Chats**: Shows a list of chat threads.
 - **User**: Displays user information and settings.
 - **Diff**: Shows differences in content (e.g., for code comparisons).
 
@@ -24,7 +24,9 @@ The application uses a pane-based system for managing different UI components. E
 ## Components
 
 - **Chat**: Renders an individual chat thread.
-- **ChatsPane**: Renders the list of all chat threads.
+- **ChatsPane**: Renders the list of chat threads.
+  - Displays the 25 most recent chats.
+  - Chats are sorted in reverse chronological order (newest first).
 - **UserStatus**: Displays user information and settings.
 
 ## Recent Changes
@@ -32,6 +34,8 @@ The application uses a pane-based system for managing different UI components. E
 - Added support for the ChatsPane component in the `PaneManager`.
 - Ensured proper initialization of the Chats pane in the pane store.
 - Updated the `PaneManager` to render the ChatsPane component when the pane type is 'chats'.
+- Modified ChatsPane to show only the 25 most recent chats in reverse chronological order.
+- Implemented efficient sorting and limiting of chats using `useMemo` in ChatsPane.
 
 ## Usage
 
