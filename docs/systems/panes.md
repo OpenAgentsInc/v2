@@ -44,6 +44,21 @@ When a new chat pane is opened:
   - Highlights the active chat.
 - **UserStatus**: Displays user information and settings.
 
+## Recent Changes
+
+- Added support for the ChatsPane component in the `PaneManager`.
+- Ensured proper initialization of the Chats pane in the pane store.
+- Updated the `PaneManager` to render the ChatsPane component when the pane type is 'chats'.
+- Modified ChatsPane to show only the 25 most recent chats in reverse chronological order.
+- Implemented efficient sorting and limiting of chats using `useMemo` in ChatsPane.
+- Updated ChatItem and ChatsPane components with new styling and interactions:
+  - Implemented a dark theme for better visual consistency.
+  - Added hover and active states for chat items.
+  - Implemented show/hide functionality for action buttons on hover.
+  - Added Framer Motion animations for smooth interactions.
+- Integrated active chat highlighting in the ChatsPane.
+- Updated chat pane behavior to replace existing pane or tile with offset based on user interaction.
+
 ## Key Implementation Points
 
 1. **Preserving the Chats Pane**: 
