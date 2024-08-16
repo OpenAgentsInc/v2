@@ -21,11 +21,17 @@ The application uses a pane-based system for managing different UI components. E
 - Pane state is managed using Zustand, with the store defined in `store/pane.ts`.
 - The initial state includes a default Chats pane.
 
+## Components
+
+- **Chat**: Renders an individual chat thread.
+- **ChatsPane**: Renders the list of all chat threads.
+- **UserStatus**: Displays user information and settings.
+
 ## Recent Changes
 
-- Added support for the Chats pane in the `PaneManager` component.
+- Added support for the ChatsPane component in the `PaneManager`.
 - Ensured proper initialization of the Chats pane in the pane store.
-- Updated the `PaneManager` to render the Chats component when the pane type is 'chats'.
+- Updated the `PaneManager` to render the ChatsPane component when the pane type is 'chats'.
 
 ## Usage
 
