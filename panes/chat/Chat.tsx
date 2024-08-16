@@ -16,7 +16,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
     messages,
     sendMessage,
     isLoading
-  } = useChat(threadId)
+  } = useChat({ propsId: threadId })
   const chatContainerRef = useChatScroll(messages);
 
   return (
