@@ -53,7 +53,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
             clerk_user_id: user.id,
             content: message.content,
             role: message.role,
-            model: currentModelRef.current || model.id,
+            model_id: currentModelRef.current || model.id, // Use model_id instead of model
           })
 
           if (result && result.newBalance) {
@@ -136,6 +136,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
         clerk_user_id: user.id,
         content,
         role: 'user',
+        model_id: model.id, // Use model_id instead of model
       })
     } catch (error) {
       console.error('Error sending message:', error)
@@ -143,7 +144,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
       // Remove the message from the thread if it failed to send
       setThreadData({ ...threadData, messages: threadData.messages.filter(m => m.id !== newMessage.id) })
     }
-  }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation])
+  }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation, model])
 
   return {
     ...vercelChatProps,
