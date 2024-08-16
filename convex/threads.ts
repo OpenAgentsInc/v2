@@ -26,7 +26,7 @@ export const createOrGetUser = mutation({
       clerk_user_id: args.clerk_user_id,
       email: args.email,
       image: args.image,
-      credits: 0, // You can set an initial credit amount here
+      credits: 0,
       createdAt: new Date().toISOString(),
     });
 
@@ -52,11 +52,10 @@ export const createNewThread = mutation({
     const newThread = await ctx.db.insert("threads", {
       user_id: user._id,
       clerk_user_id: args.clerk_user_id,
-      metadata: args.metadata || {}, // Use the provided metadata or an empty object
+      metadata: args.metadata || {},
       createdAt: new Date().toISOString(),
     });
 
-    // Return only the thread ID instead of the entire thread object
     return newThread;
   },
 });
@@ -98,14 +97,11 @@ export const getLastEmptyThread = query({
 export const deleteThread = mutation({
   args: { thread_id: v.id("threads") },
   async handler(ctx, args) {
-    // Check if the thread exists
     const thread = await ctx.db.get(args.thread_id);
     if (!thread) {
-      // Instead of throwing an error, return a result indicating the thread was not found
       return { success: false, reason: "not_found" };
     }
 
-    // Delete all messages associated with the thread
     const messages = await ctx.db
       .query("messages")
       .withIndex("by_thread_id", (q) => q.eq("thread_id", args.thread_id))
@@ -115,7 +111,6 @@ export const deleteThread = mutation({
       await ctx.db.delete(message._id);
     }
 
-    // Delete the thread
     await ctx.db.delete(args.thread_id);
 
     return { success: true };
@@ -125,10 +120,19 @@ export const deleteThread = mutation({
 export const updateThreadData = mutation({
   args: {
     thread_id: v.id("threads"),
-    metadata: v.object({ title: v.optional(v.string()) }),
+    metadata: v.object({
+      title: v.optional(v.string()),
+    }),
   },
   async handler(ctx, args) {
-    await ctx.db.patch(args.thread_id, { metadata: args.metadata });
+    const thread = await ctx.db.get(args.thread_id);
+    if (!thread) {
+      throw new Error("Thread not found");
+    }
+
+    await ctx.db.patch(args.thread_id, {
+      metadata: { ...thread.metadata, ...args.metadata },
+    });
   },
 });
 
@@ -140,13 +144,12 @@ export const shareThread = mutation({
       throw new Error("Thread not found");
     }
 
-    // Generate a unique share token (you might want to use a more sophisticated method)
     const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-    // Update the thread with the share token
-    await ctx.db.patch(args.thread_id, { shareToken });
+    await ctx.db.patch(args.thread_id, {
+      metadata: { ...thread.metadata, shareToken },
+    });
 
-    // Return the share token
     return shareToken;
   },
 });
