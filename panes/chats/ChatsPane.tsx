@@ -11,42 +11,21 @@ import { useUser } from '@clerk/nextjs';
 import { buttonVariants } from '@/components/ui/button';
 import { IconPlus } from '@/components/ui/icons';
 import { cn } from '@/lib/utils';
-import { Chat } from '@/types';
-import { useHudStore } from '@/store/hud';
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 
 function NewChatButton() {
-  const { openChatPane } = useHudStore();
   const [isCreating, setIsCreating] = useState(false);
   const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
 
   const handleNewChat = async (event: React.MouseEvent) => {
     setIsCreating(true);
     try {
-      console.log('Attempting to create new thread');
-      const threadId = await createNewThread();
-      console.log('Received threadId:', threadId);
-
-      console.log('Creating new chat for thread:', threadId);
-      const newChat: Chat = {
-        id: threadId,
-        title: 'New Chat',
-        path: `/chat/${threadId}`,
-        createdAt: new Date(),
-        messages: [],
-        userId: '' // We'll need to set this properly
-      };
-      // We'll need to handle adding the new chat to the list
-
-      openChatPane({
-        id: threadId,
-        title: 'New Chat',
-        type: 'chat',
-      });
+      await createNewThread({ metadata: {} });
+      // Handle successful creation
     } catch (error) {
       console.error('Error creating new chat:', error);
-      // Implement user-facing error handling here
+      // Handle error
     } finally {
       setIsCreating(false);
     }
