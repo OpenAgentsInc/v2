@@ -51,7 +51,8 @@ export const createNewThread = mutation({
       createdAt: new Date().toISOString(),
     });
 
-    return await ctx.db.get(newThread);
+    // Return only the thread ID instead of the entire thread object
+    return newThread;
   },
 });
 
