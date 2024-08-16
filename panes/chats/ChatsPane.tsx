@@ -66,42 +66,54 @@ export const ChatsPane: React.FC = () => {
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
+  const isLoading = chats === undefined;
+
   return (
     <div className="flex flex-col h-full">
-      <NewChatButton />
-      <div className="flex-grow overflow-y-auto">
-        {sortedChats.map((chat) => (
-          <ChatItem
-            key={chat._id}
-            index={sortedChats.indexOf(chat)}
-            chat={{
-              id: chat._id,
-              title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
-              sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
-              messages: [],
-              createdAt: new Date(chat._creationTime),
-              userId: chat.user_id,
-              path: ''
-            }}
-            isNew={!seenChatIds.has(chat._id)}
-          >
-            <div className="flex space-x-2">
-              <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
-                Share
-              </button>
-              <button onClick={() => {
-                setChatToDelete(chat._id);
-                setDeleteDialogOpen(true);
-              }} disabled={isDeleting}>
-                Delete
-              </button>
-            </div>
-          </ChatItem>
-        ))}
+      <div className="mt-2 mb-2 px-2">
+        <NewChatButton />
       </div>
-      <footer className="p-4 flex justify-center">
-        {/* Add footer content here */}
-      </footer>
+      {isLoading ? (
+        <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-full h-6 rounded-md shrink-0 animate-pulse bg-zinc-200 dark:bg-zinc-800"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex-grow overflow-y-auto">
+          {sortedChats.map((chat) => (
+            <ChatItem
+              key={chat._id}
+              index={sortedChats.indexOf(chat)}
+              chat={{
+                id: chat._id,
+                title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
+                sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
+                messages: [],
+                createdAt: new Date(chat._creationTime),
+                userId: chat.user_id,
+                path: ''
+              }}
+              isNew={!seenChatIds.has(chat._id)}
+            >
+              <div className="flex space-x-2">
+                <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
+                  Share
+                </button>
+                <button onClick={() => {
+                  setChatToDelete(chat._id);
+                  setDeleteDialogOpen(true);
+                }} disabled={isDeleting}>
+                  Delete
+                </button>
+              </div>
+            </ChatItem>
+          ))}
+        </div>
+      )}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
