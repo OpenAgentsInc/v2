@@ -2,11 +2,11 @@ import { ToolContext } from "@/types"
 import { ExternalAccount } from "@clerk/nextjs/server"
 
 export function getSystemPrompt(context: ToolContext): string {
-    const { user, repo } = context
-    const isGithubAuthed = !!user && !!user.externalAccounts.find(
-        (account: ExternalAccount) => account.provider === 'oauth_github'
-    );
-    return isGithubAuthed ? getAuthenticatedPrompt(repo) : unauthenticatedPrompt;
+  const { user, repo } = context
+  const isGithubAuthed = !!user && !!user.externalAccounts.find(
+    (account: ExternalAccount) => account.provider === 'oauth_github'
+  );
+  return isGithubAuthed ? getAuthenticatedPrompt(repo) : unauthenticatedPrompt;
 }
 
 const basePrompt = `
@@ -18,25 +18,18 @@ You are the AutoDev terminal at OpenAgents.com. Respond extremely concisely in a
 `;
 
 const unauthenticatedPrompt = `
-${basePrompt}
-CRITICAL: GitHub account connection required for full functionality.
-Until GitHub is connected:
-- Respond to queries about your capabilities and the need for GitHub connection
-- Decline to perform any actions requiring GitHub access
-- Provide instructions on how to connect GitHub account
-- Respond to basic queries not requiring codebase access
-Remember: Always respond in a concise, terminal-like manner. Do not break character or provide lengthy explanations unless specifically requested. Prioritize GitHub connection instructions until connected.
+You are a helpful assistant on OpenAgents.com. Help the user. Respond extremely concisely in a neutral, terminal-like manner. Do not break character.
 `;
 
 function getAuthenticatedPrompt(repo: { owner: string; name: string; branch: string } | null): string {
-    if (!repo) {
-        return `
+  if (!repo) {
+    return `
 ${basePrompt}
 ERROR: Repository information is missing. Please provide a valid repository.
 `;
-    }
+  }
 
-    return `
+  return `
 ${basePrompt}
 Available tools:
 - \`create_file\` - Create a new file at path with content
