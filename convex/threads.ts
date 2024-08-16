@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { mutation, query, action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
@@ -151,14 +151,10 @@ export const shareThread = mutation({
   },
 });
 
-export const generateTitle = mutation({
+export const generateTitle = action({
   args: { threadId: v.id("threads") },
   async handler(ctx, args) {
-    const messages = await ctx.db
-      .query("messages")
-      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.threadId))
-      .order("asc")
-      .collect();
+    const messages = await ctx.runQuery(api.threads.getThreadMessages, { threadId: args.threadId });
 
     if (messages.length === 0) {
       return "New Thread";
@@ -192,10 +188,23 @@ export const generateTitle = mutation({
 
     const generatedTitle = text.trim();
 
-    await ctx.db.patch(args.threadId, {
+    await ctx.runMutation(api.threads.updateThreadData, {
+      thread_id: args.threadId,
       metadata: { title: generatedTitle },
     });
 
     return generatedTitle;
+  },
+});
+
+// Add this new query to get thread messages
+export const getThreadMessages = query({
+  args: { threadId: v.id("threads") },
+  async handler(ctx, args) {
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.threadId))
+      .order("asc")
+      .collect();
   },
 });
