@@ -3,6 +3,7 @@ import { useQuery } from "convex/react"
 import { CreateDocumentButton } from "./CreateDocumentButton"
 import { DocumentCard } from "./DocumentCard"
 import UploadDocumentButton from "./UploadDocumentButton"
+import { Document } from "@/types" // Add this import
 
 export const Knowledge = () => {
   const documents = useQuery(api.documents.getDocuments)
@@ -14,7 +15,7 @@ export const Knowledge = () => {
       </div>
 
       <div className="grid grid-cols-4 gap-8">
-        {documents?.map((doc) => <DocumentCard document={doc} key={doc._id} />)}
+        {documents?.map((doc: Document) => <DocumentCard document={doc} key={doc._id} />)}
       </div>
     </div>
   )
