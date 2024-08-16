@@ -1,12 +1,12 @@
 import { query } from '@/convex/_generated/server';
-import { Id } from '@/convex/_generated/dataModel';
+import { v } from 'convex/values';
 
 export const getChatById = query({
   args: {
-    chatId: 'id'
+    chatId: v.id('messages')
   },
   handler: async ({ db }, { chatId }) => {
-    const chat = await db.get(chatId as Id<'messages'>);
+    const chat = await db.get(chatId);
     if (!chat) {
       throw new Error(`Chat with id ${chatId} not found`);
     }
