@@ -41,7 +41,7 @@ export function useChat(threadId: Id<"threads"> | null) {
       })
 
       if (result) {
-        const updatedMessage = updateMessageId(newMessage, result as Id<"messages">)
+        const updatedMessage = updateMessageId(newMessage, result._id)
         addMessageToThread(threadId, updatedMessage)
       }
     } catch (error) {
@@ -114,6 +114,11 @@ export function useChatActions() {
   }
 }
 
+interface ThreadMetadata {
+  title?: string;
+  lastMessagePreview?: string;
+}
+
 /**
  * Custom hook for retrieving the list of chat threads.
  * @returns An array of thread objects.
@@ -132,8 +137,8 @@ export function useThreadList() {
     if (getUserThreads) {
       setThreads(getUserThreads.map(thread => ({
         id: thread._id,
-        title: thread.metadata?.title || 'New Chat',
-        lastMessagePreview: thread.metadata?.lastMessagePreview || '',
+        title: (thread.metadata as ThreadMetadata)?.title || 'New Chat',
+        lastMessagePreview: (thread.metadata as ThreadMetadata)?.lastMessagePreview || '',
         createdAt: thread.createdAt,
       })))
     }
