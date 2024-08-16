@@ -10,13 +10,13 @@ export const usePaneStore = create<PaneStore>()(
     (set) => ({
       panes: [
         {
-          id: 'chats',
+          id: '0',
           type: 'chats',
           title: 'Chats',
-          x: 200,
-          y: 220,
-          width: 300,
-          height: 400,
+          x: 90,
+          y: 190,
+          width: 260,
+          height: 450,
           isOpen: true,
           dismissable: false,
         },
