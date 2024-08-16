@@ -12,8 +12,8 @@ import { useUser } from '@clerk/nextjs';
 
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
-  const chats = useQuery(api.messages.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
-  const deleteChat = useMutation(api.messages.deleteThread);
+  const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
+  const deleteChat = useMutation(api.threads.deleteThread);
   const { panes } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
