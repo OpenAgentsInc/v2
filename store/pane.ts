@@ -32,7 +32,7 @@ type PaneStore = {
     removePane: (id: string) => void
     updatePanePosition: (id: string, x: number, y: number) => void
     updatePaneSize: (id: string, width: number, height: number) => void
-    openChatPane: (pane: PaneInput) => void
+    openChatPane: (pane: PaneInput, isCommandKeyHeld: boolean) => void
     bringPaneToFront: (id: string) => void
     setActivePane: (id: string) => void
 }
@@ -170,13 +170,43 @@ export const usePaneStore = create<PaneStore>()(
                     lastPanePosition: updatedPane ? { ...updatedPane, width, height } : state.lastPanePosition
                 }
             }),
-            openChatPane: (newPane) => set((state) => {
+            openChatPane: (newPane, isCommandKeyHeld) => set((state) => {
                 const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
-                const panePosition = lastActivePane || state.lastPanePosition || {
-                    x: (typeof window !== 'undefined' ? window.innerWidth : 1920) / 2 - 400,
-                    y: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.1,
-                    width: 800,
-                    height: (typeof window !== 'undefined' ? window.innerHeight : 1080) * 0.8
+                let panePosition: { x: number; y: number; width: number; height: number }
+                let updatedPanes: Pane[]
+
+                const existingChatPanes = state.panes.filter(pane => pane.type === 'chat')
+                const lastChatPane = existingChatPanes[existingChatPanes.length - 1]
+
+                if (isCommandKeyHeld && lastChatPane) {
+                    // Tiling behavior: add a new pane with offset
+                    panePosition = {
+                        x: lastChatPane.x + PANE_OFFSET,
+                        y: lastChatPane.y + PANE_OFFSET,
+                        width: lastChatPane.width,
+                        height: lastChatPane.height
+                    }
+                    updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
+                } else if (existingChatPanes.length === 0) {
+                    // First chat pane: take up most of the screen
+                    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1920
+                    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 1080
+                    panePosition = {
+                        x: 300, // Leave space for Chats pane
+                        y: screenHeight * 0.1,
+                        width: screenWidth - 300,
+                        height: screenHeight * 0.8
+                    }
+                    updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
+                } else {
+                    // Replace existing chat pane
+                    panePosition = {
+                        x: lastChatPane.x,
+                        y: lastChatPane.y,
+                        width: lastChatPane.width,
+                        height: lastChatPane.height
+                    }
+                    updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
                 }
 
                 const paneId = newPane.id || `thread-${Math.random().toString(36).substr(2, 9)}`
@@ -192,9 +222,11 @@ export const usePaneStore = create<PaneStore>()(
                     type: 'chat',
                     title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
+
                 return {
                     panes: [
                         state.panes.find(pane => pane.id === 'chats') || initialChatsPane,
+                        ...updatedPanes,
                         newPaneWithPosition
                     ],
                     lastPanePosition: panePosition
