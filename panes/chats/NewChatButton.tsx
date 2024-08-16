@@ -1,9 +1,9 @@
-import React from 'react';
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import { usePaneStore } from '@/store/pane';
-import { Button } from '@/components/ui/button';
-import { useUser } from '@clerk/nextjs';
+import { useMutation } from "convex/react"
+import React from "react"
+import { Button } from "@/components/ui/button"
+import { api } from "@/convex/_generated/api"
+import { usePaneStore } from "@/store/pane"
+import { useUser } from "@clerk/nextjs"
 
 export const NewChatButton: React.FC = () => {
   const createThread = useMutation(api.threads.createNewThread.createNewThread);

@@ -1,18 +1,16 @@
 'use client'
 
-import * as React from 'react'
-import { motion } from 'framer-motion'
-import { buttonVariants } from '@/components/ui/button'
-import { IconMessage, IconUsers } from '@/components/ui/icons'
+import { motion } from "framer-motion"
+import * as React from "react"
+import { buttonVariants } from "@/components/ui/button"
+import { IconMessage, IconUsers } from "@/components/ui/icons"
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
-import { type Chat } from '@/types'
-import { cn } from '@/lib/utils'
-import { usePaneStore } from '@/store/pane'
-import { useOpenChatPane } from '@/hooks/useOpenChatPane'
+  Tooltip, TooltipContent, TooltipTrigger
+} from "@/components/ui/tooltip"
+import { useOpenChatPane } from "@/hooks/useOpenChatPane"
+import { cn } from "@/lib/utils"
+import { usePaneStore } from "@/store/pane"
+import { Chat } from "@/types"
 
 interface ChatItemProps {
   index: number
