@@ -94,9 +94,10 @@ export function useChatActions() {
         metadata: {},
       })
 
-      if (newThread) {
-        setCurrentThreadId(newThread as Id<"threads">)
-        return newThread
+      if (newThread && typeof newThread === 'string') {
+        const threadId = newThread as Id<"threads">
+        setCurrentThreadId(threadId)
+        return threadId
       } else {
         console.error('Unexpected thread response:', newThread)
         return null
