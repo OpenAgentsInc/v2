@@ -13,10 +13,17 @@ export const PaneManager = () => {
     return id.replace(/^chat-/, '').replace(/^chat-/, '')
   }
 
+  // Ensure Chats pane is always first
+  const sortedPanes = [...panes].sort((a, b) => {
+    if (a.type === 'chats') return -1
+    if (b.type === 'chats') return 1
+    return 0
+  })
+
   return (
     <>
       <UserStatus />
-      {panes.map((pane: Pane) => (
+      {sortedPanes.map((pane: Pane) => (
         <PaneComponent
           key={pane.id}
           title={pane.title}
@@ -28,7 +35,7 @@ export const PaneManager = () => {
           type={pane.type}
           content={pane.content}
           isActive={pane.isActive}
-          dismissable={pane.dismissable}
+          dismissable={pane.type !== 'chats'} // Chats pane cannot be dismissed
         >
           {pane.type === 'chat' && <Chat threadId={stripChatPrefix(pane.id) as Id<"threads">} />}
           {pane.type === 'chats' && <ChatsPane />}
