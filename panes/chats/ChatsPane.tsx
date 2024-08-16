@@ -1,10 +1,12 @@
+'use client'
+
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { usePaneStore } from '@/store/pane';
+import { useHudStore } from '@/store/hud';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
 import { useChatActions } from './useChatActions';
-import { ChatItem } from './ChatItem';
+import { SidebarItem } from './ChatItem';
 import { NewChatButton } from './NewChatButton';
 import { useUser } from '@clerk/nextjs';
 
@@ -12,7 +14,7 @@ export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const deleteChat = useMutation(api.threads.deleteThread);
-  const { panes, openChatPane } = usePaneStore();
+  const { panes } = useHudStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
@@ -23,21 +25,6 @@ export const ChatsPane: React.FC = () => {
       .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
       .slice(0, 25);
   }, [chats]);
-
-  const handleChatAction = (chatId: string, action: 'open' | 'delete' | 'share') => {
-    switch (action) {
-      case 'open':
-        openChatPane({ type: 'chat', id: chatId, title: `Chat ${chatId}` });
-        break;
-      case 'delete':
-        setChatToDelete(chatId);
-        setDeleteDialogOpen(true);
-        break;
-      case 'share':
-        handleShare(chatId);
-        break;
-    }
-  };
 
   const confirmDelete = async () => {
     if (chatToDelete) {
@@ -53,15 +40,20 @@ export const ChatsPane: React.FC = () => {
     <div className="flex flex-col h-full bg-gray-900 text-gray-100">
       <NewChatButton />
       <div className="flex-grow overflow-y-auto">
-        {sortedChats.map((chat) => (
-          <ChatItem
+        {sortedChats.map((chat, index) => (
+          <SidebarItem
             key={chat._id}
-            chat={chat}
-            onAction={handleChatAction}
-            isDeleting={isDeleting}
-            isSharing={isSharing}
-            isActive={chat._id === activeChatId}
-          />
+            index={index}
+            chat={{
+              id: chat._id,
+              title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
+              sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
+              messages: [] // Add actual messages if available
+            }}
+            isNew={index === 0} // Assuming the first chat is the newest
+          >
+            {/* Add action buttons here if needed */}
+          </SidebarItem>
         ))}
       </div>
       <footer className="p-4 flex justify-center">
