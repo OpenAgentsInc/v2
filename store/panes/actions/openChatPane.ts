@@ -3,6 +3,8 @@ import { PaneStore, SetFunction } from '../types'
 import { ensureChatsPaneExists } from '../utils/ensureChatsPaneExists'
 import { handleChatPanePosition } from '../utils/handleChatPanePosition'
 
+const PANE_OFFSET = 45 // Offset for new panes when tiling, matching the value in hud.ts
+
 export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
   return set((state: PaneStore) => {
     if (!newPane.id) {
@@ -25,8 +27,8 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
     if (isCommandKeyHeld) {
       // Tile the new pane with an offset
       const lastPane = updatedPanes[updatedPanes.length - 1];
-      newPaneWithPosition.x = lastPane.x + 20;
-      newPaneWithPosition.y = lastPane.y + 20;
+      newPaneWithPosition.x = lastPane.x + PANE_OFFSET;
+      newPaneWithPosition.y = lastPane.y + PANE_OFFSET;
       
       // Add the new pane and deactivate others, but keep the Chats pane
       updatedPanes = [
