@@ -41,7 +41,7 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
 
 ## Implementation Details
 
-1. **Vercel AI SDK Integration**: The `useChat` hook wraps the Vercel UI `useChat` hook, extending its functionality with custom logic:
+1. **Vercel AI SDK Integration**: The `useChat` hook now wraps the Vercel UI `useChat` hook, extending its functionality with custom logic:
    ```typescript
    import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
 
@@ -53,33 +53,7 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
      maxToolRoundtrips: 20,
      onFinish: async (message, options) => {
        // Custom logic for handling finished messages
-       if (threadId && user) {
-         const updatedMessages = [...threadData.messages, message as Message];
-         setMessages(threadId, updatedMessages);
-
-         try {
-           const result = await saveChatMessage(threadId, user.id, message as Message, {
-             ...options,
-             model: currentModelRef.current
-           });
-           if (result.newBalance) {
-             setBalance(result.newBalance);
-           }
-           setError(null);
-
-           // Generate title for new threads
-           if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-             try {
-               const title = await generateTitle(threadId);
-               updateThreadTitle(threadId, title);
-             } catch (error) {
-               console.error('Error generating title:', error);
-             }
-           }
-         } catch (error: any) {
-           // Error handling logic
-         }
-       }
+       // ...
      },
      onError: (error) => {
        // Error handling logic
@@ -89,7 +63,6 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
 
 2. **State Management**: The implementation uses Zustand for state management, with stores for chat, balance, models, and tools:
    ```typescript
-   import { create } from 'zustand';
    import { useBalanceStore } from '@/store/balance';
    import { useModelStore } from '@/store/models';
    import { useRepoStore } from '@/store/repo';
@@ -112,30 +85,37 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
        setThreadId(propsId);
        setCurrentThreadId(propsId);
      } else if (!threadId && user) {
-       createNewThread()
-         .then(({ threadId: newThreadId }) => {
-           setThreadId(newThreadId);
-           setCurrentThreadId(newThreadId);
+       createNewThread({
+         clerk_user_id: user.id,
+         metadata: {},
+       })
+         .then((newThreadId) => {
+           if (newThreadId && typeof newThreadId === 'string') {
+             setThreadId(newThreadId as Id<"threads">);
+             setCurrentThreadId(newThreadId as Id<"threads">);
+           } else {
+             console.error('Unexpected thread response:', newThreadId);
+           }
          })
          .catch(error => {
            console.error('Error creating new thread:', error);
            toast.error('Failed to create a new chat thread. Please try again.');
          });
      }
-   }, [propsId, threadId, setCurrentThreadId, user]);
+   }, [propsId, threadId, setCurrentThreadId, user, createNewThread]);
 
    useEffect(() => {
-     if (threadId) {
-       fetchThreadMessages(threadId)
-         .then((messages) => {
-           setMessages(threadId, messages);
-         })
-         .catch(error => {
-           console.error('Error fetching thread messages:', error);
-           toast.error('Failed to load chat messages. Please try refreshing the page.');
-         });
+     if (threadId && fetchMessages) {
+       const thread: Thread = {
+         id: threadId,
+         title: threadData.title || 'New Chat',
+         messages: fetchMessages as Message[],
+         createdAt: threadData.createdAt || new Date(),
+       };
+       setThreadData(thread);
+       setThread(threadId, thread);
      }
-   }, [threadId, setMessages]);
+   }, [threadId, fetchMessages, setThread]);
    ```
 
 4. **Error Handling and Notifications**: The system uses toast notifications for user feedback:
@@ -144,26 +124,24 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
 
    // Usage examples
    toast.error('Failed to create a new chat thread. Please try again.');
-   toast.error('Insufficient credits. Please add more credits to continue chatting.');
+   toast.error('Failed to send message. Please try again.');
    ```
 
 5. **Credit System**: The implementation checks and updates user credits:
    ```typescript
    // Inside onFinish callback
-   if (result.newBalance) {
+   if (result && result.newBalance) {
      setBalance(result.newBalance);
    }
    ```
 
 6. **Thread Title Generation**: The system automatically generates titles for new threads:
    ```typescript
-   import { generateTitle } from '@/db/actions';
-
    // Inside onFinish callback
    if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
      try {
-       const title = await generateTitle(threadId);
-       updateThreadTitle(threadId, title);
+       const title = await generateTitle({ threadId });
+       setThreadData({ ...threadData, title });
      } catch (error) {
        console.error('Error generating title:', error);
      }
@@ -180,25 +158,30 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
 
 8. **Custom Message Sending**: The hook implements a custom `sendMessage` function that integrates with the Vercel chat props:
    ```typescript
-   const sendMessage = useCallback(async (message: string) => {
+   const sendMessage = useCallback(async (content: string) => {
      if (!threadId || !user) {
        console.error('No thread ID or user available');
        return;
      }
 
-     const userMessage: Message = { id: Date.now().toString(), content: message, role: 'user' };
-     const updatedMessages = [...threadData.messages, userMessage];
-     setMessages(threadId, updatedMessages);
+     const newMessage = createNewMessage(threadId, user.id, content);
+     addMessageToThread(threadId, newMessage);
 
      try {
-       vercelChatProps.append(userMessage as VercelMessage);
-       await saveChatMessage(threadId, user.id, userMessage);
+       vercelChatProps.append(newMessage as VercelMessage);
+       await sendMessageMutation({
+         thread_id: threadId,
+         clerk_user_id: user.id,
+         content,
+         role: 'user',
+       });
      } catch (error) {
        console.error('Error sending message:', error);
        toast.error('Failed to send message. Please try again.');
-       setMessages(threadId, threadData.messages);
+       // Remove the message from the thread if it failed to send
+       setThreadData({ ...threadData, messages: threadData.messages.filter(m => m.id !== newMessage.id) });
      }
-   }, [threadId, user, vercelChatProps, threadData.messages, setMessages]);
+   }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation]);
    ```
 
 9. **Return Value**: The hook returns an object that combines the Vercel chat props with custom properties:
@@ -210,46 +193,39 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
      threadData,
      user,
      setCurrentThreadId,
-     setUser,
-     setInput,
      sendMessage,
-     error
+     error,
    };
    ```
 
-## Integration Steps for New Coding Agent
+## Recent Changes and Integration
 
-To implement the Vercel version in the current useChat hook:
+The chat system has been recently updated to integrate the Vercel UI useChat hook with our existing implementation. Here are the key changes and integration steps:
 
-1. Import the necessary dependencies, including the Vercel AI SDK:
-   ```typescript
-   import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react';
-   ```
+1. The `useChat` hook now accepts a `propsId` parameter instead of `threadId`, allowing for more flexible thread management.
 
-2. Set up the state management using Zustand stores for chat, balance, models, and tools.
+2. Vercel AI SDK has been integrated, wrapping our custom logic around the `useVercelChat` hook.
 
-3. Initialize the Vercel chat props using `useVercelChat` with the appropriate configuration.
+3. State management has been enhanced to include additional stores for balance, models, repo, and tools.
 
-4. Implement custom logic for handling finished messages and errors in the `onFinish` and `onError` callbacks.
+4. The thread creation process has been updated to work with the new Vercel chat integration.
 
-5. Create effects for thread creation, message fetching, and other initialization tasks.
+5. Message handling now uses the Vercel chat props for appending messages, while still maintaining our custom backend integration.
 
-6. Implement the custom `sendMessage` function that integrates with Vercel chat props and your backend.
+6. Error handling and user feedback have been improved with more specific error messages and toast notifications.
 
-7. Set up message debouncing using the `useDebounce` hook.
+7. The credit system has been integrated into the chat flow, updating user balance after each message.
 
-8. Return an object that combines Vercel chat props with your custom properties and functions.
+8. Thread title generation is now handled within the chat hook, triggered after the first assistant message.
 
-9. Ensure proper error handling and user feedback using toast notifications throughout the hook.
+9. Message debouncing has been implemented to optimize performance and reduce unnecessary re-renders.
 
-10. Integrate the credit system by updating the user's balance when necessary.
+10. The return value of the `useChat` hook has been expanded to include more properties and functions, providing a richer interface for components using this hook.
 
-11. Implement thread title generation for new threads.
-
-By following these steps and referring to the code snippets provided in the Implementation Details section, a new coding agent should be able to successfully implement the Vercel version in the current useChat hook.
+These changes have resulted in a more robust and feature-rich chat implementation that leverages the benefits of the Vercel AI SDK while maintaining our custom functionality and integrations.
 
 ## Additional Notes
 
 [Additional notes remain unchanged]
 
-For more detailed information on specific aspects of the chat system, refer to the relevant files in the codebase, particularly `useChat.ts`, the pane components, and the backend action files.
+For more detailed information on specific aspects of the chat system, refer to the relevant files in the codebase, particularly `hooks/useChat.ts`, the pane components, and the backend action files.
