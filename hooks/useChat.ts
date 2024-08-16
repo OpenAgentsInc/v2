@@ -120,7 +120,7 @@ export function useChatActions() {
  */
 export function useThreadList() {
   const { user } = useUser()
-  const listThreads = useQuery(api.threads.listThreads, user ? { clerk_user_id: user.id } : "skip")
+  const getUserThreads = useQuery(api.threads.getUserThreads, user ? { clerk_user_id: user.id } : "skip")
   const [threads, setThreads] = useState<Array<{
     id: Id<"threads">,
     title: string,
@@ -129,15 +129,15 @@ export function useThreadList() {
   }>>([])
 
   useEffect(() => {
-    if (listThreads) {
-      setThreads(listThreads as Array<{
-        id: Id<"threads">,
-        title: string,
-        lastMessagePreview: string,
-        createdAt: string,
-      }>)
+    if (getUserThreads) {
+      setThreads(getUserThreads.map(thread => ({
+        id: thread._id,
+        title: thread.metadata?.title || 'New Chat',
+        lastMessagePreview: thread.metadata?.lastMessagePreview || '',
+        createdAt: thread.createdAt,
+      })))
     }
-  }, [listThreads])
+  }, [getUserThreads])
 
   return threads
 }
