@@ -11,7 +11,7 @@ import { NewChatButton } from './NewChatButton';
 export const ChatsPane: React.FC = () => {
   const router = useRouter();
   const chats = useQuery(api.threads.getUserThreads);
-  const deleteChat = useMutation(api.chats.remove);
+  const deleteChat = useMutation(api.threads.deleteThread);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);

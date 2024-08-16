@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { IconMessage, IconUsers, IconShare, IconTrash } from '../../components/ui/icons';
-import { Button } from '../../components/ui/button';
+import { IconMessage, IconUsers, IconShare, IconTrash } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
 
 interface ChatItemProps {
   chat: {
