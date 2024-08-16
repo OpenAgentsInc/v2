@@ -7,10 +7,65 @@ import { usePaneStore } from '@/store/pane';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
 import { useChatActions } from './useChatActions';
 import { ChatItem } from './ChatItem';
-import { NewChatButton } from './NewChatButton';
 import { useUser } from '@clerk/nextjs';
+import { buttonVariants } from '@/components/ui/button';
+import { IconPlus } from '@/components/ui/icons';
+import { cn } from '@/lib/utils';
+import { Chat } from '@/types';
+import { useHudStore } from '@/store/hud';
 
 const SEEN_CHATS_KEY = 'seenChatIds';
+
+function NewChatButton() {
+  const { openChatPane } = useHudStore();
+  const [isCreating, setIsCreating] = useState(false);
+  const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
+
+  const handleNewChat = async (event: React.MouseEvent) => {
+    setIsCreating(true);
+    try {
+      console.log('Attempting to create new thread');
+      const threadId = await createNewThread();
+      console.log('Received threadId:', threadId);
+
+      console.log('Creating new chat for thread:', threadId);
+      const newChat: Chat = {
+        id: threadId,
+        title: 'New Chat',
+        path: `/chat/${threadId}`,
+        createdAt: new Date(),
+        messages: [],
+        userId: '' // We'll need to set this properly
+      };
+      // We'll need to handle adding the new chat to the list
+
+      openChatPane({
+        id: threadId,
+        title: 'New Chat',
+        type: 'chat',
+      });
+    } catch (error) {
+      console.error('Error creating new chat:', error);
+      // Implement user-facing error handling here
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleNewChat}
+      disabled={isCreating}
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'h-10 w-full justify-start bg-zinc-50 px-4 shadow-none transition-colors hover:bg-zinc-200/40 dark:bg-zinc-900 dark:hover:bg-zinc-300/10'
+      )}
+    >
+      <IconPlus className="-translate-x-2 stroke-2" />
+      {isCreating ? 'Creating...' : 'New Chat'}
+    </button>
+  );
+}
 
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
