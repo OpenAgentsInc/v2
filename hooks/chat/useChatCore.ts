@@ -17,7 +17,14 @@ import { useToolStore } from '@/store/tools'
 export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   const { user } = useUser()
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId || null)
-  const [threadData, setThreadData] = useState<Thread>({ messages: [] })
+  const [threadData, setThreadData] = useState<Thread>({
+    id: '' as Id<"threads">,
+    title: '',
+    messages: [],
+    createdAt: new Date(),
+    userId: '',
+    path: ''
+  })
   const [error, setError] = useState<string | null>(null)
   const currentModelRef = useRef<string | null>(null)
 
@@ -51,8 +58,8 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
             model_id: currentModelRef.current || model.id,
           })
 
-          if (result && result.newBalance) {
-            setBalance(result.newBalance)
+          if (result && 'balance' in result) {
+            setBalance(result.balance)
           }
           setError(null)
 
@@ -109,14 +116,16 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
     if (threadId && fetchMessages) {
       const thread: Thread = {
         id: threadId,
-        metadata: { title: 'New Chat' },
+        title: 'New Chat',
         messages: fetchMessages as Message[],
         createdAt: threadData.createdAt || new Date(),
+        userId: user?.id || '',
+        path: ''
       }
       setThreadData(thread)
       setThread(threadId, thread)
     }
-  }, [threadId, fetchMessages, setThread])
+  }, [threadId, fetchMessages, setThread, user])
 
   const sendMessage = useCallback(async (content: string) => {
     if (!threadId || !user) {
