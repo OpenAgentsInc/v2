@@ -46,7 +46,15 @@ The codebase and documentation is optimized for agents to understand and travers
   - messages.ts
   - schema.ts - Main source of truth for data structures
   - threads.ts
-  - users.ts
+  - users.ts - Index file exporting all user-related functions
+  - users/
+    - createOrGetUser.ts - Contains the createOrGetUser mutation
+    - getUserData.ts - Contains the getUserData query
+    - getUserBalance.ts - Contains the getUserBalance query
+    - updateUserCredits.ts - Contains the updateUserCredits mutation
+    - updateUserBalance.ts - Contains the updateUserBalance mutation
+    - saveMessageAndUpdateBalance.ts - Contains the saveMessageAndUpdateBalance mutation
+    - index.ts - Exports all user-related functions
 - docs/ - Background info
   - refactor-notes/ - Notes of recent work done on major systems: may be helpful in catching up on recent developments
   - systems/ - Descriptions of how we implement specific systems
