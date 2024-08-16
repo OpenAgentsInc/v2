@@ -25,10 +25,18 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
     };
 
     if (isCommandKeyHeld) {
-      // Tile the new pane with an offset
-      const lastPane = updatedPanes[updatedPanes.length - 1];
-      newPaneWithPosition.x = lastPane.x + PANE_OFFSET;
-      newPaneWithPosition.y = lastPane.y + PANE_OFFSET;
+      // Find the latest chat pane
+      const latestChatPane = [...updatedPanes].reverse().find(pane => pane.type === 'chat');
+      
+      if (latestChatPane) {
+        // Tile the new pane with an offset from the latest chat pane
+        newPaneWithPosition.x = latestChatPane.x + PANE_OFFSET;
+        newPaneWithPosition.y = latestChatPane.y + PANE_OFFSET;
+      } else {
+        // If no chat pane exists, use the default position
+        newPaneWithPosition.x = panePosition.x + PANE_OFFSET;
+        newPaneWithPosition.y = panePosition.y + PANE_OFFSET;
+      }
       
       // Add the new pane and deactivate others, but keep the Chats pane
       updatedPanes = [
