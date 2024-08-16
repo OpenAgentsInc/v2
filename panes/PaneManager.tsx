@@ -28,6 +28,7 @@ export const PaneManager = () => {
           type={pane.type}
           content={pane.content}
           isActive={pane.isActive}
+          dismissable={pane.dismissable}
         >
           {pane.type === 'chat' && <Chat threadId={stripChatPrefix(pane.id) as Id<"threads">} />}
           {pane.type === 'diff' && pane.content && (

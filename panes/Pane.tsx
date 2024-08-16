@@ -5,12 +5,10 @@ import { useDrag } from '@use-gesture/react'
 import { usePaneStore } from "@/store/pane"
 import { X } from 'lucide-react'
 import { Pane as PaneType } from '@/types/pane'
-import { Id } from '@/convex/_generated/dataModel'
 
 type PaneProps = PaneType & {
   children?: React.ReactNode
   titleBarButtons?: React.ReactNode
-  dismissable?: boolean
 }
 
 const useResizeHandlers = (
