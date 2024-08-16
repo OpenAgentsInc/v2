@@ -95,6 +95,7 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
       return state;
     }
 
+    const chatsPaneIndex = state.panes.findIndex(pane => pane.type === 'chats');
     const chatPanes = state.panes.filter(pane => pane.type === 'chat');
     let panePosition;
 
@@ -131,21 +132,41 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
       isActive: true,
       id: newPane.id,
       type: 'chat',
-      title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
+      title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length}` : newPane.title
     };
 
     let updatedPanes;
     if (chatPanes.length === 1 && !isCommandKeyHeld) {
-      // Replace the existing chat pane
+      // Replace the existing chat pane, but keep the Chats pane
       updatedPanes = state.panes.map(pane => 
         pane.type === 'chat' ? newPaneWithPosition : { ...pane, isActive: false }
       );
     } else {
-      // Add the new pane and deactivate others
+      // Add the new pane and deactivate others, but keep the Chats pane
       updatedPanes = [
         ...state.panes.map(pane => ({ ...pane, isActive: false })),
         newPaneWithPosition
       ];
+    }
+
+    // Ensure the Chats pane is always present
+    if (chatsPaneIndex === -1) {
+      updatedPanes.unshift({
+        id: 'chats',
+        type: 'chats',
+        title: 'Chats',
+        x: 200,
+        y: 220,
+        width: 300,
+        height: 400,
+        isOpen: true,
+        dismissable: false,
+        isActive: false,
+      });
+    } else {
+      // Move the Chats pane to the beginning of the array
+      const chatsPane = updatedPanes.splice(chatsPaneIndex, 1)[0];
+      updatedPanes.unshift(chatsPane);
     }
 
     return {
