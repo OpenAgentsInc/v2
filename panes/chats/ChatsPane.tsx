@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { usePaneStore } from '@/store/pane';
-import { useRouter } from 'next/router';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
 import { useChatActions } from './useChatActions';
 import { ChatItem } from './ChatItem';
@@ -10,9 +9,9 @@ import { NewChatButton } from './NewChatButton';
 import { useUser } from '@clerk/nextjs';
 
 export const ChatsPane: React.FC = () => {
-  const router = useRouter();
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
+  console.log("Chats:", chats);
   const deleteChat = useMutation(api.threads.deleteThread);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
