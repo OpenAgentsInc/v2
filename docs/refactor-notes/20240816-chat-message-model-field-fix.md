@@ -8,7 +8,7 @@ Fix the error occurring in `useChat.ts` related to an extra `model` field when s
 
 ## Problem Description
 
-The `saveChatMessage` function in the Convex backend expects a `model_id` field, but the `useChat` hook is sending a `model` field instead. This causes an ArgumentValidationError when trying to save chat messages.
+The `saveChatMessage` function in the Convex backend expects a `model_id` field, but the `useChat` hook was sending a `model` field instead. This caused an ArgumentValidationError when trying to save chat messages.
 
 Error message:
 ```
@@ -24,34 +24,36 @@ Update the `useChat` hook in `hooks/useChat.ts` to send `model_id` instead of `m
 
 ## Implementation Steps
 
-1. Locate the `sendMessage` function in `hooks/useChat.ts`.
-2. Update the `saveChatMessage` call to use `model_id` instead of `model`.
-3. Ensure that the `model_id` is correctly extracted from the `model` object.
+1. Locate the `useChat` function in `hooks/useChat.ts`.
+2. Update the `onFinish` callback in `vercelChatProps` to use `model_id` instead of `model`.
+3. Update the `sendMessage` function to include the `model_id` field when calling `sendMessageMutation`.
+4. Add `model` to the dependency array of the `sendMessage` useCallback.
 
 ## Code Changes
 
 ```typescript
 // In hooks/useChat.ts
 
-const sendMessage = useCallback(async (content: string) => {
-  // ... existing code ...
+// Inside vercelChatProps.onFinish
+const result = await sendMessageMutation({
+  thread_id: threadId,
+  clerk_user_id: user.id,
+  content: message.content,
+  role: message.role,
+  model_id: currentModelRef.current || model.id, // Changed from model to model_id
+})
 
-  try {
-    vercelChatProps.append(newMessage as VercelMessage);
-    await saveChatMessage({
-      thread_id: threadId,
-      clerk_user_id: user.id,
-      content,
-      role: 'user',
-      model_id: model.id, // Use model_id instead of model
-    });
-  } catch (error) {
-    console.error('Error sending message:', error);
-    toast.error('Failed to send message. Please try again.');
-    // Remove the message from the thread if it failed to send
-    setThreadData({ ...threadData, messages: threadData.messages.filter(m => m.id !== newMessage.id) });
-  }
-}, [threadId, user, vercelChatProps, threadData, setThreadData, model]);
+// Inside sendMessage function
+await sendMessageMutation({
+  thread_id: threadId,
+  clerk_user_id: user.id,
+  content,
+  role: 'user',
+  model_id: model.id, // Added this line
+})
+
+// Updated dependency array for sendMessage useCallback
+}, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation, model])
 ```
 
 ## Testing and Verification
@@ -72,7 +74,8 @@ const sendMessage = useCallback(async (content: string) => {
 1. Monitor the application for any potential side effects of this change.
 2. Update any documentation or comments in other parts of the codebase that may reference the old behavior of saving chat messages.
 3. Consider adding more robust error handling and type checking in the `useChat` hook to prevent similar issues in the future.
+4. Review other parts of the codebase where model information is being sent to the backend to ensure consistency in using `model_id`.
 
 ## Conclusion
 
-This fix resolves the "ArgumentValidationError" by ensuring that the correct field name (`model_id`) is used when saving chat messages. The change is minimal but crucial for the proper functioning of the chat system.
+This fix resolves the "ArgumentValidationError" by ensuring that the correct field name (`model_id`) is used when saving chat messages. The change is minimal but crucial for the proper functioning of the chat system. It highlights the importance of maintaining consistency between frontend and backend data structures and the need for thorough type checking and validation.
