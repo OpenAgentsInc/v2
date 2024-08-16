@@ -50,12 +50,11 @@ export const ChatsPane: React.FC = () => {
               sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
               messages: [],
               createdAt: new Date(chat._creationTime),
-              userId: chat.userId,
-              path: chat.path || ''
+              userId: chat.user_id,
+              path: '' // Removed chat.path as it doesn't exist
             }}
             isNew={index === 0}
           >
-            {/* Add action buttons here if needed */}
             <div className="flex space-x-2">
               <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
                 Share
