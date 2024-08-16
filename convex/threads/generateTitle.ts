@@ -10,7 +10,7 @@ import { Doc, Id } from "../_generated/dataModel";
 export const generateTitle = action({
   args: { threadId: v.id("threads") },
   async handler(ctx: ActionCtx, args: { threadId: Id<"threads"> }): Promise<string> {
-    const messages = await ctx.runQuery(api.threads.getThreadMessages, args);
+    const messages = await ctx.runQuery(api.threads.getThreadMessages as any, args);
 
     if (messages.length === 0) {
       return "New Thread";
@@ -44,7 +44,7 @@ export const generateTitle = action({
 
     const generatedTitle = text.trim();
 
-    await ctx.runMutation(api.threads.updateThreadData, {
+    await ctx.runMutation(api.threads.updateThreadData as any, {
       thread_id: args.threadId,
       metadata: { title: generatedTitle },
     });
