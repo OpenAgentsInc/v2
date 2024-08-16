@@ -12,6 +12,7 @@ import {
 import { type Chat } from '@/types'
 import { cn } from '@/lib/utils'
 import { usePaneStore } from '@/store/pane'
+import { useOpenChatPane } from '@/hooks/useOpenChatPane'
 
 interface ChatItemProps {
   index: number
@@ -21,7 +22,8 @@ interface ChatItemProps {
 }
 
 export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
-  const { panes, addPane } = usePaneStore()
+  const { panes } = usePaneStore()
+  const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const shouldAnimate = isNew && index === 0
@@ -30,15 +32,7 @@ export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    const newPane = {
-      id: crypto.randomUUID(),
-      title: chat.title,
-      type: 'chat' as const,
-      chatId: chat.id
-    }
-
-    // Use tiling (true) if Command/Ctrl is pressed, otherwise false
-    addPane(newPane, e.metaKey || e.ctrlKey)
+    openChatPane(chat.id, chat.title, e.metaKey || e.ctrlKey)
   }
 
   return (
