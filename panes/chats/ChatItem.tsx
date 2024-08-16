@@ -22,8 +22,8 @@ interface ChatItemProps {
 
 export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
   const { panes, addPane, setChatOpen } = usePaneStore()
-  const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
-  const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
+  const isActive = panes.some(pane => pane.type === 'chat' && pane.content.id === chat.id && pane.isActive)
+  const isOpen = panes.some(pane => pane.type === 'chat' && pane.content.id === chat.id)
   const shouldAnimate = isNew && index === 0
 
   if (!chat?.id) return null
@@ -31,7 +31,7 @@ export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     const newPane = {
-      id: Number(chat.id),
+      id: crypto.randomUUID(),
       title: chat.title,
       type: 'chat' as const,
       content: { id: chat.id, oldContent: chat.messages?.join('\n') }
