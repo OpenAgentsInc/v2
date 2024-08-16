@@ -2,14 +2,10 @@
 - app/
   - [[...rest]]/
   - api/
-  - documents/
-  - fonts/
+  - swebench/
   - globals.css
   - layout.tsx
-  - opengraph-image.png
   - siteConfig.ts
-  - swebench/
-  - twitter-image.png
 - auth.ts
 - components.json
 - components/
