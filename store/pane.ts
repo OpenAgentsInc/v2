@@ -8,7 +8,18 @@ import { PaneStore } from './types'
 export const usePaneStore = create<PaneStore>()(
   persist(
     (set) => ({
-      panes: [],
+      panes: [
+        {
+          id: 'chats',
+          type: 'chats',
+          title: 'Chats',
+          x: 20,
+          y: 20,
+          width: 300,
+          height: 400,
+          isOpen: true,
+        },
+      ],
       isChatOpen: true,
       lastPanePosition: null,
       addPane: (newPane: PaneInput, shouldTile = false) => actions.addPane(set, newPane, shouldTile),
