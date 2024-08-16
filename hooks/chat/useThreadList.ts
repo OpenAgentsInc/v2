@@ -17,11 +17,11 @@ export function useThreadList() {
 
   useEffect(() => {
     if (getUserThreads) {
-      setThreads(getUserThreads.map((thread: Thread) => ({
+      setThreads(getUserThreads.map((thread) => ({
         id: thread._id,
         title: (thread.metadata as ThreadMetadata)?.title || 'New Chat',
         lastMessagePreview: (thread.metadata as ThreadMetadata)?.lastMessagePreview || '',
-        createdAt: thread.createdAt,
+        createdAt: thread.createdAt ? new Date(thread.createdAt).toISOString() : new Date().toISOString(),
       })))
     }
   }, [getUserThreads])
