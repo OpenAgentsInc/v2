@@ -14,7 +14,7 @@ type PaneProps = PaneType & {
 }
 
 const useResizeHandlers = (
-  id: number | Id<"threads">,
+  id: string,
   initialPosition: { x: number; y: number },
   initialSize: { width: number; height: number },
   updatePanePosition: (id: number | Id<"threads">, x: number, y: number) => void,
