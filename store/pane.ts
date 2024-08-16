@@ -32,7 +32,7 @@ export const usePaneStore = create<PaneStore>()(
       setInputFocused: (isFocused: boolean) => set({ isInputFocused: isFocused }),
       isRepoInputOpen: false,
       setRepoInputOpen: (isOpen: boolean) => set({ isRepoInputOpen: isOpen }),
-      openChatPane: (newPane: PaneInput) => actions.openChatPane(set, newPane),
+      openChatPane: (newPane: PaneInput, isCommandKeyHeld: boolean = false) => actions.openChatPane(set, newPane, isCommandKeyHeld),
       bringPaneToFront: (id: string) => actions.bringPaneToFront(set, id),
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
