@@ -56,7 +56,7 @@ The codebase and documentation is optimized for agents to understand and travers
     - deleteThread.ts - Contains the deleteThread mutation
     - generateTitle.ts - Contains the generateTitle action
     - getLastEmptyThread.ts - Contains the getLastEmptyThread query
-    - getThreadMessages.ts - Contains the getThreadMessages query
+    - getThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically
     - getUserThreads.ts - Contains the getUserThreads query
     - shareThread.ts - Contains the shareThread mutation
     - updateThreadData.ts - Contains the updateThreadData mutation
