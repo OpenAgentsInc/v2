@@ -45,6 +45,11 @@ The codebase and documentation is optimized for agents to understand and travers
 - convex/
   - schema.ts - Main source of truth for data structures
   - messages/
+    - saveChatMessage.ts - Contains the saveChatMessage function
+    - fetchThreadMessages.ts - Contains the fetchThreadMessages function
+    - getLastMessage.ts - Contains the getLastMessage function
+    - getChatById.ts - Contains the getChatById function
+    - index.ts - Exports all message-related functions for easy import
   - threads/
   - users/
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
