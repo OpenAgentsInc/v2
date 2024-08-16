@@ -21,7 +21,7 @@ interface ChatItemProps {
 }
 
 export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
-  const { panes, addPane, setChatOpen } = usePaneStore()
+  const { panes, addPane } = usePaneStore()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id)
   const shouldAnimate = isNew && index === 0
@@ -39,7 +39,6 @@ export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
 
     // Use tiling (true) if Command/Ctrl is pressed, otherwise false
     addPane(newPane, e.metaKey || e.ctrlKey)
-    setChatOpen(true)
   }
 
   return (
