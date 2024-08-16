@@ -46,9 +46,9 @@ The codebase and documentation is optimized for agents to understand and travers
   - schema.ts - Main source of truth for data structures
   - messages/
     - saveChatMessage.ts - Contains the saveChatMessage function
-    - fetchThreadMessages.ts - Contains the fetchThreadMessages function
-    - getLastMessage.ts - Contains the getLastMessage function
-    - getChatById.ts - Contains the getChatById function
+    - fetchThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically from oldest to newest
+    - getLastMessage.ts - Fetches the most recent message for the authenticated user
+    - getChatById.ts - Retrieves a specific chat message by its ID
     - index.ts - Exports all message-related functions for easy import
   - threads/
     - createNewThread.ts - Creates a new thread for a user, including optional metadata like title
