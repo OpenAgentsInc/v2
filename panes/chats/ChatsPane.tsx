@@ -56,6 +56,17 @@ export const ChatsPane: React.FC = () => {
             isNew={index === 0}
           >
             {/* Add action buttons here if needed */}
+            <div className="flex space-x-2">
+              <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
+                Share
+              </button>
+              <button onClick={() => {
+                setChatToDelete(chat._id);
+                setDeleteDialogOpen(true);
+              }} disabled={isDeleting}>
+                Delete
+              </button>
+            </div>
           </ChatItem>
         ))}
       </div>
