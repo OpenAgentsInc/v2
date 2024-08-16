@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDrag } from '@use-gesture/react'
-import { usePaneStore } from "@/store/hud"
+import { usePaneStore } from "@/store/pane"
 import { X } from 'lucide-react'
 import { Pane as PaneType } from '@/types/pane'
 import { Id } from '../convex/_generated/dataModel'
