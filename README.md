@@ -66,7 +66,6 @@ The codebase and documentation is optimized for agents to understand and travers
     - getUserData.ts - Retrieves the first user record matching the given Clerk user ID
     - getUserBalance.ts - Fetches the user's credit balance, returning 0 if the user is not found
     - updateUserCredits.ts - Updates the user's credit balance
-    - updateUserBalance.ts - Modifies the user's credit balance
     - saveMessageAndUpdateBalance.ts - Saves a message and updates the user's balance accordingly
     - index.ts - Exports all user-related functions for easy import
 - docs/ - Background info

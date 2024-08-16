@@ -12,7 +12,7 @@ We have refactored the `convex/users.ts` file to improve code organization, main
    - `getUserData.ts`: Contains the `getUserData` query.
    - `getUserBalance.ts`: Contains the `getUserBalance` query.
    - `updateUserCredits.ts`: Contains the `updateUserCredits` mutation.
-   - `updateUserBalance.ts`: Contains the `updateUserBalance` mutation.
+   - `updateUserCredits.ts`: Contains the `updateUserCredits` mutation.
    - `saveMessageAndUpdateBalance.ts`: Contains the `saveMessageAndUpdateBalance` mutation.
 3. Updated the `convex/users/index.ts` file to export all the functions from their respective files.
 4. Updated the main `convex/users.ts` file to act as an index, exporting all functions from the `users` directory.
@@ -30,7 +30,7 @@ This new structure offers several benefits:
 To use these functions in other parts of the codebase, developers can continue to import them as before:
 
 ```typescript
-import { createOrGetUser, getUserData, updateUserBalance } from '@/convex/users'
+import { createOrGetUser, getUserData, updateUserCredits } from '@/convex/users'
 ```
 
 This change maintains the existing API while providing a more modular and maintainable structure for the user-related functions.
