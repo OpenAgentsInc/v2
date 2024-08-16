@@ -12,8 +12,8 @@ import { useUser } from '@clerk/nextjs';
 
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
-  const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
-  const deleteChat = useMutation(api.threads.deleteThread);
+  const chats = useQuery(api.messages.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
+  const deleteChat = useMutation(api.messages.deleteThread);
   const { panes } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
@@ -48,9 +48,12 @@ export const ChatsPane: React.FC = () => {
               id: chat._id,
               title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
               sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
-              messages: [] // Add actual messages if available
+              messages: [],
+              createdAt: new Date(chat._creationTime),
+              userId: chat.userId,
+              path: chat.path || ''
             }}
-            isNew={index === 0} // Assuming the first chat is the newest
+            isNew={index === 0}
           >
             {/* Add action buttons here if needed */}
           </ChatItem>
