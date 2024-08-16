@@ -1,76 +1,130 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { IconMessage, IconUsers, IconShare, IconTrash } from '@/components/ui/icons';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+'use client'
 
-interface ChatItemProps {
-  chat: {
-    _id: string;
-    _creationTime: number;
-    metadata?: {
-      title?: string;
-    };
-    shareToken?: string;
-    clerk_user_id: string;
-    createdAt: string;
-    user_id: string;
-  };
-  onAction: (chatId: string, action: 'open' | 'delete' | 'share') => void;
-  isDeleting: boolean;
-  isSharing: boolean;
-  isActive: boolean;
+import * as React from 'react'
+import { motion } from 'framer-motion'
+import { buttonVariants } from '@/components/ui/button'
+import { IconMessage, IconUsers } from '@/components/ui/icons'
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger
+} from '@/components/ui/tooltip'
+import { type Chat } from '@/types'
+import { cn } from '@/lib/utils'
+import { useHudStore } from '@/store/hud'
+
+interface SidebarItemProps {
+    index: number
+    chat: Chat
+    children: React.ReactNode
+    isNew: boolean
 }
 
-export const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction, isDeleting, isSharing, isActive }) => {
-  const title = chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`;
+export function SidebarItem({ index, chat, children, isNew }: SidebarItemProps) {
+    const { panes, addPane, setChatOpen } = useHudStore()
+    const isActive = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat' && pane.isActive)
+    const isOpen = panes.some(pane => pane.id === Number(chat.id) && pane.type === 'chat')
+    const shouldAnimate = isNew && index === 0
 
-  return (
-    <motion.div
-      className={cn(
-        'group relative flex items-center px-2 py-2 my-1 rounded-md cursor-pointer transition-colors duration-200',
-        isActive
-          ? 'bg-gray-800 text-white'
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-      )}
-      onClick={() => onAction(chat._id, 'open')}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <div className="flex-grow flex items-center overflow-hidden">
-        {chat.shareToken ? (
-          <IconUsers className="flex-shrink-0 h-5 w-5 mr-2" />
-        ) : (
-          <IconMessage className="flex-shrink-0 h-5 w-5 mr-2" />
-        )}
-        <span className="truncate">{title}</span>
-      </div>
-      <div className="flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="p-0 h-8 w-8"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAction(chat._id, 'share');
-          }}
-          disabled={isSharing}
+    if (!chat?.id) return null
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        const newPane = {
+            id: Number(chat.id),
+            title: chat.title,
+            type: 'chat' as const,
+            content: { id: chat.id, oldContent: chat.messages?.join('\n') }
+        }
+
+        // Use tiling (true) if Command/Ctrl is pressed, otherwise false
+        addPane(newPane, e.metaKey || e.ctrlKey)
+        setChatOpen(true)
+    }
+
+    return (
+        <motion.div
+            className="relative h-8"
+            variants={{
+                initial: {
+                    height: 0,
+                    opacity: 0
+                },
+                animate: {
+                    height: 'auto',
+                    opacity: 1
+                }
+            }}
+            initial={shouldAnimate ? 'initial' : false}
+            animate={shouldAnimate ? 'animate' : false}
+            transition={{
+                duration: 0.25,
+                ease: 'easeIn'
+            }}
         >
-          <IconShare className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="p-0 h-8 w-8"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAction(chat._id, 'delete');
-          }}
-          disabled={isDeleting}
-        >
-          <IconTrash className="h-4 w-4" />
-        </Button>
-      </div>
-    </motion.div>
-  );
-};
+            <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
+                {chat.sharePath ? (
+                    <Tooltip delayDuration={1000}>
+                        <TooltipTrigger
+                            tabIndex={-1}
+                            className="focus:bg-muted focus:ring-1 focus:ring-ring"
+                        >
+                            <IconUsers className="mr-2 mt-1 text-zinc-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>This is a shared chat.</TooltipContent>
+                    </Tooltip>
+                ) : (
+                    <IconMessage className="mr-2 mt-1 text-zinc-500" />
+                )}
+            </div>
+            <button
+                onClick={handleClick}
+                className={cn(
+                    buttonVariants({ variant: 'ghost' }),
+                    'group w-full px-8 transition-colors hover:bg-white/10',
+                    isOpen && 'bg-zinc-200 dark:bg-zinc-800',
+                    isActive && 'pr-16 font-semibold',
+                    'text-left'
+                )}
+            >
+                <div
+                    className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
+                    title={chat.title}
+                >
+                    <span className="whitespace-nowrap">
+                        {shouldAnimate ? (
+                            chat.title.split('').map((character, index) => (
+                                <motion.span
+                                    key={index}
+                                    variants={{
+                                        initial: {
+                                            opacity: 0,
+                                            x: -100
+                                        },
+                                        animate: {
+                                            opacity: 1,
+                                            x: 0
+                                        }
+                                    }}
+                                    initial="initial"
+                                    animate="animate"
+                                    transition={{
+                                        duration: 0.25,
+                                        ease: 'easeIn',
+                                        delay: index * 0.05,
+                                        staggerChildren: 0.05
+                                    }}
+                                >
+                                    {character}
+                                </motion.span>
+                            ))
+                        ) : (
+                            <span>{chat.title}</span>
+                        )}
+                    </span>
+                </div>
+            </button>
+            {isActive && <div className="absolute right-2 top-1">{children}</div>}
+        </motion.div >
+    )
+}
