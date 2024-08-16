@@ -6,8 +6,14 @@ import { Button } from '@/components/ui/button';
 interface ChatItemProps {
   chat: {
     _id: string;
-    title: string;
-    sharePath?: string;
+    _creationTime: number;
+    metadata?: {
+      title?: string;
+    };
+    shareToken?: string;
+    clerk_user_id: string;
+    createdAt: string;
+    user_id: string;
   };
   onAction: (chatId: string, action: 'open' | 'delete' | 'share') => void;
   isDeleting: boolean;
@@ -15,6 +21,8 @@ interface ChatItemProps {
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction, isDeleting, isSharing }) => {
+  const title = chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`;
+
   return (
     <motion.div
       className="flex items-center justify-between p-2 hover:bg-gray-100 cursor-pointer"
@@ -22,8 +30,8 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction, isDeleting, 
       onClick={() => onAction(chat._id, 'open')}
     >
       <div className="flex items-center">
-        {chat.sharePath ? <IconUsers className="mr-2" /> : <IconMessage className="mr-2" />}
-        <span>{chat.title}</span>
+        {chat.shareToken ? <IconUsers className="mr-2" /> : <IconMessage className="mr-2" />}
+        <span>{title}</span>
       </div>
       <div>
         <Button
