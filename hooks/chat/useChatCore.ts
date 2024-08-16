@@ -22,7 +22,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
     title: '',
     messages: [],
     createdAt: new Date(),
-    userId: '',
+    userId: '' as Id<"users">,
     path: ''
   })
   const [error, setError] = useState<string | null>(null)
@@ -58,8 +58,8 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
             model_id: currentModelRef.current || model.id,
           })
 
-          if (result && 'balance' in result) {
-            setBalance(result.balance)
+          if (result && typeof result === 'object' && 'balance' in result) {
+            setBalance(result.balance as number)
           }
           setError(null)
 
@@ -119,7 +119,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
         title: 'New Chat',
         messages: fetchMessages as Message[],
         createdAt: threadData.createdAt || new Date(),
-        userId: user?.id || '',
+        userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
       }
       setThreadData(thread)
