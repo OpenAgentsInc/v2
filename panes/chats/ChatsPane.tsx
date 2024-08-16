@@ -10,6 +10,8 @@ import { ChatItem } from './ChatItem';
 import { NewChatButton } from './NewChatButton';
 import { useUser } from '@clerk/nextjs';
 
+const SEEN_CHATS_KEY = 'seenChatIds';
+
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
@@ -18,7 +20,7 @@ export const ChatsPane: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
-  const [newChatIds, setNewChatIds] = useState<Set<string>>(new Set());
+  const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
 
   const sortedChats = useMemo(() => {
     if (!chats) return [];
@@ -28,13 +30,31 @@ export const ChatsPane: React.FC = () => {
   }, [chats]);
 
   useEffect(() => {
+    // Load seen chat IDs from local storage
+    const storedSeenChatIds = localStorage.getItem(SEEN_CHATS_KEY);
+    if (storedSeenChatIds) {
+      setSeenChatIds(new Set(JSON.parse(storedSeenChatIds)));
+    }
+  }, []);
+
+  useEffect(() => {
     if (sortedChats.length > 0) {
-      const latestChatId = sortedChats[0]._id;
-      if (!newChatIds.has(latestChatId)) {
-        setNewChatIds(prev => new Set(prev).add(latestChatId));
+      const newSeenChatIds = new Set(seenChatIds);
+      let hasNewChats = false;
+
+      sortedChats.forEach(chat => {
+        if (!newSeenChatIds.has(chat._id)) {
+          newSeenChatIds.add(chat._id);
+          hasNewChats = true;
+        }
+      });
+
+      if (hasNewChats) {
+        setSeenChatIds(newSeenChatIds);
+        localStorage.setItem(SEEN_CHATS_KEY, JSON.stringify([...newSeenChatIds]));
       }
     }
-  }, [sortedChats]);
+  }, [sortedChats, seenChatIds]);
 
   const confirmDelete = async () => {
     if (chatToDelete) {
@@ -63,7 +83,7 @@ export const ChatsPane: React.FC = () => {
               userId: chat.user_id,
               path: ''
             }}
-            isNew={newChatIds.has(chat._id)}
+            isNew={!seenChatIds.has(chat._id)}
           >
             <div className="flex space-x-2">
               <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
