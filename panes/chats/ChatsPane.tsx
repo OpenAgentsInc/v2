@@ -37,7 +37,7 @@ export const ChatsPane: React.FC = () => {
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-gray-100">
+    <div className="flex flex-col h-full">
       <NewChatButton />
       <div className="flex-grow overflow-y-auto">
         {sortedChats.map((chat, index) => (
