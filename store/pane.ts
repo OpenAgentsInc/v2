@@ -171,12 +171,13 @@ export const usePaneStore = create<PaneStore>()(
                 }
             }),
             openChatPane: (newPane, isCommandKeyHeld) => set((state) => {
-                const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
+                const existingChatPanes = state.panes.filter(pane => pane.type === 'chat')
+                const lastChatPane = existingChatPanes[existingChatPanes.length - 1]
                 let panePosition: { x: number; y: number; width: number; height: number }
                 let updatedPanes: Pane[]
 
-                const existingChatPanes = state.panes.filter(pane => pane.type === 'chat')
-                const lastChatPane = existingChatPanes[existingChatPanes.length - 1]
+                // Always keep the Chats pane
+                const chatsPane = state.panes.find(pane => pane.id === 'chats') || initialChatsPane
 
                 if (isCommandKeyHeld && lastChatPane) {
                     // Tiling behavior: add a new pane with offset
@@ -186,27 +187,28 @@ export const usePaneStore = create<PaneStore>()(
                         width: lastChatPane.width,
                         height: lastChatPane.height
                     }
-                    updatedPanes = state.panes.map(pane => ({ ...pane, isActive: false }))
-                } else if (existingChatPanes.length === 0) {
-                    // First chat pane: take up most of the screen
-                    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1920
-                    const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 1080
-                    panePosition = {
-                        x: 300, // Leave space for Chats pane
-                        y: screenHeight * 0.1,
-                        width: screenWidth - 300,
-                        height: screenHeight * 0.8
-                    }
-                    updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
+                    updatedPanes = [chatsPane, ...existingChatPanes.map(pane => ({ ...pane, isActive: false }))]
                 } else {
-                    // Replace existing chat pane
-                    panePosition = {
-                        x: lastChatPane.x,
-                        y: lastChatPane.y,
-                        width: lastChatPane.width,
-                        height: lastChatPane.height
+                    // Replace existing chat pane or create first chat pane
+                    if (lastChatPane) {
+                        panePosition = {
+                            x: lastChatPane.x,
+                            y: lastChatPane.y,
+                            width: lastChatPane.width,
+                            height: lastChatPane.height
+                        }
+                    } else {
+                        // First chat pane: take up most of the screen
+                        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1920
+                        const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 1080
+                        panePosition = {
+                            x: 300, // Leave space for Chats pane
+                            y: screenHeight * 0.1,
+                            width: screenWidth - 300,
+                            height: screenHeight * 0.8
+                        }
                     }
-                    updatedPanes = state.panes.filter(pane => pane.type !== 'chat')
+                    updatedPanes = [chatsPane]
                 }
 
                 const paneId = newPane.id || `thread-${Math.random().toString(36).substr(2, 9)}`
@@ -223,12 +225,10 @@ export const usePaneStore = create<PaneStore>()(
                     title: newPane.title === 'Untitled' ? `Untitled thread #${paneId}` : newPane.title
                 }
 
+                updatedPanes.push(newPaneWithPosition)
+
                 return {
-                    panes: [
-                        state.panes.find(pane => pane.id === 'chats') || initialChatsPane,
-                        ...updatedPanes,
-                        newPaneWithPosition
-                    ],
+                    panes: updatedPanes,
                     lastPanePosition: panePosition
                 }
             }),
