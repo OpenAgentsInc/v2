@@ -12,8 +12,8 @@ export function useThreadManagement(propsId?: string) {
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(null);
   const { user } = useUser();
 
-  const createNewThread = useMutation(api.threads.createNewThread);
-  const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
+  const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
+  const fetchThreadMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
 
   useEffect(() => {
     if (propsId) {
@@ -28,14 +28,9 @@ export function useThreadManagement(propsId?: string) {
         clerk_user_id: user.id,
         metadata: {} // You can add any additional metadata here if needed
       })
-        .then((newThread) => {
-          if (newThread && newThread._id) {
-            const newThreadId = newThread._id;
-            setThreadId(newThreadId);
-            setCurrentThreadId(newThreadId);
-          } else {
-            console.error('Unexpected thread response:', newThread);
-          }
+        .then((newThreadId: Id<"threads">) => {
+          setThreadId(newThreadId);
+          setCurrentThreadId(newThreadId);
         })
         .catch(error => {
           console.error('Error creating new thread:', error);

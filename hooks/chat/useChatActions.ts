@@ -8,7 +8,7 @@ import { Id } from '../../convex/_generated/dataModel'
 
 export function useChatActions() {
   const { user } = useUser()
-  const createNewThread = useMutation(api.threads.createNewThread)
+  const createNewThread = useMutation(api.threads.createNewThread.createNewThread)
   const { setCurrentThreadId } = useChatStore()
 
   const handleCreateNewThread = useCallback(async () => {

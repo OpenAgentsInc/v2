@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser()
   const [isHandled, setIsHandled] = useState(false)
-  const createOrGetUser = useMutation(api.users.createOrGetUser)
+  const createOrGetUser = useMutation(api.users.createOrGetUser.createOrGetUser)
 
   useEffect(() => {
     const handleUserCreation = async () => {
