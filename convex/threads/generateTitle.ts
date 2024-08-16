@@ -10,14 +10,14 @@ import { Doc, Id } from "../_generated/dataModel";
 export const generateTitle = action({
   args: { threadId: v.id("threads") },
   async handler(ctx: ActionCtx, args: { threadId: Id<"threads"> }): Promise<string> {
-    const messages = await ctx.runQuery(api.threads.getThreadMessages, { threadId: args.threadId });
+    const messages = await ctx.runQuery(api.threads.getThreadMessages, args);
 
     if (messages.length === 0) {
       return "New Thread";
     }
 
     const formattedMessages = messages
-      .map((msg) => `${msg.role}: ${msg.content}`)
+      .map((msg: Doc<"messages">) => `${msg.role}: ${msg.content}`)
       .join("\n");
 
     const modelObj = models.find((m) => m.name === "GPT-4o Mini");
