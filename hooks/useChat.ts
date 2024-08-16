@@ -157,5 +157,77 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   }
 }
 
-// The useChatActions and useThreadList functions can remain unchanged
-// ... [rest of the file remains the same]
+/**
+ * Custom hook for chat-related actions.
+ * @returns An object containing the createNewThread function.
+ */
+export function useChatActions() {
+  const { user } = useUser()
+  const createNewThread = useMutation(api.threads.createNewThread)
+  const { setCurrentThreadId } = useChatStore()
+
+  /**
+   * Creates a new chat thread.
+   * @returns The ID of the newly created thread, or null if creation failed.
+   */
+  const handleCreateNewThread = useCallback(async () => {
+    if (!user) return null
+
+    try {
+      const newThread = await createNewThread({
+        clerk_user_id: user.id,
+        metadata: {},
+      })
+
+      if (newThread && typeof newThread === 'string') {
+        const threadId = newThread as Id<"threads">
+        setCurrentThreadId(threadId)
+        return threadId
+      } else {
+        console.error('Unexpected thread response:', newThread)
+        return null
+      }
+    } catch (error) {
+      console.error('Error creating new thread:', error)
+      toast.error('Failed to create a new chat thread. Please try again.')
+      return null
+    }
+  }, [user, createNewThread, setCurrentThreadId])
+
+  return {
+    createNewThread: handleCreateNewThread,
+  }
+}
+
+interface ThreadMetadata {
+  title?: string;
+  lastMessagePreview?: string;
+}
+
+/**
+ * Custom hook for retrieving the list of chat threads.
+ * @returns An array of thread objects.
+ */
+export function useThreadList() {
+  const { user } = useUser()
+  const getUserThreads = useQuery(api.threads.getUserThreads, user ? { clerk_user_id: user.id } : "skip")
+  const [threads, setThreads] = useState<Array<{
+    id: Id<"threads">,
+    title: string,
+    lastMessagePreview: string,
+    createdAt: string,
+  }>>([])
+
+  useEffect(() => {
+    if (getUserThreads) {
+      setThreads(getUserThreads.map(thread => ({
+        id: thread._id,
+        title: (thread.metadata as ThreadMetadata)?.title || 'New Chat',
+        lastMessagePreview: (thread.metadata as ThreadMetadata)?.lastMessagePreview || '',
+        createdAt: thread.createdAt,
+      })))
+    }
+  }, [getUserThreads])
+
+  return threads
+}
