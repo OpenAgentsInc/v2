@@ -4,7 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 
 export const useChatActions = () => {
-  const deleteChat = useMutation(api.messages.deleteThread);
+  const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 

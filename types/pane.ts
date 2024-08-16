@@ -16,6 +16,7 @@ export type Pane = {
 
 export type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {
   id?: string
+  isCommandKeyHeld?: boolean
   paneProps?: {
     x: number
     y: number

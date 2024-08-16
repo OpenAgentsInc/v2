@@ -13,7 +13,7 @@ export const Balance = () => {
   const setBalance = useBalanceStore(state => state.setBalance);
   const { userId } = useAuth();
 
-  const balance = useQuery(api.users.getUserBalance, userId ? { clerk_user_id: userId } : "skip");
+  const balance = useQuery(api.users.getUserBalance.getUserBalance, userId ? { clerk_user_id: userId } : "skip");
 
   useEffect(() => {
     if (balance !== undefined) {

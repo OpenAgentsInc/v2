@@ -37,6 +37,7 @@ import type * as users_getUserData from "../users/getUserData.js";
 import type * as users_index from "../users/index.js";
 import type * as users_saveMessageAndUpdateBalance from "../users/saveMessageAndUpdateBalance.js";
 import type * as users_updateUserCredits from "../users/updateUserCredits.js";
+import type * as users from "../users.js";
 import type * as utils from "../utils.js";
 
 /**
@@ -71,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   "users/index": typeof users_index;
   "users/saveMessageAndUpdateBalance": typeof users_saveMessageAndUpdateBalance;
   "users/updateUserCredits": typeof users_updateUserCredits;
+  users: typeof users;
   utils: typeof utils;
 }>;
 export declare const api: FilterApi<
