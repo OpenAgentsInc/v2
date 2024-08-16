@@ -22,8 +22,8 @@ interface ChatItemProps {
 
 export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
   const { panes, addPane, setChatOpen } = usePaneStore()
-  const isActive = panes.some(pane => pane.type === 'chat' && pane.content.id === chat.id && pane.isActive)
-  const isOpen = panes.some(pane => pane.type === 'chat' && pane.content.id === chat.id)
+  const isActive = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id && pane.isActive)
+  const isOpen = panes.some(pane => pane.type === 'chat' && pane.chatId === chat.id)
   const shouldAnimate = isNew && index === 0
 
   if (!chat?.id) return null
@@ -34,7 +34,7 @@ export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
       id: crypto.randomUUID(),
       title: chat.title,
       type: 'chat' as const,
-      content: { id: chat.id, oldContent: chat.messages?.join('\n') }
+      chatId: chat.id
     }
 
     // Use tiling (true) if Command/Ctrl is pressed, otherwise false
