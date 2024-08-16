@@ -88,40 +88,72 @@ export function updatePaneSize(set: (fn: (state: PaneStore) => Partial<PaneStore
   })
 }
 
-export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, newPane: PaneInput) {
+export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
   return set((state) => {
-    const lastActivePane = state.panes.find(pane => pane.isActive) || state.panes[state.panes.length - 1]
-    const panePosition = lastActivePane || state.lastPanePosition || calculatePanePosition(0)
-
     if (!newPane.id) {
       console.error('Invalid thread ID provided for chat pane');
       return state;
     }
 
+    const chatPanes = state.panes.filter(pane => pane.type === 'chat');
+    let panePosition;
+
+    if (chatPanes.length === 0) {
+      // First chat pane, make it take up most of the screen
+      panePosition = {
+        x: 50,
+        y: 50,
+        width: window.innerWidth * 0.8,
+        height: window.innerHeight * 0.8
+      };
+    } else if (chatPanes.length === 1 && !isCommandKeyHeld) {
+      // Replace the existing chat pane
+      panePosition = {
+        x: chatPanes[0].x,
+        y: chatPanes[0].y,
+        width: chatPanes[0].width,
+        height: chatPanes[0].height
+      };
+    } else {
+      // Tile the new pane with an offset
+      const lastPane = state.panes[state.panes.length - 1];
+      panePosition = {
+        x: lastPane.x + PANE_OFFSET,
+        y: lastPane.y + PANE_OFFSET,
+        width: lastPane.width,
+        height: lastPane.height
+      };
+    }
+
     const newPaneWithPosition: Pane = {
       ...newPane,
-      x: panePosition.x,
-      y: panePosition.y,
-      width: panePosition.width,
-      height: panePosition.height,
+      ...panePosition,
       isActive: true,
       id: newPane.id,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
-    }
+    };
 
-    // Deactivate all existing panes and add the new active pane
-    const updatedPanes = [
-      ...state.panes.map(pane => ({ ...pane, isActive: false })),
-      newPaneWithPosition
-    ]
+    let updatedPanes;
+    if (chatPanes.length === 1 && !isCommandKeyHeld) {
+      // Replace the existing chat pane
+      updatedPanes = state.panes.map(pane => 
+        pane.type === 'chat' ? newPaneWithPosition : { ...pane, isActive: false }
+      );
+    } else {
+      // Add the new pane and deactivate others
+      updatedPanes = [
+        ...state.panes.map(pane => ({ ...pane, isActive: false })),
+        newPaneWithPosition
+      ];
+    }
 
     return {
       panes: updatedPanes,
       isChatOpen: true,
       lastPanePosition: panePosition
-    }
-  })
+    };
+  });
 }
 
 export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string) {
