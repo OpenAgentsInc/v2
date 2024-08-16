@@ -61,11 +61,19 @@ messages: defineTable({
 
 ## Core Logic
 
-The majority of the chat logic resides in the `useChat.ts` hook, located in the `hooks/` directory. This hook likely handles:
+The majority of the chat logic resides in the `useChat.ts` hook, located in the `hooks/` directory. This hook provides the following functionality:
 
-- Fetching and updating chat messages
-- Sending new messages
-- Managing chat state
+### useChat Hook
+- Manages the state of messages for a specific thread
+- Handles sending new messages
+- Fetches messages for a thread
+- Updates the thread in the store when messages are fetched
+
+### useChatActions Hook
+- Handles creating new chat threads
+
+### useThreadList Hook
+- Retrieves the list of chat threads for the current user
 
 ## UI Implementation
 
@@ -76,10 +84,20 @@ The chat interface is part of the main authenticated UI, which is a full-screen 
 The chat system leverages several key technologies in the stack:
 
 - **Next.js & React**: For rendering the chat interface and managing component state.
-- **Zustand**: Likely used for global state management related to chat.
+- **Zustand**: Used for global state management related to chat (useChatStore).
 - **Convex**: Used for real-time data synchronization and storage of chat-related data.
 - **Clerk**: Handles user authentication, which is crucial for associating chats with users.
 - **Shad UI**: Provides UI components that may be used in building the chat interface.
+
+## Key Features
+
+1. **Real-time messaging**: Messages are sent and received in real-time using Convex mutations and queries.
+2. **Thread management**: Users can create new chat threads and switch between existing ones.
+3. **Message persistence**: All messages are stored in the Convex database and can be retrieved for each thread.
+4. **User authentication**: Clerk is used to authenticate users and associate messages with specific users.
+5. **Error handling**: The system includes error handling for message sending and thread creation failures.
+6. **Loading states**: Loading states are managed to provide feedback to users during operations.
+7. **Thread metadata**: Threads can have metadata such as titles and last message previews.
 
 ## Additional Notes
 
