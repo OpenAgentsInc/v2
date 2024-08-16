@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { usePaneStore } from '@/store/pane';
@@ -11,12 +11,18 @@ import { useUser } from '@clerk/nextjs';
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
-  console.log("Chats:", chats);
   const deleteChat = useMutation(api.threads.deleteThread);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
+
+  const sortedChats = useMemo(() => {
+    if (!chats) return [];
+    return [...chats]
+      .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
+      .slice(0, 25);
+  }, [chats]);
 
   const handleChatAction = (chatId: string, action: 'open' | 'delete' | 'share') => {
     switch (action) {
@@ -45,7 +51,7 @@ export const ChatsPane: React.FC = () => {
     <div className="flex flex-col h-full">
       <NewChatButton />
       <div className="flex-grow overflow-y-auto">
-        {chats?.map((chat) => (
+        {sortedChats.map((chat) => (
           <ChatItem
             key={chat._id}
             chat={chat}
