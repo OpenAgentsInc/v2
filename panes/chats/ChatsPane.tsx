@@ -10,7 +10,7 @@ import { NewChatButton } from './NewChatButton';
 
 export const ChatsPane: React.FC = () => {
   const router = useRouter();
-  const chats = useQuery(api.threads.getUserThreads);
+  const chats = useQuery(api.threads.getUserThreads, []);
   const deleteChat = useMutation(api.threads.deleteThread);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -20,7 +20,7 @@ export const ChatsPane: React.FC = () => {
   const handleChatAction = (chatId: string, action: 'open' | 'delete' | 'share') => {
     switch (action) {
       case 'open':
-        openChatPane(chatId);
+        openChatPane({ type: 'chat', chatId });
         break;
       case 'delete':
         setChatToDelete(chatId);
