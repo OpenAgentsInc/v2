@@ -1,5 +1,14 @@
 # OpenAgents.com
 
+OpenAgents is 'your all-in-one AI productivity dashboard', available at openagents.com.
+
+The codebase and documentation is optimized for agents to understand and traverse it.
+
+## Agent Instructions
+- You are able to use your `view_file` and `view_hierarchy` tools to retrieve additional context from any of the below folders & files.
+- Remember when editing files to respond with the entire updated file contents. No partial edits are possible, so do not include anything like "[recent content unchanged]".
+- If you are not 100% confident in an update, like you don't know for example the proper API signature of a library like Clerk, ask for additional context instead of guessing.
+
 ## Tech stack
 - Next.js v14 (app router)
 - React v18.3
@@ -22,12 +31,28 @@
 ## Folders & important files
 - app/
 - components/
+  - auth/
+  - canvas/
+  - credits/
+  - dom/
+  - email/
+  - home/
+  - input/
+  - knowledge/
+  - landing/
+  - swebench/
+  - ui/
 - convex/
   - messages.ts
   - schema.ts - Main source of truth for data structures
   - threads.ts
   - users.ts
-- docs/
+- docs/ - Background info
+  - refactor-notes/ - Notes of recent work done on major systems: may be helpful in catching up on recent developments
+  - systems/ - Descriptions of how we implement specific systems
+    - email.md
+    - monetization.md
+    - panes.md
 - hooks/
   - useChat.ts - Where most chat logic resides
 - lib/
