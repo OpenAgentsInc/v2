@@ -17,7 +17,6 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Apfel Grotezk', 'sans-serif'],
         mono: ['var(--font-jetbrains-mono)', 'JetBrains Mono', 'monospace']
       },
       colors: {

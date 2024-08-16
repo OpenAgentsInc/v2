@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { apfel, jetbrainsMono } from '@/lib/fonts'
+import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
 

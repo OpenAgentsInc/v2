@@ -1,10 +1,4 @@
 # Hierarchy of important files & folders
-
-- .env.example
-- .eslintrc.json
-- .gitignore
-- LICENSE
-- README.md
 - app/
   - [[...rest]]/
   - api/
@@ -112,3 +106,6 @@
 - tools/
 - tsconfig.json
 - types/
+- .env.example
+- LICENSE
+- README.md
