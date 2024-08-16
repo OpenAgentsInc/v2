@@ -41,7 +41,7 @@ export function useChat(threadId: Id<"threads"> | null) {
       })
 
       if (result) {
-        const updatedMessage = updateMessageId(newMessage, result)
+        const updatedMessage = updateMessageId(newMessage, result as Id<"messages">)
         addMessageToThread(threadId, updatedMessage)
       }
     } catch (error) {
