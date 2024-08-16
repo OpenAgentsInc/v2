@@ -51,6 +51,16 @@ The codebase and documentation is optimized for agents to understand and travers
     - getChatById.ts - Contains the getChatById function
     - index.ts - Exports all message-related functions for easy import
   - threads/
+    - createNewThread.ts - Contains the createNewThread mutation
+    - createOrGetUser.ts - Contains the createOrGetUser mutation
+    - deleteThread.ts - Contains the deleteThread mutation
+    - generateTitle.ts - Contains the generateTitle action
+    - getLastEmptyThread.ts - Contains the getLastEmptyThread query
+    - getThreadMessages.ts - Contains the getThreadMessages query
+    - getUserThreads.ts - Contains the getUserThreads query
+    - shareThread.ts - Contains the shareThread mutation
+    - updateThreadData.ts - Contains the updateThreadData mutation
+    - index.ts - Exports all thread-related functions for easy import
   - users/
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
     - getUserData.ts - Retrieves user data
