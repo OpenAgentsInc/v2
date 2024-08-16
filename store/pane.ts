@@ -10,7 +10,6 @@ export const usePaneStore = create<PaneStore>()(
     (set) => ({
       panes: [],
       isChatOpen: true,
-      activeTerminalId: null,
       lastPanePosition: null,
       addPane: (newPane: PaneInput, shouldTile = false) => actions.addPane(set, newPane, shouldTile),
       removePane: (id: string) => actions.removePane(set, id),

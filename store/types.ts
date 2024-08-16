@@ -3,7 +3,6 @@ import { Pane, PaneInput } from '@/types/pane'
 export type PaneStore = {
   panes: Pane[]
   isChatOpen: boolean
-  activeTerminalId: number | null
   lastPanePosition: { x: number; y: number; width: number; height: number } | null
   addPane: (pane: PaneInput, shouldTile?: boolean) => void
   removePane: (id: string) => void

@@ -123,6 +123,7 @@ The HUD (Heads-Up Display) system in the application uses a pane-based architect
 4. Terminal Integration:
    - The HUD store keeps track of the active terminal ID (activeTerminalId).
    - This suggests that terminal functionality is integrated into the pane system, allowing for multiple terminal instances.
+   - EDIT: activeTerminalId was left over from a previous implementation and has been removed.
 
 5. Input Handling:
    - The store tracks whether an input is focused (isInputFocused) and whether the repo input is open (isRepoInputOpen).
