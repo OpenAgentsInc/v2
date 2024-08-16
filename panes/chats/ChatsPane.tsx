@@ -51,7 +51,7 @@ export const ChatsPane: React.FC = () => {
 
       if (hasNewChats) {
         setSeenChatIds(newSeenChatIds);
-        localStorage.setItem(SEEN_CHATS_KEY, JSON.stringify([...newSeenChatIds]));
+        localStorage.setItem(SEEN_CHATS_KEY, JSON.stringify(Array.from(newSeenChatIds)));
       }
     }
   }, [sortedChats, seenChatIds]);
