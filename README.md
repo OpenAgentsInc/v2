@@ -48,13 +48,13 @@ The codebase and documentation is optimized for agents to understand and travers
   - threads.ts
   - users.ts - Index file exporting all user-related functions
   - users/
-    - createOrGetUser.ts - Contains the createOrGetUser mutation
-    - getUserData.ts - Contains the getUserData query
-    - getUserBalance.ts - Contains the getUserBalance query
-    - updateUserCredits.ts - Contains the updateUserCredits mutation
-    - updateUserBalance.ts - Contains the updateUserBalance mutation
-    - saveMessageAndUpdateBalance.ts - Contains the saveMessageAndUpdateBalance mutation
-    - index.ts - Exports all user-related functions
+    - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
+    - getUserData.ts - Retrieves user data
+    - getUserBalance.ts - Fetches the user's credit balance
+    - updateUserCredits.ts - Updates the user's credit balance
+    - updateUserBalance.ts - Modifies the user's credit balance
+    - saveMessageAndUpdateBalance.ts - Saves a message and updates the user's balance accordingly
+    - index.ts - Exports all user-related functions for easy import
 - docs/ - Background info
   - refactor-notes/ - Notes of recent work done on major systems: may be helpful in catching up on recent developments
   - systems/ - Descriptions of how we implement specific systems
