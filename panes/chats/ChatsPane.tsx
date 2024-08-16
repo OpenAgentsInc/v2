@@ -16,7 +16,7 @@ const SEEN_CHATS_KEY = 'seenChatIds';
 
 interface NewChatButtonProps {
   userId: string;
-  onNewChat: (threadId: string) => void;
+  onNewChat: (threadId: string, isCommandKeyHeld: boolean) => void;
 }
 
 function NewChatButton({ userId, onNewChat }: NewChatButtonProps) {
@@ -27,7 +27,7 @@ function NewChatButton({ userId, onNewChat }: NewChatButtonProps) {
     setIsCreating(true);
     try {
       const threadId = await createNewThread({ metadata: {}, clerk_user_id: userId });
-      onNewChat(threadId);
+      onNewChat(threadId, event.metaKey || event.ctrlKey);
     } catch (error) {
       console.error('Error creating new chat:', error);
       // Handle error
@@ -103,12 +103,12 @@ export const ChatsPane: React.FC = () => {
     }
   };
 
-  const handleNewChat = (threadId: string) => {
+  const handleNewChat = (threadId: string, isCommandKeyHeld: boolean) => {
     openChatPane({
       id: threadId,
       title: 'New Chat',
       type: 'chat',
-    });
+    }, isCommandKeyHeld);
   };
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
