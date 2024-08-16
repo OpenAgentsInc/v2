@@ -14,14 +14,18 @@ import { cn } from '@/lib/utils';
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 
-function NewChatButton() {
+interface NewChatButtonProps {
+  userId: string;
+}
+
+function NewChatButton({ userId }: NewChatButtonProps) {
   const [isCreating, setIsCreating] = useState(false);
   const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
 
   const handleNewChat = async (event: React.MouseEvent) => {
     setIsCreating(true);
     try {
-      await createNewThread({ metadata: {} });
+      await createNewThread({ metadata: {}, clerk_user_id: userId });
       // Handle successful creation
     } catch (error) {
       console.error('Error creating new chat:', error);
@@ -105,7 +109,7 @@ export const ChatsPane: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="mt-2 mb-2 px-2">
-        <NewChatButton />
+        {user && <NewChatButton userId={user.id} />}
       </div>
       {isLoading ? (
         <div className="flex flex-col flex-1 px-4 space-y-4 overflow-auto">
