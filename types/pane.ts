@@ -1,5 +1,3 @@
-import { Id } from '@/convex/_generated/dataModel'
-
 export type Pane = {
   id: string
   title: string
@@ -7,12 +5,13 @@ export type Pane = {
   y: number
   width: number
   height: number
-  type: 'default' | 'chat' | 'diff'
+  type: 'default' | 'chat' | 'chats' | 'user' | 'diff'
   content?: {
     oldContent?: string
     newContent?: string
   }
   isActive?: boolean
+  dismissable?: boolean
 }
 
 export type PaneInput = Omit<Pane, 'x' | 'y' | 'width' | 'height' | 'id'> & {

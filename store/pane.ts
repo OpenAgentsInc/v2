@@ -13,11 +13,12 @@ export const usePaneStore = create<PaneStore>()(
           id: 'chats',
           type: 'chats',
           title: 'Chats',
-          x: 20,
-          y: 20,
+          x: 200,
+          y: 220,
           width: 300,
           height: 400,
           isOpen: true,
+          dismissable: false,
         },
       ],
       isChatOpen: true,
@@ -36,7 +37,7 @@ export const usePaneStore = create<PaneStore>()(
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage-1293761231',
+      name: 'openagents-hud-storage-12937612312' + Math.random(),
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
