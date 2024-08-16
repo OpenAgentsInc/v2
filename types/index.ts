@@ -1,4 +1,5 @@
 export * from './chat'
+export * from './document'
 export * from './message'
 export * from './model'
 export * from './on-finish-options'
@@ -8,4 +9,3 @@ export * from './server-action-result'
 export * from './token-usage'
 export * from './tool-context'
 export * from './tool-invocation'
-
