@@ -27,6 +27,11 @@ The application uses a pane-based system for managing different UI components. E
 - **ChatsPane**: Renders the list of chat threads.
   - Displays the 25 most recent chats.
   - Chats are sorted in reverse chronological order (newest first).
+  - Uses a dark theme with hover and active states for better user interaction.
+- **ChatItem**: Represents a single chat in the ChatsPane.
+  - Implements hover and tap animations for improved user feedback.
+  - Shows/hides action buttons (share, delete) on hover.
+  - Highlights the active chat.
 - **UserStatus**: Displays user information and settings.
 
 ## Recent Changes
@@ -36,6 +41,12 @@ The application uses a pane-based system for managing different UI components. E
 - Updated the `PaneManager` to render the ChatsPane component when the pane type is 'chats'.
 - Modified ChatsPane to show only the 25 most recent chats in reverse chronological order.
 - Implemented efficient sorting and limiting of chats using `useMemo` in ChatsPane.
+- Updated ChatItem and ChatsPane components with new styling and interactions:
+  - Implemented a dark theme for better visual consistency.
+  - Added hover and active states for chat items.
+  - Implemented show/hide functionality for action buttons on hover.
+  - Added Framer Motion animations for smooth interactions.
+- Integrated active chat highlighting in the ChatsPane.
 
 ## Usage
 
