@@ -125,7 +125,7 @@ export const deleteThread = mutation({
 export const updateThreadData = mutation({
   args: {
     thread_id: v.id("threads"),
-    metadata: v.object({}),
+    metadata: v.object({ title: v.optional(v.string()) }),
   },
   async handler(ctx, args) {
     await ctx.db.patch(args.thread_id, { metadata: args.metadata });
