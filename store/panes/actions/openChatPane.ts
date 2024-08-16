@@ -5,6 +5,10 @@ import { handleChatPanePosition } from '../utils/handleChatPanePosition'
 
 const PANE_OFFSET = 45 // Offset for new panes when tiling, matching the value in hud.ts
 
+// Define default chat pane dimensions
+const DEFAULT_CHAT_PANE_WIDTH = 800;
+const DEFAULT_CHAT_PANE_HEIGHT = window.innerHeight * 0.9;
+
 export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
   return set((state: PaneStore) => {
     if (!newPane.id) {
@@ -19,8 +23,8 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
       ...newPane,
       x: panePosition.x,
       y: panePosition.y,
-      width: panePosition.width,
-      height: panePosition.height,
+      width: DEFAULT_CHAT_PANE_WIDTH,
+      height: DEFAULT_CHAT_PANE_HEIGHT,
       isActive: true,
       id: newPane.id,
       type: 'chat',
