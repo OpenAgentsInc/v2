@@ -55,9 +55,22 @@ messages: defineTable({
 
 ## Front-end Components
 
-1. **Chat Pane**: Located in `panes/chat/`, this component displays an individual chat (thread).
-2. **Chats Pane**: Located in `panes/chats/`, this component shows a list of user chats (threads).
-3. **User Pane**: Located in `panes/user/`, this component displays user information, including settings that may affect chat behavior.
+The chat system is implemented using several React components:
+
+1. **Chat Pane**: Located in `panes/chat/Chat.tsx`, this component is the main container for an individual chat thread.
+   - Uses the `useChat` hook to manage messages, send messages, and handle loading states.
+   - Implements auto-scrolling using the `useChatScroll` hook.
+   - Renders a `ChatList` component to display messages and an `InputBar` component for message input.
+
+2. **ChatList**: Located in `panes/chat/ChatList.tsx`, this component renders the list of messages in a chat thread.
+
+3. **ChatMessage**: Located in `panes/chat/ChatMessage.tsx`, this component renders individual chat messages.
+
+4. **InputBar**: Located in `components/input/InputBar.tsx`, this component handles user input for sending messages.
+
+5. **Chats Pane**: Located in `panes/chats/`, this component shows a list of user chats (threads).
+
+6. **User Pane**: Located in `panes/user/`, this component displays user information, including settings that may affect chat behavior.
 
 ## Core Logic
 
@@ -75,9 +88,16 @@ The majority of the chat logic resides in the `useChat.ts` hook, located in the 
 ### useThreadList Hook
 - Retrieves the list of chat threads for the current user
 
+### useChatScroll Hook
+- Manages auto-scrolling behavior for the chat interface
+
 ## UI Implementation
 
 The chat interface is part of the main authenticated UI, which is a full-screen heads-up display (HUD) with a white grid on a black background. Chat-related panes (Chat, Chats, and User) are draggable, resizable, and optionally dismissible.
+
+The main Chat component (`panes/chat/Chat.tsx`) uses a flex layout to ensure proper positioning of the message list and input bar:
+- The message list takes up the majority of the space with `flex-1` and `overflow-auto`.
+- The input bar is positioned at the bottom using `sticky bottom-0`.
 
 ## Tech Stack Integration
 
@@ -98,6 +118,8 @@ The chat system leverages several key technologies in the stack:
 5. **Error handling**: The system includes error handling for message sending and thread creation failures.
 6. **Loading states**: Loading states are managed to provide feedback to users during operations.
 7. **Thread metadata**: Threads can have metadata such as titles and last message previews.
+8. **Auto-scrolling**: The chat interface automatically scrolls to the latest message when new messages are added.
+9. **Responsive design**: The chat interface is designed to be responsive and work well on various screen sizes.
 
 ## Additional Notes
 
