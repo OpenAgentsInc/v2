@@ -37,7 +37,9 @@ export const createOrGetUser = mutation({
 export const createNewThread = mutation({
   args: {
     clerk_user_id: v.string(),
-    metadata: v.optional(v.object({})),
+    metadata: v.optional(v.object({
+      title: v.optional(v.string())
+    })),
   },
   async handler(ctx, args) {
     const user = await ctx.db
@@ -131,7 +133,10 @@ export const updateThreadData = mutation({
     }
 
     await ctx.db.patch(args.thread_id, {
-      metadata: { ...thread.metadata, ...args.metadata },
+      metadata: {
+        ...thread.metadata,
+        title: args.metadata.title || thread.metadata?.title,
+      },
     });
   },
 });
@@ -147,7 +152,7 @@ export const shareThread = mutation({
     const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
     await ctx.db.patch(args.thread_id, {
-      metadata: { ...thread.metadata, shareToken },
+      shareToken,
     });
 
     return shareToken;
