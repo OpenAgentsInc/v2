@@ -55,16 +55,16 @@ The codebase and documentation is optimized for agents to understand and travers
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
     - deleteThread.ts - Deletes a thread and all its associated messages
     - generateTitle.ts - Generates a concise title for a thread based on its messages using AI
-    - getLastEmptyThread.ts - Contains the getLastEmptyThread query
-    - getThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically
-    - getUserThreads.ts - Fetches all threads associated with a specific user's Clerk ID
+    - getLastEmptyThread.ts - Retrieves the most recent thread for a user that has no messages, useful for continuing empty conversations
+    - getThreadMessages.ts - Fetches all messages for a specific thread, ordered chronologically from oldest to newest
+    - getUserThreads.ts - Retrieves all threads associated with a specific user's Clerk ID, without any specific ordering
     - shareThread.ts - Generates and stores a share token for a thread, enabling sharing functionality
     - updateThreadData.ts - Updates thread metadata, specifically the title field
     - index.ts - Exports all thread-related functions for easy import
   - users/
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
-    - getUserData.ts - Retrieves user data
-    - getUserBalance.ts - Fetches the user's credit balance
+    - getUserData.ts - Retrieves the first user record matching the given Clerk user ID
+    - getUserBalance.ts - Fetches the user's credit balance, returning 0 if the user is not found
     - updateUserCredits.ts - Updates the user's credit balance
     - updateUserBalance.ts - Modifies the user's credit balance
     - saveMessageAndUpdateBalance.ts - Saves a message and updates the user's balance accordingly
