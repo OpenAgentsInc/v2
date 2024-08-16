@@ -22,7 +22,7 @@ export const ChatsPane: React.FC = () => {
   const handleChatAction = (chatId: string, action: 'open' | 'delete' | 'share') => {
     switch (action) {
       case 'open':
-        openChatPane({ type: 'chat', id: chatId });
+        openChatPane({ type: 'chat', id: chatId, title: `Chat ${chatId}` });
         break;
       case 'delete':
         setChatToDelete(chatId);
