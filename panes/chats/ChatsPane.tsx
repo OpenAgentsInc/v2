@@ -34,7 +34,7 @@ export const ChatsPane: React.FC = () => {
     }
   };
 
-  const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.chatId;
+  const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
   return (
     <div className="flex flex-col h-full bg-gray-900 text-gray-100">
