@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '../../convex/_generated/api';
-import { usePaneStore } from '../../store/hud';
+import { api } from '@/convex/_generated/api';
+import { usePaneStore } from '@/store/pane';
 import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
-import { Button } from '../../components/ui/button';
-import { IconMessage, IconUsers, IconShare, IconTrash } from '../../components/ui/icons';
 import { useChatActions } from './useChatActions';
 import { ChatItem } from './ChatItem';
 import { NewChatButton } from './NewChatButton';
 
 export const ChatsPane: React.FC = () => {
   const router = useRouter();
-  const chats = useQuery(api.chats.list);
+  const chats = useQuery(api.threads.getUserThreads);
   const deleteChat = useMutation(api.chats.remove);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
