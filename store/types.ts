@@ -13,7 +13,7 @@ export type PaneStore = {
   setInputFocused: (isFocused: boolean) => void
   isRepoInputOpen: boolean
   setRepoInputOpen: (isOpen: boolean) => void
-  openChatPane: (pane: PaneInput) => void
+  openChatPane: (pane: PaneInput, isCommandKeyHeld: boolean) => void
   bringPaneToFront: (id: string) => void
   setActivePane: (id: string) => void
 }
