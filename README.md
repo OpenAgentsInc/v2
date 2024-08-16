@@ -52,14 +52,14 @@ The codebase and documentation is optimized for agents to understand and travers
     - index.ts - Exports all message-related functions for easy import
   - threads/
     - createNewThread.ts - Creates a new thread for a user, including optional metadata like title
-    - createOrGetUser.ts - Contains the createOrGetUser mutation
+    - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
     - deleteThread.ts - Deletes a thread and all its associated messages
-    - generateTitle.ts - Contains the generateTitle action
+    - generateTitle.ts - Generates a concise title for a thread based on its messages using AI
     - getLastEmptyThread.ts - Contains the getLastEmptyThread query
     - getThreadMessages.ts - Retrieves all messages for a specific thread, ordered chronologically
     - getUserThreads.ts - Fetches all threads associated with a specific user's Clerk ID
-    - shareThread.ts - Contains the shareThread mutation
-    - updateThreadData.ts - Contains the updateThreadData mutation
+    - shareThread.ts - Generates and stores a share token for a thread, enabling sharing functionality
+    - updateThreadData.ts - Updates thread metadata, specifically the title field
     - index.ts - Exports all thread-related functions for easy import
   - users/
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
