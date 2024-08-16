@@ -17,7 +17,10 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
 
     const newPaneWithPosition: Pane = {
       ...newPane,
-      ...panePosition,
+      x: panePosition.x,
+      y: panePosition.y,
+      width: panePosition.width,
+      height: panePosition.height,
       isActive: true,
       id: newPane.id,
       type: 'chat',
@@ -33,7 +36,7 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
         newPaneWithPosition.x = latestChatPane.x + PANE_OFFSET;
         newPaneWithPosition.y = latestChatPane.y + PANE_OFFSET;
       } else {
-        // If no chat pane exists, use the default position
+        // If no chat pane exists, use the default position with offset
         newPaneWithPosition.x = panePosition.x + PANE_OFFSET;
         newPaneWithPosition.y = panePosition.y + PANE_OFFSET;
       }
@@ -66,7 +69,12 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
     return {
       panes: updatedPanes,
       isChatOpen: true,
-      lastPanePosition: panePosition
+      lastPanePosition: {
+        x: newPaneWithPosition.x,
+        y: newPaneWithPosition.y,
+        width: newPaneWithPosition.width,
+        height: newPaneWithPosition.height
+      }
     };
   });
 }
