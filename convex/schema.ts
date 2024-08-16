@@ -36,7 +36,9 @@ export default defineSchema({
   threads: defineTable({
     user_id: v.id("users"),
     clerk_user_id: v.string(),
-    metadata: v.optional(v.object({})),
+    metadata: v.optional(v.object({
+      title: v.optional(v.string())
+    })),
     createdAt: v.string(),
     shareToken: v.optional(v.string()),
   })
