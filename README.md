@@ -43,10 +43,9 @@ The codebase and documentation is optimized for agents to understand and travers
   - swebench/
   - ui/
 - convex/
-  - messages.ts
   - schema.ts - Main source of truth for data structures
-  - threads.ts
-  - users.ts - Index file exporting all user-related functions
+  - messages/
+  - threads/
   - users/
     - createOrGetUser.ts - Creates a new user or retrieves an existing one based on Clerk user ID
     - getUserData.ts - Retrieves user data
