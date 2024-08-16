@@ -37,7 +37,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id || '', adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
