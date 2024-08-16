@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useHudStore } from '@/store/hud';
+import { usePaneStore } from '@/store/pane';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '../../components/ui/alert-dialog';
 import { useChatActions } from './useChatActions';
-import { SidebarItem } from './ChatItem';
+import { ChatItem } from './ChatItem';
 import { NewChatButton } from './NewChatButton';
 import { useUser } from '@clerk/nextjs';
 
@@ -14,7 +14,7 @@ export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const deleteChat = useMutation(api.threads.deleteThread);
-  const { panes } = useHudStore();
+  const { panes } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
@@ -34,14 +34,14 @@ export const ChatsPane: React.FC = () => {
     }
   };
 
-  const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
+  const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.chatId;
 
   return (
     <div className="flex flex-col h-full bg-gray-900 text-gray-100">
       <NewChatButton />
       <div className="flex-grow overflow-y-auto">
         {sortedChats.map((chat, index) => (
-          <SidebarItem
+          <ChatItem
             key={chat._id}
             index={index}
             chat={{
@@ -53,7 +53,7 @@ export const ChatsPane: React.FC = () => {
             isNew={index === 0} // Assuming the first chat is the newest
           >
             {/* Add action buttons here if needed */}
-          </SidebarItem>
+          </ChatItem>
         ))}
       </div>
       <footer className="p-4 flex justify-center">
