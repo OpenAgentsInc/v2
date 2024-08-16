@@ -11,7 +11,7 @@ export const getLastMessage = query({
     const messages = await db
       .query('messages')
       .order('desc')
-      .filter((q) => q.eq(q.field('user_id'), identity.subject))
+      .filter((q) => q.eq(q.field('clerk_user_id'), identity.subject))
       .take(1);
 
     return messages[0] || null;
