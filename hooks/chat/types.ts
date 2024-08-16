@@ -8,6 +8,9 @@ export interface ThreadMetadata {
 export interface Thread {
   _id: Id<"threads">;
   metadata?: ThreadMetadata;
-  messages: any[];
-  createdAt?: Date;
+  createdAt?: string;
+  clerk_user_id: string;
+  user_id: Id<"users">;
+  _creationTime: number;
+  shareToken?: string;
 }
