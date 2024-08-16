@@ -7,10 +7,12 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { useChatActions } from './useChatActions';
 import { ChatItem } from './ChatItem';
 import { NewChatButton } from './NewChatButton';
+import { useUser } from '@clerk/nextjs';
 
 export const ChatsPane: React.FC = () => {
   const router = useRouter();
-  const chats = useQuery(api.threads.getUserThreads, []);
+  const { user } = useUser();
+  const chats = useQuery(api.threads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const deleteChat = useMutation(api.threads.deleteThread);
   const { openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -20,7 +22,7 @@ export const ChatsPane: React.FC = () => {
   const handleChatAction = (chatId: string, action: 'open' | 'delete' | 'share') => {
     switch (action) {
       case 'open':
-        openChatPane({ type: 'chat', chatId });
+        openChatPane({ type: 'chat', id: chatId });
         break;
       case 'delete':
         setChatToDelete(chatId);
