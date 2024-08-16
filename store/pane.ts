@@ -26,7 +26,7 @@ export const usePaneStore = create<PaneStore>()(
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage-129376123',
+      name: 'openagents-hud-storage-1293761231',
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
