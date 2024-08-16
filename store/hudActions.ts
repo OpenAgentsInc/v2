@@ -37,7 +37,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
     }
 
     const adjustedPosition = adjustPanePosition(panePosition)
-    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id as Id<"threads"> | number, adjustedPosition)
+    const newPaneWithPosition = createNewPaneWithPosition(newPane, newPane.id, adjustedPosition)
 
     return {
       panes: [...updatedPanes.map(pane => ({ ...pane, isActive: false })), newPaneWithPosition],
@@ -47,7 +47,7 @@ export function addPane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => v
   })
 }
 
-export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
+export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string) {
   return set((state) => {
     const removedPane = state.panes.find(pane => pane.id === id)
     const remainingPanes = state.panes.filter(pane => pane.id !== id)
@@ -64,7 +64,7 @@ export function removePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) =
   })
 }
 
-export function updatePanePosition(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number, x: number, y: number) {
+export function updatePanePosition(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string, x: number, y: number) {
   return set((state) => {
     const updatedPane = state.panes.find(pane => pane.id === id)
     return {
@@ -76,7 +76,7 @@ export function updatePanePosition(set: (fn: (state: PaneStore) => Partial<PaneS
   })
 }
 
-export function updatePaneSize(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number, width: number, height: number) {
+export function updatePaneSize(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string, width: number, height: number) {
   return set((state) => {
     const updatedPane = state.panes.find(pane => pane.id === id)
     return {
@@ -105,7 +105,7 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
       width: panePosition.width,
       height: panePosition.height,
       isActive: true,
-      id: newPane.id as Id<"threads"> | number,
+      id: newPane.id,
       type: 'chat',
       title: newPane.title === 'Untitled' ? `Untitled thread #${state.panes.length + 1}` : newPane.title
     }
@@ -124,7 +124,7 @@ export function openChatPane(set: (fn: (state: PaneStore) => Partial<PaneStore>)
   })
 }
 
-export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
+export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string) {
   return set((state) => {
     const paneToMove = state.panes.find(pane => pane.id === id)
     if (!paneToMove) return state
@@ -142,7 +142,7 @@ export function bringPaneToFront(set: (fn: (state: PaneStore) => Partial<PaneSto
   })
 }
 
-export function setActivePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: Id<"threads"> | number) {
+export function setActivePane(set: (fn: (state: PaneStore) => Partial<PaneStore>) => void, id: string) {
   return set((state) => ({
     panes: state.panes.map(pane => ({
       ...pane,
