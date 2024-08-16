@@ -4,18 +4,20 @@ import { api } from "../_generated/api";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { models } from "@/lib/models";
+import { ActionCtx } from "../_generated/server";
+import { Doc } from "../_generated/dataModel";
 
 export const generateTitle = action({
   args: { threadId: v.id("threads") },
-  async handler(ctx, args) {
-    const messages = await ctx.runQuery(api.threads.getThreadMessages, { threadId: args.threadId });
+  async handler(ctx: ActionCtx, args: { threadId: string }): Promise<string> {
+    const messages: Doc<"messages">[] = await ctx.runQuery(api.threads.getThreadMessages, { threadId: args.threadId });
 
     if (messages.length === 0) {
       return "New Thread";
     }
 
-    const formattedMessages = messages
-      .map((msg) => `${msg.role}: ${msg.content}`)
+    const formattedMessages: string = messages
+      .map((msg: Doc<"messages">) => `${msg.role}: ${msg.content}`)
       .join("\n");
 
     const modelObj = models.find((m) => m.name === "GPT-4o Mini");
@@ -40,7 +42,7 @@ export const generateTitle = action({
       maxTokens: 10,
     });
 
-    const generatedTitle = text.trim();
+    const generatedTitle: string = text.trim();
 
     await ctx.runMutation(api.threads.updateThreadData, {
       thread_id: args.threadId,
