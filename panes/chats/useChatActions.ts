@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useMutation } from 'convex/react';
-import { api } from '../../convex/_generated/api';
-import { useRouter } from 'next/router';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 export const useChatActions = () => {
-  const router = useRouter();
-  const deleteChat = useMutation(api.chats.remove);
+  const deleteChat = useMutation(api.threads.deleteThread);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
   const handleDelete = async (chatId: string) => {
     setIsDeleting(true);
     try {
-      await deleteChat({ id: chatId });
-      router.push('/');
+      await deleteChat({ thread_id: chatId as Id<'threads'> });
     } catch (error) {
       console.error('Error deleting chat:', error);
     } finally {
