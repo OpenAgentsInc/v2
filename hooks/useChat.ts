@@ -59,7 +59,10 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
           if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
             try {
               const title = await generateTitle({ threadId })
-              setThreadData({ ...threadData, title })
+              setThreadData((prevThreadData) => ({
+                ...prevThreadData,
+                metadata: { ...prevThreadData.metadata, title },
+              }))
             } catch (error) {
               console.error('Error generating title:', error)
             }
@@ -106,7 +109,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
     if (threadId && fetchMessages) {
       const thread: Thread = {
         id: threadId,
-        title: threadData.title || 'New Chat',
+        metadata: { title: 'New Chat' },
         messages: fetchMessages as Message[],
         createdAt: threadData.createdAt || new Date(),
       }
