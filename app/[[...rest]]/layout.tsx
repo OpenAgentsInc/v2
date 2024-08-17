@@ -17,7 +17,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const user = await currentUser()
   return (
     <div className="size-full fixed w-screen">
-      <Toaster position='top-right' />
+      <div className="z-[10200] fixed">
+        <Toaster position='top-right' />
+      </div>
       <Providers
         attribute="class"
         defaultTheme="dark"
