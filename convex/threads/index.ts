@@ -3,6 +3,7 @@ export { createOrGetUser } from "./createOrGetUser";
 export { deleteThread } from "./deleteThread";
 export { generateTitle } from "./generateTitle";
 export { getLastEmptyThread } from "./getLastEmptyThread";
+export { getSharedThread } from "./getSharedThread";
 export { getThreadMessages } from "./getThreadMessages";
 export { getUserThreads } from "./getUserThreads";
 export { shareThread } from "./shareThread";
