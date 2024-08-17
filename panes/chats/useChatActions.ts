@@ -52,7 +52,7 @@ export const useChatActions = () => {
       toast.error('Failed to get current user');
       return;
     }
-    const shareUrl = `${window.location.origin}/share/${chatId}?ref=${currentUser._id}`;
+    const shareUrl = `${window.location.origin}/share/${chatId}${currentUser._id ? `?ref=${currentUser._id}` : ''}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast.success('Chat link copied to clipboard');
@@ -72,7 +72,7 @@ export const useChatActions = () => {
       toast.error('Failed to get current user');
       return;
     }
-    const shareUrl = `${window.location.origin}/share/${chatId}?ref=${currentUser._id}`;
+    const shareUrl = `${window.location.origin}/share/${chatId}${currentUser._id ? `?ref=${currentUser._id}` : ''}`;
     const tweetText = `Check out my OpenAgents chat, '${title}':`;
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
