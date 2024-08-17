@@ -1,42 +1,61 @@
-"use client";
+"use client"
+
 import { useQuery } from "convex/react"
+import { Metadata } from "next"
+import { notFound } from "next/navigation"
+import { Providers } from "@/components/providers"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
+import { useChat } from "@/hooks/useChat"
+import { formatDate } from "@/lib/utils"
+import { ChatList } from "@/panes/chat/ChatList"
 
-export default function SharePage({
-  params,
-}: {
+export const runtime = 'edge'
+export const preferredRegion = 'home'
+
+interface SharePageProps {
   params: {
-    threadId: Id<"threads">;
-  };
-}) {
-  // Fetch the shared thread using the threadId from the URL params
-  const thread = useQuery(api.threads.getSharedThread.getSharedThread, {
-    threadId: params.threadId,
-  });
+    threadId: string
+  }
+}
 
-  // If the thread is not found or not shared, show an error message
-  if (!thread || !thread.shareToken) {
-    return (
-      <div className="p-24">
-        <h1 className="text-2xl font-bold text-red-500">Access Denied</h1>
-        <p className="mt-4">You don&apos;t have access to view this document. It may not exist or it hasn&apos;t been shared.</p>
-      </div>
-    );
+// export async function generateMetadata({
+//   params
+// }: SharePageProps): Promise<Metadata> {
+//   const chat = await getSharedChat(params.id)
+
+//   return {
+//     title: chat?.title.slice(0, 50) ?? 'Chat'
+//   }
+// }
+
+export default function SharePage({ params }: SharePageProps) {
+  const chat = useQuery(api.threads.getSharedThread.getSharedThread, { threadId: params.threadId as Id<'threads'> })
+  const { messages } = useChat({ propsId: params.threadId as Id<'threads'> })
+  console.log("SharePage chat:", chat)
+
+  if (!chat || !chat?.isShared) {
+    // notFound()
+    return <></>
   }
 
   return (
-    <main className="p-24 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-bold">Shared Thread</h1>
-      </div>
-      <div className="flex gap-12">
-        <div className="bg-gray-900 p-4 rounded flex-1 h-[600px]">
-          {/* TODO: Add the actual thread content here */}
-          <p className="text-white">Thread ID: {params.threadId}</p>
-          <p className="text-white">Share Token: {thread.shareToken}</p>
+    <>
+      <div className="flex-1 space-y-6">
+        <div className="border-b bg-background px-4 py-6 md:px-6 md:py-8">
+          <div className="mx-auto max-w-2xl">
+            <div className="space-y-1 md:-mx-8">
+              <h1 className="text-2xl font-bold">{chat.metadata?.title || "Untitled Chat"}</h1>
+              <div className="text-sm text-muted-foreground">
+                {formatDate(chat.createdAt)} · {messages.length} messages
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
-  );
+      <div className="mx-auto max-w-3xl">
+        <ChatList messages={messages} />
+      </div>
+    </>
+  )
 }
