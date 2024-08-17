@@ -29,7 +29,7 @@ export function ChatActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
-  const { handleShare, handleCopyShareLink, handleShareTwitter, closeShareDialog, isSharing, setIsSharing } = useChatActions()
+  const { handleShare, handleCopyShareLink, handleShareTwitter, isDeleting } = useChatActions()
   const [shareLink, setShareLink] = React.useState("")
 
   const handleRemoveChat = React.useCallback(async () => {
@@ -48,32 +48,10 @@ export function ChatActions({
     })
   }, [chatId, removeChat, router])
 
-  const handleShareClick = async () => {
-    setIsSharing(true)
-    const link = await handleShare(chatId)
-    if (link) {
-      setShareLink(link)
-      setShareDialogOpen(true)
-    }
-    setIsSharing(false)
-  }
-
-  const handleCloseShareDialog = () => {
-    setShareDialogOpen(false)
-    closeShareDialog()
-  }
-
-  const handleCopyLink = async () => {
-    setIsSharing(true)
-    await handleCopyShareLink(chatId)
-    setIsSharing(false)
-  }
-
-  const handleTwitterShare = () => {
-    setIsSharing(true)
-    handleShareTwitter(chatId)
-    handleCloseShareDialog()
-    setIsSharing(false)
+  const handleShareClick = () => {
+    const link = handleShare(chatId)
+    setShareLink(link)
+    setShareDialogOpen(true)
   }
 
   return (
@@ -84,7 +62,6 @@ export function ChatActions({
             <Button
               variant="ghost"
               className="size-7 p-0 hover:bg-background"
-              disabled={isSharing}
               onClick={handleShareClick}
             >
               <IconShare />
@@ -98,7 +75,7 @@ export function ChatActions({
             <Button
               variant="ghost"
               className="size-7 p-0 hover:bg-background"
-              disabled={isRemovePending}
+              disabled={isDeleting}
               onClick={() => setDeleteDialogOpen(true)}
             >
               <IconTrash />
@@ -118,23 +95,23 @@ export function ChatActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isRemovePending}>
+            <AlertDialogCancel disabled={isDeleting}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={isRemovePending}
+              disabled={isDeleting}
               onClick={event => {
                 event.preventDefault()
                 handleRemoveChat()
               }}
             >
-              {isRemovePending && <IconSpinner className="mr-2 animate-spin" />}
+              {isDeleting && <IconSpinner className="mr-2 animate-spin" />}
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <AlertDialog open={shareDialogOpen} onOpenChange={handleCloseShareDialog}>
+      <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Share this chat</AlertDialogTitle>
@@ -147,16 +124,19 @@ export function ChatActions({
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCloseShareDialog}>
+            <AlertDialogCancel onClick={() => setShareDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleTwitterShare}
+              onClick={() => {
+                handleShareTwitter(chatId)
+                setShareDialogOpen(false)
+              }}
             >
               Share on Twitter
             </AlertDialogAction>
             <AlertDialogAction
-              onClick={handleCopyLink}
+              onClick={() => handleCopyShareLink(chatId)}
             >
               Copy Link
             </AlertDialogAction>
