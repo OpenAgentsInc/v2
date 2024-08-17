@@ -17,7 +17,7 @@ interface ChatItemProps {
   chat: Chat
   children: React.ReactNode
   isNew: boolean
-  isUpdated: boolean // New prop to indicate if the title has been updated
+  isUpdated: boolean
 }
 
 export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
@@ -25,17 +25,23 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
-  const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
+  const [shouldAnimate, setShouldAnimate] = React.useState(false)
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
 
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
-      setShouldAnimate(true);
       setPrevTitle(chat.title);
-      const timer = setTimeout(() => {
+      // Add a small delay before starting the animation
+      const animationDelay = setTimeout(() => {
+        setShouldAnimate(true);
+      }, 50);
+      const animationDuration = setTimeout(() => {
         setShouldAnimate(false);
-      }, 5000); // Reset after 5 seconds
-      return () => clearTimeout(timer);
+      }, 5050); // 5000ms animation + 50ms delay
+      return () => {
+        clearTimeout(animationDelay);
+        clearTimeout(animationDuration);
+      };
     }
   }, [chat.id, chat.title, isNew, isUpdated, prevTitle]);
 
@@ -48,19 +54,19 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
 
   return (
     <motion.div
-      className="relative "
+      className="relative"
       variants={{
         initial: {
-          height: 0,
-          opacity: 0
+          height: 'auto',
+          opacity: 1
         },
         animate: {
           height: 'auto',
           opacity: 1
         }
       }}
-      initial={shouldAnimate ? 'initial' : false}
-      animate={shouldAnimate ? 'animate' : false}
+      initial="initial"
+      animate="animate"
       transition={{
         duration: 0.25,
         ease: 'easeIn'
@@ -103,7 +109,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
                   variants={{
                     initial: {
                       opacity: 0,
-                      x: -100
+                      x: -10
                     },
                     animate: {
                       opacity: 1,
@@ -114,9 +120,8 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
                   animate="animate"
                   transition={{
                     duration: 0.25,
-                    ease: 'easeIn',
-                    delay: index * 0.05,
-                    staggerChildren: 0.05
+                    ease: 'easeOut',
+                    delay: index * 0.03
                   }}
                 >
                   {character}
@@ -129,6 +134,6 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
         </div>
       </button>
       {isActive && <div className="absolute right-2 top-1">{children}</div>}
-    </motion.div >
+    </motion.div>
   )
 }
