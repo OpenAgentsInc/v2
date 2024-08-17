@@ -29,7 +29,6 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
 
   React.useEffect(() => {
-    console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}, prevTitle: ${prevTitle}, currentTitle: ${chat.title}`);
     if (isNew || isUpdated || chat.title !== prevTitle) {
       setShouldAnimate(true);
       setPrevTitle(chat.title);
