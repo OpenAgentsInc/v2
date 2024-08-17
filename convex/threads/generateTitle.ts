@@ -1,11 +1,10 @@
-import { action } from "../_generated/server";
-import { v } from "convex/values";
-import { api } from "../_generated/api";
-import { openai } from "@ai-sdk/openai";
-import { generateText } from "ai";
-import { models } from "@/lib/models";
-import { ActionCtx } from "../_generated/server";
-import { Doc, Id } from "../_generated/dataModel";
+import { generateText } from "ai"
+import { v } from "convex/values"
+import { models } from "@/lib/models"
+import { openai } from "@ai-sdk/openai"
+import { api } from "../_generated/api"
+import { Doc, Id } from "../_generated/dataModel"
+import { action, ActionCtx } from "../_generated/server"
 
 export const generateTitle = action({
   args: { threadId: v.id("threads") },
@@ -35,7 +34,7 @@ export const generateTitle = action({
         },
         {
           role: "user",
-          content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}`,
+          content: `Please generate a short, concise title (5 words or less) for the following conversation. Do not wrap it in quotes, just the text:\n\n${formattedMessages}`,
         },
       ],
       temperature: 0.7,
