@@ -41,7 +41,8 @@ The codebase and documentation is optimized for agents to understand and travers
   - knowledge/
   - landing/
   - swebench/
-  - ui/
+  - ui/ - Contains shad-ui components. PRIORITIZE USING THESE COMPONENTS WHENEVER POSSIBLE!
+    - alert-dialog, badge, button, card, codeblock, dialog, dropdown-menu, form, icons, input, label, scroll-area, select, separator, sheet, slider, sonner, switch, table, textarea, tooltip
 - convex/
   - schema.ts - Main source of truth for data structures
   - messages/
