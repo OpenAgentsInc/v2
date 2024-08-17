@@ -7,7 +7,6 @@ import { Id } from "@/convex/_generated/dataModel"
 export const useChatActions = () => {
   const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
 
   const handleDelete = async (chatId: string) => {
     setIsDeleting(true);
@@ -24,15 +23,8 @@ export const useChatActions = () => {
     return `${window.location.origin}/share/${chatId}`;
   };
 
-  const handleShare = async (chatId: string) => {
-    setIsSharing(true);
-    try {
-      const shareUrl = getShareUrl(chatId);
-      return shareUrl;
-    } catch (error) {
-      console.error('Error generating share URL:', error);
-      setIsSharing(false);
-    }
+  const handleShare = (chatId: string) => {
+    return getShareUrl(chatId);
   };
 
   const handleCopyShareLink = async (chatId: string) => {
@@ -52,18 +44,11 @@ export const useChatActions = () => {
     window.open(twitterShareUrl, '_blank');
   };
 
-  const closeShareDialog = () => {
-    setIsSharing(false);
-  };
-
   return {
     handleDelete,
     handleShare,
     handleCopyShareLink,
     handleShareTwitter,
-    closeShareDialog,
     isDeleting,
-    isSharing,
-    setIsSharing,
   };
 };
