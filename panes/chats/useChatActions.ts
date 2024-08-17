@@ -20,23 +20,44 @@ export const useChatActions = () => {
     }
   };
 
+  const getShareUrl = (chatId: string) => {
+    return `${window.location.origin}/share/${chatId}`;
+  };
+
   const handleShare = async (chatId: string) => {
     setIsSharing(true);
     try {
-      const shareUrl = `${window.location.origin}/share/${chatId}`;
-      await navigator.clipboard.writeText(shareUrl);
-      // You can add a toast notification here to inform the user that the link has been copied
-      toast.success('Chat link copied to clipboard');
+      const shareUrl = getShareUrl(chatId);
+      return shareUrl;
     } catch (error) {
-      console.error('Error sharing chat:', error);
+      console.error('Error generating share URL:', error);
     } finally {
       setIsSharing(false);
     }
   };
 
+  const handleCopyShareLink = async (chatId: string) => {
+    try {
+      const shareUrl = getShareUrl(chatId);
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Chat link copied to clipboard');
+    } catch (error) {
+      console.error('Error copying share link:', error);
+      toast.error('Failed to copy share link');
+    }
+  };
+
+  const handleShareTwitter = (chatId: string) => {
+    const shareUrl = getShareUrl(chatId);
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=Check out this chat on OpenAgents!&url=${encodeURIComponent(shareUrl)}`;
+    window.open(twitterShareUrl, '_blank');
+  };
+
   return {
     handleDelete,
     handleShare,
+    handleCopyShareLink,
+    handleShareTwitter,
     isDeleting,
     isSharing,
   };
