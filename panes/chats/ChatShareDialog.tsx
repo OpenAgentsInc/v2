@@ -19,7 +19,7 @@ import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
 
 interface ChatShareDialogProps extends DialogProps {
   chatId: string
-  onShare: (id: string) => string
+  onShare: (id: string) => Promise<boolean>
   onCopyLink: (id: string) => void
   onShareTwitter: (id: string) => void
 }
@@ -36,10 +36,15 @@ export function ChatShareDialog({
 
   const handleShare = React.useCallback(() => {
     startShareTransition(async () => {
-      const shareLink = onShare(chatId)
-      copyToClipboard(shareLink)
-      onCopyLink(chatId)
-      toast.success('Share link copied to clipboard')
+      const isShared = await onShare(chatId)
+      if (isShared) {
+        const shareLink = `https://openagents.com/share/${chatId}`
+        copyToClipboard(shareLink)
+        onCopyLink(chatId)
+        toast.success('Share link copied to clipboard')
+      } else {
+        toast.error('Failed to share the chat')
+      }
     })
   }, [chatId, onShare, onCopyLink, copyToClipboard])
 
@@ -60,10 +65,10 @@ export function ChatShareDialog({
             {isSharePending ? (
               <>
                 <IconSpinner className="mr-2 animate-spin" />
-                Generating link...
+                Sharing...
               </>
             ) : (
-              <>Generate and copy link</>
+              <>Share and copy link</>
             )}
           </Button>
           <Button
