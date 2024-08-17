@@ -75,7 +75,10 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
               }))
               
               // Trigger the title update animation
-              await updateThreadData({ threadId, title })
+              await updateThreadData({
+                thread_id: threadId,
+                metadata: { title }
+              })
               console.log('Title updated in thread data')
               if (onTitleUpdate) {
                 console.log('Calling onTitleUpdate with threadId:', threadId)
