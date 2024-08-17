@@ -12,7 +12,7 @@ export const getSharedThread = query({
       return null;
     }
 
-    if (!thread.isShared) {
+    if (!thread.shareToken) {
       return null;
     }
 
