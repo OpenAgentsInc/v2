@@ -66,7 +66,7 @@ export function ChatActions({
               className="size-7 p-1 bg-black hover:bg-gray-800"
               onClick={handleShareClick}
             >
-              <IconShare />
+              <IconShare className="pl-1" />
               <span className="sr-only">Share</span>
             </Button>
           </TooltipTrigger>
@@ -76,7 +76,7 @@ export function ChatActions({
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className="size-7 p-0 hover:bg-background"
+              className="size-7 p-1 bg-black hover:bg-gray-800"
               disabled={isDeleting}
               onClick={() => setDeleteDialogOpen(true)}
             >
