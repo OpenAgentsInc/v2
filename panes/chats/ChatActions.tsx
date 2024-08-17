@@ -9,10 +9,11 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { IconShare, IconSpinner, IconTrash } from "@/components/ui/icons"
+import { IconShare, IconSpinner, IconTrash, IconCopy } from "@/components/ui/icons"
 import {
   Tooltip, TooltipContent, TooltipTrigger
 } from "@/components/ui/tooltip"
+import { Input } from "@/components/ui/input"
 import { ServerActionResult } from "@/types"
 import { useChatActions } from "./useChatActions"
 
@@ -56,6 +57,11 @@ export function ChatActions({
 
   const handleCloseShareDialog = () => {
     setShareDialogOpen(false)
+  }
+
+  const handleCopyLink = () => {
+    handleCopyShareLink(chatId)
+    toast.success('Share link copied to clipboard')
   }
 
   return (
@@ -124,7 +130,21 @@ export function ChatActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <p className="break-all">Share link: {shareLink}</p>
+            <div className="flex items-center space-x-2">
+              <Input
+                type="text"
+                value={shareLink}
+                readOnly
+                className="flex-grow"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCopyLink}
+              >
+                <IconCopy className="h-4 w-4" />
+              </Button>
+            </div>
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
@@ -138,11 +158,6 @@ export function ChatActions({
               }}
             >
               Share on Twitter
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={() => handleCopyShareLink(chatId)}
-            >
-              Copy Link
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
