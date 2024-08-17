@@ -99,8 +99,10 @@ export const ChatsPane: React.FC = () => {
       ) : (
         <div className="flex-grow overflow-y-auto">
           <AnimatePresence>
-            {sortedChats.map((chat) => (
-              !deletedChatIds.has(chat._id) && (
+            {sortedChats.map((chat) => {
+              const messageCount = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount, { thread_id: chat._id });
+              
+              return !deletedChatIds.has(chat._id) && (
                 <motion.div
                   key={chat._id}
                   initial={{ opacity: 0, height: 0 }}
@@ -124,13 +126,13 @@ export const ChatsPane: React.FC = () => {
                     <ChatActions
                       chatId={chat._id}
                       title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
-                      messageCount={useQuery(api.threads.getThreadMessageCount.getThreadMessageCount, { thread_id: chat._id }) || 0}
+                      messageCount={messageCount ?? 0}
                       removeChat={removeChat}
                     />
                   </ChatItem>
                 </motion.div>
-              )
-            ))}
+              );
+            })}
           </AnimatePresence>
         </div>
       )}
