@@ -99,35 +99,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
           title={chat.title}
         >
           <span className="whitespace-nowrap">
-            {shouldAnimate ? (
-              chat.title.split('').map((character, index) => (
-                <motion.span
-                  key={index}
-                  variants={{
-                    initial: {
-                      opacity: 0,
-                      x: -100
-                    },
-                    animate: {
-                      opacity: 1,
-                      x: 0
-                    }
-                  }}
-                  initial="initial"
-                  animate="animate"
-                  transition={{
-                    duration: 0.25,
-                    ease: 'easeIn',
-                    delay: index * 0.05,
-                    staggerChildren: 0.05
-                  }}
-                >
-                  {character}
-                </motion.span>
-              ))
-            ) : (
-              <span>{chat.title}</span>
-            )}
+            {chat.title}
           </span>
         </div>
       </button>
