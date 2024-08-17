@@ -6,6 +6,7 @@ export const createOrGetUser = mutation({
     clerk_user_id: v.string(),
     email: v.string(),
     image: v.optional(v.string()),
+    referrer_id: v.optional(v.string()),
   },
   async handler(ctx, args) {
     const existingUser = await ctx.db
@@ -23,7 +24,20 @@ export const createOrGetUser = mutation({
       image: args.image,
       credits: 0,
       createdAt: new Date().toISOString(),
+      referrer_id: args.referrer_id,
     });
+
+    // If there's a referrer, add credits to their account
+    if (args.referrer_id) {
+      const referrer = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_user_id", (q) => q.eq("clerk_user_id", args.referrer_id))
+        .first();
+
+      if (referrer) {
+        await ctx.db.patch(referrer._id, { credits: referrer.credits + 500 }); // Add $5 worth of credits
+      }
+    }
 
     return await ctx.db.get(newUser);
   },
