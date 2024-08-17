@@ -115,7 +115,7 @@ export function ChatActions({
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Share this chat</AlertDialogTitle>
             <AlertDialogDescription>
@@ -123,16 +123,19 @@ export function ChatActions({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <p>Share link: {shareLink}</p>
+            <p className="break-all">Share link: {shareLink}</p>
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSharing}>
+            <AlertDialogCancel disabled={isSharing} onClick={() => setShareDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isSharing}
-              onClick={() => handleShareTwitter(chatId)}
+              onClick={() => {
+                handleShareTwitter(chatId)
+                setShareDialogOpen(false)
+              }}
             >
               Share on Twitter
             </AlertDialogAction>
