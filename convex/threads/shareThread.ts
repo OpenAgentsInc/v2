@@ -9,12 +9,10 @@ export const shareThread = mutation({
       throw new Error("Thread not found");
     }
 
-    const shareToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
     await ctx.db.patch(args.thread_id, {
-      shareToken,
+      isShared: true,
     });
 
-    return shareToken;
+    return true;
   },
 });
