@@ -47,8 +47,18 @@ export function ChatShareDialog({
   }, [chatId, onShare, onCopyLink])
 
   const handleTwitterShare = React.useCallback(async () => {
-    await onShareTwitter(chatId, title)
-  }, [chatId, title, onShareTwitter])
+    startShareTransition(async () => {
+      const success = await onShare(chatId)
+
+      if (!success) {
+        toast.error('Failed to share chat')
+        return
+      }
+
+      await onShareTwitter(chatId, title)
+      toast.success('Shared on X (Twitter)')
+    })
+  }, [chatId, title, onShare, onShareTwitter])
 
   return (
     <Dialog {...props}>
