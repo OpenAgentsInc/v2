@@ -56,13 +56,14 @@ export const useChatActions = () => {
     }
   };
 
-  const handleShareTwitter = async (chatId: string) => {
+  const handleShareTwitter = async (chatId: string, title: string) => {
     const isShared = await handleShare(chatId);
     if (!isShared) {
       return;
     }
     const shareUrl = `${window.location.origin}/share/${chatId}`;
-    const twitterShareUrl = `https://twitter.com/intent/tweet?text=Check out this chat on OpenAgents!&url=${encodeURIComponent(shareUrl)}`;
+    const tweetText = `Talking about '${title}' on OpenAgents - check it out:`;
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
   };
 
