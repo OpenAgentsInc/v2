@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { api } from "@/convex/_generated/api"
 import { useChat } from "@/hooks/useChat"
@@ -20,6 +20,8 @@ export const ChatsPane: React.FC = () => {
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
   const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
   const [forceUpdate, setForceUpdate] = useState(0);
+
+  const deleteThread = useMutation(api.threads.deleteThread.deleteThread);
 
   const sortedChats = useMemo(() => {
     if (!chats) return [];
@@ -87,6 +89,16 @@ export const ChatsPane: React.FC = () => {
     setForceUpdate(prev => prev + 1); // Force re-render
   };
 
+  const removeChat = async ({ id }: { id: string }) => {
+    try {
+      await deleteThread({ thread_id: id });
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting thread:', error);
+      return { success: false, error: 'Failed to delete chat' };
+    }
+  };
+
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
   // Use the useChat hook with the onTitleUpdate callback
@@ -126,7 +138,7 @@ export const ChatsPane: React.FC = () => {
               isNew={!seenChatIds.has(chat._id)}
               isUpdated={updatedChatIds.has(chat._id)}
             >
-              <ChatActions chatId={chat._id} />
+              <ChatActions chatId={chat._id} removeChat={removeChat} />
             </ChatItem>
           ))}
         </div>
