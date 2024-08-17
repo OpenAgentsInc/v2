@@ -96,7 +96,7 @@ export function ChatActions({
         </Tooltip>
       </div>
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="z-[10150]">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -122,7 +122,7 @@ export function ChatActions({
         </AlertDialogContent>
       </AlertDialog>
       <AlertDialog open={shareDialogOpen} onOpenChange={handleCloseShareDialog}>
-        <AlertDialogContent className="sm:max-w-[425px]">
+        <AlertDialogContent className="sm:max-w-[425px] z-[10150]">
           <AlertDialogHeader>
             <AlertDialogTitle>Share this chat</AlertDialogTitle>
             <AlertDialogDescription>
