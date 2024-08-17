@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '../convex/_generated/api';
-import { toast } from 'sonner';
-import { useChatStore } from './useChatStore';
-import { Message } from '@/types';
-import { useUser } from '@clerk/nextjs';
-import { Id } from '../convex/_generated/dataModel';
+import { useMutation, useQuery } from "convex/react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Message } from "@/types"
+import { useUser } from "@clerk/nextjs"
+import { api } from "../convex/_generated/api"
+import { Id } from "../convex/_generated/dataModel"
+import { useChatStore } from "./useChatStore"
 
 export function useThreadManagement(propsId?: string) {
+  console.log('useThreadManagement');
+  return
   const { currentThreadId, setCurrentThreadId, setMessages } = useChatStore();
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(null);
   const { user } = useUser();

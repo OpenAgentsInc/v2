@@ -1,10 +1,10 @@
-import { useCallback } from 'react'
-import { useMutation } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { toast } from 'sonner'
-import { useUser } from '@clerk/nextjs'
-import { useChatStore } from '../../store/chat'
-import { Id } from '../../convex/_generated/dataModel'
+import { useMutation } from "convex/react"
+import { useCallback } from "react"
+import { toast } from "sonner"
+import { useUser } from "@clerk/nextjs"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
+import { useChatStore } from "../../store/chat"
 
 export function useChatActions() {
   const { user } = useUser()
@@ -12,6 +12,8 @@ export function useChatActions() {
   const { setCurrentThreadId } = useChatStore()
 
   const handleCreateNewThread = useCallback(async () => {
+    console.log("nah")
+    return
     if (!user) return null
 
     try {

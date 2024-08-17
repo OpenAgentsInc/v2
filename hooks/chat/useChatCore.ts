@@ -28,10 +28,9 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
   const [error, setError] = useState<string | null>(null)
   const currentModelRef = useRef<string | null>(null)
 
-  const { threads, addMessageToThread, setThread, setCurrentThreadId } = useChatStore()
+  const { addMessageToThread, setThread, setCurrentThreadId } = useChatStore()
   const sendMessageMutation = useMutation(api.messages.saveChatMessage.saveChatMessage)
   const fetchMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
-  const createNewThread = useMutation(api.threads.createNewThread.createNewThread)
   const generateTitle = useAction(api.threads.generateTitle.generateTitle)
   const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData)
 
@@ -95,31 +94,8 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     },
   })
 
-  const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
-
-  useEffect(() => {
-    if (propsId) {
-      setThreadId(propsId)
-      setCurrentThreadId(propsId)
-    } else if (!threadId && user) {
-      createNewThread({
-        clerk_user_id: user.id,
-        metadata: {},
-      })
-        .then((newThreadId) => {
-          if (newThreadId && typeof newThreadId === 'string') {
-            setThreadId(newThreadId as Id<"threads">)
-            setCurrentThreadId(newThreadId as Id<"threads">)
-          } else {
-            console.error('Unexpected thread response:', newThreadId)
-          }
-        })
-        .catch(error => {
-          console.error('Error creating new thread:', error)
-          toast.error('Failed to create a new chat thread. Please try again.')
-        })
-    }
-  }, [propsId, threadId, setCurrentThreadId, user, createNewThread])
+  // const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
+  const debouncedMessages = vercelChatProps.messages
 
   useEffect(() => {
     if (threadId && fetchMessages) {
