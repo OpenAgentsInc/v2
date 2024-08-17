@@ -22,7 +22,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
-  const [shouldAnimate, setShouldAnimate] = useState(isNew || isUpdated)
+  const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
 
   React.useEffect(() => {
     console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}`);
@@ -130,19 +130,8 @@ export const ChatsPane: React.FC = () => {
   return (
     // ... other JSX ...
     <ChatItem
-      key={`${chat._id}-${forceUpdate}`} // Add forceUpdate to key
-      index={sortedChats.indexOf(chat)}
-      chat={{
-        id: chat._id,
-        title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
-        sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
-        messages: [],
-        createdAt: new Date(chat._creationTime),
-        userId: chat.user_id,
-        path: ''
-      }}
-      isNew={!seenChatIds.has(chat._id)}
-      isUpdated={updatedChatIds.has(chat._id)}
+      key={`${chat._id}-${forceUpdate}`}
+      // ... other props ...
     >
       {/* ... chat item content ... */}
     </ChatItem>
@@ -153,7 +142,12 @@ export const ChatsPane: React.FC = () => {
 
 ## Workflow
 
-[The existing content for Workflow remains unchanged]
+1. When a new chat is created, the `generateTitle` function is called after the first assistant message.
+2. The generated title is saved to the thread's metadata.
+3. The `ChatsPane` component tracks updated chat IDs using the `updatedChatIds` state.
+4. When a chat's title is updated, the `handleTitleUpdate` function is called, which adds the chat ID to the `updatedChatIds` set and forces a re-render.
+5. The `ChatItem` component receives the `isUpdated` prop, which triggers the animation when true.
+6. The animation lasts for 5 seconds before the `updatedChatIds` set is cleared and another re-render is forced.
 
 ## Troubleshooting
 
@@ -195,6 +189,11 @@ Additional debugging steps:
 
 ## Future Improvements
 
-[The existing content for Future Improvements remains unchanged]
+1. Implement error handling and retries for title generation.
+2. Add a way to manually trigger title regeneration.
+3. Optimize the title generation process for longer conversations.
+4. Consider caching generated titles to reduce API calls.
+5. Allow customization of the animation duration and style.
+6. Add unit and integration tests to ensure the title generation and animation features work correctly.
 
 Remember to keep this document updated as the implementation evolves.
