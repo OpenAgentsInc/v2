@@ -14,7 +14,7 @@ import { useModelStore } from '@/store/models'
 import { useRepoStore } from '@/store/repo'
 import { useToolStore } from '@/store/tools'
 
-export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
+export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, onTitleUpdate?: (chatId: string) => void }) {
   const { user } = useUser()
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId || null)
   const [threadData, setThreadData] = useState<Thread>({
@@ -74,6 +74,9 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
               
               // Trigger the title update animation
               await updateThreadData({ threadId, title })
+              if (onTitleUpdate) {
+                onTitleUpdate(threadId)
+              }
             } catch (error) {
               console.error('Error generating title:', error)
             }
