@@ -18,77 +18,62 @@ import { IconSpinner } from '@/components/ui/icons'
 import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
 
 interface ChatShareDialogProps extends DialogProps {
-  chat: Pick<Chat, 'id' | 'title' | 'messages'>
-  shareChat: (id: string) => ServerActionResult<Chat>
-  onCopy: () => void
+  chatId: string
+  onShare: (id: string) => string
+  onCopyLink: (id: string) => void
+  onShareTwitter: (id: string) => void
 }
 
 export function ChatShareDialog({
-  chat,
-  shareChat,
-  onCopy,
+  chatId,
+  onShare,
+  onCopyLink,
+  onShareTwitter,
   ...props
 }: ChatShareDialogProps) {
   const { copyToClipboard } = useCopyToClipboard({ timeout: 1000 })
   const [isSharePending, startShareTransition] = React.useTransition()
 
-  const copyShareLink = React.useCallback(
-    async (chat: Chat) => {
-      if (!chat.sharePath) {
-        return toast.error('Could not copy share link to clipboard')
-      }
-
-      const url = new URL(window.location.href)
-      url.pathname = chat.sharePath
-      copyToClipboard(url.toString())
-      onCopy()
+  const handleShare = React.useCallback(() => {
+    startShareTransition(async () => {
+      const shareLink = onShare(chatId)
+      copyToClipboard(shareLink)
+      onCopyLink(chatId)
       toast.success('Share link copied to clipboard')
-    },
-    [copyToClipboard, onCopy]
-  )
+    })
+  }, [chatId, onShare, onCopyLink, copyToClipboard])
 
   return (
     <Dialog {...props}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share link to chat</DialogTitle>
+          <DialogTitle>Share this chat</DialogTitle>
           <DialogDescription>
-            Anyone with the URL will be able to view the shared chat.
+            This will generate a share link that will let the public access current and future messages in this chat thread.
           </DialogDescription>
         </DialogHeader>
-        <div className="p-4 space-y-1 text-sm border rounded-md">
-          <div className="font-medium">{chat.title}</div>
-          <div className="text-muted-foreground">
-            {chat.messages.length} messages
-          </div>
-        </div>
         <DialogFooter className="items-center">
           <Button
             disabled={isSharePending}
-            onClick={() => {
-              // @ts-ignore
-              startShareTransition(async () => {
-                const result = await shareChat(chat.id)
-
-                if (result && 'error' in result) {
-                  toast.error(result.error)
-                  return
-                }
-
-                copyShareLink(result)
-              })
-            }}
+            onClick={handleShare}
           >
             {isSharePending ? (
               <>
                 <IconSpinner className="mr-2 animate-spin" />
-                Copying...
+                Generating link...
               </>
             ) : (
-              <>Copy link</>
+              <>Generate and copy link</>
             )}
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => onShareTwitter(chatId)}
+          >
+            Share on Twitter
+          </Button>
         </DialogFooter>
+        <p className="mt-2 text-sm text-muted-foreground">Anyone who signs up after clicking your link will give you $5 of credit.</p>
       </DialogContent>
     </Dialog>
   )
