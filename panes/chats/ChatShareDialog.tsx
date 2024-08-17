@@ -22,7 +22,7 @@ interface ChatShareDialogProps extends DialogProps {
   messageCount: number
   onShare: (chatId: string) => Promise<boolean>
   onCopyLink: (chatId: string) => Promise<void>
-  onShareTwitter: (chatId: string) => Promise<void>
+  onShareTwitter: (chatId: string, title: string) => Promise<void>
 }
 
 export function ChatShareDialog({
@@ -52,8 +52,8 @@ export function ChatShareDialog({
   }, [chatId, onShare, onCopyLink])
 
   const handleTwitterShare = React.useCallback(async () => {
-    await onShareTwitter(chatId)
-  }, [chatId, onShareTwitter])
+    await onShareTwitter(chatId, title)
+  }, [chatId, title, onShareTwitter])
 
   return (
     <Dialog {...props}>
