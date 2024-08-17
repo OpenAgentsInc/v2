@@ -1,39 +1,45 @@
 import { useMutation } from "convex/react"
 import React from "react"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
+import { IconPlus } from "@/components/ui/icons"
 import { api } from "@/convex/_generated/api"
+import { cn } from "@/lib/utils"
 import { usePaneStore } from "@/store/pane"
 import { useUser } from "@clerk/nextjs"
 
-export const NewChatButton: React.FC = () => {
-  const createThread = useMutation(api.threads.createNewThread.createNewThread);
-  const { openChatPane } = usePaneStore();
-  const [isCreating, setIsCreating] = React.useState(false);
-  const { user } = useUser();
-  if (!user) {
-    return null;
-  }
+interface NewChatButtonProps {
+  userId: string;
+  onNewChat: (threadId: string, isCommandKeyHeld: boolean) => void;
+}
 
-  const handleNewChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
+export const NewChatButton: React.FC<NewChatButtonProps> = ({ userId, onNewChat }) => {
+  const [isCreating, setIsCreating] = React.useState(false);
+  const createNewThread = useMutation(api.threads.createNewThread.createNewThread);
+
+  const handleNewChat = async (event: React.MouseEvent) => {
     setIsCreating(true);
     try {
-      const threadId = await createThread({ clerk_user_id: user.id });
-      const isCommandKeyHeld = event.metaKey || event.ctrlKey; // metaKey for Mac, ctrlKey for Windows/Linux
-      openChatPane({ id: threadId, title: 'New Chat', type: 'chat' }, isCommandKeyHeld);
+      const threadId = await createNewThread({ metadata: {}, clerk_user_id: userId });
+      onNewChat(threadId, event.metaKey || event.ctrlKey);
     } catch (error) {
       console.error('Error creating new chat:', error);
+      // Handle error
     } finally {
       setIsCreating(false);
     }
   };
 
   return (
-    <Button
+    <button
       onClick={handleNewChat}
       disabled={isCreating}
-      className="w-full mb-4"
+      className={cn(
+        buttonVariants({ variant: 'outline' }),
+        'h-10 w-full justify-start bg-zinc-50 px-4 shadow-none transition-colors hover:bg-zinc-200/40 dark:bg-zinc-900 dark:hover:bg-zinc-300/10'
+      )}
     >
+      <IconPlus className="-translate-x-2 stroke-2" />
       {isCreating ? 'Creating...' : 'New Chat'}
-    </Button>
+    </button>
   );
 };
