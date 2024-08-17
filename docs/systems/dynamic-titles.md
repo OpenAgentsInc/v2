@@ -39,7 +39,7 @@ export const generateTitle = action({
         },
         {
           role: "user",
-          content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}`,
+          content: `Please generate a short, concise title (5 words or less) for the following conversation. Do not wrap it in quotes, just the text:\n\n${formattedMessages}`,
         },
       ],
       temperature: 0.7,
@@ -87,7 +87,9 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
           if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
             try {
+              console.log('Generating title for thread:', threadId);
               const title = await generateTitle({ threadId });
+              console.log('Generated title:', title);
               setThreadData((prevThreadData) => ({
                 ...prevThreadData,
                 metadata: { ...prevThreadData.metadata, title },
@@ -95,7 +97,9 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
               
               // Trigger the title update animation
               await updateThreadData({ threadId, title });
+              console.log('Title updated in thread data');
               if (onTitleUpdate) {
+                console.log('Calling onTitleUpdate with threadId:', threadId);
                 onTitleUpdate(threadId);
               }
             } catch (error) {
@@ -122,16 +126,18 @@ The animation for updated chat titles is implemented in the `ChatItem` component
 1. In `panes/chats/ChatItem.tsx`:
 
 ```typescript
-interface ChatItemProps {
-  index: number;
-  chat: Chat;
-  children: React.ReactNode;
-  isNew: boolean;
-  isUpdated: boolean;
-}
-
 export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
-  const shouldAnimate = isNew || isUpdated;
+  const { panes } = usePaneStore()
+  const openChatPane = useOpenChatPane()
+  const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
+  const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
+  const shouldAnimate = isNew || isUpdated // Animate for both new and updated chats
+
+  React.useEffect(() => {
+    console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}`);
+  }, [chat.id, isNew, isUpdated, shouldAnimate]);
+
+  // ... other code ...
 
   return (
     <motion.div
@@ -204,21 +210,19 @@ export const ChatsPane: React.FC = () => {
     const timer = setTimeout(() => {
       setUpdatedChatIds(new Set());
       localStorage.removeItem(UPDATED_CHATS_KEY);
+      console.log('Cleared updatedChatIds');
     }, 5000); // Clear after 5 seconds
 
     return () => clearTimeout(timer);
   }, [updatedChatIds]);
 
   const handleTitleUpdate = (chatId: string) => {
+    console.log('Title update triggered for chat:', chatId);
     const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
     setUpdatedChatIds(newUpdatedChatIds);
     localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
+    console.log('Updated updatedChatIds:', newUpdatedChatIds);
   };
-
-  const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
-
-  // Use the useChat hook with the onTitleUpdate callback
-  useChat({ propsId: activeChatId, onTitleUpdate: handleTitleUpdate });
 
   // ... other code ...
 
@@ -257,21 +261,38 @@ export const ChatsPane: React.FC = () => {
 
 ## Troubleshooting
 
-If the animation doesn't trigger when updating a chat title, check that:
+If the animation doesn't trigger when updating a chat title, follow these steps:
 
-1. The `generateTitle` function is being called correctly after the first assistant message in the `useChat` hook.
-2. The `onTitleUpdate` callback is being passed to the `useChat` hook in the `ChatsPane` component.
-3. The `handleTitleUpdate` function in `ChatsPane` is being called when a title is updated.
-4. The `isUpdated` prop is being passed correctly to the `ChatItem` component.
-5. The `updatedChatIds` state in `ChatsPane` is being updated and cleared correctly.
-6. The `shouldAnimate` variable in the `ChatItem` component is correctly set based on the `isNew` and `isUpdated` props.
+1. Run the application and open the browser's developer console.
+2. Create a new chat and send a message.
+3. Watch the console for logs related to:
+   - Title generation in the `useChat` hook
+   - `updatedChatIds` updates in the `ChatsPane` component
+   - `isNew` and `isUpdated` prop changes in the `ChatItem` component
+4. Check if the animation is triggered for the updated chat in the chat list.
 
 If you're still experiencing issues:
 
-1. Add console.log statements in key areas to track the flow of data and function calls.
-2. Check the browser console for any error messages.
+1. Verify that the `generateTitle` function is being called correctly after the first assistant message in the `useChat` hook.
+2. Ensure that the `onTitleUpdate` callback is being passed to the `useChat` hook in the `ChatsPane` component.
+3. Check that the `handleTitleUpdate` function in `ChatsPane` is being called when a title is updated.
+4. Confirm that the `isUpdated` prop is being passed correctly to the `ChatItem` component.
+5. Verify that the `updatedChatIds` state in `ChatsPane` is being updated and cleared correctly.
+6. Check that the `shouldAnimate` variable in the `ChatItem` component is correctly set based on the `isNew` and `isUpdated` props.
+
+If you notice any discrepancies in the logs, investigate:
+
+- Whether the title is being generated correctly in the `useChat` hook
+- If the `updatedChatIds` state in `ChatsPane` is being updated with the correct chat ID
+- Whether the `ChatItem` component is receiving the correct `isUpdated` prop value
+
+Additional debugging steps:
+
+1. Add more detailed console logs in key areas to track the flow of data and function calls.
+2. Use browser developer tools to inspect the React component tree and check prop values.
 3. Verify that the Convex functions (generateTitle, updateThreadData) are working correctly by checking the Convex dashboard.
 4. Ensure that the framer-motion library is correctly installed and imported in the `ChatItem` component.
+5. Check for any error messages in the browser console that might indicate issues with the animation or state updates.
 
 ## Future Improvements
 
