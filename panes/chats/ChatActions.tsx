@@ -9,13 +9,13 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { IconShare, IconSpinner, IconTrash, IconCopy } from "@/components/ui/icons"
+import { IconShare, IconSpinner, IconTrash } from "@/components/ui/icons"
 import {
   Tooltip, TooltipContent, TooltipTrigger
 } from "@/components/ui/tooltip"
-import { Input } from "@/components/ui/input"
 import { ServerActionResult } from "@/types"
 import { useChatActions } from "./useChatActions"
+import { ChatShareDialog } from "./ChatShareDialog"
 
 interface ChatActionsProps {
   chatId: string
@@ -31,7 +31,6 @@ export function ChatActions({
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
   const { handleShare, handleCopyShareLink, handleShareTwitter, isDeleting } = useChatActions()
-  const [shareLink, setShareLink] = React.useState("")
 
   const handleRemoveChat = React.useCallback(async () => {
     startRemoveTransition(async () => {
@@ -50,18 +49,11 @@ export function ChatActions({
   }, [chatId, removeChat, router])
 
   const handleShareClick = () => {
-    const link = handleShare(chatId)
-    setShareLink(link)
     setShareDialogOpen(true)
   }
 
   const handleCloseShareDialog = () => {
     setShareDialogOpen(false)
-  }
-
-  const handleCopyLink = () => {
-    handleCopyShareLink(chatId)
-    toast.success('Share link copied to clipboard')
   }
 
   return (
@@ -121,47 +113,14 @@ export function ChatActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <AlertDialog open={shareDialogOpen} onOpenChange={handleCloseShareDialog}>
-        <AlertDialogContent className="sm:max-w-[425px] z-[10150]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Share this chat</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will generate a share link that will let the public access current and future messages in this chat thread.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <div className="flex items-center space-x-2">
-              <Input
-                type="text"
-                value={shareLink}
-                readOnly
-                className="flex-grow"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleCopyLink}
-              >
-                <IconCopy className="h-4 w-4" />
-              </Button>
-            </div>
-            <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCloseShareDialog}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                handleShareTwitter(chatId)
-                handleCloseShareDialog()
-              }}
-            >
-              Share on Twitter
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ChatShareDialog
+        open={shareDialogOpen}
+        onOpenChange={handleCloseShareDialog}
+        chatId={chatId}
+        onShare={handleShare}
+        onCopyLink={handleCopyShareLink}
+        onShareTwitter={handleShareTwitter}
+      />
     </>
   )
 }
