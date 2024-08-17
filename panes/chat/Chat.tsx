@@ -5,7 +5,7 @@ import { useChat } from "@/hooks/useChat"
 import { useChatScroll } from "@/hooks/useChatScroll"
 import { Message } from "@/types"
 import { ChatList } from "./ChatList"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   threadId: Id<"threads">
@@ -20,9 +20,18 @@ export const Chat = ({ threadId, className }: ChatProps) => {
   const {
     messages,
     sendMessage,
-    isLoading
+    isLoading,
+    threadData
   } = useChat({ propsId: threadId, onTitleUpdate: handleTitleUpdate })
   const chatContainerRef = useChatScroll(messages);
+
+  useEffect(() => {
+    console.log('Chat component received new threadId:', threadId);
+  }, [threadId]);
+
+  useEffect(() => {
+    console.log('Chat component threadData updated:', threadData);
+  }, [threadData]);
 
   return (
     <div className={`bg-transparent hover:bg-black hover:bg-opacity-100 transition-all duration-300 ease-in-out flex flex-col h-full ${className}`}>
