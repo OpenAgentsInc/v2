@@ -11,22 +11,23 @@ import { useOpenChatPane } from "@/hooks/useOpenChatPane"
 import { cn } from "@/lib/utils"
 import { usePaneStore } from "@/store/pane"
 import { Chat } from "@/types"
+import { ChatActions } from "./ChatActions"
 
 interface ChatItemProps {
   index: number
   chat: Chat
-  children: React.ReactNode
   isNew: boolean
   isUpdated: boolean
 }
 
-export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
+export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
   const { panes } = usePaneStore()
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const [shouldAnimate, setShouldAnimate] = React.useState(false)
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
+  const [isHovered, setIsHovered] = React.useState(false)
 
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
@@ -71,6 +72,8 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
         duration: 0.25,
         ease: 'easeIn'
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
         {chat.sharePath ? (
@@ -93,7 +96,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
           buttonVariants({ variant: 'ghost' }),
           'group w-full px-8 transition-colors hover:bg-white/10',
           isOpen && 'bg-zinc-200 dark:bg-zinc-800',
-          isActive && 'pr-16 font-semibold',
+          (isActive || isHovered) && 'pr-16 font-semibold',
           'text-left'
         )}
       >
@@ -133,7 +136,11 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
           </span>
         </div>
       </button>
-      {isActive && <div className="absolute right-2 top-1">{children}</div>}
+      {(isActive || isHovered) && (
+        <div className="absolute right-2 top-1">
+          <ChatActions chatId={chat.id} />
+        </div>
+      )}
     </motion.div>
   )
 }
