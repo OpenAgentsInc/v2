@@ -19,11 +19,15 @@ import { ChatShareDialog } from "./ChatShareDialog"
 
 interface ChatActionsProps {
   chatId: string
+  title: string
+  messageCount: number
   removeChat: (args: { id: string }) => Promise<ServerActionResult<void>>
 }
 
 export function ChatActions({
   chatId,
+  title,
+  messageCount,
   removeChat
 }: ChatActionsProps) {
   const router = useRouter()
@@ -117,6 +121,8 @@ export function ChatActions({
         open={shareDialogOpen}
         onOpenChange={handleCloseShareDialog}
         chatId={chatId}
+        title={title}
+        messageCount={messageCount}
         onShare={handleShare}
         onCopyLink={handleCopyShareLink}
         onShareTwitter={handleShareTwitter}
