@@ -15,6 +15,7 @@ import {
 } from "../../components/ui/alert-dialog"
 import { ChatItem } from "./ChatItem"
 import { useChatActions } from "./useChatActions"
+import { useChat } from "@/hooks/chat/useChatCore"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 const UPDATED_CHATS_KEY = 'updatedChatIds';
@@ -140,6 +141,9 @@ export const ChatsPane: React.FC = () => {
   };
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
+
+  // Use the useChat hook with the onTitleUpdate callback
+  useChat({ propsId: activeChatId, onTitleUpdate: handleTitleUpdate });
 
   const isLoading = chats === undefined;
 
