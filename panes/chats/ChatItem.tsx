@@ -30,13 +30,17 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
   const [isHovered, setIsHovered] = React.useState(false)
 
   React.useEffect(() => {
+    console.log('ChatItem useEffect triggered', { isNew, isUpdated, chatTitle: chat.title, prevTitle });
     if (isNew || isUpdated || chat.title !== prevTitle) {
+      console.log('Animation condition met, setting up animation');
       setPrevTitle(chat.title);
       // Add a small delay before starting the animation
       const animationDelay = setTimeout(() => {
+        console.log('Setting shouldAnimate to true');
         setShouldAnimate(true);
       }, 50);
       const animationDuration = setTimeout(() => {
+        console.log('Setting shouldAnimate to false');
         setShouldAnimate(false);
       }, 5050); // 5000ms animation + 50ms delay
       return () => {
@@ -45,6 +49,10 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
       };
     }
   }, [chat.id, chat.title, isNew, isUpdated, prevTitle]);
+
+  React.useEffect(() => {
+    console.log('shouldAnimate changed:', shouldAnimate);
+  }, [shouldAnimate]);
 
   if (!chat?.id) return null
 
