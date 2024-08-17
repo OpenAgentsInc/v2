@@ -11,7 +11,7 @@ import {
   AlertDialogTitle
 } from "../../components/ui/alert-dialog"
 import { ChatItem } from "./ChatItem"
-import { useChatActions } from "./useChatActions"
+import { ChatActions } from "./ChatActions"
 import { useChat } from "@/hooks/useChat"
 import { NewChatButton } from "./NewChatButton"
 
@@ -25,7 +25,6 @@ export const ChatsPane: React.FC = () => {
   const { panes, openChatPane } = usePaneStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
-  const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
   const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -81,14 +80,6 @@ export const ChatsPane: React.FC = () => {
     return () => clearTimeout(timer);
   }, [updatedChatIds]);
 
-  const confirmDelete = async () => {
-    if (chatToDelete) {
-      await handleDelete(chatToDelete);
-      setDeleteDialogOpen(false);
-      setChatToDelete(null);
-    }
-  };
-
   const handleNewChat = (threadId: string, isCommandKeyHeld: boolean) => {
     openChatPane({
       id: threadId,
@@ -143,35 +134,11 @@ export const ChatsPane: React.FC = () => {
               isNew={!seenChatIds.has(chat._id)}
               isUpdated={updatedChatIds.has(chat._id)}
             >
-              <div className="flex space-x-2">
-                <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
-                  Share
-                </button>
-                <button onClick={() => {
-                  setChatToDelete(chat._id);
-                  setDeleteDialogOpen(true);
-                }} disabled={isDeleting}>
-                  Delete
-                </button>
-              </div>
+              <ChatActions chatId={chat._id} />
             </ChatItem>
           ))}
         </div>
       )}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this chat?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the chat and remove its data from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
