@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
-import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://openagents.com"),
@@ -40,7 +39,6 @@ export default function RootLayout({
         className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
       >
         {children}
-        <Toaster />
       </body>
     </html>
   )
