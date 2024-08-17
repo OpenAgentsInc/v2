@@ -64,29 +64,28 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
           }
           setError(null)
 
-          if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-            try {
-              console.log('Generating title for thread:', threadId)
-              const title = await generateTitle({ threadId })
-              console.log('Generated title:', title)
-              setThreadData((prevThreadData) => ({
-                ...prevThreadData,
-                metadata: { ...prevThreadData.metadata, title },
-              }))
-              
-              // Trigger the title update animation
-              await updateThreadData({
-                thread_id: threadId,
-                metadata: { title }
-              })
-              console.log('Title updated in thread data')
-              if (onTitleUpdate) {
-                console.log('Calling onTitleUpdate with threadId:', threadId)
-                onTitleUpdate(threadId)
-              }
-            } catch (error) {
-              console.error('Error generating title:', error)
+          // Generate or update title for every assistant message
+          try {
+            console.log('Generating title for thread:', threadId)
+            const title = await generateTitle({ threadId })
+            console.log('Generated title:', title)
+            setThreadData((prevThreadData) => ({
+              ...prevThreadData,
+              metadata: { ...prevThreadData.metadata, title },
+            }))
+            
+            // Trigger the title update animation
+            await updateThreadData({
+              thread_id: threadId,
+              metadata: { title }
+            })
+            console.log('Title updated in thread data')
+            if (onTitleUpdate) {
+              console.log('Calling onTitleUpdate with threadId:', threadId)
+              onTitleUpdate(threadId)
             }
+          } catch (error) {
+            console.error('Error generating title:', error)
           }
         } catch (error: any) {
           console.error('Error saving chat message:', error)
