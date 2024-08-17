@@ -55,7 +55,7 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
 
   return (
     <motion.div
-      className="relative"
+      className="relative py-1"
       variants={{
         initial: {
           height: 'auto',
@@ -75,31 +75,31 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
-        {chat.sharePath ? (
-          <Tooltip delayDuration={1000}>
-            <TooltipTrigger
-              tabIndex={-1}
-              className="focus:bg-muted focus:ring-1 focus:ring-ring"
-            >
-              <IconUsers className="mr-2 mt-1 text-zinc-500" />
-            </TooltipTrigger>
-            <TooltipContent>This is a shared chat.</TooltipContent>
-          </Tooltip>
-        ) : (
-          <IconMessage className="mr-2 mt-1 text-zinc-500" />
-        )}
-      </div>
       <button
         onClick={handleClick}
         className={cn(
           buttonVariants({ variant: 'ghost' }),
-          'group w-full px-8 transition-colors hover:bg-white/10',
+          'group w-full px-8 py-2 transition-colors hover:bg-white/10',
           isOpen && 'bg-zinc-200 dark:bg-zinc-800',
-          (isActive || isHovered) && 'pr-16 font-semibold',
-          'text-left'
+          (isActive || isHovered) && 'pr-24 font-semibold',
+          'text-left relative'
         )}
       >
+        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex size-6 items-center justify-center">
+          {chat.sharePath ? (
+            <Tooltip delayDuration={1000}>
+              <TooltipTrigger
+                tabIndex={-1}
+                className="focus:bg-muted focus:ring-1 focus:ring-ring"
+              >
+                <IconUsers className="text-zinc-500" />
+              </TooltipTrigger>
+              <TooltipContent>This is a shared chat.</TooltipContent>
+            </Tooltip>
+          ) : (
+            <IconMessage className="text-zinc-500" />
+          )}
+        </div>
         <div
           className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
           title={chat.title}
@@ -137,7 +137,7 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
         </div>
       </button>
       {(isActive || isHovered) && (
-        <div className="absolute right-2 top-1">
+        <div className="absolute right-2 top-1/2 -translate-y-1/2">
           <ChatActions chatId={chat.id} />
         </div>
       )}
