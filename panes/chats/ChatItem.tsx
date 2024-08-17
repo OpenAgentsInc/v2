@@ -25,11 +25,18 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
-  const shouldAnimate = isNew || isUpdated // Animate for both new and updated chats
+  const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
 
   React.useEffect(() => {
     console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}`);
-  }, [chat.id, isNew, isUpdated, shouldAnimate]);
+    if (isNew || isUpdated) {
+      setShouldAnimate(true);
+      const timer = setTimeout(() => {
+        setShouldAnimate(false);
+      }, 5000); // Reset after 5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [chat.id, isNew, isUpdated]);
 
   if (!chat?.id) return null
 
