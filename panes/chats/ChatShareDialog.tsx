@@ -70,10 +70,11 @@ export function ChatShareDialog({
             {messageCount} messages
           </div>
         </div>
-        <DialogFooter className="items-center">
+        <DialogFooter className="flex flex-col items-center space-y-2">
           <Button
             disabled={isSharePending}
             onClick={handleShare}
+            className="w-full max-w-xs"
           >
             {isSharePending ? (
               <>
@@ -87,11 +88,12 @@ export function ChatShareDialog({
           <Button
             disabled={isSharePending}
             onClick={handleTwitterShare}
+            className="w-full max-w-xs bg-blue-500 hover:bg-blue-600"
           >
             Share on Twitter
           </Button>
         </DialogFooter>
-        <DialogDescription>
+        <DialogDescription className="text-center mt-4">
           Anyone who signs up after clicking your link will give you $5 of credit.
         </DialogDescription>
       </DialogContent>
