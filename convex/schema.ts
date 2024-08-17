@@ -40,11 +40,11 @@ export default defineSchema({
       title: v.optional(v.string())
     })),
     createdAt: v.string(),
-    shareToken: v.optional(v.string()),
+    isShared: v.boolean(),
   })
     .index('by_user_id', ['user_id'])
     .index('by_clerk_user_id', ['clerk_user_id'])
-    .index('by_shareToken', ['shareToken']),
+    .index('by_isShared', ['isShared']),
 
   messages: defineTable({
     thread_id: v.id("threads"),
