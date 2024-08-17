@@ -3,10 +3,11 @@
 import { useQuery } from "convex/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { api } from "@/convex/_generated/api"
+import { useChat } from "@/hooks/useChat"
 import { usePaneStore } from "@/store/pane"
 import { useUser } from "@clerk/nextjs"
+import { ChatActions } from "./ChatActions"
 import { ChatItem } from "./ChatItem"
-import { useChat } from "@/hooks/useChat"
 import { NewChatButton } from "./NewChatButton"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
@@ -124,7 +125,9 @@ export const ChatsPane: React.FC = () => {
               }}
               isNew={!seenChatIds.has(chat._id)}
               isUpdated={updatedChatIds.has(chat._id)}
-            />
+            >
+              <ChatActions chatId={chat._id} />
+            </ChatItem>
           ))}
         </div>
       )}
