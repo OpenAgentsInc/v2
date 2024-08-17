@@ -114,7 +114,6 @@ export const ChatsPane: React.FC = () => {
     const timer = setTimeout(() => {
       setUpdatedChatIds(new Set());
       localStorage.removeItem(UPDATED_CHATS_KEY);
-      console.log('Cleared updatedChatIds');
       setForceUpdate(prev => prev + 1); // Force re-render
     }, 5000); // Clear after 5 seconds
 
@@ -138,11 +137,9 @@ export const ChatsPane: React.FC = () => {
   };
 
   const handleTitleUpdate = (chatId: string) => {
-    console.log('Title update triggered for chat:', chatId);
     const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
     setUpdatedChatIds(newUpdatedChatIds);
     localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
-    console.log('Updated updatedChatIds:', newUpdatedChatIds);
     setForceUpdate(prev => prev + 1); // Force re-render
   };
 
