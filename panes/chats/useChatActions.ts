@@ -3,7 +3,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { ServerActionResult, Chat } from "@/lib/types"
+import { Chat, ServerActionResult } from "@/lib/types"
 
 export const useChatActions = () => {
   const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
@@ -62,7 +62,7 @@ export const useChatActions = () => {
       return;
     }
     const shareUrl = `${window.location.origin}/share/${chatId}`;
-    const tweetText = `Talking about '${title}' on OpenAgents - check it out:`;
+    const tweetText = `Check out my OpenAgents chat, '${title}':`;
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
   };
