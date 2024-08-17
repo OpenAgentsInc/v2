@@ -2,58 +2,113 @@
 
 After the first message is received from an assistant, a dynamic title is generated via OpenAI. When a chat's title is updated, an animation is triggered to highlight the change.
 
-## Simplified Implementation
+## Implementation
 
 The dynamic title generation is implemented using Convex functions, and the animation is handled in the React components.
 
 ### Title Generation
 
-1. The `generateTitle` function is defined in `convex/threads.ts`:
+1. The `generateTitle` function is defined in `convex/threads/generateTitle.ts`:
 
 ```typescript
-export const generateTitle = mutation({
+export const generateTitle = action({
   args: { threadId: v.id("threads") },
-  async handler(ctx, args) {
-    const thread = await ctx.db.get(args.threadId);
-    if (!thread) throw new Error("Thread not found");
+  async handler(ctx: ActionCtx, args: { threadId: Id<"threads"> }): Promise<string> {
+    const messages = await ctx.runQuery(api.threads.getThreadMessages.getThreadMessages, args);
 
-    const messages = await ctx.db
-      .query("messages")
-      .filter((q) => q.eq(q.field("threadId"), args.threadId))
-      .order("desc")
-      .take(5);
+    if (messages.length === 0) {
+      return "New Thread";
+    }
 
-    // Use OpenAI to generate a title based on the messages
-    const title = await generateTitleWithAI(messages);
+    const formattedMessages = messages
+      .map((msg: Doc<"messages">) => `${msg.role}: ${msg.content}`)
+      .join("\n");
 
-    // Update the thread with the new title
-    await ctx.db.patch(args.threadId, { title });
+    const modelObj = models.find((m) => m.name === "GPT-4o Mini");
+    if (!modelObj) {
+      throw new Error("Model not found");
+    }
 
-    return title;
+    const { text } = await generateText({
+      model: openai(modelObj.id),
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant that generates concise and relevant titles for chat conversations.",
+        },
+        {
+          role: "user",
+          content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}`,
+        },
+      ],
+      temperature: 0.7,
+      maxTokens: 10,
+    });
+
+    const generatedTitle = text.trim();
+
+    await ctx.runMutation(api.threads.updateThreadData.updateThreadData, {
+      thread_id: args.threadId,
+      metadata: { title: generatedTitle },
+    });
+
+    return generatedTitle;
   },
 });
 ```
 
-2. The `useChat` hook in `hooks/useChat.ts` calls this function after the first assistant message:
+2. The `useChat` hook in `hooks/chat/useChatCore.ts` calls this function after the first assistant message:
 
 ```typescript
-export function useChat(threadId: Id<"threads">) {
-  const generateTitle = useMutation(api.threads.generateTitle);
+export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
+  // ... other code ...
 
-  const handleNewMessage = useCallback(async (message: Message) => {
-    if (message.role === 'assistant') {
-      const messagesInThread = await getMessagesForThread(threadId);
-      if (messagesInThread.length === 2) { // User message + AI response
+  const vercelChatProps = useVercelChat({
+    // ... other props ...
+    onFinish: async (message, options) => {
+      if (threadId && user) {
+        const updatedMessages = [...threadData.messages, message as Message];
+        setThreadData({ ...threadData, messages: updatedMessages });
+
         try {
-          await generateTitle({ threadId });
-        } catch (error) {
-          console.error('Error generating title:', error);
+          const result = await sendMessageMutation({
+            thread_id: threadId,
+            clerk_user_id: user.id,
+            content: message.content,
+            role: message.role,
+            model_id: currentModelRef.current || model.id,
+          });
+
+          if (result && typeof result === 'object' && 'balance' in result) {
+            setBalance(result.balance as number);
+          }
+          setError(null);
+
+          if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+            try {
+              const title = await generateTitle({ threadId });
+              setThreadData((prevThreadData) => ({
+                ...prevThreadData,
+                metadata: { ...prevThreadData.metadata, title },
+              }));
+              
+              // Trigger the title update animation
+              await updateThreadData({ threadId, title });
+            } catch (error) {
+              console.error('Error generating title:', error);
+            }
+          }
+        } catch (error: any) {
+          console.error('Error saving chat message:', error);
+          setError(error.message || 'An error occurred while saving the message');
         }
       }
-    }
-  }, [threadId, generateTitle]);
+    },
+    // ... other code ...
+  });
 
-  // ... rest of the hook implementation
+  // ... rest of the component ...
 }
 ```
 
@@ -61,75 +116,144 @@ export function useChat(threadId: Id<"threads">) {
 
 The animation for updated chat titles is implemented in the `ChatItem` component.
 
-1. In `components/ChatItem.tsx`:
+1. In `panes/chats/ChatItem.tsx`:
 
 ```typescript
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-
 interface ChatItemProps {
+  index: number;
   chat: Chat;
+  children: React.ReactNode;
   isNew: boolean;
+  isUpdated: boolean;
 }
 
-export function ChatItem({ chat, isNew }: ChatItemProps) {
-  const [isUpdated, setIsUpdated] = useState(isNew);
-
-  useEffect(() => {
-    if (isUpdated) {
-      const timer = setTimeout(() => setIsUpdated(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [isUpdated]);
+export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
+  const shouldAnimate = isNew || isUpdated;
 
   return (
     <motion.div
-      initial={isUpdated ? { backgroundColor: "#4a5568" } : false}
-      animate={isUpdated ? { backgroundColor: "#2d3748" } : false}
-      transition={{ duration: 1 }}
+      className="relative h-8"
+      variants={{
+        initial: {
+          height: 0,
+          opacity: 0
+        },
+        animate: {
+          height: 'auto',
+          opacity: 1
+        }
+      }}
+      initial={shouldAnimate ? 'initial' : false}
+      animate={shouldAnimate ? 'animate' : false}
+      transition={{
+        duration: 0.25,
+        ease: 'easeIn'
+      }}
     >
-      <h3>{chat.title}</h3>
-      {/* ... other chat item content ... */}
+      {/* ... other content ... */}
+      <span className="whitespace-nowrap">
+        {shouldAnimate ? (
+          chat.title.split('').map((character, index) => (
+            <motion.span
+              key={index}
+              variants={{
+                initial: {
+                  opacity: 0,
+                  x: -100
+                },
+                animate: {
+                  opacity: 1,
+                  x: 0
+                }
+              }}
+              initial="initial"
+              animate="animate"
+              transition={{
+                duration: 0.25,
+                ease: 'easeIn',
+                delay: index * 0.05,
+                staggerChildren: 0.05
+              }}
+            >
+              {character}
+            </motion.span>
+          ))
+        ) : (
+          <span>{chat.title}</span>
+        )}
+      </span>
+      {/* ... other content ... */}
     </motion.div>
   );
 }
 ```
 
-2. In `components/ChatList.tsx`:
+2. In `panes/chats/ChatsPane.tsx`:
 
 ```typescript
-import { useQuery } from 'convex/react';
-import { api } from '../convex/_generated/api';
-import { ChatItem } from './ChatItem';
+export const ChatsPane: React.FC = () => {
+  // ... other code ...
 
-export function ChatList() {
-  const chats = useQuery(api.threads.getUserThreads) || [];
+  const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
+
+  // Effect to clear updatedChatIds after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setUpdatedChatIds(new Set());
+      localStorage.removeItem(UPDATED_CHATS_KEY);
+    }, 5000); // Clear after 5 seconds
+
+    return () => clearTimeout(timer);
+  }, [updatedChatIds]);
+
+  const handleTitleUpdate = (chatId: string) => {
+    const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
+    setUpdatedChatIds(newUpdatedChatIds);
+    localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
+  };
+
+  // ... other code ...
 
   return (
-    <div>
-      {chats.map((chat) => (
-        <ChatItem key={chat._id} chat={chat} isNew={chat.isNew} />
-      ))}
-    </div>
+    // ... other JSX ...
+    <ChatItem
+      key={chat._id}
+      index={sortedChats.indexOf(chat)}
+      chat={{
+        id: chat._id,
+        title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
+        sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
+        messages: [],
+        createdAt: new Date(chat._creationTime),
+        userId: chat.user_id,
+        path: ''
+      }}
+      isNew={!seenChatIds.has(chat._id)}
+      isUpdated={updatedChatIds.has(chat._id)}
+    >
+      {/* ... chat item content ... */}
+    </ChatItem>
+    // ... other JSX ...
   );
-}
+};
 ```
 
-## Deployment
+## Workflow
 
-To ensure the `generateTitle` function is available, make sure to deploy the updated Convex functions using:
-
-```
-npx convex deploy
-```
+1. When a new chat is created, the `generateTitle` function is called after the first assistant message.
+2. The generated title is saved to the thread's metadata.
+3. The `ChatsPane` component tracks updated chat IDs using the `updatedChatIds` state.
+4. When a chat's title is updated, the `handleTitleUpdate` function is called, which adds the chat ID to the `updatedChatIds` set.
+5. The `ChatItem` component receives the `isUpdated` prop, which triggers the animation when true.
+6. The animation lasts for 5 seconds before the `updatedChatIds` set is cleared.
 
 ## Troubleshooting
 
-- If you encounter errors related to missing Convex functions, ensure that you've run `npx convex deploy` after making changes to the Convex functions.
 - If the animation doesn't trigger when updating a chat title, check that:
-  1. The `generateTitle` mutation is correctly implemented in your Convex backend.
-  2. The `isNew` prop is being passed correctly to the `ChatItem` component.
-  3. The `useEffect` hook in `ChatItem` is working as expected.
+  1. The `generateTitle` function is being called correctly after the first assistant message.
+  2. The `handleTitleUpdate` function is being called when a title is updated.
+  3. The `isUpdated` prop is being passed correctly to the `ChatItem` component.
+  4. The `updatedChatIds` state in `ChatsPane` is being updated and cleared correctly.
 
 ## Future Improvements
 
