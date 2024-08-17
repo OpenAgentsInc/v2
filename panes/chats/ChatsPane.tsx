@@ -1,17 +1,11 @@
 'use client'
 
-import { useMutation, useQuery } from "convex/react"
+import { useQuery } from "convex/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { api } from "@/convex/_generated/api"
 import { usePaneStore } from "@/store/pane"
 import { useUser } from "@clerk/nextjs"
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogTitle
-} from "../../components/ui/alert-dialog"
 import { ChatItem } from "./ChatItem"
-import { ChatActions } from "./ChatActions"
 import { useChat } from "@/hooks/useChat"
 import { NewChatButton } from "./NewChatButton"
 
@@ -21,10 +15,7 @@ const UPDATED_CHATS_KEY = 'updatedChatIds';
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
-  const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
   const { panes, openChatPane } = usePaneStore();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
   const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -133,9 +124,7 @@ export const ChatsPane: React.FC = () => {
               }}
               isNew={!seenChatIds.has(chat._id)}
               isUpdated={updatedChatIds.has(chat._id)}
-            >
-              <ChatActions chatId={chat._id} />
-            </ChatItem>
+            />
           ))}
         </div>
       )}
