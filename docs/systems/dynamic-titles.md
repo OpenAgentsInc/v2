@@ -1,3 +1,5 @@
+Here's a combined version of the two documents, preserving all text:
+
 # Dynamic Title Generation and Animation
 
 After the first message is received from an assistant, a dynamic title is generated via OpenAI. When a chat's title is updated, an animation is triggered to highlight the change.
@@ -8,7 +10,116 @@ The dynamic title generation is implemented using Convex functions, and the anim
 
 ### Title Generation
 
-[The existing content for Title Generation remains unchanged]
+1. The `generateTitle` function is defined in `convex/threads/generateTitle.ts`:
+
+```typescript
+export const generateTitle = action({
+  args: { threadId: v.id("threads") },
+  async handler(ctx: ActionCtx, args: { threadId: Id<"threads"> }): Promise<string> {
+    const messages = await ctx.runQuery(api.threads.getThreadMessages.getThreadMessages, args);
+
+    if (messages.length === 0) {
+      return "New Thread";
+    }
+
+    const formattedMessages = messages
+      .map((msg: Doc<"messages">) => `${msg.role}: ${msg.content}`)
+      .join("\n");
+
+    const modelObj = models.find((m) => m.name === "GPT-4o Mini");
+    if (!modelObj) {
+      throw new Error("Model not found");
+    }
+
+    const { text } = await generateText({
+      model: openai(modelObj.id),
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant that generates concise and relevant titles for chat conversations.",
+        },
+        {
+          role: "user",
+          content: `Please generate a short, concise title (5 words or less) for the following conversation. Do not wrap it in quotes, just the text:\n\n${formattedMessages}`,
+        },
+      ],
+      temperature: 0.7,
+      maxTokens: 10,
+    });
+
+    const generatedTitle = text.trim();
+
+    await ctx.runMutation(api.threads.updateThreadData.updateThreadData, {
+      thread_id: args.threadId,
+      metadata: { title: generatedTitle },
+    });
+
+    return generatedTitle;
+  },
+});
+```
+
+2. The `useChat` hook in `hooks/chat/useChatCore.ts` calls this function after the first assistant message:
+
+```typescript
+export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, onTitleUpdate?: (chatId: string) => void }) {
+  // ... other code ...
+
+  const vercelChatProps = useVercelChat({
+    // ... other props ...
+    onFinish: async (message, options) => {
+      if (threadId && user) {
+        const updatedMessages = [...threadData.messages, message as Message];
+        setThreadData({ ...threadData, messages: updatedMessages });
+
+        try {
+          const result = await sendMessageMutation({
+            thread_id: threadId,
+            clerk_user_id: user.id,
+            content: message.content,
+            role: message.role,
+            model_id: currentModelRef.current || model.id,
+          });
+
+          if (result && typeof result === 'object' && 'balance' in result) {
+            setBalance(result.balance as number);
+          }
+          setError(null);
+
+          if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+            try {
+              console.log('Generating title for thread:', threadId);
+              const title = await generateTitle({ threadId });
+              console.log('Generated title:', title);
+              setThreadData((prevThreadData) => ({
+                ...prevThreadData,
+                metadata: { ...prevThreadData.metadata, title },
+              }));
+
+              // Trigger the title update animation
+              await updateThreadData({ threadId, title });
+              console.log('Title updated in thread data');
+              if (onTitleUpdate) {
+                console.log('Calling onTitleUpdate with threadId:', threadId);
+                onTitleUpdate(threadId);
+              }
+            } catch (error) {
+              console.error('Error generating title:', error);
+            }
+          }
+        } catch (error: any) {
+          console.error('Error saving chat message:', error);
+          setError(error.message || 'An error occurred while saving the message');
+        }
+      }
+    },
+    // ... other code ...
+  });
+
+  // ... rest of the component ...
+}
+```
 
 ### Title Update Animation
 
@@ -131,7 +242,18 @@ export const ChatsPane: React.FC = () => {
     // ... other JSX ...
     <ChatItem
       key={`${chat._id}-${forceUpdate}`}
-      // ... other props ...
+      index={sortedChats.indexOf(chat)}
+      chat={{
+        id: chat._id,
+        title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
+        sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
+        messages: [],
+        createdAt: new Date(chat._creationTime),
+        userId: chat.user_id,
+        path: ''
+      }}
+      isNew={!seenChatIds.has(chat._id)}
+      isUpdated={updatedChatIds.has(chat._id)}
     >
       {/* ... chat item content ... */}
     </ChatItem>
@@ -169,7 +291,7 @@ If you're still experiencing issues:
 4. Confirm that the `isUpdated` prop is being passed correctly to the `ChatItem` component.
 5. Verify that the `updatedChatIds` state in `ChatsPane` is being updated and cleared correctly.
 6. Check that the `shouldAnimate` state in the `ChatItem` component is correctly set based on the `isNew` and `isUpdated` props.
-7. Ensure that the `forceUpdate` state in `ChatsPane` is triggering a re-render of the `ChatItem` components.
+7. Verify that the `forceUpdate` state in `ChatsPane` is triggering a re-render of the `ChatItem` components.
 
 If you notice any discrepancies in the logs, investigate:
 
