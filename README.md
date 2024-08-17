@@ -71,15 +71,24 @@ The codebase and documentation is optimized for agents to understand and travers
 - docs/ - Background info
   - refactor-notes/ - Notes of recent work done on major systems: may be helpful in catching up on recent developments
   - systems/ - Descriptions of how we implement specific systems
+    - chat.md
+    - dynamic-titles.md
     - email.md
     - monetization.md
     - panes.md
+    - sharing-and-referrals.md
 - hooks/
   - useChat.ts - Where most chat logic resides
 - lib/
 - panes/ - HUD panes
   - chat/ - Chat pane shows an individual chat (thread)
   - chats/ - Chats pane shows list of user chats (threads)
+    - ChatActions.tsx
+    - ChatItem.tsx
+    - ChatsPane.tsx
+    - index.ts - Exports all
+    - NewChatButton.tsx
+    - useChatActions.ts
   - user/ - User pane shows name/avatar, settings, credit balance
 - public/
 - store/
