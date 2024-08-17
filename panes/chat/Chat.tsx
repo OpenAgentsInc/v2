@@ -5,33 +5,18 @@ import { useChat } from "@/hooks/useChat"
 import { useChatScroll } from "@/hooks/useChatScroll"
 import { Message } from "@/types"
 import { ChatList } from "./ChatList"
-import { useCallback, useEffect } from "react"
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   threadId: Id<"threads">
 }
 
 export const Chat = ({ threadId, className }: ChatProps) => {
-  const handleTitleUpdate = useCallback((chatId: string) => {
-    console.log('Title updated for chat:', chatId);
-    // You might want to trigger a re-render of the chat list or update the UI in some way
-  }, []);
-
   const {
     messages,
     sendMessage,
     isLoading,
-    threadData
-  } = useChat({ propsId: threadId, onTitleUpdate: handleTitleUpdate })
+  } = useChat({ propsId: threadId })
   const chatContainerRef = useChatScroll(messages);
-
-  useEffect(() => {
-    console.log('Chat component received new threadId:', threadId);
-  }, [threadId]);
-
-  useEffect(() => {
-    console.log('Chat component threadData updated:', threadData);
-  }, [threadData]);
 
   return (
     <div className={`bg-transparent hover:bg-black hover:bg-opacity-100 transition-all duration-300 ease-in-out flex flex-col h-full ${className}`}>
