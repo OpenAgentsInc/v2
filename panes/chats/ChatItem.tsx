@@ -32,12 +32,13 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
       setPrevTitle(chat.title);
+      // Add a small delay before starting the animation
       const animationDelay = setTimeout(() => {
         setShouldAnimate(true);
       }, 50);
       const animationDuration = setTimeout(() => {
         setShouldAnimate(false);
-      }, 5050);
+      }, 5050); // 5000ms animation + 50ms delay
       return () => {
         clearTimeout(animationDelay);
         clearTimeout(animationDuration);
