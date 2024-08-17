@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { api } from "@/convex/_generated/api"
@@ -8,6 +8,7 @@ import { Chat, ServerActionResult } from "@/lib/types"
 export const useChatActions = () => {
   const deleteChat = useMutation(api.threads.deleteThread.deleteThread);
   const shareChat = useMutation(api.threads.shareThread.shareThread);
+  const getCurrentUser = useQuery(api.users.getUserData.getUserData);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
@@ -46,7 +47,12 @@ export const useChatActions = () => {
     if (!isShared) {
       return;
     }
-    const shareUrl = `${window.location.origin}/share/${chatId}`;
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      toast.error('Failed to get current user');
+      return;
+    }
+    const shareUrl = `${window.location.origin}/share/${chatId}?ref=${currentUser._id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
       toast.success('Chat link copied to clipboard');
@@ -61,7 +67,12 @@ export const useChatActions = () => {
     if (!isShared) {
       return;
     }
-    const shareUrl = `${window.location.origin}/share/${chatId}`;
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      toast.error('Failed to get current user');
+      return;
+    }
+    const shareUrl = `${window.location.origin}/share/${chatId}?ref=${currentUser._id}`;
     const tweetText = `Check out my OpenAgents chat, '${title}':`;
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
