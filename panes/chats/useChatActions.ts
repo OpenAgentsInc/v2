@@ -23,39 +23,33 @@ export const useChatActions = () => {
     }
   };
 
-  const handleShare = async (chatId: string): ServerActionResult<Chat> => {
+  const handleShare = (chatId: string): string => {
     setIsSharing(true);
     try {
-      const result = await shareChat({ thread_id: chatId as Id<'threads'> });
+      const result = shareChat({ thread_id: chatId as Id<'threads'> });
       if (result && 'error' in result) {
         toast.error(result.error);
-        return result;
+        return '';
       }
-      return result as Chat;
+      const shareUrl = `${window.location.origin}/share/${result.shareToken}`;
+      return shareUrl;
     } catch (error) {
       console.error('Error sharing chat:', error);
       toast.error('Failed to share chat');
-      return { error: 'Failed to share chat' };
+      return '';
     } finally {
       setIsSharing(false);
     }
   };
 
-  const getShareUrl = (chat: Chat) => {
-    if (!chat.sharePath) {
-      return null;
-    }
-    return `${window.location.origin}${chat.sharePath}`;
-  };
-
-  const handleCopyShareLink = async (chat: Chat) => {
-    const shareUrl = getShareUrl(chat);
+  const handleCopyShareLink = (chatId: string) => {
+    const shareUrl = handleShare(chatId);
     if (!shareUrl) {
       toast.error('Could not generate share link');
       return;
     }
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      navigator.clipboard.writeText(shareUrl);
       toast.success('Chat link copied to clipboard');
     } catch (error) {
       console.error('Error copying share link:', error);
@@ -63,8 +57,8 @@ export const useChatActions = () => {
     }
   };
 
-  const handleShareTwitter = (chat: Chat) => {
-    const shareUrl = getShareUrl(chat);
+  const handleShareTwitter = (chatId: string) => {
+    const shareUrl = handleShare(chatId);
     if (!shareUrl) {
       toast.error('Could not generate share link');
       return;
