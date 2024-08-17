@@ -74,3 +74,47 @@ To verify the changes:
    - Simplified error handling and share URL generation
 
 These changes complete the integration of the new share dialog functionality, ensuring a more streamlined and consistent user experience when sharing chat threads.
+
+## Addendum (2024-08-19)
+
+### Refactoring to Remove sharePath and Implement isShared
+
+1. Updated Schema (convex/schema.ts):
+   - Removed `shareToken` field from the `threads` table
+   - Added `isShared` boolean field to the `threads` table
+   - Updated index from `by_shareToken` to `by_isShared`
+
+2. Modified ChatShareDialog Component (panes/chats/ChatShareDialog.tsx):
+   - Updated `onShare` prop to return a Promise<boolean> instead of a string
+   - Modified handleShare logic to work with the new isShared boolean
+   - Updated share URL generation to use chatId directly
+
+3. Refactored useChatActions Hook (panes/chats/useChatActions.ts):
+   - Updated handleShare to return a boolean indicating success
+   - Modified handleCopyShareLink and handleShareTwitter to work with the new sharing logic
+   - Simplified share URL generation
+
+4. Updated shareThread Mutation (convex/threads/shareThread.ts):
+   - Removed shareToken generation
+   - Set `isShared` to true when sharing a thread
+   - Return a boolean indicating success
+
+5. Modified getSharedThread Query (convex/threads/getSharedThread.ts):
+   - Updated to check `isShared` boolean instead of `shareToken`
+
+These changes simplify the sharing mechanism by using a boolean flag instead of a token, making the system more straightforward and easier to maintain. The share URL now uses the thread ID directly, which is more consistent with the rest of the application's URL structure.
+
+## Testing
+To verify the new changes:
+1. Open a chat thread
+2. Click the share button to open the share dialog
+3. Test sharing the chat and copying the link
+4. Verify the shared link works for viewing the chat
+5. Check that previously shared chats are still accessible
+6. Ensure error cases are handled properly (e.g., trying to share a non-existent thread)
+
+## Next Steps
+- Update any remaining components or functions that might still be using the old `shareToken` system
+- Consider implementing a migration script to convert existing `shareToken` entries to the new `isShared` boolean
+- Update documentation and API references to reflect the new sharing mechanism
+- Monitor performance and user feedback on the updated sharing system
