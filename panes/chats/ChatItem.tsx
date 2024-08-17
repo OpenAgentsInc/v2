@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import * as React from "react"
 import { buttonVariants } from "@/components/ui/button"
 import { IconMessage, IconUsers } from "@/components/ui/icons"
@@ -17,7 +17,7 @@ interface ChatItemProps {
   chat: Chat
   children: React.ReactNode
   isNew: boolean
-  isUpdated: boolean
+  isUpdated: boolean // New prop to indicate if the title has been updated
 }
 
 export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
@@ -27,13 +27,11 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
-  const [isInitialRender, setIsInitialRender] = React.useState(true)
 
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
       setShouldAnimate(true);
       setPrevTitle(chat.title);
-      setIsInitialRender(false);
       const timer = setTimeout(() => {
         setShouldAnimate(false);
       }, 5000); // Reset after 5 seconds
@@ -50,7 +48,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
 
   return (
     <motion.div
-      className="relative"
+      className="relative "
       variants={{
         initial: {
           height: 0,
@@ -97,23 +95,40 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
           className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
           title={chat.title}
         >
-          <AnimatePresence>
-            {(shouldAnimate || !isInitialRender) && (
-              <motion.span
-                key={chat.title}
-                className="whitespace-nowrap absolute"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.5 }}
-              >
-                {chat.title}
-              </motion.span>
+          <span className="whitespace-nowrap">
+            {shouldAnimate ? (
+              chat.title.split('').map((character, index) => (
+                <motion.span
+                  key={index}
+                  variants={{
+                    initial: {
+                      opacity: 0,
+                      x: -100
+                    },
+                    animate: {
+                      opacity: 1,
+                      x: 0
+                    }
+                  }}
+                  initial="initial"
+                  animate="animate"
+                  transition={{
+                    duration: 0.25,
+                    ease: 'easeIn',
+                    delay: index * 0.05,
+                    staggerChildren: 0.05
+                  }}
+                >
+                  {character}
+                </motion.span>
+              ))
+            ) : (
+              <span>{chat.title}</span>
             )}
-          </AnimatePresence>
+          </span>
         </div>
       </button>
       {isActive && <div className="absolute right-2 top-1">{children}</div>}
-    </motion.div>
+    </motion.div >
   )
 }
