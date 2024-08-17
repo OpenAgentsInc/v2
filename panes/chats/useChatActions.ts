@@ -43,8 +43,6 @@ export const useChatActions = () => {
     } catch (error) {
       console.error('Error copying share link:', error);
       toast.error('Failed to copy share link');
-    } finally {
-      setIsSharing(false);
     }
   };
 
@@ -52,7 +50,6 @@ export const useChatActions = () => {
     const shareUrl = getShareUrl(chatId);
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=Check out this chat on OpenAgents!&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
-    setIsSharing(false);
   };
 
   const closeShareDialog = () => {
@@ -67,5 +64,6 @@ export const useChatActions = () => {
     closeShareDialog,
     isDeleting,
     isSharing,
+    setIsSharing,
   };
 };
