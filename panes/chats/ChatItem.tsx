@@ -32,13 +32,12 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
       setPrevTitle(chat.title);
-      // Add a small delay before starting the animation
       const animationDelay = setTimeout(() => {
         setShouldAnimate(true);
       }, 50);
       const animationDuration = setTimeout(() => {
         setShouldAnimate(false);
-      }, 5050); // 5000ms animation + 50ms delay
+      }, 5050);
       return () => {
         clearTimeout(animationDelay);
         clearTimeout(animationDuration);
@@ -55,23 +54,14 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
 
   return (
     <motion.div
-      className="relative py-1"
+      className="relative"
       variants={{
-        initial: {
-          height: 'auto',
-          opacity: 1
-        },
-        animate: {
-          height: 'auto',
-          opacity: 1
-        }
+        initial: { opacity: 1 },
+        animate: { opacity: 1 }
       }}
       initial="initial"
       animate="animate"
-      transition={{
-        duration: 0.25,
-        ease: 'easeIn'
-      }}
+      transition={{ duration: 0.25, ease: 'easeIn' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -101,7 +91,7 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
           )}
         </div>
         <div
-          className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
+          className="relative flex-1 select-none overflow-hidden text-ellipsis break-all"
           title={chat.title}
         >
           <span className="whitespace-nowrap">
@@ -110,14 +100,8 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
                 <motion.span
                   key={index}
                   variants={{
-                    initial: {
-                      opacity: 0,
-                      x: -10
-                    },
-                    animate: {
-                      opacity: 1,
-                      x: 0
-                    }
+                    initial: { opacity: 0, x: -10 },
+                    animate: { opacity: 1, x: 0 }
                   }}
                   initial="initial"
                   animate="animate"
