@@ -2,13 +2,20 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
+import { createPortal } from 'react-dom'
+import { useEffect, useState } from 'react'
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
     const { theme = "system" } = useTheme()
+    const [isMounted, setIsMounted] = useState(false)
 
-    return (
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
+
+    const toasterContent = (
         <Sonner
             theme={theme as ToasterProps["theme"]}
             className="toaster group font-mono"
@@ -26,6 +33,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
             {...props}
         />
     )
+
+    // Only render in the browser
+    if (!isMounted) return null
+
+    return createPortal(toasterContent, document.body)
 }
 
 export { Toaster }
