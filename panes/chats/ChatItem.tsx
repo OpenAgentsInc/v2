@@ -27,6 +27,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
+  const [isHovered, setIsHovered] = React.useState(false)
 
   React.useEffect(() => {
     if (isNew || isUpdated || chat.title !== prevTitle) {
@@ -65,6 +66,8 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
         duration: 0.25,
         ease: 'easeIn'
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
         {chat.sharePath ? (
@@ -128,7 +131,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
           </span>
         </div>
       </button>
-      {isActive && <div className="absolute right-2 top-1">{children}</div>}
+      {(isActive || isHovered) && <div className="absolute right-2 top-1">{children}</div>}
     </motion.div >
   )
 }
