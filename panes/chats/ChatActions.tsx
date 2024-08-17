@@ -63,7 +63,7 @@ export function ChatActions({
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className="size-7 p-0 hover:bg-background"
+              className="size-7 p-1 bg-black hover:bg-gray-800"
               onClick={handleShareClick}
             >
               <IconShare />
