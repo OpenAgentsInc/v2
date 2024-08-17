@@ -17,6 +17,7 @@ import { ChatItem } from "./ChatItem"
 import { useChatActions } from "./useChatActions"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
+const UPDATED_CHATS_KEY = 'updatedChatIds';
 
 interface NewChatButtonProps {
   userId: string;
@@ -64,6 +65,7 @@ export const ChatsPane: React.FC = () => {
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
+  const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
 
   const sortedChats = useMemo(() => {
     if (!chats) return [];
@@ -77,6 +79,12 @@ export const ChatsPane: React.FC = () => {
     const storedSeenChatIds = localStorage.getItem(SEEN_CHATS_KEY);
     if (storedSeenChatIds) {
       setSeenChatIds(new Set(JSON.parse(storedSeenChatIds)));
+    }
+
+    // Load updated chat IDs from local storage
+    const storedUpdatedChatIds = localStorage.getItem(UPDATED_CHATS_KEY);
+    if (storedUpdatedChatIds) {
+      setUpdatedChatIds(new Set(JSON.parse(storedUpdatedChatIds)));
     }
   }, []);
 
@@ -99,6 +107,16 @@ export const ChatsPane: React.FC = () => {
     }
   }, [sortedChats, seenChatIds]);
 
+  // Effect to clear updatedChatIds after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setUpdatedChatIds(new Set());
+      localStorage.removeItem(UPDATED_CHATS_KEY);
+    }, 5000); // Clear after 5 seconds
+
+    return () => clearTimeout(timer);
+  }, [updatedChatIds]);
+
   const confirmDelete = async () => {
     if (chatToDelete) {
       await handleDelete(chatToDelete);
@@ -113,6 +131,12 @@ export const ChatsPane: React.FC = () => {
       title: 'New Chat',
       type: 'chat',
     }, isCommandKeyHeld);
+  };
+
+  const handleTitleUpdate = (chatId: string) => {
+    const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
+    setUpdatedChatIds(newUpdatedChatIds);
+    localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
   };
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
@@ -149,6 +173,7 @@ export const ChatsPane: React.FC = () => {
                 path: ''
               }}
               isNew={!seenChatIds.has(chat._id)}
+              isUpdated={updatedChatIds.has(chat._id)}
             >
               <div className="flex space-x-2">
                 <button onClick={() => handleShare(chat._id)} disabled={isSharing}>
