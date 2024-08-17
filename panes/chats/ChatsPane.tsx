@@ -11,15 +11,12 @@ import { ChatItem } from "./ChatItem"
 import { NewChatButton } from "./NewChatButton"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
-const UPDATED_CHATS_KEY = 'updatedChatIds';
 
 export const ChatsPane: React.FC = () => {
   const { user } = useUser();
   const chats = useQuery(api.threads.getUserThreads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const { panes, openChatPane } = usePaneStore();
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
-  const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   const deleteThread = useMutation(api.threads.deleteThread.deleteThread);
 
@@ -35,12 +32,6 @@ export const ChatsPane: React.FC = () => {
     const storedSeenChatIds = localStorage.getItem(SEEN_CHATS_KEY);
     if (storedSeenChatIds) {
       setSeenChatIds(new Set(JSON.parse(storedSeenChatIds)));
-    }
-
-    // Load updated chat IDs from local storage
-    const storedUpdatedChatIds = localStorage.getItem(UPDATED_CHATS_KEY);
-    if (storedUpdatedChatIds) {
-      setUpdatedChatIds(new Set(JSON.parse(storedUpdatedChatIds)));
     }
   }, []);
 
@@ -63,30 +54,12 @@ export const ChatsPane: React.FC = () => {
     }
   }, [sortedChats, seenChatIds]);
 
-  // Effect to clear updatedChatIds after a delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setUpdatedChatIds(new Set());
-      localStorage.removeItem(UPDATED_CHATS_KEY);
-      setForceUpdate(prev => prev + 1); // Force re-render
-    }, 5000); // Clear after 5 seconds
-
-    return () => clearTimeout(timer);
-  }, [updatedChatIds]);
-
   const handleNewChat = (threadId: string, isCommandKeyHeld: boolean) => {
     openChatPane({
       id: threadId,
       title: 'New Chat',
       type: 'chat',
     }, isCommandKeyHeld);
-  };
-
-  const handleTitleUpdate = (chatId: string) => {
-    const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
-    setUpdatedChatIds(newUpdatedChatIds);
-    localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
-    setForceUpdate(prev => prev + 1); // Force re-render
   };
 
   const removeChat = async ({ id }: { id: string }) => {
@@ -101,8 +74,8 @@ export const ChatsPane: React.FC = () => {
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
-  // Use the useChat hook with the onTitleUpdate callback
-  useChat({ propsId: activeChatId, onTitleUpdate: handleTitleUpdate });
+  // Use the useChat hook without the onTitleUpdate callback
+  useChat({ propsId: activeChatId });
 
   const isLoading = chats === undefined;
 
@@ -124,7 +97,7 @@ export const ChatsPane: React.FC = () => {
         <div className="flex-grow overflow-y-auto">
           {sortedChats.map((chat) => (
             <ChatItem
-              key={`${chat._id}-${forceUpdate}`}
+              key={chat._id}
               index={sortedChats.indexOf(chat)}
               chat={{
                 id: chat._id,
@@ -136,7 +109,7 @@ export const ChatsPane: React.FC = () => {
                 path: ''
               }}
               isNew={!seenChatIds.has(chat._id)}
-              isUpdated={updatedChatIds.has(chat._id)}
+              isUpdated={false}
             >
               <ChatActions chatId={chat._id} removeChat={removeChat} />
             </ChatItem>
