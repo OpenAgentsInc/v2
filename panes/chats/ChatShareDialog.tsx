@@ -66,7 +66,7 @@ export function ChatShareDialog({
         <DialogHeader>
           <DialogTitle>Share link to chat</DialogTitle>
           <DialogDescription>
-            Anyone with the URL will be able to view the shared chat.
+            Anyone with the URL will be able to view the shared chat. You'll earn $5 of credit for anyone who joins OpenAgents after signing up through your link.
           </DialogDescription>
         </DialogHeader>
         <div className="p-4 space-y-1 text-sm border rounded-md">
