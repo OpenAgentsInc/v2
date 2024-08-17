@@ -135,6 +135,7 @@ export const ChatsPane: React.FC = () => {
   };
 
   const handleTitleUpdate = (chatId: string) => {
+    console.log('Title update triggered for chat:', chatId);
     const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
     setUpdatedChatIds(newUpdatedChatIds);
     localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
