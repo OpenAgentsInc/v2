@@ -23,33 +23,32 @@ export const useChatActions = () => {
     }
   };
 
-  const handleShare = (chatId: string): string => {
+  const handleShare = async (chatId: string): Promise<boolean> => {
     setIsSharing(true);
     try {
-      const result = shareChat({ thread_id: chatId as Id<'threads'> });
-      if (result && 'error' in result) {
-        toast.error(result.error);
-        return '';
+      const result = await shareChat({ thread_id: chatId as Id<'threads'> });
+      if (!result) {
+        toast.error('Failed to share chat');
+        return false;
       }
-      const shareUrl = `${window.location.origin}/share/${result.shareToken}`;
-      return shareUrl;
+      return true;
     } catch (error) {
       console.error('Error sharing chat:', error);
       toast.error('Failed to share chat');
-      return '';
+      return false;
     } finally {
       setIsSharing(false);
     }
   };
 
-  const handleCopyShareLink = (chatId: string) => {
-    const shareUrl = handleShare(chatId);
-    if (!shareUrl) {
-      toast.error('Could not generate share link');
+  const handleCopyShareLink = async (chatId: string) => {
+    const isShared = await handleShare(chatId);
+    if (!isShared) {
       return;
     }
+    const shareUrl = `${window.location.origin}/share/${chatId}`;
     try {
-      navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(shareUrl);
       toast.success('Chat link copied to clipboard');
     } catch (error) {
       console.error('Error copying share link:', error);
@@ -57,12 +56,12 @@ export const useChatActions = () => {
     }
   };
 
-  const handleShareTwitter = (chatId: string) => {
-    const shareUrl = handleShare(chatId);
-    if (!shareUrl) {
-      toast.error('Could not generate share link');
+  const handleShareTwitter = async (chatId: string) => {
+    const isShared = await handleShare(chatId);
+    if (!isShared) {
       return;
     }
+    const shareUrl = `${window.location.origin}/share/${chatId}`;
     const twitterShareUrl = `https://twitter.com/intent/tweet?text=Check out this chat on OpenAgents!&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterShareUrl, '_blank');
   };
