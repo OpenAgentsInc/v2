@@ -33,6 +33,7 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
   const fetchMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
   const createNewThread = useMutation(api.threads.createNewThread.createNewThread)
   const generateTitle = useAction(api.threads.generateTitle.generateTitle)
+  const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData)
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)
@@ -70,6 +71,9 @@ export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
                 ...prevThreadData,
                 metadata: { ...prevThreadData.metadata, title },
               }))
+              
+              // Trigger the title update animation
+              await updateThreadData({ threadId, title })
             } catch (error) {
               console.error('Error generating title:', error)
             }
