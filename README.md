@@ -30,6 +30,10 @@ The codebase and documentation is optimized for agents to understand and travers
 
 ## Folders & important files
 - app/
+  - api/
+  - share/
+    - [threadId]/
+      - page.tsx
 - components/
   - auth/
   - canvas/
