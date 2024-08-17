@@ -29,6 +29,7 @@ export default defineSchema({
     image: v.optional(v.string()),
     credits: v.number(),
     createdAt: v.string(),
+    referrer_id: v.optional(v.id("users")),
   })
     .index('by_clerk_user_id', ['clerk_user_id'])
     .index('by_email', ['email']),
