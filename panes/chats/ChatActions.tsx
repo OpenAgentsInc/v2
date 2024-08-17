@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
 
-import { ServerActionResult, type Chat } from '@/types'
+import { ServerActionResult } from '@/types'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -25,12 +25,12 @@ import {
 import { useChatActions } from './useChatActions'
 
 interface ChatActionsProps {
-    chat: Chat
-    removeChat: (args: { id: string; path: string }) => Promise<ServerActionResult<void>>
+    chatId: string
+    removeChat: (args: { id: string }) => Promise<ServerActionResult<void>>
 }
 
 export function ChatActions({
-    chat,
+    chatId,
     removeChat
 }: ChatActionsProps) {
     const router = useRouter()
@@ -41,8 +41,7 @@ export function ChatActions({
     const handleRemoveChat = React.useCallback(async () => {
         startRemoveTransition(async () => {
             const result = await removeChat({
-                id: chat.id,
-                path: chat.path
+                id: chatId
             })
 
             if (result.success === false) {
@@ -55,7 +54,7 @@ export function ChatActions({
             router.push('/')
             toast.success('Chat deleted')
         })
-    }, [chat.id, chat.path, removeChat, router])
+    }, [chatId, removeChat, router])
 
     return (
         <>
@@ -66,7 +65,7 @@ export function ChatActions({
                             variant="ghost"
                             className="size-7 p-0 hover:bg-background"
                             disabled={isSharing}
-                            onClick={() => handleShare(chat.id)}
+                            onClick={() => handleShare(chatId)}
                         >
                             <IconShare />
                             <span className="sr-only">Share</span>
