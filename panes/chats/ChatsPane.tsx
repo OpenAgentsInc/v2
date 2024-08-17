@@ -10,6 +10,7 @@ import { ChatActions } from "./ChatActions"
 import { ChatItem } from "./ChatItem"
 import { NewChatButton } from "./NewChatButton"
 import { AnimatePresence, motion } from "framer-motion"
+import { Id } from "@/convex/_generated/dataModel"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 
@@ -32,7 +33,7 @@ export const ChatsPane: React.FC = () => {
   // Fetch message counts for all chats
   const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount, 
     { thread_ids: sortedChats.map(chat => chat._id) }
-  ) ?? {};
+  ) as { [key: Id<"threads">]: number } | undefined;
 
   useEffect(() => {
     // Load seen chat IDs from local storage
@@ -129,7 +130,7 @@ export const ChatsPane: React.FC = () => {
                     <ChatActions
                       chatId={chat._id}
                       title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
-                      messageCount={messageCounts[chat._id] ?? 0}
+                      messageCount={messageCounts?.[chat._id] ?? 0}
                       removeChat={removeChat}
                     />
                   </ChatItem>
