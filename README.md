@@ -90,6 +90,7 @@ The codebase and documentation is optimized for agents to understand and travers
   - chats/ - Chats pane shows list of user chats (threads)
     - ChatActions.tsx
     - ChatItem.tsx
+    - ChatShareDialog.tsx
     - ChatsPane.tsx
     - index.ts - Exports all
     - NewChatButton.tsx
