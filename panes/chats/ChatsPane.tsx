@@ -67,6 +67,7 @@ export const ChatsPane: React.FC = () => {
   const { handleShare, handleDelete, isDeleting, isSharing } = useChatActions();
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
   const [updatedChatIds, setUpdatedChatIds] = useState<Set<string>>(new Set());
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const sortedChats = useMemo(() => {
     if (!chats) return [];
@@ -114,6 +115,7 @@ export const ChatsPane: React.FC = () => {
       setUpdatedChatIds(new Set());
       localStorage.removeItem(UPDATED_CHATS_KEY);
       console.log('Cleared updatedChatIds');
+      setForceUpdate(prev => prev + 1); // Force re-render
     }, 5000); // Clear after 5 seconds
 
     return () => clearTimeout(timer);
@@ -141,6 +143,7 @@ export const ChatsPane: React.FC = () => {
     setUpdatedChatIds(newUpdatedChatIds);
     localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
     console.log('Updated updatedChatIds:', newUpdatedChatIds);
+    setForceUpdate(prev => prev + 1); // Force re-render
   };
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
@@ -168,7 +171,7 @@ export const ChatsPane: React.FC = () => {
         <div className="flex-grow overflow-y-auto">
           {sortedChats.map((chat) => (
             <ChatItem
-              key={chat._id}
+              key={`${chat._id}-${forceUpdate}`}
               index={sortedChats.indexOf(chat)}
               chat={{
                 id: chat._id,
