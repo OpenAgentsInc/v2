@@ -124,7 +124,7 @@ export const ChatsPane: React.FC = () => {
                     <ChatActions
                       chatId={chat._id}
                       title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
-                      messageCount={chat.messages?.length || 0}
+                      messageCount={useQuery(api.threads.getThreadMessageCount.getThreadMessageCount, { thread_id: chat._id }) || 0}
                       removeChat={removeChat}
                     />
                   </ChatItem>
