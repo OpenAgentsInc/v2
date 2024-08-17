@@ -15,7 +15,7 @@ import {
 } from "../../components/ui/alert-dialog"
 import { ChatItem } from "./ChatItem"
 import { useChatActions } from "./useChatActions"
-import { useChat } from "@/hooks/chat/useChatCore"
+import { useChat } from "@/hooks/useChat"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 const UPDATED_CHATS_KEY = 'updatedChatIds';
@@ -113,6 +113,7 @@ export const ChatsPane: React.FC = () => {
     const timer = setTimeout(() => {
       setUpdatedChatIds(new Set());
       localStorage.removeItem(UPDATED_CHATS_KEY);
+      console.log('Cleared updatedChatIds');
     }, 5000); // Clear after 5 seconds
 
     return () => clearTimeout(timer);
@@ -139,6 +140,7 @@ export const ChatsPane: React.FC = () => {
     const newUpdatedChatIds = new Set(updatedChatIds).add(chatId);
     setUpdatedChatIds(newUpdatedChatIds);
     localStorage.setItem(UPDATED_CHATS_KEY, JSON.stringify(Array.from(newUpdatedChatIds)));
+    console.log('Updated updatedChatIds:', newUpdatedChatIds);
   };
 
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
