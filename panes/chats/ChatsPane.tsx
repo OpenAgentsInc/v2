@@ -9,6 +9,7 @@ import { useUser } from "@clerk/nextjs"
 import { ChatActions } from "./ChatActions"
 import { ChatItem } from "./ChatItem"
 import { NewChatButton } from "./NewChatButton"
+import { AnimatePresence, motion } from "framer-motion"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 
@@ -17,6 +18,7 @@ export const ChatsPane: React.FC = () => {
   const chats = useQuery(api.threads.getUserThreads.getUserThreads, { clerk_user_id: user?.id ?? "skip" });
   const { panes, openChatPane } = usePaneStore();
   const [seenChatIds, setSeenChatIds] = useState<Set<string>>(new Set());
+  const [deletedChatIds, setDeletedChatIds] = useState<Set<string>>(new Set());
 
   const deleteThread = useMutation(api.threads.deleteThread.deleteThread);
 
@@ -65,6 +67,7 @@ export const ChatsPane: React.FC = () => {
   const removeChat = async ({ id }: { id: string }) => {
     try {
       await deleteThread({ thread_id: id });
+      setDeletedChatIds(prev => new Set(prev).add(id));
       return { success: true };
     } catch (error) {
       console.error('Error deleting thread:', error);
@@ -95,25 +98,40 @@ export const ChatsPane: React.FC = () => {
         </div>
       ) : (
         <div className="flex-grow overflow-y-auto">
-          {sortedChats.map((chat) => (
-            <ChatItem
-              key={chat._id}
-              index={sortedChats.indexOf(chat)}
-              chat={{
-                id: chat._id,
-                title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
-                sharePath: chat.shareToken ? `/share/${chat.shareToken}` : undefined,
-                messages: [],
-                createdAt: new Date(chat._creationTime),
-                userId: chat.user_id,
-                path: ''
-              }}
-              isNew={!seenChatIds.has(chat._id)}
-              isUpdated={false}
-            >
-              <ChatActions chatId={chat._id} removeChat={removeChat} />
-            </ChatItem>
-          ))}
+          <AnimatePresence>
+            {sortedChats.map((chat) => (
+              !deletedChatIds.has(chat._id) && (
+                <motion.div
+                  key={chat._id}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChatItem
+                    index={sortedChats.indexOf(chat)}
+                    chat={{
+                      id: chat._id,
+                      title: chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`,
+                      messages: [],
+                      createdAt: new Date(chat._creationTime),
+                      userId: chat.user_id,
+                      path: ''
+                    }}
+                    isNew={!seenChatIds.has(chat._id)}
+                    isUpdated={false}
+                  >
+                    <ChatActions
+                      chatId={chat._id}
+                      title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
+                      messageCount={chat.messages?.length || 0}
+                      removeChat={removeChat}
+                    />
+                  </ChatItem>
+                </motion.div>
+              )
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </div>
