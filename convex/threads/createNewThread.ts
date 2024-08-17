@@ -1,5 +1,5 @@
-import { mutation } from "../_generated/server";
-import { v } from "convex/values";
+import { v } from "convex/values"
+import { mutation } from "../_generated/server"
 
 export const createNewThread = mutation({
   args: {
@@ -23,6 +23,7 @@ export const createNewThread = mutation({
       clerk_user_id: args.clerk_user_id,
       metadata: args.metadata || {},
       createdAt: new Date().toISOString(),
+      isShared: false,
     });
 
     return newThread;
