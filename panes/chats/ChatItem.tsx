@@ -11,48 +11,33 @@ import { useOpenChatPane } from "@/hooks/useOpenChatPane"
 import { cn } from "@/lib/utils"
 import { usePaneStore } from "@/store/pane"
 import { Chat } from "@/types"
-import { ChatActions } from "./ChatActions"
 
 interface ChatItemProps {
   index: number
   chat: Chat
+  children: React.ReactNode
   isNew: boolean
-  isUpdated: boolean
+  isUpdated: boolean // New prop to indicate if the title has been updated
 }
 
-export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
+export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
   const { panes } = usePaneStore()
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
-  const [shouldAnimate, setShouldAnimate] = React.useState(false)
+  const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
   const [prevTitle, setPrevTitle] = React.useState(chat.title)
-  const [isHovered, setIsHovered] = React.useState(false)
 
   React.useEffect(() => {
-    console.log('ChatItem useEffect triggered', { isNew, isUpdated, chatTitle: chat.title, prevTitle });
     if (isNew || isUpdated || chat.title !== prevTitle) {
-      console.log('Animation condition met, setting up animation');
+      setShouldAnimate(true);
       setPrevTitle(chat.title);
-      // Add a small delay before starting the animation
-      const animationDelay = setTimeout(() => {
-        console.log('Setting shouldAnimate to true');
-        setShouldAnimate(true);
-      }, 50);
-      const animationDuration = setTimeout(() => {
-        console.log('Setting shouldAnimate to false');
+      const timer = setTimeout(() => {
         setShouldAnimate(false);
-      }, 5050); // 5000ms animation + 50ms delay
-      return () => {
-        clearTimeout(animationDelay);
-        clearTimeout(animationDuration);
-      };
+      }, 5000); // Reset after 5 seconds
+      return () => clearTimeout(timer);
     }
   }, [chat.id, chat.title, isNew, isUpdated, prevTitle]);
-
-  React.useEffect(() => {
-    console.log('shouldAnimate changed:', shouldAnimate);
-  }, [shouldAnimate]);
 
   if (!chat?.id) return null
 
@@ -65,42 +50,49 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
     <motion.div
       className="relative"
       variants={{
-        initial: { opacity: 1 },
-        animate: { opacity: 1 }
+        initial: {
+          height: 0,
+          opacity: 0
+        },
+        animate: {
+          height: 'auto',
+          opacity: 1
+        }
       }}
-      initial="initial"
-      animate="animate"
-      transition={{ duration: 0.25, ease: 'easeIn' }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      initial={shouldAnimate ? 'initial' : false}
+      animate={shouldAnimate ? 'animate' : false}
+      transition={{
+        duration: 0.25,
+        ease: 'easeIn'
+      }}
     >
+      <div className="absolute left-2 top-1 flex size-6 items-center justify-center">
+        {chat.sharePath ? (
+          <Tooltip delayDuration={1000}>
+            <TooltipTrigger
+              tabIndex={-1}
+              className="focus:bg-muted focus:ring-1 focus:ring-ring"
+            >
+              <IconUsers className="mr-2 mt-1 text-zinc-500" />
+            </TooltipTrigger>
+            <TooltipContent>This is a shared chat.</TooltipContent>
+          </Tooltip>
+        ) : (
+          <IconMessage className="mr-2 mt-1 text-zinc-500" />
+        )}
+      </div>
       <button
         onClick={handleClick}
         className={cn(
           buttonVariants({ variant: 'ghost' }),
-          'group w-full px-8 py-2 transition-colors hover:bg-white/10',
+          'group w-full px-8 transition-colors hover:bg-white/10',
           isOpen && 'bg-zinc-200 dark:bg-zinc-800',
-          (isActive || isHovered) && 'pr-24 font-semibold',
-          'text-left relative'
+          isActive && 'pr-16 font-semibold',
+          'text-left'
         )}
       >
-        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex size-6 items-center justify-center">
-          {chat.sharePath ? (
-            <Tooltip delayDuration={1000}>
-              <TooltipTrigger
-                tabIndex={-1}
-                className="focus:bg-muted focus:ring-1 focus:ring-ring"
-              >
-                <IconUsers className="text-zinc-500" />
-              </TooltipTrigger>
-              <TooltipContent>This is a shared chat.</TooltipContent>
-            </Tooltip>
-          ) : (
-            <IconMessage className="text-zinc-500" />
-          )}
-        </div>
         <div
-          className="relative flex-1 select-none overflow-hidden text-ellipsis break-all"
+          className="relative max-h-5 flex-1 select-none overflow-hidden text-ellipsis break-all"
           title={chat.title}
         >
           <span className="whitespace-nowrap">
@@ -109,15 +101,22 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
                 <motion.span
                   key={index}
                   variants={{
-                    initial: { opacity: 0, x: -10 },
-                    animate: { opacity: 1, x: 0 }
+                    initial: {
+                      opacity: 0,
+                      x: -100
+                    },
+                    animate: {
+                      opacity: 1,
+                      x: 0
+                    }
                   }}
                   initial="initial"
                   animate="animate"
                   transition={{
                     duration: 0.25,
-                    ease: 'easeOut',
-                    delay: index * 0.03
+                    ease: 'easeIn',
+                    delay: index * 0.05,
+                    staggerChildren: 0.05
                   }}
                 >
                   {character}
@@ -129,11 +128,7 @@ export function ChatItem({ index, chat, isNew, isUpdated }: ChatItemProps) {
           </span>
         </div>
       </button>
-      {(isActive || isHovered) && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2">
-          <ChatActions chatId={chat.id} />
-        </div>
-      )}
-    </motion.div>
+      {isActive && <div className="absolute right-2 top-1">{children}</div>}
+    </motion.div >
   )
 }
