@@ -27,6 +27,7 @@ export function ChatActions({
 }: ChatActionsProps) {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
   const { handleShare, isSharing } = useChatActions()
 
@@ -46,6 +47,17 @@ export function ChatActions({
     })
   }, [chatId, removeChat, router])
 
+  const handleShareClick = () => {
+    setShareDialogOpen(true)
+  }
+
+  const handleShareConfirm = () => {
+    handleShare(chatId)
+    setShareDialogOpen(false)
+  }
+
+  const shareLink = `https://openagents.com/share/${chatId}`
+
   return (
     <>
       <div className="flex space-x-2">
@@ -55,7 +67,7 @@ export function ChatActions({
               variant="ghost"
               className="size-7 p-0 hover:bg-background"
               disabled={isSharing}
-              onClick={() => handleShare(chatId)}
+              onClick={handleShareClick}
             >
               <IconShare />
               <span className="sr-only">Share</span>
@@ -100,6 +112,44 @@ export function ChatActions({
             >
               {isRemovePending && <IconSpinner className="mr-2 animate-spin" />}
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Share this chat</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will generate a share link that will let the public access current and future messages in this chat thread.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <p>Share link: {shareLink}</p>
+            <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSharing}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isSharing}
+              onClick={event => {
+                event.preventDefault()
+                handleShareConfirm()
+              }}
+            >
+              {isSharing && <IconSpinner className="mr-2 animate-spin" />}
+              Share on Twitter
+            </AlertDialogAction>
+            <AlertDialogAction
+              disabled={isSharing}
+              onClick={() => {
+                navigator.clipboard.writeText(shareLink)
+                toast.success('Share link copied to clipboard')
+              }}
+            >
+              Copy Link
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
