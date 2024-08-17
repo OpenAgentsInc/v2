@@ -66,7 +66,9 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
           if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
             try {
+              console.log('Generating title for thread:', threadId)
               const title = await generateTitle({ threadId })
+              console.log('Generated title:', title)
               setThreadData((prevThreadData) => ({
                 ...prevThreadData,
                 metadata: { ...prevThreadData.metadata, title },
@@ -74,7 +76,9 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
               
               // Trigger the title update animation
               await updateThreadData({ threadId, title })
+              console.log('Title updated in thread data')
               if (onTitleUpdate) {
+                console.log('Calling onTitleUpdate with threadId:', threadId)
                 onTitleUpdate(threadId)
               }
             } catch (error) {
