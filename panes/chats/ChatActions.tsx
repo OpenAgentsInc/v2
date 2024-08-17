@@ -29,7 +29,7 @@ export function ChatActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
-  const { handleShare, handleCopyShareLink, handleShareTwitter, closeShareDialog, isSharing } = useChatActions()
+  const { handleShare, handleCopyShareLink, handleShareTwitter, closeShareDialog, isSharing, setIsSharing } = useChatActions()
   const [shareLink, setShareLink] = React.useState("")
 
   const handleRemoveChat = React.useCallback(async () => {
@@ -49,16 +49,31 @@ export function ChatActions({
   }, [chatId, removeChat, router])
 
   const handleShareClick = async () => {
+    setIsSharing(true)
     const link = await handleShare(chatId)
     if (link) {
       setShareLink(link)
       setShareDialogOpen(true)
     }
+    setIsSharing(false)
   }
 
   const handleCloseShareDialog = () => {
     setShareDialogOpen(false)
     closeShareDialog()
+  }
+
+  const handleCopyLink = async () => {
+    setIsSharing(true)
+    await handleCopyShareLink(chatId)
+    setIsSharing(false)
+  }
+
+  const handleTwitterShare = () => {
+    setIsSharing(true)
+    handleShareTwitter(chatId)
+    handleCloseShareDialog()
+    setIsSharing(false)
   }
 
   return (
@@ -132,21 +147,16 @@ export function ChatActions({
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSharing} onClick={handleCloseShareDialog}>
+            <AlertDialogCancel onClick={handleCloseShareDialog}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={isSharing}
-              onClick={() => {
-                handleShareTwitter(chatId)
-                handleCloseShareDialog()
-              }}
+              onClick={handleTwitterShare}
             >
               Share on Twitter
             </AlertDialogAction>
             <AlertDialogAction
-              disabled={isSharing}
-              onClick={() => handleCopyShareLink(chatId)}
+              onClick={handleCopyLink}
             >
               Copy Link
             </AlertDialogAction>
