@@ -1,14 +1,11 @@
 "use client"
 
 import { useQuery } from "convex/react"
-import { Metadata } from "next"
-import { notFound } from "next/navigation"
-import { Providers } from "@/components/providers"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { useChat } from "@/hooks/useChat"
 import { formatDate } from "@/lib/utils"
 import { ChatList } from "@/panes/chat/ChatList"
+import { Message } from "@/types"
 
 export const runtime = 'edge'
 export const preferredRegion = 'home'
@@ -19,24 +16,16 @@ interface SharePageProps {
   }
 }
 
-// export async function generateMetadata({
-//   params
-// }: SharePageProps): Promise<Metadata> {
-//   const chat = await getSharedChat(params.id)
-
-//   return {
-//     title: chat?.title.slice(0, 50) ?? 'Chat'
-//   }
-// }
-
 export default function SharePage({ params }: SharePageProps) {
   const chat = useQuery(api.threads.getSharedThread.getSharedThread, { threadId: params.threadId as Id<'threads'> })
-  const { messages } = useChat({ propsId: params.threadId as Id<'threads'> })
-  console.log("SharePage chat:", chat)
+  const messages = useQuery(api.threads.getThreadMessages.getThreadMessages, { threadId: params.threadId as Id<'threads'> })
 
   if (!chat || !chat?.isShared) {
-    // notFound()
     return <></>
+  }
+
+  if (!messages) {
+    return <p>No messages</p>
   }
 
   return (
@@ -54,7 +43,7 @@ export default function SharePage({ params }: SharePageProps) {
         </div>
       </div>
       <div className="mx-auto max-w-3xl">
-        <ChatList messages={messages} />
+        <ChatList messages={messages as Message[]} />
       </div>
     </>
   )
