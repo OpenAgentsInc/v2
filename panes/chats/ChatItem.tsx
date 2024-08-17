@@ -26,17 +26,19 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const [shouldAnimate, setShouldAnimate] = React.useState(isNew || isUpdated)
+  const [prevTitle, setPrevTitle] = React.useState(chat.title)
 
   React.useEffect(() => {
-    console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}`);
-    if (isNew || isUpdated) {
+    console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}, prevTitle: ${prevTitle}, currentTitle: ${chat.title}`);
+    if (isNew || isUpdated || chat.title !== prevTitle) {
       setShouldAnimate(true);
+      setPrevTitle(chat.title);
       const timer = setTimeout(() => {
         setShouldAnimate(false);
       }, 5000); // Reset after 5 seconds
       return () => clearTimeout(timer);
     }
-  }, [chat.id, isNew, isUpdated]);
+  }, [chat.id, chat.title, isNew, isUpdated, prevTitle]);
 
   if (!chat?.id) return null
 
