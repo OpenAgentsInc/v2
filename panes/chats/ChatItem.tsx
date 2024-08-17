@@ -27,6 +27,10 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
   const shouldAnimate = isNew || isUpdated // Animate for both new and updated chats
 
+  React.useEffect(() => {
+    console.log(`ChatItem ${chat.id} - isNew: ${isNew}, isUpdated: ${isUpdated}, shouldAnimate: ${shouldAnimate}`);
+  }, [chat.id, isNew, isUpdated, shouldAnimate]);
+
   if (!chat?.id) return null
 
   const handleClick = (e: React.MouseEvent) => {
