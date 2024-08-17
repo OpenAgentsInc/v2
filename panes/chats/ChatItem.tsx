@@ -48,7 +48,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
 
   return (
     <motion.div
-      className="relative h-8"
+      className="relative "
       variants={{
         initial: {
           height: 0,

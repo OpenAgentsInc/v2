@@ -1,18 +1,18 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { useMutation, useQuery, useAction } from 'convex/react'
-import { api } from '../../convex/_generated/api'
-import { toast } from 'sonner'
-import { useUser } from '@clerk/nextjs'
-import { Message, Chat as Thread } from '@/types'
-import { useChatStore } from '../../store/chat'
-import { Id } from '../../convex/_generated/dataModel'
-import { createNewMessage } from '@/panes/chat/chatUtils'
-import { useChat as useVercelChat, Message as VercelMessage } from 'ai/react'
-import { useDebounce } from 'use-debounce'
-import { useBalanceStore } from '@/store/balance'
-import { useModelStore } from '@/store/models'
-import { useRepoStore } from '@/store/repo'
-import { useToolStore } from '@/store/tools'
+import { Message as VercelMessage, useChat as useVercelChat } from "ai/react"
+import { useAction, useMutation, useQuery } from "convex/react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { toast } from "sonner"
+import { useDebounce } from "use-debounce"
+import { createNewMessage } from "@/panes/chat/chatUtils"
+import { useBalanceStore } from "@/store/balance"
+import { useModelStore } from "@/store/models"
+import { useRepoStore } from "@/store/repo"
+import { useToolStore } from "@/store/tools"
+import { Chat as Thread, Message } from "@/types"
+import { useUser } from "@clerk/nextjs"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
+import { useChatStore } from "../../store/chat"
 
 export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, onTitleUpdate?: (chatId: string) => void }) {
   const { user } = useUser()
@@ -66,22 +66,18 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
           // Generate or update title for every assistant message
           try {
-            console.log('Generating title for thread:', threadId)
             const title = await generateTitle({ threadId })
-            console.log('Generated title:', title)
             setThreadData((prevThreadData) => ({
               ...prevThreadData,
               metadata: { ...prevThreadData.metadata, title },
             }))
-            
+
             // Trigger the title update animation
             await updateThreadData({
               thread_id: threadId,
               metadata: { title }
             })
-            console.log('Title updated in thread data')
             if (onTitleUpdate) {
-              console.log('Calling onTitleUpdate with threadId:', threadId)
               onTitleUpdate(threadId)
             }
           } catch (error) {
@@ -99,7 +95,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     },
   })
 
-  const [debouncedMessages] = useDebounce(vercelChatProps.messages, 250, { maxWait: 250 })
+  const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
 
   useEffect(() => {
     if (propsId) {
