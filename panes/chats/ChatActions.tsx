@@ -29,7 +29,8 @@ export function ChatActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
-  const { handleShare, isSharing } = useChatActions()
+  const { handleShare, handleCopyShareLink, handleShareTwitter, isSharing } = useChatActions()
+  const [shareLink, setShareLink] = React.useState("")
 
   const handleRemoveChat = React.useCallback(async () => {
     startRemoveTransition(async () => {
@@ -47,16 +48,13 @@ export function ChatActions({
     })
   }, [chatId, removeChat, router])
 
-  const handleShareClick = () => {
-    setShareDialogOpen(true)
+  const handleShareClick = async () => {
+    const link = await handleShare(chatId)
+    if (link) {
+      setShareLink(link)
+      setShareDialogOpen(true)
+    }
   }
-
-  const handleShareConfirm = () => {
-    handleShare(chatId)
-    setShareDialogOpen(false)
-  }
-
-  const shareLink = `https://openagents.com/share/${chatId}`
 
   return (
     <>
@@ -134,20 +132,13 @@ export function ChatActions({
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isSharing}
-              onClick={event => {
-                event.preventDefault()
-                handleShareConfirm()
-              }}
+              onClick={() => handleShareTwitter(chatId)}
             >
-              {isSharing && <IconSpinner className="mr-2 animate-spin" />}
               Share on Twitter
             </AlertDialogAction>
             <AlertDialogAction
               disabled={isSharing}
-              onClick={() => {
-                navigator.clipboard.writeText(shareLink)
-                toast.success('Share link copied to clipboard')
-              }}
+              onClick={() => handleCopyShareLink(chatId)}
             >
               Copy Link
             </AlertDialogAction>
