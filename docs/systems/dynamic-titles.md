@@ -1,6 +1,6 @@
 # Dynamic Title Generation and Animation
 
-After the first message is received from an assistant, a dynamic title should be generated via OpenAI. When a chat's title is updated, an animation is triggered to highlight the change.
+After the first message is received from an assistant, a dynamic title is generated via OpenAI. When a chat's title is updated, an animation is triggered to highlight the change.
 
 ## Implementation
 
@@ -14,64 +14,37 @@ The dynamic title generation is implemented using Convex functions, and the anim
 export const generateTitle = mutation({
   args: { threadId: v.id("threads") },
   async handler(ctx, args) {
-    const messages = await ctx.db
-      .query("messages")
-      .withIndex("by_thread_id", (q) => q.eq("thread_id", args.threadId))
-      .order("asc")
-      .collect();
-
-    if (messages.length === 0) {
-      return "New Thread";
-    }
-
-    const formattedMessages = messages
-      .map((msg) => `${msg.role}: ${msg.content}`)
-      .join("\n");
-
-    const modelObj = models.find((m) => m.name === "GPT-4o Mini");
-    if (!modelObj) {
-      throw new Error("Model not found");
-    }
-
-    const { text } = await generateText({
-      model: openai(modelObj.id),
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant that generates concise and relevant titles for chat conversations.",
-        },
-        {
-          role: "user",
-          content: `Please generate a short, concise title (5 words or less) for the following conversation:\n\n${formattedMessages}`,
-        },
-      ],
-      temperature: 0.7,
-      maxTokens: 10,
-    });
-
-    const generatedTitle = text.trim();
-
-    await ctx.db.patch(args.threadId, {
-      metadata: { title: generatedTitle },
-    });
-
-    return generatedTitle;
+    // ... (implementation details)
   },
 });
 ```
 
-2. The `useChat` hook in `hooks/useChat.ts` calls this function after the first assistant message:
+2. The `useChat` hook in `hooks/chat/useChatCore.ts` calls this function after the first assistant message:
 
 ```typescript
-if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
-  try {
-    const title = await generateTitle({ threadId });
-    setThreadData({ ...threadData, title });
-  } catch (error) {
-    console.error('Error generating title:', error);
-  }
-}
+const vercelChatProps = useVercelChat({
+  // ... other props
+  onFinish: async (message, options) => {
+    if (threadId && user) {
+      // ... other logic
+
+      if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+        try {
+          const title = await generateTitle({ threadId });
+          setThreadData((prevThreadData) => ({
+            ...prevThreadData,
+            metadata: { ...prevThreadData.metadata, title },
+          }));
+          
+          // Trigger the title update animation
+          await updateThreadData({ threadId, title });
+        } catch (error) {
+          console.error('Error generating title:', error);
+        }
+      }
+    }
+  },
+});
 ```
 
 ### Title Update Animation
@@ -154,25 +127,43 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
 }
 ```
 
-3. To trigger the animation when a chat title is updated, call the `handleTitleUpdate` function after successfully updating the title:
+3. The animation is triggered in `hooks/chat/useChatCore.ts`:
 
 ```typescript
-const updateChatTitle = async (chatId: string, newTitle: string) => {
-  try {
-    // Update the chat title in your backend
-    await updateChatTitleInBackend(chatId, newTitle);
-    
-    // Mark the chat as updated to trigger the animation
-    handleTitleUpdate(chatId);
-  } catch (error) {
-    console.error('Error updating chat title:', error);
-  }
-};
+export function useChat({ propsId }: { propsId?: Id<"threads"> }) {
+  // ... other code ...
+
+  const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData);
+
+  const vercelChatProps = useVercelChat({
+    // ... other props ...
+    onFinish: async (message, options) => {
+      // ... other logic ...
+
+      if (updatedMessages.length === 1 && updatedMessages[0].role === 'assistant') {
+        try {
+          const title = await generateTitle({ threadId });
+          setThreadData((prevThreadData) => ({
+            ...prevThreadData,
+            metadata: { ...prevThreadData.metadata, title },
+          }));
+          
+          // Trigger the title update animation
+          await updateThreadData({ threadId, title });
+        } catch (error) {
+          console.error('Error generating title:', error);
+        }
+      }
+    },
+  });
+
+  // ... rest of the component ...
+}
 ```
 
 ## Deployment
 
-To ensure the `generateTitle` function is available, make sure to deploy the updated Convex functions using:
+To ensure the `generateTitle` and `updateThreadData` functions are available, make sure to deploy the updated Convex functions using:
 
 ```
 npx convex deploy
@@ -180,8 +171,11 @@ npx convex deploy
 
 ## Troubleshooting
 
-- If you encounter the error "Could not find public function for 'threads:generateTitle'", it usually means that the Convex functions haven't been deployed after making changes. Always run `npx convex deploy` after modifying Convex functions.
-- If the animation doesn't trigger when updating a chat title, ensure that the `handleTitleUpdate` function is being called correctly after the title update.
+- If you encounter the error "Could not find public function for 'threads:generateTitle'" or "Could not find public function for 'threads:updateThreadData'", it usually means that the Convex functions haven't been deployed after making changes. Always run `npx convex deploy` after modifying Convex functions.
+- If the animation doesn't trigger when updating a chat title, ensure that:
+  1. The `updateThreadData` mutation is correctly implemented in your Convex backend.
+  2. The `ChatsPane` component is correctly updating the `updatedChatIds` state when it receives updates from the backend.
+  3. The `isUpdated` prop is being passed correctly to the `ChatItem` component.
 
 ## Future Improvements
 
@@ -191,5 +185,6 @@ npx convex deploy
 4. Consider caching generated titles to reduce API calls.
 5. Allow customization of the animation duration and style.
 6. Implement a more sophisticated system for tracking which chats have been updated, possibly using a timestamp-based approach instead of a simple Set.
+7. Add unit and integration tests to ensure the title generation and animation features work correctly.
 
 Remember to keep this document updated as the implementation evolves.
