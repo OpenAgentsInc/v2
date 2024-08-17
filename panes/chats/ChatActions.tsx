@@ -54,6 +54,10 @@ export function ChatActions({
     setShareDialogOpen(true)
   }
 
+  const handleCloseShareDialog = () => {
+    setShareDialogOpen(false)
+  }
+
   return (
     <>
       <div className="flex space-x-2">
@@ -111,7 +115,7 @@ export function ChatActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+      <AlertDialog open={shareDialogOpen} onOpenChange={handleCloseShareDialog}>
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Share this chat</AlertDialogTitle>
@@ -124,13 +128,13 @@ export function ChatActions({
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShareDialogOpen(false)}>
+            <AlertDialogCancel onClick={handleCloseShareDialog}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 handleShareTwitter(chatId)
-                setShareDialogOpen(false)
+                handleCloseShareDialog()
               }}
             >
               Share on Twitter
