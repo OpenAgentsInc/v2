@@ -1,20 +1,15 @@
 'use client'
 
-import * as React from 'react'
-import { type DialogProps } from '@radix-ui/react-dialog'
-import { toast } from 'sonner'
-
-import { Button } from '@/components/ui/button'
+import * as React from "react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,
   DialogTitle
-} from '@/components/ui/dialog'
-import { IconSpinner } from '@/components/ui/icons'
-import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
+} from "@/components/ui/dialog"
+import { IconSpinner } from "@/components/ui/icons"
+import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
+import { DialogProps } from "@radix-ui/react-dialog"
 
 interface ChatShareDialogProps extends DialogProps {
   chatId: string
@@ -70,7 +65,7 @@ export function ChatShareDialog({
             {messageCount} messages
           </div>
         </div>
-        <DialogFooter className="flex flex-col items-center space-y-2">
+        <DialogFooter className="flex flex-col items-center space-x-2">
           <Button
             disabled={isSharePending}
             onClick={handleShare}
@@ -88,14 +83,16 @@ export function ChatShareDialog({
           <Button
             disabled={isSharePending}
             onClick={handleTwitterShare}
-            className="w-full max-w-xs bg-blue-500 hover:bg-blue-600"
+            className="w-full text-white max-w-xs bg-background border border-primary hover:bg-accent/50"
           >
-            Share on Twitter
+            Share on X
           </Button>
         </DialogFooter>
+        {/*
         <DialogDescription className="text-center mt-4">
           Anyone who signs up after clicking your link will give you $5 of credit.
         </DialogDescription>
+        */}
       </DialogContent>
     </Dialog>
   )
