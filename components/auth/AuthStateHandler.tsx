@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react' // Import the Loader2 icon from lucide-react
 
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser()
@@ -31,7 +32,11 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   }, [isLoaded, user, isHandled, createOrGetUser])
 
   if (!isLoaded || (user && !isHandled)) {
-    return <div>Loading...</div>
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
+      </div>
+    )
   }
 
   return <>{children}</>
