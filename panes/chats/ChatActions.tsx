@@ -14,8 +14,8 @@ import {
   Tooltip, TooltipContent, TooltipTrigger
 } from "@/components/ui/tooltip"
 import { ServerActionResult } from "@/types"
-import { useChatActions } from "./useChatActions"
 import { ChatShareDialog } from "./ChatShareDialog"
+import { useChatActions } from "./useChatActions"
 
 interface ChatActionsProps {
   chatId: string
@@ -67,7 +67,7 @@ export function ChatActions({
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className="size-7 p-1 bg-black hover:bg-white/5"
+              className="size-7 p-1 bg-black hover:bg-muted"
               onClick={handleShareClick}
             >
               <IconShare className="pl-1" />
@@ -80,7 +80,7 @@ export function ChatActions({
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className="size-7 p-1 bg-black hover:bg-white/5"
+              className="size-7 p-1 bg-black hover:bg-muted"
               disabled={isDeleting}
               onClick={() => setDeleteDialogOpen(true)}
             >
