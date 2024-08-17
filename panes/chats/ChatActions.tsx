@@ -29,7 +29,7 @@ export function ChatActions({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false)
   const [isRemovePending, startRemoveTransition] = React.useTransition()
-  const { handleShare, handleCopyShareLink, handleShareTwitter, isSharing } = useChatActions()
+  const { handleShare, handleCopyShareLink, handleShareTwitter, closeShareDialog, isSharing } = useChatActions()
   const [shareLink, setShareLink] = React.useState("")
 
   const handleRemoveChat = React.useCallback(async () => {
@@ -54,6 +54,11 @@ export function ChatActions({
       setShareLink(link)
       setShareDialogOpen(true)
     }
+  }
+
+  const handleCloseShareDialog = () => {
+    setShareDialogOpen(false)
+    closeShareDialog()
   }
 
   return (
@@ -114,7 +119,7 @@ export function ChatActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <AlertDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+      <AlertDialog open={shareDialogOpen} onOpenChange={handleCloseShareDialog}>
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Share this chat</AlertDialogTitle>
@@ -127,14 +132,14 @@ export function ChatActions({
             <p className="mt-2">Anyone who signs up after clicking your link will give you $5 of credit.</p>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSharing} onClick={() => setShareDialogOpen(false)}>
+            <AlertDialogCancel disabled={isSharing} onClick={handleCloseShareDialog}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isSharing}
               onClick={() => {
                 handleShareTwitter(chatId)
-                setShareDialogOpen(false)
+                handleCloseShareDialog()
               }}
             >
               Share on Twitter
