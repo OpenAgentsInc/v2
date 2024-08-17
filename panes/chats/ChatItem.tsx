@@ -17,14 +17,15 @@ interface ChatItemProps {
   chat: Chat
   children: React.ReactNode
   isNew: boolean
+  isUpdated: boolean // New prop to indicate if the title has been updated
 }
 
-export function ChatItem({ index, chat, children, isNew }: ChatItemProps) {
+export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemProps) {
   const { panes } = usePaneStore()
   const openChatPane = useOpenChatPane()
   const isActive = panes.some(pane => pane.type === 'chat' && pane.id === chat.id && pane.isActive)
   const isOpen = panes.some(pane => pane.type === 'chat' && pane.id === chat.id)
-  const shouldAnimate = isNew // Remove the index === 0 condition
+  const shouldAnimate = isNew || isUpdated // Animate for both new and updated chats
 
   if (!chat?.id) return null
 
