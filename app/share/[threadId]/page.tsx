@@ -23,6 +23,9 @@ export default function SharePage({ params }: SharePageProps) {
   const messages = useQuery(api.threads.getThreadMessages.getThreadMessages, { threadId: params.threadId as Id<'threads'> })
   const chatOwner = useQuery(api.users.getUserData.getUserData, chat?.user_id ? { clerk_user_id: chat.clerk_user_id } : "skip")
 
+  // Filter out all messages with empty content
+  const filteredMessages = messages?.filter(message => message.content.trim() !== "")
+
   if (!chat || !chat?.isShared) {
     return <></>
   }
@@ -59,7 +62,7 @@ export default function SharePage({ params }: SharePageProps) {
         </div>
       </div>
       <div className="mx-auto max-w-3xl pb-48">
-        <ChatList messages={messages as Message[]} />
+        <ChatList messages={filteredMessages as Message[]} />
       </div>
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
         <SignUpButton mode="modal">
