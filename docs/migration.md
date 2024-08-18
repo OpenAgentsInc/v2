@@ -148,3 +148,17 @@ The migration script provides a solid foundation for transferring data from Verc
 However, it's crucial to thoroughly test and verify the migrated data and updated application code to ensure a smooth transition. Pay special attention to how your application handles fields that now have default values instead of being null, and make any necessary adjustments to maintain the expected behavior.
 
 Remember that while the migration script is designed to be safe to run multiple times, it's always a good practice to back up your data before performing any migration or running scripts that modify your database.
+
+## Recent Updates
+
+As of the latest update, the following changes have been made to improve the migration process:
+
+1. **New updateUser Function**: A new `updateUser` function has been added to the Convex backend. This function allows for updating existing user records during the migration process.
+
+2. **Migration Script Enhancement**: The migration script now uses the `updateUser` function to update existing users instead of creating duplicates. This ensures that user data is kept up-to-date during multiple runs of the migration script.
+
+3. **Export Update**: The `updateUser` function has been properly exported in the `convex/users/index.ts` file, making it available for use in the migration script and other parts of the application.
+
+These updates improve the robustness and efficiency of the migration process, particularly when dealing with existing user data. The migration script can now handle updates to user information more effectively, reducing the risk of data inconsistencies.
+
+When running the migration script after these updates, pay attention to the console output for any messages related to user updates. This will help verify that the new `updateUser` function is working as expected during the migration process.
