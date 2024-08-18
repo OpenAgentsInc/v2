@@ -4,8 +4,63 @@ This document outlines the migration process from Vercel Postgres to Convex, inc
 
 ## Original Vercel Postgres Table Structure
 
-[The original table structures remain unchanged, so I'm omitting them for brevity]
+### Users Table
 
+```sql
+CREATE TABLE "public"."users" (
+    "id" int4 NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+    "clerk_user_id" varchar(255) NOT NULL,
+    "email" varchar(255) NOT NULL,
+    "image" varchar(255),
+    "credits" numeric(10,2) NOT NULL DEFAULT 0,
+    "createdAt" timestamptz DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX users_clerk_user_id_key ON public.users USING btree (clerk_user_id);
+CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email);
+CREATE INDEX idx_users_clerk_user_id ON public.users USING btree (clerk_user_id);
+```
+
+### Threads Table
+
+```sql
+CREATE TABLE "public"."threads" (
+    "id" int4 NOT NULL DEFAULT nextval('threads_id_seq'::regclass),
+    "user_id" int4 NOT NULL,
+    "clerk_user_id" varchar(255) NOT NULL,
+    "metadata" jsonb,
+    "createdAt" timestamptz DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX idx_threads_user_id ON public.threads USING btree (user_id);
+CREATE INDEX idx_threads_clerk_user_id ON public.threads USING btree (clerk_user_id);
+```
+
+### Messages Table
+
+```sql
+CREATE TABLE "public"."messages" (
+    "id" int4 NOT NULL DEFAULT nextval('messages_id_seq'::regclass),
+    "thread_id" int4 NOT NULL,
+    "clerk_user_id" varchar(255) NOT NULL,
+    "role" varchar(50) NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamptz DEFAULT CURRENT_TIMESTAMP,
+    "tool_invocations" jsonb,
+    "finish_reason" varchar(50),
+    "total_tokens" int4,
+    "prompt_tokens" int4,
+    "completion_tokens" int4,
+    "model_id" varchar(255),
+    "cost_in_cents" numeric(10,2),
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX idx_messages_thread_id ON public.messages USING btree (thread_id);
+CREATE INDEX idx_messages_clerk_user_id ON public.messages USING btree (clerk_user_id);
+```
 ## Migration Considerations
 
 1. **ID Fields**: Convex uses string IDs, while the Vercel Postgres tables use integer IDs. The migration script handles this conversion, especially for foreign key relationships.
