@@ -1,12 +1,14 @@
 "use client"
 
 import { useQuery } from "convex/react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { formatDate } from "@/lib/utils"
 import { ChatList } from "@/panes/chat/ChatList"
 import { Message } from "@/types"
-import Link from "next/link"
+import { SignUp, SignUpButton } from "@clerk/nextjs"
 
 export const runtime = 'edge'
 export const preferredRegion = 'home'
@@ -47,14 +49,18 @@ export default function SharePage({ params }: SharePageProps) {
         <ChatList messages={messages as Message[]} />
       </div>
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
-        <Link href="https://openagents.com" passHref>
-          <div className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-            Join OpenAgents - Your all-in-one AI productivity dashboard
-            <span className="ml-2 bg-white text-primary rounded-full px-2 py-1 text-xs font-semibold">
-              Get $5 credit free
-            </span>
+        <SignUpButton mode="modal">
+          <div className="bg-background border border-white/50 text-white inline-flex items-center justify-center rounded-full px-9 py-4 text-sm font-medium shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+            <div className="flex flex-col space-y-1">
+              <p className="font-extrabold text-xl">Join OpenAgents</p>
+              <p className="text-primary">Your all-in-one AI productivity dashboard</p>
+              <p className="text-primary italic">Join now for $5 of free credit</p>
+            </div>
+            <Button variant="outline" className="ml-6 border-white">
+              Sign up
+            </Button>
           </div>
-        </Link>
+        </SignUpButton>
       </div>
     </>
   )
