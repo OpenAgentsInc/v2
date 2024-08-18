@@ -24,6 +24,8 @@ This document outlines the migration process from Vercel Postgres to Convex, inc
 
 8. **Data Validation**: Convex uses schema validation. The migration script ensures that all data from Vercel Postgres meets the validation requirements of the Convex schema.
 
+9. **Handling Null Values**: The migration script now handles potential null values for fields like `completion_tokens`, `total_tokens`, `prompt_tokens`, and `cost_in_cents` by providing default values (0) when these fields are null.
+
 ## Migration Script
 
 The migration script (`scripts/migrate_vercel_to_convex.ts`) handles the migration of data from Vercel Postgres to Convex. Here are the key features of the script:
@@ -34,6 +36,7 @@ The migration script (`scripts/migrate_vercel_to_convex.ts`) handles the migrati
 - It handles the conversion of integer IDs to Convex's string IDs.
 - It derives `name` and `username` fields for users from their email addresses.
 - It maintains relationships between entities using Convex's ID system.
+- It handles potential null values for certain fields by providing default values.
 
 ### Running the Migration Script
 
@@ -54,15 +57,18 @@ To run the migration script:
    - Check that all users, threads, and messages have been migrated correctly.
    - Ensure that relationships between entities are maintained.
    - Verify that derived fields (like `name` and `username`) are populated correctly.
+   - Check that fields that previously contained null values have been properly handled with default values.
 
 2. Update any application code that relies on the old database structure:
    - Replace Vercel Postgres queries with Convex queries.
    - Update any code that assumes integer IDs to work with Convex's string IDs.
+   - Ensure that your application can handle the default values (0) for fields that might have been null in the original database.
 
 3. Test all functionality thoroughly to ensure the migration hasn't introduced any issues:
    - Test user authentication and profile management.
    - Verify that threads and messages are displayed correctly.
    - Check that all CRUD operations work as expected with the new Convex backend.
+   - Pay special attention to features that involve fields that previously could have been null.
 
 4. Update documentation to reflect the new data structure and any changes in querying or data management processes.
 
@@ -72,4 +78,4 @@ To run the migration script:
 
 This migration represents a significant change in the data storage and management approach. While the basic structure remains similar, the shift to Convex introduces new capabilities and constraints that need to be carefully managed throughout the migration process and in ongoing development.
 
-The migration script provides a solid foundation for transferring data from Vercel Postgres to Convex, but it's crucial to thoroughly test and verify the migrated data and updated application code to ensure a smooth transition.
+The migration script provides a solid foundation for transferring data from Vercel Postgres to Convex, including handling potential null values in certain fields. However, it's crucial to thoroughly test and verify the migrated data and updated application code to ensure a smooth transition. Pay special attention to how your application handles fields that now have default values instead of being null, and make any necessary adjustments to maintain the expected behavior.
