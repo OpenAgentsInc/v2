@@ -27,6 +27,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
   const { user, isLoaded, isSignedIn } = useUser()
   const [isGitHubConnected, setIsGitHubConnected] = useState(false)
   const [showGitHubConnectDialog, setShowGitHubConnectDialog] = useState(false)
+<<<<<<< HEAD
   const repo = useRepoStore((state) => state.repo)
   const setRepo = useRepoStore((state) => state.setRepo)
   const model = useModelStore((state) => state.model)
@@ -37,24 +38,32 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
   const { user, isLoaded, isSignedIn } = useUser()
   const [isGitHubConnected, setIsGitHubConnected] = useState(false)
   const [showGitHubConnectDialog, setShowGitHubConnectDialog] = useState(false)
+=======
+>>>>>>> main
 
   const [repoInput, setRepoInput] = React.useState({
     owner: repo?.owner || '',
     name: repo?.name || '',
     branch: repo?.branch || ''
   })
+<<<<<<< HEAD
   const [repoInput, setRepoInput] = React.useState({
     owner: repo?.owner || '',
     name: repo?.name || '',
     branch: repo?.branch || ''
   })
+=======
+>>>>>>> main
 
   const [open, setOpen] = React.useState(false)
   const [toolsOpen, setToolsOpen] = React.useState(false)
   const [creditsDialogOpen, setCreditsDialogOpen] = React.useState(false)
+<<<<<<< HEAD
   const [open, setOpen] = React.useState(false)
   const [toolsOpen, setToolsOpen] = React.useState(false)
   const [creditsDialogOpen, setCreditsDialogOpen] = React.useState(false)
+=======
+>>>>>>> main
 
   useEffect(() => {
     async function checkGitHubConnection() {
@@ -65,6 +74,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     }
     checkGitHubConnection()
   }, [isLoaded, isSignedIn])
+<<<<<<< HEAD
   useEffect(() => {
     async function checkGitHubConnection() {
       if (isLoaded && isSignedIn) {
@@ -176,6 +186,62 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
   if (!isLoaded || !isSignedIn) {
     return null
   }
+=======
+
+  const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRepoInput({ ...repoInput, [e.target.name]: e.target.value })
+  }
+
+  const handleRepoSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setRepo(repoInput)
+    setOpen(false)
+  }
+
+  const handleToolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    if (checked) {
+      setTools([...tools, name])
+    } else {
+      setTools(tools.filter((tool) => tool !== name))
+    }
+  }
+
+  const ourtools = [
+    'create_file',
+    'list_repos',
+    'rewrite_file',
+    'scrape_webpage',
+    'view_file',
+    'view_hierarchy',
+    'create_pull_request',
+    'create_branch',
+    'search_codebase'
+  ]
+
+  const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
+
+  const isModelDisabled = (modelId: string) => {
+    return balance <= 0 && modelId !== 'gpt-4o-mini'
+  }
+
+  const handleModelClick = (m: Model) => {
+    if (isModelDisabled(m.id)) {
+      setCreditsDialogOpen(true)
+    } else {
+      setModel(m)
+    }
+  }
+
+  const handleGitHubIconClick = () => {
+    if (isGitHubConnected) {
+      setOpen(true)
+    } else {
+      setShowGitHubConnectDialog(true)
+    }
+  }
+
+>>>>>>> main
   if (!isLoaded || !isSignedIn) {
     return null
   }
@@ -338,6 +404,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
       </Dialog>
     </div>
   )
+<<<<<<< HEAD
   return (
     <div
       className={cn(
@@ -496,4 +563,6 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
       </Dialog>
     </div>
   )
+=======
+>>>>>>> main
 }
