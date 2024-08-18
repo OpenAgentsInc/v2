@@ -37,7 +37,9 @@ async function migrateData() {
           name: user.email.split('@')[0],
           username: user.email.split('@')[0],
         });
-        userIdMap.set(user.id, updatedUser._id);
+        if (updatedUser) {
+          userIdMap.set(user.id, updatedUser._id);
+        }
       } else {
         const newUser = await convex.mutation(api.users.createOrGetUser.createOrGetUser, {
           clerk_user_id: user.clerk_user_id,
@@ -75,11 +77,11 @@ async function migrateData() {
     for (const message of messages) {
       const convexThreadId = threadIdMap.get(message.thread_id);
       if (convexThreadId) {
-        const existingMessage = await convex.query(api.messages.getMessageByThreadAndTimestamp.getMessageByThreadAndTimestamp, {
+        const existingMessage = await convex.query(api.messages.fetchThreadMessages.fetchThreadMessages, {
           thread_id: convexThreadId,
-          created_at: message.created_at,
         });
-        if (existingMessage) {
+        const messageExists = existingMessage.some(m => m.created_at === message.created_at);
+        if (messageExists) {
           console.log(`Message in thread ${convexThreadId} at ${message.created_at} already exists. Skipping...`);
         } else {
           await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
@@ -94,7 +96,6 @@ async function migrateData() {
             completion_tokens: message.completion_tokens || 0,
             model_id: message.model_id,
             cost_in_cents: parseFloat(message.cost_in_cents) || 0,
-            created_at: message.created_at,
           });
         }
       } else {
