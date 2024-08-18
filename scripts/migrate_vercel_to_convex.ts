@@ -58,9 +58,10 @@ async function migrateData() {
     const { rows: threads } = await sql`SELECT * FROM threads`;
     const threadIdMap = new Map<number, Id<"threads">>();
     for (const thread of threads) {
-      const existingThread = await convex.query(api.threads.getThreadByClerkId.getThreadByClerkId, { clerk_user_id: thread.clerk_user_id });
+      const existingThreads = await convex.query(api.threads.getUserThreads.getUserThreads, { clerk_user_id: thread.clerk_user_id });
+      const existingThread = existingThreads.find(t => t.metadata?.title === thread.metadata?.title);
       if (existingThread) {
-        console.log(`Thread for user ${thread.clerk_user_id} already exists. Skipping...`);
+        console.log(`Thread "${thread.metadata?.title}" for user ${thread.clerk_user_id} already exists. Skipping...`);
         threadIdMap.set(thread.id, existingThread._id);
       } else {
         const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
