@@ -5,6 +5,8 @@ import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
 
 dotenv.config();
+console.log("CONVEX_URL:", process.env.CONVEX_URL);
+
 // Convex configuration
 const convexUrl = process.env.CONVEX_URL as string;
 
