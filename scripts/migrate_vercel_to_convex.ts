@@ -34,11 +34,16 @@ async function migrateData() {
     const { rows: threads } = await sql`SELECT * FROM threads`;
     const threadIdMap = new Map<number, Id<"threads">>();
     for (const thread of threads) {
-      const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
-        clerk_user_id: thread.clerk_user_id,
-        metadata: thread.metadata,
-      });
-      threadIdMap.set(thread.id, convexThread);
+      const convexUserId = userIdMap.get(thread.user_id);
+      if (convexUserId) {
+        const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
+          clerk_user_id: thread.clerk_user_id,
+          metadata: thread.metadata || { title: "Untitled Thread" },
+        });
+        threadIdMap.set(thread.id, convexThread);
+      } else {
+        console.warn(`User not found for thread ${thread.id}. Skipping this thread.`);
+      }
     }
 
     // Migrate messages
@@ -59,6 +64,8 @@ async function migrateData() {
           model_id: message.model_id,
           cost_in_cents: parseFloat(message.cost_in_cents),
         });
+      } else {
+        console.warn(`Thread not found for message ${message.id}. Skipping this message.`);
       }
     }
 
