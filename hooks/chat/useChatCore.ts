@@ -59,12 +59,11 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             model_id: currentModelRef.current || model.id,
           })
 
-          if (result && typeof result === 'object' && 'usage' in result) {
-            const { usage } = result
+          if (options && options.usage) {
             const balanceResult = await saveMessageAndUpdateBalance({
               clerk_user_id: user.id,
               model_id: currentModelRef.current || model.id,
-              usage: usage,
+              usage: options.usage,
             })
 
             if (balanceResult && 'newBalance' in balanceResult) {
