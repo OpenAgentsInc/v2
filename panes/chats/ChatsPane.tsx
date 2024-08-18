@@ -1,16 +1,16 @@
 'use client'
 
 import { useMutation, useQuery } from "convex/react"
+import { AnimatePresence, motion } from "framer-motion"
 import React, { useEffect, useMemo, useState } from "react"
 import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 import { useChat } from "@/hooks/useChat"
 import { usePaneStore } from "@/store/pane"
 import { useUser } from "@clerk/nextjs"
 import { ChatActions } from "./ChatActions"
 import { ChatItem } from "./ChatItem"
 import { NewChatButton } from "./NewChatButton"
-import { AnimatePresence, motion } from "framer-motion"
-import { Id } from "@/convex/_generated/dataModel"
 
 const SEEN_CHATS_KEY = 'seenChatIds';
 
@@ -31,7 +31,7 @@ export const ChatsPane: React.FC = () => {
   }, [chats]);
 
   // Fetch message counts for all chats
-  const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount, 
+  const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount,
     { thread_ids: sortedChats.map(chat => chat._id) }
   ) as { [key: Id<"threads">]: number } | undefined;
 
@@ -72,7 +72,7 @@ export const ChatsPane: React.FC = () => {
 
   const removeChat = async ({ id }: { id: string }) => {
     try {
-      await deleteThread({ thread_id: id });
+      await deleteThread({ thread_id: id as Id<"threads"> });
       setDeletedChatIds(prev => new Set(prev).add(id));
       return { success: true };
     } catch (error) {
@@ -84,7 +84,7 @@ export const ChatsPane: React.FC = () => {
   const activeChatId = panes.find(pane => pane.type === 'chat' && pane.isActive)?.id;
 
   // Use the useChat hook without the onTitleUpdate callback
-  useChat({ propsId: activeChatId });
+  useChat({ propsId: activeChatId as Id<"threads"> });
 
   const isLoading = chats === undefined;
 
@@ -105,7 +105,7 @@ export const ChatsPane: React.FC = () => {
       ) : (
         <div className="flex-grow overflow-y-auto">
           <AnimatePresence>
-            {sortedChats.map((chat) => 
+            {sortedChats.map((chat) =>
               !deletedChatIds.has(chat._id) && (
                 <motion.div
                   key={chat._id}

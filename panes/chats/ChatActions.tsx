@@ -70,7 +70,7 @@ export function ChatActions({
               className="size-7 p-1 bg-black hover:bg-[#1a1a1a]"
               onClick={handleShareClick}
             >
-              <IconShare className="pl-1" />
+              <IconShare />
               <span className="sr-only">Share</span>
             </Button>
           </TooltipTrigger>

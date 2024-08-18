@@ -27,6 +27,7 @@ import type * as threads_deleteThread from "../threads/deleteThread.js";
 import type * as threads_generateTitle from "../threads/generateTitle.js";
 import type * as threads_getLastEmptyThread from "../threads/getLastEmptyThread.js";
 import type * as threads_getSharedThread from "../threads/getSharedThread.js";
+import type * as threads_getThreadMessageCount from "../threads/getThreadMessageCount.js";
 import type * as threads_getThreadMessages from "../threads/getThreadMessages.js";
 import type * as threads_getUserThreads from "../threads/getUserThreads.js";
 import type * as threads_index from "../threads/index.js";
@@ -63,6 +64,7 @@ declare const fullApi: ApiFromModules<{
   "threads/generateTitle": typeof threads_generateTitle;
   "threads/getLastEmptyThread": typeof threads_getLastEmptyThread;
   "threads/getSharedThread": typeof threads_getSharedThread;
+  "threads/getThreadMessageCount": typeof threads_getThreadMessageCount;
   "threads/getThreadMessages": typeof threads_getThreadMessages;
   "threads/getUserThreads": typeof threads_getUserThreads;
   "threads/index": typeof threads_index;
