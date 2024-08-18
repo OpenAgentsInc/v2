@@ -48,6 +48,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     maxToolRoundtrips: 20,
     onFinish: async (message, options) => {
       if (threadId && user) {
+        console.log("Whats up")
         const updatedMessages = [...threadData.messages, message as Message]
         setThreadData({ ...threadData, messages: updatedMessages })
 
@@ -60,10 +61,13 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             model_id: currentModelRef.current || model.id,
           })
 
+          console.log("Result is", result)
+
           if (result && typeof result === 'object' && 'balance' in result) {
             const newBalance = result.balance as number
+            console.log("About to set balance", newBalance)
             setBalance(newBalance)
-            
+
             // Update user credits in the database
             await updateUserCreditsMutation({
               clerk_user_id: user.id,
