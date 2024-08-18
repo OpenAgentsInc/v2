@@ -45,7 +45,7 @@ export default function SharePage({ params }: SharePageProps) {
           </div>
         </div>
       </div>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl pb-48">
         <ChatList messages={messages as Message[]} />
       </div>
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">

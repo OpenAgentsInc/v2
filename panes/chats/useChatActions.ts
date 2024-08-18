@@ -56,7 +56,7 @@ export const useChatActions = () => {
     const shareUrl = `${window.location.origin}/share/${chatId}${getCurrentUser._id ? `?ref=${getCurrentUser._id}` : ''}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      toast.success('Chat link copied to clipboard');
+      toast.success('Share link copied to clipboard');
     } catch (error) {
       console.error('Error copying share link:', error);
       toast.error('Failed to copy share link');

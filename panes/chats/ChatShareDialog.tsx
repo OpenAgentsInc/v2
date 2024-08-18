@@ -42,7 +42,7 @@ export function ChatShareDialog({
       }
 
       await onCopyLink(chatId)
-      toast.success('Share link copied to clipboard')
+      // toast.success('Share link copied to clipboard')
     })
   }, [chatId, onShare, onCopyLink])
 
