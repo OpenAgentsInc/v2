@@ -1,8 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server'
-import dynamic from 'next/dynamic'
-import { Providers } from '@/components/providers'
-import { Toaster } from '@/components/ui/sonner'
-import './globals.css'
+import "./globals.css"
+import dynamic from "next/dynamic"
+import { Providers } from "@/components/providers"
+import { Toaster } from "@/components/ui/sonner"
+import { currentUser } from "@clerk/nextjs/server"
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: false })
 
@@ -24,19 +24,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         enableSystem
         disableTransitionOnChange
       >
-        {!!user && (
-          <Scene
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              pointerEvents: 'none',
-              zIndex: 0,
-            }}
-          />
-        )}
         {children}
       </Providers>
     </div>
