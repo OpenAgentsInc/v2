@@ -90,6 +90,8 @@
     - Entities: lib/fonts.ts
 23. Server Actions
     - Entities: types/server-action-result.ts
+24. Testing
+    - Entities: test folder, testing utilities, test configurations
 
 ## Process Flow (Chat System)
 1. User initiates a chat or opens an existing thread
