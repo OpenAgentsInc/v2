@@ -28,7 +28,7 @@ export const createOrGetUser = mutation({
       image: args.image,
       name: args.name,
       username: args.username,
-      credits: args.credits || 0,
+      credits: args.credits || 1000,
       createdAt: new Date().toISOString(),
       referrer_id: args.referrer_id ? args.referrer_id as Id<"users"> : undefined,
     });

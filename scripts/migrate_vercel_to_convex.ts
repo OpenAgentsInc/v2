@@ -1,7 +1,9 @@
 import { ConvexClient } from "convex/browser"
+import dotenv from "dotenv"
 import { sql } from "@vercel/postgres"
 import { api } from "../convex/_generated/api"
 
+dotenv.config();
 // Convex configuration
 const convexUrl = process.env.CONVEX_URL as string;
 
