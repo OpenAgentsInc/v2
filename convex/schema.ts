@@ -55,7 +55,7 @@ export default defineSchema({
     role: v.string(),
     content: v.string(),
     created_at: v.string(),
-    tool_invocations: v.optional(v.object({})),
+    tool_invocations: v.optional(v.any()),
     finish_reason: v.optional(v.string()),
     total_tokens: v.optional(v.number()),
     prompt_tokens: v.optional(v.number()),
