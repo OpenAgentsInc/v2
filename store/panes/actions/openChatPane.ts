@@ -45,22 +45,23 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
         newPaneWithPosition.y = panePosition.y + PANE_OFFSET;
       }
       
-      // Add the new pane and deactivate others, but keep the Chats pane
+      // Add the new pane and deactivate others, but keep the Chats pane and changelog pane active
       updatedPanes = [
-        ...updatedPanes.map(pane => ({ ...pane, isActive: false })),
+        ...updatedPanes.map(pane => ({ ...pane, isActive: pane.type === 'chats' || pane.type === 'changelog' })),
         newPaneWithPosition
       ];
-    } else if (updatedPanes.length > 1) {
-      // Replace the existing chat pane, but keep the Chats pane
-      updatedPanes = updatedPanes.map(pane =>
-        pane.type === 'chat' ? newPaneWithPosition : { ...pane, isActive: false }
-      );
     } else {
-      // Add the new pane and deactivate others, but keep the Chats pane
-      updatedPanes = [
-        ...updatedPanes.map(pane => ({ ...pane, isActive: false })),
-        newPaneWithPosition
-      ];
+      // Replace the existing chat pane, but keep the Chats pane and changelog pane
+      updatedPanes = updatedPanes.map(pane =>
+        pane.type === 'chat' ? newPaneWithPosition : 
+        (pane.type === 'chats' || pane.type === 'changelog') ? { ...pane, isActive: true } : 
+        { ...pane, isActive: false }
+      );
+
+      // If there's no existing chat pane, add the new one
+      if (!updatedPanes.some(pane => pane.type === 'chat')) {
+        updatedPanes.push(newPaneWithPosition);
+      }
     }
 
     // Ensure the Chats pane is always at the beginning of the array
