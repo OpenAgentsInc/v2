@@ -4,16 +4,9 @@ import { sql } from "@vercel/postgres"
 import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
 import path from 'path'
-import fs from 'fs'
 
-// Load .env file manually
-const envPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(envPath)) {
-  const envConfig = dotenv.parse(fs.readFileSync(envPath));
-  for (const k in envConfig) {
-    process.env[k] = envConfig[k];
-  }
-}
+// Load .env.local file
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 console.log("CONVEX_URL:", process.env.CONVEX_URL);
 
