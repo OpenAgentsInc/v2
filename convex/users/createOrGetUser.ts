@@ -8,8 +8,8 @@ export const createOrGetUser = mutation({
     email: v.string(),
     image: v.optional(v.string()),
     referrer_id: v.optional(v.string()),
-    name: v.optional(v.string()),
-    username: v.optional(v.string()),
+    name: v.string(),
+    username: v.string(),
   },
   async handler(ctx, args) {
     const existingUser = await ctx.db
@@ -25,6 +25,8 @@ export const createOrGetUser = mutation({
       clerk_user_id: args.clerk_user_id,
       email: args.email,
       image: args.image,
+      name: args.name,
+      username: args.username,
       credits: 0,
       createdAt: new Date().toISOString(),
       referrer_id: args.referrer_id ? args.referrer_id as Id<"users"> : undefined,

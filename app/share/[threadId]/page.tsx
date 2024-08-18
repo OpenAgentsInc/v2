@@ -36,22 +36,24 @@ export default function SharePage({ params }: SharePageProps) {
         <div className="border-b bg-background px-4 py-6 md:px-6 md:py-8">
           <div className="mx-auto max-w-2xl">
             <div className="space-y-1 md:-mx-8">
-              <h1 className="text-2xl font-bold">{chat.metadata?.title || "Untitled Chat"}</h1>
+              <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">{chat.metadata?.title || "Untitled Chat"}</h1>
+                {chatOwner && (
+                  <div className="flex items-center space-x-2">
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">Chat shared by</p>
+                      <p className="text-sm font-semibold">{chatOwner.username}</p>
+                    </div>
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={chatOwner.image} alt={chatOwner.name || "User"} />
+                      <AvatarFallback>{chatOwner.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+              </div>
               <div className="text-sm text-muted-foreground">
                 {formatDate(chat.createdAt)} · {messages.length} messages
               </div>
-              {chatOwner && (
-                <div className="flex items-center space-x-4 mt-4">
-                  <Avatar>
-                    <AvatarImage src={chatOwner.image} alt="Tester" />
-                    <AvatarFallback>{chatOwner.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold">{chatOwner.name}</p>
-                    <p className="text-sm text-muted-foreground">Chat Owner</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
