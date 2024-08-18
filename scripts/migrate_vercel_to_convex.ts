@@ -1,25 +1,28 @@
-import { createPool } from '@vercel/postgres';
+import { sql } from '@vercel/postgres';
 import { ConvexClient } from 'convex/browser';
-
-// Vercel Postgres connection configuration
-const vercelConfig = {
-  connectionString: process.env.POSTGRES_URL,
-};
 
 // Convex configuration
 const convexUrl = process.env.CONVEX_URL;
 
-async function migrateData() {
-  // Connect to Vercel Postgres
-  const vercelPool = createPool(vercelConfig);
+async function executeSQL(query: string, params: any[] = []) {
+    try {
+        await sql.query(query, params);
+        console.log(`Successfully executed: ${query.split('\n')[0]}...`);
+    } catch (error) {
+        console.error(`Error executing SQL: ${query.split('\n')[0]}...`);
+        console.error(error);
+        throw error;
+    }
+}
 
+async function migrateData() {
   // Connect to Convex
   const convex = new ConvexClient(convexUrl);
   await convex.initialize();
 
   try {
     // Migrate users
-    const { rows: users } = await vercelPool.query('SELECT * FROM users');
+    const { rows: users } = await sql`SELECT * FROM users`;
     for (const user of users) {
       await convex.mutation('users:create', {
         clerk_user_id: user.clerk_user_id,
@@ -31,7 +34,7 @@ async function migrateData() {
     }
 
     // Migrate threads
-    const { rows: threads } = await vercelPool.query('SELECT * FROM threads');
+    const { rows: threads } = await sql`SELECT * FROM threads`;
     for (const thread of threads) {
       await convex.mutation('threads:create', {
         user_id: thread.user_id.toString(), // Convex uses string IDs
@@ -43,7 +46,7 @@ async function migrateData() {
     }
 
     // Migrate messages
-    const { rows: messages } = await vercelPool.query('SELECT * FROM messages');
+    const { rows: messages } = await sql`SELECT * FROM messages`;
     for (const message of messages) {
       await convex.mutation('messages:create', {
         thread_id: message.thread_id.toString(), // Convex uses string IDs
@@ -65,8 +68,7 @@ async function migrateData() {
   } catch (error) {
     console.error('Error during migration:', error);
   } finally {
-    // Close connections
-    await vercelPool.end();
+    // Close connection
     await convex.close();
   }
 }
