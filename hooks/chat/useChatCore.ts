@@ -33,13 +33,12 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
   const fetchMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
   const generateTitle = useAction(api.threads.generateTitle.generateTitle)
   const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData)
-  const updateUserCreditsMutation = useMutation(api.users.updateUserCredits.updateUserCredits)
+  const saveMessageAndUpdateBalance = useMutation(api.users.saveMessageAndUpdateBalance.saveMessageAndUpdateBalance)
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)
   const tools = useToolStore((state) => state.tools)
   const setBalance = useBalanceStore((state) => state.setBalance)
-  const balance = useBalanceStore((state) => state.balance)
 
   const vercelChatProps = useVercelChat({
     id: threadId?.toString(),
@@ -48,7 +47,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     maxToolRoundtrips: 20,
     onFinish: async (message, options) => {
       if (threadId && user) {
-        console.log("Whats up")
         const updatedMessages = [...threadData.messages, message as Message]
         setThreadData({ ...threadData, messages: updatedMessages })
 
@@ -61,18 +59,17 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             model_id: currentModelRef.current || model.id,
           })
 
-          console.log("Result is", result)
-
-          if (result && typeof result === 'object' && 'balance' in result) {
-            const newBalance = result.balance as number
-            console.log("About to set balance", newBalance)
-            setBalance(newBalance)
-
-            // Update user credits in the database
-            await updateUserCreditsMutation({
+          if (result && typeof result === 'object' && 'usage' in result) {
+            const { usage } = result
+            const balanceResult = await saveMessageAndUpdateBalance({
               clerk_user_id: user.id,
-              credits: newBalance,
+              model_id: currentModelRef.current || model.id,
+              usage: usage,
             })
+
+            if (balanceResult && 'newBalance' in balanceResult) {
+              setBalance(balanceResult.newBalance)
+            }
           }
           setError(null)
 
