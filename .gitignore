@@ -32,11 +32,10 @@ yarn-error.log*
 # turbo
 .turbo
 
-.env
 .vercel
 .vscode
+.env
 .env*
-.env*.local
 
 tsconfig.tsbuildinfo
 *.jsonl
