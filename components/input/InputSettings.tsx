@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
-import { Wrench, Github, GitBranch } from 'lucide-react'
-import { useRepoStore } from '@/store/repo'
-import { useModelStore } from '@/store/models'
-import { useToolStore } from '@/store/tools'
-import { useBalanceStore } from '@/store/balance'
-import * as Popover from '@radix-ui/react-popover'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { models } from '@/lib/models'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import AddCreditsForm from '@/components/AddCreditsForm'
-import { Model } from '@/types'
-import { useUser } from '@clerk/nextjs'
-import { isGitHubUser } from '@/lib/github/isGitHubUser'
+import { GitBranch, Github, Wrench } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import AddCreditsForm from "@/components/credits/AddCreditsForm"
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle
+} from "@/components/ui/dialog"
+import { isGitHubUser } from "@/lib/github/isGitHubUser"
+import { models } from "@/lib/models"
+import { cn } from "@/lib/utils"
+import { useBalanceStore } from "@/store/balance"
+import { useModelStore } from "@/store/models"
+import { useRepoStore } from "@/store/repo"
+import { useToolStore } from "@/store/tools"
+import { Model } from "@/types"
+import { useUser } from "@clerk/nextjs"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import * as Popover from "@radix-ui/react-popover"
 
 export function InputSettings({ className, ...props }: React.ComponentProps<'div'>) {
   const repo = useRepoStore((state) => state.repo)
@@ -243,7 +245,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
           <DialogHeader>
             <DialogTitle>Add Credits</DialogTitle>
             s                     <DialogDescription>
-              Advanced models require credits. Select the amount of credits to buy. Min $5, max $1000
+              Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
             </DialogDescription>
           </DialogHeader>
           <AddCreditsForm uiMode="hosted" clerkUserId={user.id} />

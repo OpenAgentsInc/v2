@@ -1,4 +1,5 @@
-import Code from "../Code"
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import {
     RiLinksLine,
     RiPlugLine,
@@ -102,15 +103,14 @@ export default function CodeExample() {
             </p>
             <CodeExampleTabs
                 tab1={
-                    <Code code={code} lang="sql" copy={false} className="h-[31rem]" />
+                    <SyntaxHighlighter language="sql" style={vscDarkPlus} className="h-[31rem]">
+                        {code}
+                    </SyntaxHighlighter>
                 }
                 tab2={
-                    <Code
-                        code={code2}
-                        lang="javascript"
-                        copy={false}
-                        className="h-[31rem]"
-                    />
+                    <SyntaxHighlighter language="javascript" style={vscDarkPlus} className="h-[31rem]">
+                        {code2}
+                    </SyntaxHighlighter>
                 }
             />
             <dl className="mt-24 grid grid-cols-4 gap-10">

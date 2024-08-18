@@ -1,0 +1,7 @@
+export * from './addPane'
+export * from './bringPaneToFront'
+export * from './openChatPane'
+export * from './removePane'
+export * from './setActivePane'
+export * from './updatePanePosition'
+export * from './updatePaneSize'

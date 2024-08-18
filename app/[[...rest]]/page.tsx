@@ -1,16 +1,17 @@
-import { SignedIn, SignedOut } from '@clerk/nextjs'
+"use client"
+import { Authenticated, Unauthenticated } from "convex/react";
 import { HomeAuthed } from '@/components/home'
 import { Lander } from '@/components/landing/Lander'
 
 export default function Page() {
-    return (
-        <>
-            <SignedOut>
-                <Lander />
-            </SignedOut>
-            <SignedIn>
-                <HomeAuthed />
-            </SignedIn>
-        </>
-    )
+  return (
+    <>
+      <Unauthenticated>
+        <Lander />
+      </Unauthenticated>
+      <Authenticated>
+        <HomeAuthed />
+      </Authenticated>
+    </>
+  )
 }

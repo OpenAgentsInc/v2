@@ -1,30 +1,35 @@
 import { create } from 'zustand';
-import { Message } from '@/types';
+import { ChatStore, Thread } from '@/panes/chat/chatUtils';
 
-interface Thread {
-  id: number;
-  title: string;
-  messages: Message[];
-  createdAt: Date;
-}
-
-interface ChatStore {
-  threads: Record<number, Thread>;
-  currentThreadId: number | null;
-  setThread: (threadId: number, thread: Thread) => void;
-  setCurrentThreadId: (threadId: number | null) => void;
-  updateThreadTitle: (threadId: number, title: string) => void;
-  addMessageToThread: (threadId: number, message: Message) => void;
-}
-
+/**
+ * Creates a Zustand store for managing chat state.
+ * This store handles thread management, including adding, updating, and retrieving threads and messages.
+ */
 export const useChatStore = create<ChatStore>((set) => ({
   threads: {},
   currentThreadId: null,
+
+  /**
+   * Sets a thread in the store.
+   * @param threadId - The ID of the thread to set.
+   * @param thread - The thread object to store.
+   */
   setThread: (threadId, thread) =>
     set((state) => ({
       threads: { ...state.threads, [threadId]: thread },
     })),
+
+  /**
+   * Sets the current active thread ID.
+   * @param threadId - The ID of the thread to set as current.
+   */
   setCurrentThreadId: (threadId) => set({ currentThreadId: threadId }),
+
+  /**
+   * Updates the title of a specific thread.
+   * @param threadId - The ID of the thread to update.
+   * @param title - The new title for the thread.
+   */
   updateThreadTitle: (threadId, title) =>
     set((state) => ({
       threads: {
@@ -32,6 +37,12 @@ export const useChatStore = create<ChatStore>((set) => ({
         [threadId]: { ...state.threads[threadId], title },
       },
     })),
+
+  /**
+   * Adds a message to a specific thread.
+   * @param threadId - The ID of the thread to add the message to.
+   * @param message - The message object to add.
+   */
   addMessageToThread: (threadId, message) =>
     set((state) => ({
       threads: {
