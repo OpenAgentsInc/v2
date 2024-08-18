@@ -9,7 +9,7 @@ const getClerkDomain = () => {
 export default {
   providers: [
     {
-      domain: getClerkDomain(),
+      domain: "https://clerk.openagents.com",
       applicationID: "convex",
     },
   ]
