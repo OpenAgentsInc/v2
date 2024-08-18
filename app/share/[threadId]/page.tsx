@@ -1,14 +1,13 @@
 "use client"
-
 import { useQuery } from "convex/react"
-import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { formatDate } from "@/lib/utils"
 import { ChatList } from "@/panes/chat/ChatList"
 import { Message } from "@/types"
-import { SignUp, SignUpButton } from "@clerk/nextjs"
+import { SignUpButton } from "@clerk/nextjs"
 
 export const runtime = 'edge'
 export const preferredRegion = 'home'
@@ -22,11 +21,11 @@ interface SharePageProps {
 export default function SharePage({ params }: SharePageProps) {
   const chat = useQuery(api.threads.getSharedThread.getSharedThread, { threadId: params.threadId as Id<'threads'> })
   const messages = useQuery(api.threads.getThreadMessages.getThreadMessages, { threadId: params.threadId as Id<'threads'> })
+  const chatOwner = useQuery(api.users.getUserData.getUserData, chat?.user_id ? { clerk_user_id: chat.clerk_user_id } : "skip")
 
   if (!chat || !chat?.isShared) {
     return <></>
   }
-
   if (!messages) {
     return <p>No messages</p>
   }
@@ -41,6 +40,18 @@ export default function SharePage({ params }: SharePageProps) {
               <div className="text-sm text-muted-foreground">
                 {formatDate(chat.createdAt)} · {messages.length} messages
               </div>
+              {chatOwner && (
+                <div className="flex items-center space-x-4 mt-4">
+                  <Avatar>
+                    <AvatarImage src={chatOwner.image} alt="Tester" />
+                    <AvatarFallback>{chatOwner.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold">{chatOwner.name}</p>
+                    <p className="text-sm text-muted-foreground">Chat Owner</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
