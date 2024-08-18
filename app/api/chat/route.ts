@@ -15,8 +15,6 @@ export async function POST(req: Request) {
   const body = await req.json();
   const threadId = body.threadId as Id<"threads">;
 
-  console.log("POST request received with body:", JSON.stringify(body));
-
   if (!threadId) {
     console.error("Invalid threadId");
     return new Response('Invalid threadId', { status: 400 });
@@ -30,13 +28,10 @@ export async function POST(req: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  console.log("User authenticated with userId:", userId);
-
   // Check user balance is > 0, but skip for GPT-4o Mini
   if (toolContext.model.modelId !== 'gpt-4o-mini') {
     try {
       const userBalance = await convex.query(api.users.getUserBalance.getUserBalance, { clerk_user_id: userId });
-      console.log("User balance:", userBalance);
       if (userBalance <= 0) {
         console.error("Insufficient credits for user:", userId);
         return new Response('Insufficient credits', { status: 403 });
