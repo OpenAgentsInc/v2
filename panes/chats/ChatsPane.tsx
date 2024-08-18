@@ -31,9 +31,9 @@ export const ChatsPane: React.FC = () => {
   }, [chats]);
 
   // Fetch message counts for all chats
-  const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount,
-    { thread_ids: sortedChats.map(chat => chat._id) }
-  ) as { [key: Id<"threads">]: number } | undefined;
+  // const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount,
+  //   { thread_ids: sortedChats.map(chat => chat._id) }
+  // ) as { [key: Id<"threads">]: number } | undefined;
 
   useEffect(() => {
     // Load seen chat IDs from local storage
