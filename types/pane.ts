@@ -5,7 +5,7 @@ export type Pane = {
   y: number
   width: number
   height: number
-  type: 'default' | 'chat' | 'chats' | 'user' | 'diff'
+  type: 'default' | 'chat' | 'chats' | 'user' | 'diff' | 'changelog'
   content?: {
     oldContent?: string
     newContent?: string

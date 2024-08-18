@@ -1,9 +1,9 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import { PaneInput } from '@/types/pane'
-import { calculatePanePosition } from './panes'
-import * as actions from './panes/actions'
-import { PaneStore } from './types'
+import { PaneInput } from "@/types/pane"
+import { calculatePanePosition } from "./panes"
+import * as actions from "./panes/actions"
+import { PaneStore } from "./types"
 
 export const usePaneStore = create<PaneStore>()(
   persist(
@@ -14,7 +14,7 @@ export const usePaneStore = create<PaneStore>()(
           type: 'chats',
           title: 'Chats',
           x: 90,
-          y: 190,
+          y: 170,
           width: 260,
           height: 450,
           isOpen: true,
@@ -48,7 +48,7 @@ export const usePaneStore = create<PaneStore>()(
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage-12937612312333',
+      name: 'openagents-hud-storage-1293761231233x3' + Math.random(),
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
