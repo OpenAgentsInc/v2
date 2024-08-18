@@ -1,29 +1,32 @@
 import { ConvexClient } from "convex/browser"
 import dotenv from "dotenv"
+import path from "path"
 import { sql } from "@vercel/postgres"
 import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
-import path from 'path'
 
 // Load .env.local file
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-console.log("CONVEX_URL:", process.env.CONVEX_URL);
+console.log("NEXT_PUBLIC_CONVEX_URL:", process.env.NEXT_PUBLIC_CONVEX_URL);
 
 // Convex configuration
-const convexUrl = process.env.CONVEX_URL || "https://your-deployment-id.convex.cloud";
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
 console.log("Using CONVEX_URL:", convexUrl);
+if (!convexUrl) {
+  throw new Error("CONVEX_URL is not set in the environment.");
+}
 
 async function migrateData() {
   // Connect to Convex
-  const convex = new ConvexClient(convexUrl);
+  const convex = new ConvexClient(convexUrl as string);
 
   try {
     // Migrate users
     const { rows: users } = await sql`SELECT * FROM users`;
     const userIdMap = new Map<number, Id<"users">>();
     for (const user of users) {
-      const existingUser = await convex.query(api.users.getUserByClerkId.getUserByClerkId, { clerk_user_id: user.clerk_user_id });
+      const existingUser = await convex.query(api.users.getUserData.getUserData, { clerk_user_id: user.clerk_user_id });
       if (existingUser) {
         console.log(`User ${user.clerk_user_id} already exists. Updating...`);
         const updatedUser = await convex.mutation(api.users.updateUser.updateUser, {
