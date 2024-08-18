@@ -1,24 +1,12 @@
-import { sql } from '@vercel/postgres';
-import { ConvexClient } from 'convex/browser';
+import { ConvexHttpClient } from "convex/browser"
+import { sql } from "@vercel/postgres"
 
 // Convex configuration
-const convexUrl = process.env.CONVEX_URL;
-
-async function executeSQL(query: string, params: any[] = []) {
-    try {
-        await sql.query(query, params);
-        console.log(`Successfully executed: ${query.split('\n')[0]}...`);
-    } catch (error) {
-        console.error(`Error executing SQL: ${query.split('\n')[0]}...`);
-        console.error(error);
-        throw error;
-    }
-}
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL as string;
 
 async function migrateData() {
   // Connect to Convex
-  const convex = new ConvexClient(convexUrl);
-  await convex.initialize();
+  const convex = new ConvexHttpClient(convexUrl);
 
   try {
     // Migrate users
@@ -67,9 +55,6 @@ async function migrateData() {
     console.log('Migration completed successfully');
   } catch (error) {
     console.error('Error during migration:', error);
-  } finally {
-    // Close connection
-    await convex.close();
   }
 }
 
