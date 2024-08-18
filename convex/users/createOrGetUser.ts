@@ -1,5 +1,6 @@
-import { mutation } from "../_generated/server";
-import { v } from "convex/values";
+import { v } from "convex/values"
+import { Id } from "../_generated/dataModel"
+import { mutation } from "../_generated/server"
 
 export const createOrGetUser = mutation({
   args: {
@@ -7,6 +8,8 @@ export const createOrGetUser = mutation({
     email: v.string(),
     image: v.optional(v.string()),
     referrer_id: v.optional(v.string()),
+    name: v.optional(v.string()),
+    username: v.optional(v.string()),
   },
   async handler(ctx, args) {
     const existingUser = await ctx.db
@@ -24,14 +27,15 @@ export const createOrGetUser = mutation({
       image: args.image,
       credits: 0,
       createdAt: new Date().toISOString(),
-      referrer_id: args.referrer_id,
+      referrer_id: args.referrer_id ? args.referrer_id as Id<"users"> : undefined,
     });
 
     // If there's a referrer, add credits to their account
-    if (args.referrer_id) {
+    const referrerId = args.referrer_id as Id<"users">;
+    if (referrerId !== undefined) {
       const referrer = await ctx.db
         .query("users")
-        .withIndex("by_clerk_user_id", (q) => q.eq("clerk_user_id", args.referrer_id))
+        .withIndex("by_clerk_user_id", (q) => q.eq("clerk_user_id", referrerId))
         .first();
 
       if (referrer) {

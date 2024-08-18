@@ -1,9 +1,9 @@
-import { useUser } from '@clerk/nextjs'
-import { useEffect, useState } from 'react'
-import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react' // Import the Loader2 icon from lucide-react
+import { useMutation } from "convex/react"
+import { Loader2 } from "lucide-react" // Import the Loader2 icon from lucide-react
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { api } from "@/convex/_generated/api"
+import { useUser } from "@clerk/nextjs"
 
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser()
@@ -18,6 +18,8 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
             clerk_user_id: user.id,
             email: user.emailAddresses[0].emailAddress,
             image: user.imageUrl,
+            name: user.fullName,
+            username: user.username
           })
           setIsHandled(true)
           // console.log('User created or retrieved successfully:', result)

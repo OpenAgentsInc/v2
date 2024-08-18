@@ -1,10 +1,10 @@
-import { convertToCoreMessages, streamText } from 'ai';
-import { getSystemPrompt } from '@/lib/systemPrompt';
-import { getTools, getToolContext } from '@/tools';
-import { auth } from '@clerk/nextjs/server';
-import { Id } from '@/convex/_generated/dataModel';
-import { ConvexHttpClient } from 'convex/browser';
-import { api } from '@/convex/_generated/api';
+import { convertToCoreMessages, streamText } from "ai"
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
+import { getSystemPrompt } from "@/lib/systemPrompt"
+import { getToolContext, getTools } from "@/tools"
+import { auth } from "@clerk/nextjs/server"
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   console.log("User authenticated with userId:", userId);
 
   // Check user balance is > 0, but skip for GPT-4o Mini
-  if (toolContext.model !== 'gpt-4o-mini') {
+  if (toolContext.model.modelId !== 'gpt-4o-mini') {
     try {
       const userBalance = await convex.query(api.users.getUserBalance.getUserBalance, { clerk_user_id: userId });
       console.log("User balance:", userBalance);
