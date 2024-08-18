@@ -1,18 +1,20 @@
 import { ConvexClient } from "convex/browser"
 import dotenv from "dotenv"
+import path from "path"
 import { sql } from "@vercel/postgres"
 import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
-import path from 'path'
 
 // Load .env.local file
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-console.log("CONVEX_URL:", process.env.CONVEX_URL);
-
 // Convex configuration
-const convexUrl = process.env.CONVEX_URL || "https://your-deployment-id.convex.cloud";
-console.log("Using CONVEX_URL:", convexUrl);
+const convexUrl = process.env.CONVEX_URL as string
+// if no convexUrl, stop the script
+if (!convexUrl) {
+  console.error("CONVEX_URL is not set. Please set it in .env.local file.");
+  process.exit(1);
+}
 
 async function migrateData() {
   // Connect to Convex
