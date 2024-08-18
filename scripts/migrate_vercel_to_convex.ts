@@ -1,20 +1,18 @@
 import { ConvexClient } from "convex/browser"
 import dotenv from "dotenv"
-import path from "path"
 import { sql } from "@vercel/postgres"
 import { api } from "../convex/_generated/api"
 import { Id } from "../convex/_generated/dataModel"
+import path from 'path'
 
 // Load .env.local file
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
+console.log("CONVEX_URL:", process.env.CONVEX_URL);
+
 // Convex configuration
-const convexUrl = process.env.CONVEX_URL as string
-// if no convexUrl, stop the script
-if (!convexUrl) {
-  console.error("CONVEX_URL is not set. Please set it in .env.local file.");
-  process.exit(1);
-}
+const convexUrl = process.env.CONVEX_URL || "https://your-deployment-id.convex.cloud";
+console.log("Using CONVEX_URL:", convexUrl);
 
 async function migrateData() {
   // Connect to Convex
@@ -66,11 +64,11 @@ async function migrateData() {
           content: message.content,
           tool_invocations: message.tool_invocations,
           finish_reason: message.finish_reason,
-          total_tokens: message.total_tokens,
-          prompt_tokens: message.prompt_tokens,
-          completion_tokens: message.completion_tokens,
+          total_tokens: message.total_tokens || 0,
+          prompt_tokens: message.prompt_tokens || 0,
+          completion_tokens: message.completion_tokens || 0,
           model_id: message.model_id,
-          cost_in_cents: parseFloat(message.cost_in_cents),
+          cost_in_cents: parseFloat(message.cost_in_cents) || 0,
         });
       } else {
         console.warn(`Thread not found for message ${message.id}. Skipping this message.`);
