@@ -1,7 +1,7 @@
 "use client"
 
 import { usePaneStore } from '@/store/pane'
-import { Chat, Pane as PaneComponent, UserStatus, ChatsPane } from '@/panes'
+import { Chat, Pane as PaneComponent, UserStatus, ChatsPane, ChangelogPane } from '@/panes'
 import { Pane } from '@/types/pane'
 import { Id } from '@/convex/_generated/dataModel'
 
@@ -13,10 +13,12 @@ export const PaneManager = () => {
     return id.replace(/^chat-/, '').replace(/^chat-/, '')
   }
 
-  // Ensure Chats pane is always first
+  // Ensure Chats pane is always first, followed by Changelog
   const sortedPanes = [...panes].sort((a, b) => {
     if (a.type === 'chats') return -1
     if (b.type === 'chats') return 1
+    if (a.type === 'changelog') return -1
+    if (b.type === 'changelog') return 1
     return 0
   })
 
@@ -39,6 +41,7 @@ export const PaneManager = () => {
         >
           {pane.type === 'chat' && <Chat threadId={stripChatPrefix(pane.id) as Id<"threads">} />}
           {pane.type === 'chats' && <ChatsPane />}
+          {pane.type === 'changelog' && <ChangelogPane />}
           {pane.type === 'diff' && pane.content && (
             <div>
               <h3>Old Content:</h3>
