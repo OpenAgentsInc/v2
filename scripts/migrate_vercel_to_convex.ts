@@ -89,12 +89,12 @@ async function migrateData() {
             clerk_user_id: message.clerk_user_id,
             role: message.role,
             content: message.content,
-            tool_invocations: message.tool_invocations,
-            finish_reason: message.finish_reason,
+            tool_invocations: message.tool_invocations || undefined,
+            finish_reason: message.finish_reason || "",
             total_tokens: message.total_tokens || 0,
             prompt_tokens: message.prompt_tokens || 0,
             completion_tokens: message.completion_tokens || 0,
-            model_id: message.model_id,
+            model_id: message.model_id || "",
             cost_in_cents: parseFloat(message.cost_in_cents) || 0,
           });
         }
