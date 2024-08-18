@@ -13,7 +13,6 @@ const ChangelogPane: React.FC = () => {
             <li className="text-sm text-foreground/80">Fixed duplicate chats</li>
             <li className="text-sm text-foreground/80">Chats can be shared</li>
           </ul>
-          <p className="mt-3 text-sm text-foreground/80">Note: Because we switched databases, any chats older than Aug 18 will not show until later today</p>
         </ScrollArea>
       </CardContent>
     </Card>
