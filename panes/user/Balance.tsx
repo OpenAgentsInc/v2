@@ -1,11 +1,14 @@
 "use client"
-import { useEffect, useState } from 'react';
-import { useBalanceStore } from '@/store/balance';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import AddCreditsForm from '@/components/credits/AddCreditsForm';
-import { useAuth } from '@clerk/nextjs';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { useQuery } from "convex/react"
+import { useEffect, useState } from "react"
+import AddCreditsForm from "@/components/credits/AddCreditsForm"
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
+import { api } from "@/convex/_generated/api"
+import { useBalanceStore } from "@/store/balance"
+import { useAuth } from "@clerk/nextjs"
 
 export const Balance = () => {
   const [loading, setLoading] = useState(true);
@@ -47,7 +50,7 @@ export const Balance = () => {
         <DialogHeader>
           <DialogTitle>Add Credits</DialogTitle>
           <DialogDescription>
-            Advanced models require credits. Select the amount of credits to buy. Min $5, max $200
+            Advanced models require credits. Select the amount of credits to buy. Min $5, max $1000
           </DialogDescription>
         </DialogHeader>
         <AddCreditsForm uiMode="hosted" clerkUserId={userId} />
