@@ -11,7 +11,8 @@
     "type-check": "tsc --noEmit",
     "format:write": "prettier --write \"{app,lib,components}/**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"{app,lib,components}**/*.{ts,tsx,mdx}\" --cache",
-    "migrate": "npx tsx scripts/migrate_vercel_to_convex.ts"
+    "migrate": "npx tsx scripts/migrate_vercel_to_convex.ts",
+    "migrate:prod": "NODE_ENV=production npx tsx scripts/migrate_vercel_to_convex.ts"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^0.0.13",

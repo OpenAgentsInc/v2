@@ -130,7 +130,8 @@ export const ChatsPane: React.FC = () => {
                     <ChatActions
                       chatId={chat._id}
                       title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
-                      messageCount={messageCounts?.[chat._id] ?? 0}
+                      // messageCount={messageCounts?.[chat._id] ?? 0}
+                      messageCount={0}
                       removeChat={removeChat}
                     />
                   </ChatItem>

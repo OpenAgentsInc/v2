@@ -9,3 +9,4 @@ export { getUserThreads } from "./getUserThreads";
 export { shareThread } from "./shareThread";
 export { updateThreadData } from "./updateThreadData";
 export { getThreadMessageCount } from "./getThreadMessageCount";
+export { getThreadByClerkId } from "./getThreadByClerkId";
