@@ -1,5 +1,5 @@
 import { PaneManager } from '@/panes/PaneManager'
-import { SimpleGrid } from '@/components/ui/simple-grid'
+import { SimpleGrid } from './SimpleGrid'
 
 export function HomeAuthed() {
   return (
