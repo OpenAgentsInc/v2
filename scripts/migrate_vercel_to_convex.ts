@@ -31,13 +31,10 @@ async function migrateData() {
     for (const user of usersResult.rows) {
       await convex.mutation('users:create', {
         clerk_user_id: user.clerk_user_id,
-        name: user.name,
-        username: user.username,
         email: user.email,
         image: user.image,
-        credits: user.credits,
-        createdAt: user.created_at,
-        referrer_id: user.referrer_id
+        credits: parseFloat(user.credits),
+        createdAt: user.createdAt.toISOString(),
       });
     }
 
@@ -45,11 +42,11 @@ async function migrateData() {
     const threadsResult = await vercelClient.query('SELECT * FROM threads');
     for (const thread of threadsResult.rows) {
       await convex.mutation('threads:create', {
-        user_id: thread.user_id,
+        user_id: thread.user_id.toString(), // Convex uses string IDs
         clerk_user_id: thread.clerk_user_id,
         metadata: thread.metadata,
-        createdAt: thread.created_at,
-        isShared: thread.is_shared
+        createdAt: thread.createdAt.toISOString(),
+        isShared: false, // This field is not in the Vercel schema, defaulting to false
       });
     }
 
@@ -57,18 +54,18 @@ async function migrateData() {
     const messagesResult = await vercelClient.query('SELECT * FROM messages');
     for (const message of messagesResult.rows) {
       await convex.mutation('messages:create', {
-        thread_id: message.thread_id,
+        thread_id: message.thread_id.toString(), // Convex uses string IDs
         clerk_user_id: message.clerk_user_id,
         role: message.role,
         content: message.content,
-        created_at: message.created_at,
+        created_at: message.created_at.toISOString(),
         tool_invocations: message.tool_invocations,
         finish_reason: message.finish_reason,
         total_tokens: message.total_tokens,
         prompt_tokens: message.prompt_tokens,
         completion_tokens: message.completion_tokens,
         model_id: message.model_id,
-        cost_in_cents: message.cost_in_cents
+        cost_in_cents: parseFloat(message.cost_in_cents),
       });
     }
 
