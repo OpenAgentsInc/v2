@@ -27,6 +27,9 @@ export const ChatsPane: React.FC = () => {
     if (!chats) return [];
     return [...chats]
       .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
+      // and filter out any where a. or b.created_At is not null
+      .filter(chat => !chat.createdAt)
+
       .slice(0, 25);
   }, [chats]);
 

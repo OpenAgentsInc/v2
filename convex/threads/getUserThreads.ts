@@ -1,5 +1,5 @@
-import { query } from "../_generated/server";
-import { v } from "convex/values";
+import { v } from "convex/values"
+import { query } from "../_generated/server"
 
 export const getUserThreads = query({
   args: { clerk_user_id: v.string() },
