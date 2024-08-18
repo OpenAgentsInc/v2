@@ -13,12 +13,10 @@ export const PaneManager = () => {
     return id.replace(/^chat-/, '').replace(/^chat-/, '')
   }
 
-  // Ensure Chats pane is always first, followed by Changelog
+  // Ensure Chats pane is always first, but don't give special treatment to Changelog
   const sortedPanes = [...panes].sort((a, b) => {
     if (a.type === 'chats') return -1
     if (b.type === 'chats') return 1
-    if (a.type === 'changelog') return -1
-    if (b.type === 'changelog') return 1
     return 0
   })
 
