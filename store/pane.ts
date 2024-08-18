@@ -24,10 +24,10 @@ export const usePaneStore = create<PaneStore>()(
           id: '1',
           type: 'changelog',
           title: 'Changelog',
-          x: 90,
-          y: 650,  // Positioned below the Chats pane
-          width: 260,
-          height: 150,  // Smaller height
+          x: 390,
+          y: 170,  // Positioned below the Chats pane
+          width: 360,
+          height: 450,  // Smaller height
           isOpen: true,
           dismissable: true,
         },

@@ -73,7 +73,7 @@ export function ChatItem({ index, chat, children, isNew, isUpdated }: ChatItemPr
         onClick={handleClick}
         className={cn(
           buttonVariants({ variant: 'ghost' }),
-          'group w-full px-8 transition-colors hover:bg-white/10',
+          'group w-full px-4 transition-colors hover:bg-white/10',
           isOpen && 'bg-zinc-200 dark:bg-zinc-800',
           isActive && 'pr-16 font-semibold',
           'text-left'
