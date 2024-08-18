@@ -1,16 +1,9 @@
-import { Client } from 'pg';
+import { createPool } from '@vercel/postgres';
 import { ConvexClient } from 'convex/browser';
 
 // Vercel Postgres connection configuration
 const vercelConfig = {
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DATABASE,
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: process.env.POSTGRES_URL,
 };
 
 // Convex configuration
@@ -18,8 +11,7 @@ const convexUrl = process.env.CONVEX_URL;
 
 async function migrateData() {
   // Connect to Vercel Postgres
-  const vercelClient = new Client(vercelConfig);
-  await vercelClient.connect();
+  const vercelPool = createPool(vercelConfig);
 
   // Connect to Convex
   const convex = new ConvexClient(convexUrl);
@@ -27,8 +19,8 @@ async function migrateData() {
 
   try {
     // Migrate users
-    const usersResult = await vercelClient.query('SELECT * FROM users');
-    for (const user of usersResult.rows) {
+    const { rows: users } = await vercelPool.query('SELECT * FROM users');
+    for (const user of users) {
       await convex.mutation('users:create', {
         clerk_user_id: user.clerk_user_id,
         email: user.email,
@@ -39,8 +31,8 @@ async function migrateData() {
     }
 
     // Migrate threads
-    const threadsResult = await vercelClient.query('SELECT * FROM threads');
-    for (const thread of threadsResult.rows) {
+    const { rows: threads } = await vercelPool.query('SELECT * FROM threads');
+    for (const thread of threads) {
       await convex.mutation('threads:create', {
         user_id: thread.user_id.toString(), // Convex uses string IDs
         clerk_user_id: thread.clerk_user_id,
@@ -51,8 +43,8 @@ async function migrateData() {
     }
 
     // Migrate messages
-    const messagesResult = await vercelClient.query('SELECT * FROM messages');
-    for (const message of messagesResult.rows) {
+    const { rows: messages } = await vercelPool.query('SELECT * FROM messages');
+    for (const message of messages) {
       await convex.mutation('messages:create', {
         thread_id: message.thread_id.toString(), // Convex uses string IDs
         clerk_user_id: message.clerk_user_id,
@@ -74,7 +66,7 @@ async function migrateData() {
     console.error('Error during migration:', error);
   } finally {
     // Close connections
-    await vercelClient.end();
+    await vercelPool.end();
     await convex.close();
   }
 }
