@@ -29,7 +29,7 @@ async function migrateData() {
       const existingUser = await convex.query(api.users.getUserData.getUserData, { clerk_user_id: user.clerk_user_id });
       if (existingUser) {
         console.log(`User ${user.clerk_user_id} already exists. Updating...`);
-        const updatedUser = await convex.mutation(api.users.updateUser.updateUser, {
+        await convex.mutation(api.users.updateUser.updateUser, {
           _id: existingUser._id,
           email: user.email,
           image: user.image,
@@ -37,9 +37,7 @@ async function migrateData() {
           name: user.email.split('@')[0],
           username: user.email.split('@')[0],
         });
-        if (updatedUser) {
-          userIdMap.set(user.id, updatedUser._id);
-        }
+        userIdMap.set(user.id, existingUser._id);
       } else {
         const newUser = await convex.mutation(api.users.createOrGetUser.createOrGetUser, {
           clerk_user_id: user.clerk_user_id,
@@ -49,7 +47,7 @@ async function migrateData() {
           name: user.email.split('@')[0],
           username: user.email.split('@')[0],
         });
-        if (newUser) {
+        if (newUser && '_id' in newUser) {
           userIdMap.set(user.id, newUser._id);
         }
       }
@@ -68,7 +66,9 @@ async function migrateData() {
           clerk_user_id: thread.clerk_user_id,
           metadata: thread.metadata || { title: "Untitled Thread" },
         });
-        threadIdMap.set(thread.id, convexThread);
+        if (typeof convexThread === 'string') {
+          threadIdMap.set(thread.id, convexThread as Id<"threads">);
+        }
       }
     }
 
@@ -77,10 +77,10 @@ async function migrateData() {
     for (const message of messages) {
       const convexThreadId = threadIdMap.get(message.thread_id);
       if (convexThreadId) {
-        const existingMessage = await convex.query(api.messages.fetchThreadMessages.fetchThreadMessages, {
+        const existingMessages = await convex.query(api.messages.fetchThreadMessages.fetchThreadMessages, {
           thread_id: convexThreadId,
         });
-        const messageExists = existingMessage.some(m => m.created_at === message.created_at);
+        const messageExists = existingMessages.some(m => m._creationTime === message.created_at.getTime());
         if (messageExists) {
           console.log(`Message in thread ${convexThreadId} at ${message.created_at} already exists. Skipping...`);
         } else {
