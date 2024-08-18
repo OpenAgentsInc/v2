@@ -20,6 +20,17 @@ export const usePaneStore = create<PaneStore>()(
           isOpen: true,
           dismissable: false,
         },
+        {
+          id: '1',
+          type: 'changelog',
+          title: 'Changelog',
+          x: 90,
+          y: 650,  // Positioned below the Chats pane
+          width: 260,
+          height: 150,  // Smaller height
+          isOpen: true,
+          dismissable: true,
+        },
       ],
       isChatOpen: true,
       lastPanePosition: null,
