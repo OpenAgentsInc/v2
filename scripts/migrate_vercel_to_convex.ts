@@ -34,15 +34,11 @@ async function migrateData() {
     const { rows: threads } = await sql`SELECT * FROM threads`;
     const threadIdMap = new Map<number, Id<"threads">>();
     for (const thread of threads) {
-      const convexUserId = userIdMap.get(thread.user_id);
-      if (convexUserId) {
-        const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
-          clerk_user_id: thread.clerk_user_id,
-          metadata: thread.metadata,
-          userId: convexUserId, // Use the Convex user ID
-        });
-        threadIdMap.set(thread.id, convexThread);
-      }
+      const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
+        clerk_user_id: thread.clerk_user_id,
+        metadata: thread.metadata,
+      });
+      threadIdMap.set(thread.id, convexThread);
     }
 
     // Migrate messages
