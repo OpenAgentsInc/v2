@@ -33,11 +33,13 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
   const fetchMessages = useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip")
   const generateTitle = useAction(api.threads.generateTitle.generateTitle)
   const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData)
+  const updateUserCreditsMutation = useMutation(api.users.updateUserCredits.updateUserCredits)
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)
   const tools = useToolStore((state) => state.tools)
   const setBalance = useBalanceStore((state) => state.setBalance)
+  const balance = useBalanceStore((state) => state.balance)
 
   const vercelChatProps = useVercelChat({
     id: threadId?.toString(),
@@ -59,7 +61,14 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
           })
 
           if (result && typeof result === 'object' && 'balance' in result) {
-            setBalance(result.balance as number)
+            const newBalance = result.balance as number
+            setBalance(newBalance)
+            
+            // Update user credits in the database
+            await updateUserCreditsMutation({
+              clerk_user_id: user.id,
+              credits: newBalance,
+            })
           }
           setError(null)
 
