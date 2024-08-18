@@ -8,7 +8,8 @@ dotenv.config();
 console.log("CONVEX_URL:", process.env.CONVEX_URL);
 
 // Convex configuration
-const convexUrl = process.env.CONVEX_URL as string;
+const convexUrl = process.env.CONVEX_URL || "https://your-deployment-id.convex.cloud";
+console.log("Using CONVEX_URL:", convexUrl);
 
 async function migrateData() {
   // Connect to Convex
