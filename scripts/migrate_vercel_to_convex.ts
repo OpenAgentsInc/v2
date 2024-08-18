@@ -14,34 +14,39 @@ async function migrateData() {
   try {
     // Migrate users
     const { rows: users } = await sql`SELECT * FROM users`;
+    const userIdMap = new Map();
     for (const user of users) {
-      await convex.mutation(api.users.createOrGetUser.createOrGetUser, {
+      const convexUser = await convex.mutation(api.users.createOrGetUser.createOrGetUser, {
         clerk_user_id: user.clerk_user_id,
         email: user.email,
         image: user.image,
         credits: parseFloat(user.credits),
-        // createdAt: user.createdAt.toISOString(),
+        name: user.email.split('@')[0], // Default name to part before @ in email
+        username: user.email.split('@')[0], // Default username to part before @ in email
       });
+      userIdMap.set(user.id, convexUser._id);
     }
 
     // Migrate threads
     const { rows: threads } = await sql`SELECT * FROM threads`;
+    const threadIdMap = new Map();
     for (const thread of threads) {
-      await convex.mutation(api.threads.createNewThread.createNewThread, {
+      const convexThread = await convex.mutation(api.threads.createNewThread.createNewThread, {
         clerk_user_id: thread.clerk_user_id,
         metadata: thread.metadata,
+        user: userIdMap.get(thread.user_id), // Use the Convex user ID
       });
+      threadIdMap.set(thread.id, convexThread._id);
     }
 
     // Migrate messages
     const { rows: messages } = await sql`SELECT * FROM messages`;
     for (const message of messages) {
       await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
-        thread_id: message.thread_id.toString(), // Convex uses string IDs
+        thread_id: threadIdMap.get(message.thread_id), // Use the Convex thread ID
         clerk_user_id: message.clerk_user_id,
         role: message.role,
         content: message.content,
-        // created_at: message.created_at.toISOString(),
         tool_invocations: message.tool_invocations,
         finish_reason: message.finish_reason,
         total_tokens: message.total_tokens,
