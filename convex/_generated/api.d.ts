@@ -39,6 +39,7 @@ import type * as users_getUserBalance from "../users/getUserBalance.js";
 import type * as users_getUserData from "../users/getUserData.js";
 import type * as users_index from "../users/index.js";
 import type * as users_saveMessageAndUpdateBalance from "../users/saveMessageAndUpdateBalance.js";
+import type * as users_updateUser from "../users/updateUser.js";
 import type * as users_updateUserCredits from "../users/updateUserCredits.js";
 import type * as users from "../users.js";
 import type * as utils from "../utils.js";
@@ -77,6 +78,7 @@ declare const fullApi: ApiFromModules<{
   "users/getUserData": typeof users_getUserData;
   "users/index": typeof users_index;
   "users/saveMessageAndUpdateBalance": typeof users_saveMessageAndUpdateBalance;
+  "users/updateUser": typeof users_updateUser;
   "users/updateUserCredits": typeof users_updateUserCredits;
   users: typeof users;
   utils: typeof utils;
