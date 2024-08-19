@@ -1,27 +1,27 @@
-import { defineTable, fields } from "convex/schema";
+import { v } from "convex/values";
 
-export const emails = defineTable({
-  to: fields.string(),
-  from: fields.string(),
-  subject: fields.string(),
-  body: fields.string(),
-  status: fields.string(),
-  sentAt: fields.optional(fields.number()),
-  createdAt: fields.number(),
-});
+export const emails = {
+  to: v.string(),
+  from: v.string(),
+  subject: v.string(),
+  body: v.string(),
+  status: v.string(),
+  sentAt: v.optional(v.number()),
+  createdAt: v.number(),
+};
 
-export const emailCampaigns = defineTable({
-  name: fields.string(),
-  description: fields.optional(fields.string()),
-  status: fields.string(),
-  createdAt: fields.number(),
-  updatedAt: fields.number(),
-});
+export const emailCampaigns = {
+  name: v.string(),
+  description: v.optional(v.string()),
+  status: v.string(),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+};
 
-export const emailAudiences = defineTable({
-  name: fields.string(),
-  description: fields.optional(fields.string()),
-  members: fields.array(fields.string()),
-  createdAt: fields.number(),
-  updatedAt: fields.number(),
-});
+export const emailAudiences = {
+  name: v.string(),
+  description: v.optional(v.string()),
+  members: v.array(v.string()),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+};
