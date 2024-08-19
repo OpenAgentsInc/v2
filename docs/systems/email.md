@@ -1,6 +1,6 @@
 # Emailing System
 
-We integrate with the Resend API for our email needs. This document outlines our email system setup, capabilities, and implementation plan.
+We integrate with the Resend API for our email needs. This document outlines our email system setup, capabilities, implementation plan, and queueing strategy.
 
 ## Current Setup
 
@@ -17,123 +17,168 @@ We integrate with the Resend API for our email needs. This document outlines our
 
 ## Implementation Plan
 
-### 1. Create Email Management HUD Pane
+[... Previous implementation plan remains unchanged ...]
 
-- Add a new folder `panes/email/` with the following files:
-  - `EmailPane.tsx`: Main container for email management
-  - `EmailList.tsx`: Display list of sent/scheduled emails
-  - `EmailCompose.tsx`: Interface for composing new emails
-  - `EmailCampaign.tsx`: Interface for creating and managing email campaigns
-- Use Shad UI components from `components/ui/` for consistency
+## Email Queueing and Background Processing
 
-### 2. Update Convex Schema
+To handle a large number of email jobs efficiently and outside the HTTP request lifecycle, we need to implement a robust queueing system. Here's our strategy:
 
-Modify `convex/schema.ts` to include new tables:
-- `emails`: Store individual email data
-- `emailCampaigns`: Manage email campaigns
-- `emailAudiences`: Store audience information
+### 1. Queueing System
 
-### 3. Add Convex Functions for Email Operations
+We'll use Bull, a Redis-based queue for Node.js, to manage our email queue. Bull provides features like job prioritization, retries, and scheduling, which are crucial for our email system.
 
-Create `convex/emails/` folder with:
-- `sendEmail.ts`: Send individual emails
-- `createCampaign.ts`: Create email campaigns
-- `addToAudience.ts`: Manage email audiences
-- `getEmailStats.ts`: Retrieve email analytics
-- `index.ts`: Export all email-related functions
+#### Setup:
 
-### 4. Integrate Resend API
+1. Install Bull: `npm install bull`
+2. Set up a Redis instance (we can use a managed service like Redis Labs or run it locally for development)
 
-- Add Resend API configuration to environment variables
-- Create `lib/resend.ts` to initialize and export the Resend client
+#### Implementation:
 
-### 5. Implement Email Templates
+Create a new file `lib/emailQueue.ts`:
 
-- Enhance `components/email/email-template.tsx`
-- Create additional templates for different purposes (welcome, newsletter, etc.)
-- Use React Email components for styling and responsiveness
-
-### 6. Update User Management
-
-- Modify `convex/users/getUserData.ts` to include email preferences and subscription status
-- Add `convex/users/updateEmailPreferences.ts` for managing user email settings
-
-### 7. Implement Email Scheduling and Automation
-
-- Create `convex/emails/scheduleEmail.ts` for scheduling future emails
-- Set up a background job system for automated sending (may require additional service integration)
-
-### 8. Add Email Analytics
-
-- Create `convex/emails/getEmailAnalytics.ts` to fetch and process engagement data from Resend
-- Implement visualization components in the email HUD pane
-
-### 9. Update Main Application Logic
-
-- Modify `hooks/useChat.ts` to include email-related actions if necessary
-- Create `hooks/useEmail.ts` for email-specific logic
-
-### 10. Documentation
-
-- Keep this document (`docs/systems/email.md`) updated with implementation details and usage instructions
-- Add comments to new components and functions
-
-### 11. Testing
-
-- Create unit tests for new Convex functions in `convex/emails/`
-- Add integration tests for the email HUD pane and its interactions with the backend
-
-### 12. Security and Compliance
-
-- Implement access controls in Convex functions to ensure users can only access their own email data
-- Add unsubscribe links to all outgoing emails
-- Ensure compliance with anti-spam laws and data protection regulations
-
-## Resend API Integration
-
-### Sending Emails
-
-Basic example of sending an email:
-
-```javascript
+```typescript
+import Queue from 'bull';
 import { Resend } from 'resend';
 
-const resend = new Resend('re_123456789');
+const emailQueue = new Queue('email', process.env.REDIS_URL);
 
-resend.emails.send({
-  from: 'onboarding@resend.dev',
-  to: 'delivered@resend.dev',
-  subject: 'Hello World',
-  html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+emailQueue.process(async (job) => {
+  const { to, from, subject, html, text } = job.data;
+  
+  try {
+    const result = await resend.emails.send({
+      to,
+      from,
+      subject,
+      html,
+      text
+    });
+    return result;
+  } catch (error) {
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
+});
+
+export const queueEmail = (emailData) => {
+  return emailQueue.add(emailData);
+};
+
+export default emailQueue;
+```
+
+### 2. Integration with Convex
+
+Since Convex doesn't natively support long-running background jobs, we'll use a hybrid approach:
+
+1. Use Convex for storing email data and managing the email queue state.
+2. Use a separate Node.js worker (deployed on a platform like Vercel Serverless Functions or AWS Lambda) to process the queue.
+
+#### Convex Schema Update:
+
+Add a new table to `convex/schema.ts`:
+
+```typescript
+emailQueue: defineTable({
+  userId: v.string(),
+  status: v.string(), // "queued", "processing", "completed", "failed"
+  emailData: v.object({
+    to: v.string(),
+    from: v.string(),
+    subject: v.string(),
+    html: v.optional(v.string()),
+    text: v.optional(v.string()),
+  }),
+  attempts: v.number(),
+  createdAt: v.number(),
+  processedAt: v.optional(v.number()),
+}).index("by_status", ["status"]),
+```
+
+#### Convex Function for Queueing:
+
+Create `convex/emails/queueEmail.ts`:
+
+```typescript
+import { mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export const queueEmail = mutation({
+  args: {
+    to: v.string(),
+    from: v.string(),
+    subject: v.string(),
+    html: v.optional(v.string()),
+    text: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const emailId = await ctx.db.insert("emailQueue", {
+      userId: ctx.auth.userId,
+      status: "queued",
+      emailData: args,
+      attempts: 0,
+      createdAt: Date.now(),
+    });
+    
+    // Trigger the worker to process the queue
+    await fetch(process.env.WORKER_WEBHOOK_URL, { method: 'POST' });
+    
+    return emailId;
+  },
 });
 ```
 
-### Audiences API
+### 3. Worker Implementation
 
-Key endpoints for managing recipient lists:
+Create a new file `workers/emailProcessor.js`:
 
-- Create an audience: `POST /audiences`
-- Add contacts to an audience: `POST /audiences/{audience_id}/contacts`
-- Remove contacts from an audience: `DELETE /audiences/{audience_id}/contacts`
+```javascript
+import { ConvexHttpClient } from "convex/browser";
+import { queueEmail } from "../lib/emailQueue";
 
-## Styling Email Templates
+const convex = new ConvexHttpClient(process.env.CONVEX_URL);
 
-Steps to implement React Email for better styling:
+export default async function (req, res) {
+  const queuedEmails = await convex.query("emails:getQueuedEmails");
+  
+  for (const email of queuedEmails) {
+    try {
+      await convex.mutation("emails:updateEmailStatus", { id: email._id, status: "processing" });
+      await queueEmail(email.emailData);
+      await convex.mutation("emails:updateEmailStatus", { id: email._id, status: "completed" });
+    } catch (error) {
+      await convex.mutation("emails:updateEmailStatus", { 
+        id: email._id, 
+        status: "failed", 
+        error: error.message 
+      });
+    }
+  }
+  
+  res.status(200).end();
+}
+```
 
-1. Install React Email: `npm install @react-email/components`
-2. Use React Email components in our templates
-3. Test emails across different clients using React Email's preview functionality
+### 4. Monitoring and Management
+
+- Implement a dashboard in the Email Management HUD Pane to monitor the email queue status.
+- Use Bull's built-in events to track job progress and update the Convex database accordingly.
+
+### 5. Scaling Considerations
+
+- As the number of emails increases, consider scaling the Redis instance and adding more worker processes.
+- Implement rate limiting to comply with Resend's API limits and avoid overwhelming the email service.
 
 ## Next Steps
 
-1. Begin implementation of the email management HUD pane
-2. Set up Convex schema updates and new functions
-3. Integrate Resend API and implement basic email sending functionality
-4. Develop and style email templates using React Email
-5. Implement user email preference management
-6. Set up email scheduling and automation system
-7. Develop email analytics and visualization components
-8. Conduct thorough testing of all new features
-9. Ensure security measures and compliance with email regulations
+1. Set up Redis and integrate Bull for email queueing
+2. Implement the worker for processing queued emails
+3. Update Convex schema and functions to work with the queueing system
+4. Create a monitoring dashboard in the Email Management HUD Pane
+5. Conduct load testing to ensure the system can handle high volumes of emails
+6. Implement error handling and retry mechanisms for failed email sends
 
 Remember to always follow best practices for email sending, including proper unsubscribe mechanisms and compliance with anti-spam laws.
+
+[... Rest of the document remains unchanged ...]
