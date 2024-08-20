@@ -12,6 +12,16 @@ The OpenAgents mobile app is a powerful tool that allows you to command AI agent
 
 The OpenAgents mobile app is available for $29 per month, providing you with full access to AI agent control from your phone.
 
+## Technology Stack
+
+Our app is built using the following key packages:
+
+- React Native and Expo: For cross-platform mobile app development
+- RevenueCat: For managing in-app subscriptions and purchases
+- Convex: For real-time backend and database management
+- React Native Gesture Handler: For handling complex touch and gesture interactions
+- Clerk: For secure authentication and user management
+
 ## Getting Started
 
 To get started with the OpenAgents mobile app:
