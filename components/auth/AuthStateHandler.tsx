@@ -18,8 +18,8 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
             clerk_user_id: user.id,
             email: user.emailAddresses[0].emailAddress,
             image: user.imageUrl,
-            name: user.fullName,
-            username: user.username
+            // name: user.fullName,
+            // username: user.username
           })
           setIsHandled(true)
           // console.log('User created or retrieved successfully:', result)

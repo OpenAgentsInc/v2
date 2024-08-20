@@ -5,7 +5,7 @@ import { mutation } from "../_generated/server"
 export const createOrGetUser = mutation({
   args: {
     clerk_user_id: v.string(),
-    email: v.string(),
+    email: v.optional(v.string()),
     credits: v.optional(v.number()),
     image: v.optional(v.string()),
     referrer_id: v.optional(v.string()),
@@ -24,10 +24,10 @@ export const createOrGetUser = mutation({
 
     const newUser = await ctx.db.insert("users", {
       clerk_user_id: args.clerk_user_id,
-      email: args.email,
-      image: args.image,
-      name: args.name,
-      username: args.username,
+      email: args.email || "",
+      image: args.image || "",
+      name: args.name || "",
+      username: args.username || "",
       credits: args.credits || 1000,
       createdAt: new Date().toISOString(),
       referrer_id: args.referrer_id ? args.referrer_id as Id<"users"> : undefined,

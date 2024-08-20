@@ -1,9 +1,11 @@
-import { Pane } from '@/types/pane'
-import { PANE_OFFSET } from '../constants'
+"use client"
+
+import { Pane } from "@/types/pane"
+import { PANE_OFFSET } from "../constants"
 
 export function handleChatPanePosition(existingPanes: Pane[]): { x: number; y: number; width: number; height: number } {
   const chatPanes = existingPanes.filter(pane => pane.type === 'chat');
-  
+
   if (chatPanes.length === 0) {
     // First chat pane, set dimensions as requested
     return {
