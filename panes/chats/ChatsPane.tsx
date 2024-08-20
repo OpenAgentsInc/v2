@@ -27,16 +27,13 @@ export const ChatsPane: React.FC = () => {
     if (!chats) return [];
     return [...chats]
       .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
-      // and filter out any where a. or b.created_At is not null
-      .filter(chat => !chat.createdAt)
-
       .slice(0, 25);
   }, [chats]);
 
   // Fetch message counts for all chats
-  // const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount,
-  //   { thread_ids: sortedChats.map(chat => chat._id) }
-  // ) as { [key: Id<"threads">]: number } | undefined;
+  const messageCounts = useQuery(api.threads.getThreadMessageCount.getThreadMessageCount,
+    { thread_ids: sortedChats.map(chat => chat._id) }
+  ) as { [key: Id<"threads">]: number } | undefined;
 
   useEffect(() => {
     // Load seen chat IDs from local storage
@@ -134,7 +131,7 @@ export const ChatsPane: React.FC = () => {
                       chatId={chat._id}
                       title={chat.metadata?.title || `Chat ${new Date(chat._creationTime).toLocaleString()}`}
                       // messageCount={messageCounts?.[chat._id] ?? 0}
-                      messageCount={0}
+                      messageCount={messageCounts?.[chat._id] ?? 0}
                       removeChat={removeChat}
                     />
                   </ChatItem>
