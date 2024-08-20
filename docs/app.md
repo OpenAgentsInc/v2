@@ -9,6 +9,7 @@ The OpenAgents mobile app is a powerful tool that allows you to command AI agent
 - Seamless integration with OpenAgents ecosystem
 - Long-lived agents with function calling capabilities
 - Full-screen heads-up display (HUD) with draggable, resizable panes
+- Background job processing for enhanced performance
 
 ## Pricing
 
@@ -25,6 +26,7 @@ Our app is built using the following key packages and technologies:
 - Clerk: For secure authentication and user management
 - Zustand: For state management across the app
 - React Native's built-in styling system: For consistent and efficient styling
+- Inngest: For managing and processing background jobs
 
 ## Implementation Plan
 
@@ -42,6 +44,9 @@ Our app is built using the following key packages and technologies:
 7. Implement the user pane with settings and credit balance display.
 8. Add sharing functionality for threads.
 9. Implement dynamic title generation for threads using AI.
+10. Integrate Inngest for background job processing:
+    - Set up job queues for time-consuming tasks
+    - Implement background jobs for AI processing, data syncing, etc.
 
 ## Long-lived Agents and Function Calling
 
@@ -63,12 +68,23 @@ These data structures are managed using Convex, ensuring real-time updates and e
 
 ## UI Components
 
-Instead of using Shad UI components (which are designed for web applications), the mobile app will use:
+The mobile app will use:
 - React Native's built-in components (View, Text, TextInput, etc.)
 - Custom components built specifically for the mobile interface
 - React Native community packages for more complex UI elements (e.g., react-native-elements, react-native-paper)
 
 These components will be styled using React Native's built-in styling system to create a consistent and efficient UI that matches the OpenAgents brand.
+
+## Background Jobs with Inngest
+
+Inngest is used to manage and process background jobs in the OpenAgents mobile app. This allows for efficient handling of time-consuming tasks without impacting the app's responsiveness. Some use cases include:
+
+- Processing large AI requests
+- Syncing data between the mobile app and the server
+- Generating chat summaries or analytics
+- Scheduling periodic tasks like cleanup or maintenance
+
+Inngest jobs are defined on the server-side and can be triggered from the mobile app when needed.
 
 ## Getting Started
 
