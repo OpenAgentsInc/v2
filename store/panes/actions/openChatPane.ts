@@ -1,7 +1,9 @@
-import { Pane, PaneInput } from '@/types/pane'
-import { PaneStore, SetFunction } from '../types'
-import { ensureChatsPaneExists } from '../utils/ensureChatsPaneExists'
-import { handleChatPanePosition } from '../utils/handleChatPanePosition'
+"use client"
+
+import { Pane, PaneInput } from "@/types/pane"
+import { PaneStore, SetFunction } from "../types"
+import { ensureChatsPaneExists } from "../utils/ensureChatsPaneExists"
+import { handleChatPanePosition } from "../utils/handleChatPanePosition"
 
 const PANE_OFFSET = 45 // Offset for new panes when tiling, matching the value in hud.ts
 
@@ -34,7 +36,7 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
     if (isCommandKeyHeld) {
       // Find the latest chat pane
       const latestChatPane = [...updatedPanes].reverse().find(pane => pane.type === 'chat');
-      
+
       if (latestChatPane) {
         // Tile the new pane with an offset from the latest chat pane
         newPaneWithPosition.x = latestChatPane.x + PANE_OFFSET;
@@ -44,7 +46,7 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
         newPaneWithPosition.x = panePosition.x + PANE_OFFSET;
         newPaneWithPosition.y = panePosition.y + PANE_OFFSET;
       }
-      
+
       // Add the new pane and deactivate others, but keep the Chats pane and changelog pane active
       updatedPanes = [
         ...updatedPanes.map(pane => ({ ...pane, isActive: pane.type === 'chats' || pane.type === 'changelog' })),
@@ -53,9 +55,9 @@ export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyH
     } else {
       // Replace the existing chat pane, but keep the Chats pane and changelog pane
       updatedPanes = updatedPanes.map(pane =>
-        pane.type === 'chat' ? newPaneWithPosition : 
-        (pane.type === 'chats' || pane.type === 'changelog') ? { ...pane, isActive: true } : 
-        { ...pane, isActive: false }
+        pane.type === 'chat' ? newPaneWithPosition :
+          (pane.type === 'chats' || pane.type === 'changelog') ? { ...pane, isActive: true } :
+            { ...pane, isActive: false }
       );
 
       // If there's no existing chat pane, add the new one

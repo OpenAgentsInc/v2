@@ -1,9 +1,10 @@
+"use client"
+
 import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
-import { Chat, ServerActionResult } from "@/lib/types"
 import { useUser } from "@clerk/nextjs"
 
 export const useChatActions = () => {
