@@ -24,8 +24,7 @@ Our app is built using the following key packages and technologies:
 - React Native Gesture Handler: For handling complex touch and gesture interactions in the HUD interface
 - Clerk: For secure authentication and user management
 - Zustand: For state management across the app
-- Tailwind: For consistent and efficient styling
-- Shad UI components: For pre-built, customizable UI elements
+- React Native's built-in styling system: For consistent and efficient styling
 
 ## Implementation Plan
 
@@ -37,7 +36,7 @@ Our app is built using the following key packages and technologies:
    - Set up thread management (createNewThread, getUserThreads, etc.)
    - Handle user data (createOrGetUser, updateUserCredits, etc.)
 5. Implement the chat interface with long-lived agents:
-   - Use the useChat hook for chat logic
+   - Use a custom hook for chat logic (similar to the useChat hook in the web version)
    - Implement function calling capabilities for agents
 6. Set up RevenueCat for subscription management.
 7. Implement the user pane with settings and credit balance display.
@@ -51,7 +50,7 @@ The OpenAgents mobile app supports long-lived agents with function calling capab
 Implementation details:
 - Agents are associated with threads (chats) and persist across multiple messages.
 - Function calling is implemented through an ingest system, allowing agents to execute predefined functions.
-- The `useChat` hook in `hooks/useChat.ts` manages most of the chat logic, including agent interactions and function calling.
+- A custom hook manages most of the chat logic, including agent interactions and function calling.
 
 ## Data Structure
 
@@ -61,6 +60,15 @@ The app uses three primary data types:
 3. User: Stores user information and preferences.
 
 These data structures are managed using Convex, ensuring real-time updates and efficient data handling.
+
+## UI Components
+
+Instead of using Shad UI components (which are designed for web applications), the mobile app will use:
+- React Native's built-in components (View, Text, TextInput, etc.)
+- Custom components built specifically for the mobile interface
+- React Native community packages for more complex UI elements (e.g., react-native-elements, react-native-paper)
+
+These components will be styled using React Native's built-in styling system to create a consistent and efficient UI that matches the OpenAgents brand.
 
 ## Getting Started
 
