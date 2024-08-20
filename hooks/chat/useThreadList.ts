@@ -7,7 +7,6 @@ import { Thread, ThreadMetadata } from "./types"
 
 export function useThreadList() {
   const { user } = useUser()
-  return
   const getUserThreads = useQuery(api.threads.getUserThreads.getUserThreads, user ? { clerk_user_id: user.id } : "skip")
   const [threads, setThreads] = useState<Array<{
     id: Id<"threads">,
