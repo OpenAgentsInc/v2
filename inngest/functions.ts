@@ -1,1 +1,0 @@
-// This file has been refactored. Please see the inngest/functions/ folder for the updated code.
