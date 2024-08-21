@@ -45,7 +45,13 @@ async function sendEmails() {
     const jsonData = JSON.parse(fs.readFileSync('emails/usersemails.json', 'utf-8'));
     const newEmails = jsonData
       .map((item: { email: string }) => item.email)
-      .filter((email: string) => email && email.length >= 3 && !existingEmails.has(email) && !excludedEmails.includes(email));
+      .filter((email: string) => 
+        email && 
+        email.length >= 3 && 
+        !existingEmails.has(email) && 
+        !excludedEmails.includes(email) &&
+        !email.endsWith('@notanemail.com')
+      );
 
     console.log(`Found ${newEmails.length} new emails to send to.`);
 
