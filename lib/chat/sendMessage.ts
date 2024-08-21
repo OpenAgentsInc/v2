@@ -1,9 +1,10 @@
 "use server"
 
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 import { inngest } from "@/inngest/client"
 import { currentUser } from "@clerk/nextjs/server"
-import { api } from "@/convex/_generated/api"
-import { ConvexHttpClient } from "convex/browser"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
@@ -21,7 +22,7 @@ export async function sendMessage({ text, threadId }: SendMessageProps) {
 
   // Save the message to Convex
   const savedMessage = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
-    thread_id: threadId,
+    thread_id: threadId as Id<"threads">,
     clerk_user_id: user.id,
     content: text,
     role: 'user',
@@ -31,8 +32,8 @@ export async function sendMessage({ text, threadId }: SendMessageProps) {
   // Trigger Inngest event for message processing
   await inngest.send({
     name: "chat/process.message",
-    data: { 
-      messageId: savedMessage.id,
+    data: {
+      // messageId: savedMessage.id,
       threadId: threadId,
       userId: user.id,
     }
