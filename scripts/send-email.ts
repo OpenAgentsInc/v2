@@ -1,8 +1,8 @@
-import { ConvexHttpClient } from "convex/browser";
-import * as dotenv from "dotenv";
-import { api } from "../convex/_generated/api.js";
-import { Resend } from "resend";
-import OpenAgentsEmail from "../emails/superpower";
+import { ConvexHttpClient } from "convex/browser"
+import * as dotenv from "dotenv"
+import { Resend } from "resend"
+import { api } from "../convex/_generated/api.js"
+import OpenAgentsEmail from "../emails/superpower"
 
 dotenv.config({ path: ".env.local" });
 // dotenv.config({ path: ".env.production" });
@@ -49,13 +49,10 @@ async function sendEmails() {
           react: OpenAgentsEmail({ balance: user.credits }),
         });
 
-        console.log(`Email sent successfully to ${user.email}. ID: ${data.id}`);
-        
-        // Add a delay of 2 seconds between each email send
-        await sleep(2000);
+        console.log(`Email sent successfully to ${user.email}.`, data);
       } catch (error) {
         console.error(`Failed to send email to ${user.email}:`, error);
-        
+
         // If we hit the rate limit, wait for 10 seconds before continuing
         if (error.statusCode === 429) {
           console.log("Rate limit hit. Waiting for 10 seconds...");

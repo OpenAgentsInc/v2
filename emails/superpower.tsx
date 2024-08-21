@@ -44,18 +44,13 @@ export const OpenAgentsEmail = ({
             <Text className="text-black text-[14px] leading-[24px]">
               It's time to change that.
             </Text>
-            {balance && balance > 0 && (
-              <Text className="text-black text-[14px] leading-[24px]">
-                By the way, you have a current balance of ${formattedBalance} so you can test out the advanced models like Claude 3.5 Sonnet!
-              </Text>
-            )}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-black text-[14px] leading-[24px]">
               Our long-term goal is to make it easy for anyone to build, use and sell the world's most powerful agents all through OpenAgents.com.
             </Text>
 
             <Text className="text-black text-[14px] leading-[24px]">
-              For now we want to work closely with a few select users to build custom agents that dramatically improve their productivity.
+              For now we want to work closely with a few select users to build custom agents that dramatically improve your productivity.
             </Text>
 
             <Text className="text-black text-[14px] leading-[24px]">
@@ -96,6 +91,12 @@ export const OpenAgentsEmail = ({
             <Text className="text-black text-[14px] leading-[24px]">
               Chris
             </Text>
+
+            {balance && balance > 0 && (
+              <Text className="text-black text-[14px] leading-[24px]">
+                P.S. On OpenAgents you currently have a balance of ${formattedBalance} &mdash; so <Link href="https://openagents.com" style={link}>go try</Link> the advanced models like Claude 3.5 Sonnet!
+              </Text>
+            )}
           </Container>
         </Body>
       </Tailwind>
