@@ -47,6 +47,8 @@ async function sendEmails() {
       .map((item: { email: string }) => item.email)
       .filter((email: string) => email && email.length >= 3 && !existingEmails.has(email) && !excludedEmails.includes(email));
 
+    console.log(`Found ${newEmails.length} new emails to send to.`);
+
     for (const email of newEmails) {
       try {
         const data = await resend.emails.send({
@@ -62,6 +64,8 @@ async function sendEmails() {
         console.error(`Failed to send email to ${email}:`, error);
       }
     }
+
+    console.log(`Finished sending emails. Total sent: ${newEmails.length}`);
   } catch (error) {
     console.error("Failed to fetch users or send emails:", error);
   }
