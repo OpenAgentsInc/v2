@@ -13,6 +13,8 @@
     "format:check": "prettier --check \"{app,lib,components}**/*.{ts,tsx,mdx}\" --cache",
     "migrate": "npx tsx scripts/migrate_vercel_to_convex.ts",
     "migrate:prod": "NODE_ENV=production npx tsx scripts/migrate_vercel_to_convex.ts",
+    "email:blast": "npx tsx scripts/send-email.ts",
+    "email:blast:prod": "NODE_ENV=production npx tsx scripts/send-email.ts",
     "email:build": "email build",
     "email:dev": "email dev",
     "email:export": "email export"
