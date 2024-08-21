@@ -16,7 +16,7 @@ import { useChatStore } from "../../store/chat"
 
 const processBlankMessages = (messages: VercelMessage[]): VercelMessage[] => {
   return messages.map(message => {
-    if (message.content.trim() === '' && (!message.function_call || Object.keys(message.function_call).length === 0)) {
+    if (message.content.trim() === '' && (!message.toolInvocations || Object.keys(message.toolInvocations).length === 0)) {
       return { ...message, content: "(no content)" };
     }
     return message;
