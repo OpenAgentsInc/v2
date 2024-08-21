@@ -1,15 +1,14 @@
 'use client'
 
-import * as React from 'react'
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { ThemeProviderProps } from 'next-themes/dist/types'
-import { SidebarProvider } from '@/lib/hooks/use-sidebar'
-import { TooltipProvider } from '@/components/ui/tooltip'
-import { ClerkProvider, useAuth } from '@clerk/nextjs'
-import { dark } from '@clerk/themes'
-import { AuthStateHandler } from '@/components/auth/AuthStateHandler'
-import { ConvexReactClient } from "convex/react";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { ConvexReactClient } from "convex/react"
+import { ConvexProviderWithClerk } from "convex/react-clerk"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { ThemeProviderProps } from "next-themes/dist/types"
+import * as React from "react"
+import { AuthStateHandler } from "@/components/auth/AuthStateHandler"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { ClerkProvider, useAuth } from "@clerk/nextjs"
+import { dark } from "@clerk/themes"
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL as string);
 
@@ -34,9 +33,7 @@ export function Providers({ children, ...props }: ThemeProviderProps) {
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <AuthStateHandler>
           <NextThemesProvider {...props}>
-            <SidebarProvider>
-              <TooltipProvider>{children}</TooltipProvider>
-            </SidebarProvider>
+            <TooltipProvider>{children}</TooltipProvider>
           </NextThemesProvider>
         </AuthStateHandler>
       </ConvexProviderWithClerk>
