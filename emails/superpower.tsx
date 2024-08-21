@@ -92,11 +92,11 @@ export const OpenAgentsEmail = ({
               Chris
             </Text>
 
-            {balance && balance > 0 && (
+            {/* {balance && balance > 0 && (
               <Text className="text-black text-[14px] leading-[24px]">
                 P.S. On OpenAgents you currently have a balance of ${formattedBalance} &mdash; so <Link href="https://openagents.com" style={link}>go try</Link> the advanced models like Claude 3.5 Sonnet!
               </Text>
-            )}
+            )} */}
           </Container>
         </Body>
       </Tailwind>
