@@ -1,18 +1,19 @@
-import { prisma } from "@/lib/prisma";
-import { Message } from "@prisma/client";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@/convex/_generated/api";
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function saveProcessedMessage(
-  chatId: string,
+  threadId: string,
   content: string,
   role: "assistant" | "function",
   name?: string
-): Promise<Message> {
-  return await prisma.message.create({
-    data: {
-      chatId,
-      content,
-      role,
-      name,
-    },
+) {
+  return await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
+    thread_id: threadId,
+    content,
+    role,
+    name,
+    model_id: 'default', // You might want to make this configurable
   });
 }
