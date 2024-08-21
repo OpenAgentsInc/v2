@@ -1,1 +1,1 @@
-// This file has been refactored. Please see the functions/ folder for the updated code.
+// This file has been refactored. Please see the inngest/functions/ folder for the updated code.
