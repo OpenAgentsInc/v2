@@ -13,11 +13,9 @@ if (!url) {
 const client = new ConvexHttpClient(url);
 
 client.query(api.users.getAllUsers.getAllUsers).then(users => {
-  // Loop through each user and console log their email address
 
   users.forEach(user => {
     if (!user.email || user.email === "" || user.email.length < 3) return
-
     console.log(user.email);
   });
 
