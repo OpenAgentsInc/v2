@@ -1,17 +1,31 @@
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
-import { Message } from "@/types";
+import { useQuery } from '@tanstack/react-query';
+import { ChatCoreType, Message } from './types';
 
-export function useChatMessages(threadId: Id<"threads"> | null) {
-  return useQuery(api.messages.fetchThreadMessages.fetchThreadMessages, threadId ? { thread_id: threadId } : "skip");
-}
+export const useChatMessages = (core: ChatCoreType) => {
+  const { queryClient, threadId } = core;
 
-export function useProcessedMessages(messages: Message[]) {
-  return messages.map((message) => ({
+  const messages = useQuery({
+    queryKey: ['messages', threadId],
+    queryFn: async () => {
+      // Implement the logic to fetch messages for the thread
+      // This should return an array of Message objects
+      // For now, we'll return an empty array
+      return [] as Message[];
+    },
+    enabled: !!threadId,
+  });
+
+  const processedMessages = messages.data?.map((message) => ({
     ...message,
     content: message.content.trim() === '' && (!message.toolInvocations || Object.keys(message.toolInvocations).length === 0)
       ? "--"
       : message.content
-  }));
-}
+  })) || [];
+
+  return {
+    messages: processedMessages,
+    isLoading: messages.isLoading,
+    isError: messages.isError,
+    error: messages.error,
+  };
+};
