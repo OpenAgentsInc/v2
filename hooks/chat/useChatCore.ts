@@ -14,13 +14,35 @@ import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useChatStore } from "../../store/chat"
 
-const processBlankMessages = (messages: VercelMessage[]): VercelMessage[] => {
-  return messages.map(message => {
-    if (message.content.trim() === '' && (!message.toolInvocations || Object.keys(message.toolInvocations).length === 0)) {
-      return { ...message, content: "--" };
+const processMessages = (messages: VercelMessage[]): VercelMessage[] => {
+  const processedMessages: VercelMessage[] = [];
+  let currentUserMessage: VercelMessage | null = null;
+
+  for (const message of messages) {
+    if (message.role === 'user') {
+      if (currentUserMessage) {
+        currentUserMessage.content += '\n\n' + message.content;
+      } else {
+        currentUserMessage = { ...message };
+      }
+    } else {
+      if (currentUserMessage) {
+        processedMessages.push(currentUserMessage);
+        currentUserMessage = null;
+      }
+      if (message.content.trim() === '' && (!message.toolInvocations || Object.keys(message.toolInvocations).length === 0)) {
+        processedMessages.push({ ...message, content: "--" });
+      } else {
+        processedMessages.push(message);
+      }
     }
-    return message;
-  });
+  }
+
+  if (currentUserMessage) {
+    processedMessages.push(currentUserMessage);
+  }
+
+  return processedMessages;
 };
 
 export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, onTitleUpdate?: (chatId: string) => void }) {
@@ -172,7 +194,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
   return {
     ...vercelChatProps,
-    messages: processBlankMessages(debouncedMessages),
+    messages: processMessages(debouncedMessages),
     id: threadId,
     threadData,
     user,
