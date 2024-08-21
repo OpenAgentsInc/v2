@@ -20,7 +20,15 @@ if (!resendApiKey) {
 const client = new ConvexHttpClient(url);
 const resend = new Resend(resendApiKey);
 
-const excludedEmails = ["thewildhustle@proton.me", "chris@arcadelabs.co"];
+const excludedEmails = [
+  "thewildhustle@proton.me",
+  "chris@arcadelabs.co",
+  "aquarianprojectmgmt@gmail.com",
+  "chris+1@openagents.com",
+  "shomasoccer71@gmail.com",
+  "cypherperro@protonmail.com",
+  "st.mytchyk@gmail.com"
+];
 
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -43,14 +51,18 @@ async function sendEmails() {
 
         console.log(`Email sent successfully to ${user.email}. ID: ${data.id}`);
         
-        // Add a delay of 0.6 seconds (to stay under the 2 requests per second limit)
-        await sleep(600);
+        // Add a delay of 2 seconds between each email send
+        await sleep(2000);
       } catch (error) {
         console.error(`Failed to send email to ${user.email}:`, error);
         
-        // If we hit the rate limit, wait for 5 seconds before continuing
+        // If we hit the rate limit, wait for 10 seconds before continuing
         if (error.statusCode === 429) {
-          console.log("Rate limit hit. Waiting for 5 seconds...");
+          console.log("Rate limit hit. Waiting for 10 seconds...");
+          await sleep(10000);
+        } else {
+          // For other errors, wait for 5 seconds before continuing
+          console.log("Error occurred. Waiting for 5 seconds...");
           await sleep(5000);
         }
       }
