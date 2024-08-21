@@ -32,7 +32,7 @@ async function sendEmails() {
           from: "Chris from OpenAgents <chris@openagents.com>",
           to: user.email,
           subject: "What AI agent can we build for you?",
-          react: OpenAgentsEmail({}),
+          react: OpenAgentsEmail({ balance: user.credits }),
         });
 
         console.log(`Email sent successfully to ${user.email}. ID: ${data.id}`);
