@@ -1,4 +1,4 @@
-import { Id } from '../../convex/_generated/dataModel'
+import { Id } from '../../convex/_generated/dataModel';
 
 export interface ThreadMetadata {
   title?: string;
@@ -13,4 +13,21 @@ export interface Thread {
   user_id: Id<"users">;
   _creationTime: number;
   shareToken?: string;
+}
+
+export interface Message {
+  id: string;
+  threadId: Id<"threads">;
+  content: string;
+  role: 'user' | 'assistant';
+  createdAt: string;
+  toolInvocations?: Record<string, any>;
+}
+
+export interface ChatCoreType {
+  threadId: Id<"threads"> | null;
+  setThreadId: (id: Id<"threads"> | null) => void;
+  messages: Message[];
+  sendMessage: (content: string) => Promise<void>;
+  updateTitle: (newTitle: string) => Promise<void>;
 }
