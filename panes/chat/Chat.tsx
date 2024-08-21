@@ -11,11 +11,7 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export const Chat = ({ threadId, className }: ChatProps) => {
-  const {
-    messages,
-    sendMessage,
-    isLoading,
-  } = useChat({ propsId: threadId })
+  const { messages, sendMessage, isLoading } = useChat({ threadId })
   const chatContainerRef = useChatScroll(messages);
 
   return (
