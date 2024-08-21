@@ -5,7 +5,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function saveUserMessage(threadId: string, userId: string, content: string) {
   return await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
-    thread_id: threadId,
+    thread_id: threadId as any, // Type assertion to avoid the error
     clerk_user_id: userId,
     content: content,
     role: 'user',
