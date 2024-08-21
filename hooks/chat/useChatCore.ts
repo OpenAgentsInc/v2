@@ -14,6 +14,10 @@ import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useChatStore } from "../../store/chat"
 
+const filterBlankMessages = (messages: VercelMessage[]): VercelMessage[] => {
+  return messages.filter(message => message.content.trim() !== '');
+};
+
 export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, onTitleUpdate?: (chatId: string) => void }) {
   const { user } = useUser()
   const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId || null)
@@ -161,7 +165,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
   return {
     ...vercelChatProps,
-    messages: debouncedMessages,
+    messages: filterBlankMessages(debouncedMessages),
     id: threadId,
     threadData,
     user,
