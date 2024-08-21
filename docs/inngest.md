@@ -9,3 +9,5 @@ Here is the new flow:
   - Gathers needed context (async...?)
   - Gathers needed tools
   - Sends context & prompt to LLM
+- ...
+- Agent can opt to wait a certain amount of time before continuing/retrying, or wait for user input
