@@ -15,7 +15,7 @@ export async function sendMessage({ text }: SendMessageProps) {
   }
 
   await inngest.send({
-    name: "test/hello.world",
+    name: "chat/send.message",
     data: { text }
   });
 }
