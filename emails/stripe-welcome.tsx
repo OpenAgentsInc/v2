@@ -1,17 +1,7 @@
+import * as React from "react"
 import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Hr,
-  Html,
-  Img,
-  Link,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
-import * as React from "react";
+  Body, Button, Container, Head, Hr, Html, Img, Link, Preview, Section, Text
+} from "@react-email/components"
 
 const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`

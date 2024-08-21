@@ -12,7 +12,10 @@
     "format:write": "prettier --write \"{app,lib,components}/**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"{app,lib,components}**/*.{ts,tsx,mdx}\" --cache",
     "migrate": "npx tsx scripts/migrate_vercel_to_convex.ts",
-    "migrate:prod": "NODE_ENV=production npx tsx scripts/migrate_vercel_to_convex.ts"
+    "migrate:prod": "NODE_ENV=production npx tsx scripts/migrate_vercel_to_convex.ts",
+    "email:build": "email build",
+    "email:dev": "email dev",
+    "email:export": "email export"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^0.0.13",
@@ -42,6 +45,7 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@react-email/components": "0.0.22",
     "@react-spring/three": "^9.7.4",
     "@react-three/drei": "9.97.0",
     "@react-three/fiber": "^8.15.15",
@@ -75,7 +79,7 @@
     "openai": "^4.52.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-email": "^2.1.6",
+    "react-email": "2.1.6",
     "react-hook-form": "^7.52.2",
     "react-intersection-observer": "^9.10.3",
     "react-markdown": "^8.0.7",
