@@ -1,7 +1,7 @@
 "use server"
 
-import { inngest } from "@/inngest/client"
-import { currentUser } from "@clerk/nextjs/server"
+import { authenticateUser } from "./authenticateUser"
+import { triggerInngestEvent } from "./triggerInngestEvent"
 
 interface SendMessageProps {
   text: string
@@ -9,21 +9,13 @@ interface SendMessageProps {
 }
 
 export async function sendMessage({ text, threadId }: SendMessageProps) {
-  const user = await currentUser()
+  const user = await authenticateUser()
 
-  if (!user) {
-    throw new Error("User not authenticated")
-  }
-
-  // Trigger Inngest event for message processing
-  await inngest.send({
-    name: "chat/process.message",
-    data: {
-      threadId: threadId,
-      userId: user.id,
-      content: text,
-    }
-  });
+  await triggerInngestEvent({
+    threadId,
+    userId: user.id,
+    content: text,
+  })
 
   return { success: true }
 }
