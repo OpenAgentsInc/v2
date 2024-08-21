@@ -5,11 +5,15 @@ import {
 } from "@react-email/components"
 
 interface OpenAgentsEmailProps {
+  balance?: number;
 }
 
 export const OpenAgentsEmail = ({
+  balance
 }: OpenAgentsEmailProps) => {
   const previewText = "Coding, research, marketing";
+
+  const formattedBalance = balance ? (balance / 100).toFixed(2) : "0.00";
 
   return (
     <Html>
@@ -40,6 +44,11 @@ export const OpenAgentsEmail = ({
             <Text className="text-black text-[14px] leading-[24px]">
               It's time to change that.
             </Text>
+            {balance && balance > 0 && (
+              <Text className="text-black text-[14px] leading-[24px]">
+                By the way, you have a current balance of ${formattedBalance} so you can test out the advanced models like Claude 3.5 Sonnet!
+              </Text>
+            )}
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-black text-[14px] leading-[24px]">
               Our long-term goal is to make it easy for anyone to build, use and sell the world's most powerful agents all through OpenAgents.com.
@@ -50,7 +59,7 @@ export const OpenAgentsEmail = ({
             </Text>
 
             <Text className="text-black text-[14px] leading-[24px]">
-              So if you can fill in this sentence: <span className="font-bold">"If my AI agent could automate _____, I'd pay _____."</span>
+              So if you can fill in this sentence: <span className="font-bold">"If my AI agent could automate _____, I'd pay _____.\"</span>
             </Text>
 
             <Text className="text-black text-[14px] leading-[24px]">
@@ -100,6 +109,7 @@ const link = {
 };
 
 OpenAgentsEmail.PreviewProps = {
+  balance: 1000,
 } as OpenAgentsEmailProps;
 
 export default OpenAgentsEmail;
