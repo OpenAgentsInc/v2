@@ -188,4 +188,21 @@ The `sendMessage` function has been refactored into separate files for better mo
 
 This refactoring allows for easier testing, maintenance, and potential reuse of the authentication and event triggering logic in other parts of the application.
 
-By following this comprehensive plan and implementing these additional steps, we can create a robust, scalable, and feature-rich chat system using Inngest for background processing.
+## Recent Changes
+
+1. Updated `hooks/chat/useChatCore.ts`:
+   - Removed React Query dependencies
+   - Implemented Convex queries and mutations for fetching messages, sending messages, and updating thread titles
+   - Renamed the hook from `useChatCore` to `useChat`
+
+2. Updated `hooks/chat/types.ts`:
+   - Adjusted types to work with Convex's `Id` type
+   - Simplified the `ChatCoreType` interface to include all necessary properties and methods
+
+3. Updated `hooks/chat/index.ts`:
+   - Removed the commented-out export for `useChatActions`
+   - Kept the exports for `useChat`, `useThreadList`, and types
+
+These changes ensure that the chat functionality is now fully integrated with Convex and Inngest, providing a more robust and scalable solution for handling chat operations.
+
+By following this comprehensive plan and implementing these additional steps, we can create a robust, scalable, and feature-rich chat system using Inngest for background processing and Convex for real-time data management.
