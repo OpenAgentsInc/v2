@@ -1,9 +1,9 @@
 import { ConvexHttpClient } from "convex/browser"
 import * as dotenv from "dotenv"
+import fs from "fs"
 import { Resend } from "resend"
 import { api } from "../convex/_generated/api.js"
 import OpenAgentsEmail from "../emails/superpower"
-import fs from 'fs'
 
 dotenv.config({ path: ".env.production" });
 
@@ -29,7 +29,8 @@ const excludedEmails = [
   "cypherperro@protonmail.com",
   "st.mytchyk@gmail.com",
   "datadelaurier@gmail.com",
-  "bob.tomazic@yahoo.com"
+  "bob.tomazic@yahoo.com",
+  "john@blockrewards.ca"
 ];
 
 function sleep(ms: number) {
@@ -45,10 +46,10 @@ async function sendEmails() {
     const jsonData = JSON.parse(fs.readFileSync('emails/usersemails.json', 'utf-8'));
     const newEmails = jsonData
       .map((item: { email: string }) => item.email)
-      .filter((email: string) => 
-        email && 
-        email.length >= 3 && 
-        !existingEmails.has(email) && 
+      .filter((email: string) =>
+        email &&
+        email.length >= 3 &&
+        !existingEmails.has(email) &&
         !excludedEmails.includes(email) &&
         !email.endsWith('@notanemail.com')
       );

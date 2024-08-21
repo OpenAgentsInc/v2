@@ -39,3 +39,4 @@ yarn-error.log*
 
 tsconfig.tsbuildinfo
 *.jsonl
+usersemails.json
