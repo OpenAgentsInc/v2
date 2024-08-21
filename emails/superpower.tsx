@@ -5,11 +5,9 @@ import {
 } from "@react-email/components"
 
 interface OpenAgentsEmailProps {
-  username?: string;
 }
 
 export const OpenAgentsEmail = ({
-  username = "there",
 }: OpenAgentsEmailProps) => {
   const previewText = "Coding, research, marketing";
 
@@ -20,74 +18,74 @@ export const OpenAgentsEmail = ({
       <Tailwind>
         <Body className="bg-white my-auto mx-auto font-mono px-2">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
-            <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
+            <Heading className="text-black text-[24px] font-bold text-center p-0 my-[30px] mx-0">
               What AI agent can we build for you?
             </Heading>
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-black text-[14px] leading-[24px]">
-              Hello {username},
+              Hey folks, quick note:
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Let me share a quick story about how AI has transformed my coding workflow:
+              After a year of using & building different AI tools, I now code <span className="font-bold">~3 times faster</span> than I did in 2022.
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              As a developer, I often found myself bogged down by repetitive tasks and
-              context-switching. That's when I decided to create a custom AI agent
-              tailored to my specific coding needs. The results were astounding.
+              Today I primarily use the new{" "}
+              <Link href="https://openagents.com" style={link}>
+                OpenAgents v2 platform
+              </Link>{" "} &mdash; and I'm excited you now have access to the same tool.
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              My personalized coding assistant now handles everything from code
-              refactoring suggestions to documentation generation. It even helps me
-              stay up-to-date with the latest best practices in my tech stack. The
-              boost in my productivity has been nothing short of remarkable.
+              One problem right now: the v2 site is optimized for <span className="font-bold">MY</span> workflow!
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Now, we want to bring that same level of efficiency and innovation to you.
+              It's time to change that.
             </Text>
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-black text-[14px] leading-[24px]">
-              Whether you're a coder, researcher, marketer, or any other professional,
-              we can build an AI agent specifically designed for your workflow.
+              Our long-term goal is to make it easy for anyone to build, use and sell the world's most powerful agents all through OpenAgents.com.
             </Text>
+
             <Text className="text-black text-[14px] leading-[24px]">
-              Imagine having an AI assistant that:
+              For now we want to work closely with a few select users to build custom agents that dramatically improve their productivity.
             </Text>
+
             <Text className="text-black text-[14px] leading-[24px]">
-              • Understands the nuances of your industry<br />
-              • Adapts to your unique working style<br />
-              • Automates your most time-consuming tasks<br />
-              • Provides insights tailored to your specific needs
+              So if you can fill in this sentence: <span className="font-bold">"If my AI agent could automate _____, I'd pay _____."</span>
             </Text>
+
             <Text className="text-black text-[14px] leading-[24px]">
-              That's exactly what we offer at OpenAgents AI.
+              ...then please book a 15-minute call with me and let's plan to build you a custom OpenAgent.
             </Text>
+
             <Section className="text-center mt-[32px] mb-[32px]">
               <Button
                 className="bg-[#000000] rounded text-white text-[14px] font-semibold no-underline text-center px-5 py-3"
-                href="https://openagents.ai/consultation"
+                href="https://calendly.com/christopher-david-openagents/custom-agent-consultation"
               >
-                Schedule a Free Consultation
+                Schedule a call with me
               </Button>
             </Section>
             <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
             <Text className="text-black text-[14px] leading-[24px]">
-              During our consultation, we'll discuss your workflow, challenges, and goals.
-              Then, our team of AI experts will design and build an agent that's
-              perfectly suited to your needs.
+              Otherwise please give our new self-serve{" "}
+              <Link href="https://openagents.com" style={link}>
+                OpenAgents v2 platform
+              </Link>{" "} a try. You can use it to:
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Don't let generic AI solutions hold you back. Experience the power of a
-              truly personalized AI agent.
+              • Connect to your GitHub codebase<br />
+              • Intelligently navigate multiple webpages<br />
+              • Write anything you need, just like ChatGPT or Claude<br />
+              • Connect to any API: now GitHub, soon many more (requests welcome!)<br />
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              Looking forward to helping you supercharge your productivity!
+              We want to give you AI superpowers! Just tell us what superpowers you'd find most valuable. :)
             </Text>
             <Text className="text-black text-[14px] leading-[24px]">
-              — The OpenAgents team
+              Best regards
             </Text>
-            <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
-            <Text className="text-[#666666] text-[12px] leading-[24px]">
-              OpenAgents AI, 123 Tech Plaza, Silicon Valley, CA 94000
+            <Text className="text-black text-[14px] leading-[24px]">
+              Chris
             </Text>
           </Container>
         </Body>
@@ -96,8 +94,12 @@ export const OpenAgentsEmail = ({
   );
 };
 
+const link = {
+  fontWeight: 'bold',
+  textDecoration: "underline",
+};
+
 OpenAgentsEmail.PreviewProps = {
-  username: "Alan",
 } as OpenAgentsEmailProps;
 
 export default OpenAgentsEmail;
