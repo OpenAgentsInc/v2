@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import { Id } from '../../convex/_generated/dataModel';
 
 export interface ThreadMetadata {
   title?: string;
@@ -6,16 +6,18 @@ export interface ThreadMetadata {
 }
 
 export interface Thread {
-  id: string;
+  _id: Id<"threads">;
   metadata?: ThreadMetadata;
   createdAt?: string;
-  userId: string;
+  clerk_user_id: string;
+  user_id: Id<"users">;
+  _creationTime: number;
   shareToken?: string;
 }
 
 export interface Message {
   id: string;
-  threadId: string;
+  threadId: Id<"threads">;
   content: string;
   role: 'user' | 'assistant';
   createdAt: string;
@@ -23,31 +25,9 @@ export interface Message {
 }
 
 export interface ChatCoreType {
-  threadId: string | null;
-  setThreadId: (id: string | null) => void;
-  queryClient: QueryClient;
-}
-
-export interface ChatMessagesType {
+  threadId: Id<"threads"> | null;
+  setThreadId: (id: Id<"threads"> | null) => void;
   messages: Message[];
-  isLoading: boolean;
-  isError: boolean;
-  error: Error | null;
+  sendMessage: (content: string) => Promise<void>;
+  updateTitle: (newTitle: string) => Promise<void>;
 }
-
-export interface ChatThreadType {
-  threadId: string | null;
-  setThreadId: (id: string | null) => void;
-  threadData: Thread | null;
-  setThreadData: (data: Thread | null) => void;
-  updateTitle: (newTitle: string) => void;
-  isLoading: boolean;
-  isError: boolean;
-  error: Error | null;
-}
-
-export interface ChatMutationsType {
-  sendMessage: (message: string) => Promise<void>;
-}
-
-export interface ChatType extends ChatCoreType, ChatMessagesType, ChatThreadType, ChatMutationsType {}
