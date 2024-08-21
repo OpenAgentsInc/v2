@@ -1,2 +1,1 @@
-export * from './helloWorld';
-export * from './processMessage';
+// This file was created by mistake and should be deleted.
