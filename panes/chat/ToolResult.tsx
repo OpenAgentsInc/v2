@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Loader2, GitCompare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { FileViewer } from './FileViewer';
+import { CheckCircle2, GitCompare, Loader2 } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
+import { FileViewer } from "./FileViewer"
 
 interface ToolResultProps {
   toolName: string;
@@ -36,6 +36,8 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
   const [currentState, setCurrentState] = useState(state);
   const [currentResult, setCurrentResult] = useState(result);
   const [showOldContent, setShowOldContent] = useState(false);
+
+  // console.log("hi", { toolName, args, result, state })
 
   useEffect(() => {
     setCurrentState(state);

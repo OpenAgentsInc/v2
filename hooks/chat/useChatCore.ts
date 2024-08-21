@@ -17,7 +17,7 @@ import { useChatStore } from "../../store/chat"
 const processBlankMessages = (messages: VercelMessage[]): VercelMessage[] => {
   return messages.map(message => {
     if (message.content.trim() === '' && (!message.toolInvocations || Object.keys(message.toolInvocations).length === 0)) {
-      return { ...message, content: "(no content)" };
+      return { ...message, content: "--" };
     }
     return message;
   });
@@ -60,12 +60,13 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
         setThreadData({ ...threadData, messages: updatedMessages })
 
         try {
-          const result = await sendMessageMutation({
+          await sendMessageMutation({
             thread_id: threadId,
             clerk_user_id: user.id,
             content: message.content,
             role: message.role,
             model_id: currentModelRef.current || model.id,
+            tool_invocations: message.toolInvocations,
           })
 
           if (options && options.usage) {
@@ -112,8 +113,8 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     },
   })
 
-  // const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
-  const debouncedMessages = vercelChatProps.messages
+  const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
+  // const debouncedMessages = vercelChatProps.messages
 
   useEffect(() => {
     if (threadId && fetchMessages) {
@@ -167,6 +168,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       setThreadData({ ...threadData, messages: threadData.messages.filter(m => m.id !== newMessage.id) })
     }
   }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation, model])
+
 
   return {
     ...vercelChatProps,
