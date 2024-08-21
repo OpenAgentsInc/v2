@@ -1,4 +1,4 @@
-import { query } from "../_generated/server";
+import { query } from "../_generated/server"
 
 export const getAllUsers = query({
   args: {},
@@ -6,8 +6,8 @@ export const getAllUsers = query({
     const users = await ctx.db.query("users").collect();
 
     // Remove sensitive information (email and credits) from each user
-    const sanitizedUsers = users.map(({ email, credits, ...user }) => user);
+    // const sanitizedUsers = users.map(({ credits, ...user }) => user);
 
-    return sanitizedUsers;
+    return users;
   },
 });

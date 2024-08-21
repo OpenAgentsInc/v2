@@ -3,7 +3,22 @@ import * as dotenv from "dotenv"
 import { api } from "../convex/_generated/api.js"
 
 dotenv.config({ path: ".env.local" });
+// dotenv.config({ path: ".env.production" });
 
-const client = new ConvexHttpClient(process.env["CONVEX_URL"] as string);
+const url = process.env["NEXT_PUBLIC_CONVEX_URL"] as string
+if (!url) {
+  throw new Error("NEXT_PUBLIC_CONVEX_URL is not defined")
+}
 
-client.query(api.users.getAllUsers).then(console.log);
+const client = new ConvexHttpClient(url);
+
+client.query(api.users.getAllUsers.getAllUsers).then(users => {
+  // Loop through each user and console log their email address
+
+  users.forEach(user => {
+    if (!user.email || user.email === "" || user.email.length < 3) return
+
+    console.log(user.email);
+  });
+
+});
