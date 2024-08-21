@@ -3,8 +3,8 @@ import * as dotenv from "dotenv"
 import { Resend } from "resend"
 import { api } from "../convex/_generated/api.js"
 import OpenAgentsEmail from "../emails/superpower"
+import fs from 'fs'
 
-// dotenv.config({ path: ".env.local" });
 dotenv.config({ path: ".env.production" });
 
 const url = process.env["NEXT_PUBLIC_CONVEX_URL"] as string;
@@ -39,22 +39,27 @@ function sleep(ms: number) {
 async function sendEmails() {
   try {
     const users = await client.query(api.users.getAllUsers.getAllUsers);
+    const existingEmails = new Set(users.map(user => user.email));
 
-    for (const user of users) {
-      if (!user.email || user.email === "" || user.email.length < 3 || excludedEmails.includes(user.email)) continue;
+    // Read and parse the JSON file
+    const jsonData = JSON.parse(fs.readFileSync('emails/usersemails.json', 'utf-8'));
+    const newEmails = jsonData
+      .map((item: { email: string }) => item.email)
+      .filter((email: string) => email && email.length >= 3 && !existingEmails.has(email) && !excludedEmails.includes(email));
 
+    for (const email of newEmails) {
       try {
         const data = await resend.emails.send({
           from: "Chris from OpenAgents <chris@openagents.com>",
-          to: user.email,
+          to: email,
           subject: "What AI agent can we build for you?",
-          react: OpenAgentsEmail({ balance: user.credits }),
+          react: OpenAgentsEmail({ balance: 0 }), // New users start with 0 credits
         });
 
-        console.log(`Email sent successfully to ${user.email}.`, data);
+        console.log(`Email sent successfully to ${email}.`, data);
         await sleep(2000);
       } catch (error) {
-        console.error(`Failed to send email to ${user.email}:`, error);
+        console.error(`Failed to send email to ${email}:`, error);
       }
     }
   } catch (error) {
