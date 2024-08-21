@@ -178,4 +178,14 @@ We are refactoring our chat system to use background jobs via Inngest, replacing
    - Review and improve authentication and authorization checks
    - Implement additional security measures as needed
 
+## Refactored `sendMessage` Function
+
+The `sendMessage` function has been refactored into separate files for better modularity and maintainability:
+
+1. `lib/chat/authenticateUser.ts`: Handles user authentication using Clerk.
+2. `lib/chat/triggerInngestEvent.ts`: Triggers the Inngest event for message processing.
+3. `lib/chat/sendMessage.ts`: The main function that coordinates the message sending process.
+
+This refactoring allows for easier testing, maintenance, and potential reuse of the authentication and event triggering logic in other parts of the application.
+
 By following this comprehensive plan and implementing these additional steps, we can create a robust, scalable, and feature-rich chat system using Inngest for background processing.
