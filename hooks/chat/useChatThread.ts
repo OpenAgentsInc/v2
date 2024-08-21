@@ -1,64 +1,56 @@
-import { useState, useEffect } from "react";
-import { useAction, useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
-import { Chat as Thread, Message } from "@/types";
-import { useChatStore } from "../../store/chat";
-import { useUser } from "@clerk/nextjs";
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ChatCoreType, Thread } from './types';
+import { inngest } from '../../inngest/client';
 
-export function useChatThread(propsId?: Id<"threads">) {
-  const { user } = useUser();
-  const [threadId, setThreadId] = useState<Id<"threads"> | null>(propsId || null);
-  const [threadData, setThreadData] = useState<Thread>({
-    id: '' as Id<"threads">,
-    title: '',
-    messages: [],
-    createdAt: new Date(),
-    userId: '' as Id<"users">,
-    path: ''
-  });
+export const useChatThread = (core: ChatCoreType) => {
+  const { queryClient, threadId, setThreadId } = core;
+  const [threadData, setThreadData] = useState<Thread | null>(null);
 
-  const { setThread } = useChatStore();
-  const generateTitle = useAction(api.threads.generateTitle.generateTitle);
-  const updateThreadData = useMutation(api.threads.updateThreadData.updateThreadData);
-
-  const updateTitle = async (newThreadId: Id<"threads">) => {
-    try {
-      const title = await generateTitle({ threadId: newThreadId });
-      setThreadData((prevThreadData) => ({
-        ...prevThreadData,
-        metadata: { ...prevThreadData.metadata, title },
-      }));
-
-      await updateThreadData({
-        thread_id: newThreadId,
-        metadata: { title }
-      });
-    } catch (error) {
-      console.error('Error generating title:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (threadId && user) {
-      const thread: Thread = {
+  const thread = useQuery({
+    queryKey: ['thread', threadId],
+    queryFn: async () => {
+      // Implement the logic to fetch thread data
+      // For now, we'll return a dummy thread
+      return {
         id: threadId,
         title: 'New Chat',
-        messages: [],
         createdAt: new Date(),
-        userId: user.id as Id<"users">,
-        path: ''
-      };
-      setThreadData(thread);
-      setThread(threadId, thread);
+        userId: 'user123',
+        path: '',
+      } as Thread;
+    },
+    enabled: !!threadId,
+  });
+
+  useEffect(() => {
+    if (thread.data) {
+      setThreadData(thread.data);
     }
-  }, [threadId, user, setThread]);
+  }, [thread.data]);
+
+  const updateTitle = useMutation({
+    mutationFn: async (newTitle: string) => {
+      if (!threadId) throw new Error('No thread ID');
+      // Implement the logic to update the thread title
+      await inngest.send({
+        name: 'thread/update.title',
+        data: { threadId, newTitle },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['thread', threadId]);
+    },
+  });
 
   return {
     threadId,
     setThreadId,
     threadData,
     setThreadData,
-    updateTitle
+    updateTitle: updateTitle.mutate,
+    isLoading: thread.isLoading,
+    isError: thread.isError,
+    error: thread.error,
   };
-}
+};
