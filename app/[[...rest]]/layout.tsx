@@ -1,7 +1,6 @@
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/sonner"
-import { currentUser } from "@clerk/nextjs/server"
 
 export const viewport = {
   themeColor: [
@@ -11,7 +10,6 @@ export const viewport = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const user = await currentUser()
   return (
     <div className="size-full fixed w-screen">
       <Toaster position='top-right' />
