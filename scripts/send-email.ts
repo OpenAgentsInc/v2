@@ -4,8 +4,8 @@ import { Resend } from "resend"
 import { api } from "../convex/_generated/api.js"
 import OpenAgentsEmail from "../emails/superpower"
 
-dotenv.config({ path: ".env.local" });
-// dotenv.config({ path: ".env.production" });
+// dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env.production" });
 
 const url = process.env["NEXT_PUBLIC_CONVEX_URL"] as string;
 if (!url) {
@@ -27,7 +27,9 @@ const excludedEmails = [
   "chris+1@openagents.com",
   "shomasoccer71@gmail.com",
   "cypherperro@protonmail.com",
-  "st.mytchyk@gmail.com"
+  "st.mytchyk@gmail.com",
+  "datadelaurier@gmail.com",
+  "bob.tomazic@yahoo.com"
 ];
 
 function sleep(ms: number) {
@@ -50,18 +52,9 @@ async function sendEmails() {
         });
 
         console.log(`Email sent successfully to ${user.email}.`, data);
+        await sleep(2000);
       } catch (error) {
         console.error(`Failed to send email to ${user.email}:`, error);
-
-        // If we hit the rate limit, wait for 10 seconds before continuing
-        if (error.statusCode === 429) {
-          console.log("Rate limit hit. Waiting for 10 seconds...");
-          await sleep(10000);
-        } else {
-          // For other errors, wait for 5 seconds before continuing
-          console.log("Error occurred. Waiting for 5 seconds...");
-          await sleep(5000);
-        }
       }
     }
   } catch (error) {
