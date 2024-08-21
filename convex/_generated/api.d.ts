@@ -41,6 +41,7 @@ import type * as threads_index from "../threads/index.js";
 import type * as threads_shareThread from "../threads/shareThread.js";
 import type * as threads_updateThreadData from "../threads/updateThreadData.js";
 import type * as users_createOrGetUser from "../users/createOrGetUser.js";
+import type * as users_getAllUsers from "../users/getAllUsers.js";
 import type * as users_getUserBalance from "../users/getUserBalance.js";
 import type * as users_getUserData from "../users/getUserData.js";
 import type * as users_index from "../users/index.js";
@@ -86,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   "threads/shareThread": typeof threads_shareThread;
   "threads/updateThreadData": typeof threads_updateThreadData;
   "users/createOrGetUser": typeof users_createOrGetUser;
+  "users/getAllUsers": typeof users_getAllUsers;
   "users/getUserBalance": typeof users_getUserBalance;
   "users/getUserData": typeof users_getUserData;
   "users/index": typeof users_index;
