@@ -1,4 +1,5 @@
 import { generateText } from "ai"
+import { getToolContext, getTools } from "@/tools"
 import { anthropic } from "@ai-sdk/anthropic"
 
 interface InferProps {
@@ -7,12 +8,14 @@ interface InferProps {
   tools: any[]
 }
 
-export async function infer({ messages, modelId, tools }: InferProps) {
+export async function infer({ messages, modelId, tools: bodyTools }: InferProps) {
+  const toolContext = await getToolContext({ modelId });
+  const tools = getTools(toolContext, bodyTools);
   const result = await generateText({
     messages,
     model: anthropic(modelId),
     system: "You are a helpful assistant.",
-    // tools: [],
+    tools
   });
   return {
     response: result.text

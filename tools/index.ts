@@ -40,19 +40,20 @@ export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
 };
 
 interface ToolContextBody {
-  repoOwner: string;
-  repoName: string;
-  repoBranch: string;
-  model: string; // Change this to expect just the model ID
+  // repoOwner: string;
+  // repoName: string;
+  // repoBranch: string;
+  modelId: string;
 }
 
 export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
-  const { repoOwner, repoName, repoBranch, model: modelId } = body;
-  const repo: Repo = {
-    owner: repoOwner,
-    name: repoName,
-    branch: repoBranch
-  };
+  const { modelId } = body
+  // const { repoOwner, repoName, repoBranch, modelId } = body;
+  // const repo: Repo = {
+  //   owner: repoOwner,
+  //   name: repoName,
+  //   branch: repoBranch
+  // };
   const user = await currentUser();
   const gitHubToken = user ? await getGitHubToken(user) : undefined;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
@@ -80,7 +81,7 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
   }
 
   return {
-    repo,
+    // repo,
     user: user as User | null,
     gitHubToken,
     firecrawlToken,
