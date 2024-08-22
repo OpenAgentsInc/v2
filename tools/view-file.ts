@@ -5,6 +5,7 @@ import { ToolContext } from '@/types';
 
 const params = z.object({
     path: z.string().describe("The path of the file to view"),
+    repoUrl: z.string().optional().describe("Optional URL of the GitHub repository to view the file from"),
 });
 
 type Params = z.infer<typeof params>;
@@ -18,9 +19,9 @@ type Result = {
 };
 
 export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
-    description: "View file contents at path",
+    description: "View file contents at path, optionally from a specified repository",
     parameters: params,
-    execute: async ({ path }: Params): Promise<Result> => {
+    execute: async ({ path, repoUrl }: Params): Promise<Result> => {
         if (!context.repo || !context.user) {
             return {
                 success: false,
@@ -30,20 +31,38 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
             };
         }
 
+        let repoOwner = context.repo.owner;
+        let repoName = context.repo.name;
+        let branch = context.repo.branch;
+
+        if (repoUrl) {
+            const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)(?:\/tree\/([^/]+))?/);
+            if (match) {
+                [, repoOwner, repoName, branch = 'main'] = match;
+            } else {
+                return {
+                    success: false,
+                    error: "Invalid repository URL",
+                    summary: "Failed to parse repository URL",
+                    details: "The provided repository URL is not in the expected format: https://github.com/owner/repo"
+                };
+            }
+        }
+
         try {
             const content = await githubReadFile({
                 path,
                 token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '', // TODO
-                repoOwner: context.repo.owner,
-                repoName: context.repo.name,
-                branch: context.repo.branch
+                repoOwner,
+                repoName,
+                branch
             });
 
             return {
                 success: true,
                 content: content,
-                summary: `Viewed ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `File contents of ${path} on branch ${context.repo.branch || 'main'} have been retrieved:\n\n${content}`
+                summary: `Viewed ${path} on branch ${branch} of ${repoOwner}/${repoName}`,
+                details: `File contents of ${path} on branch ${branch} of ${repoOwner}/${repoName} have been retrieved:\n\n${content}`
             };
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : String(error);
@@ -51,8 +70,8 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
             return {
                 success: false,
                 error: errorMessage,
-                summary: `Failed to view ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `Failed to retrieve file contents at ${path} on branch ${context.repo.branch || 'main'}. Error: ${errorMessage}`
+                summary: `Failed to view ${path} on branch ${branch} of ${repoOwner}/${repoName}`,
+                details: `Failed to retrieve file contents at ${path} on branch ${branch} of ${repoOwner}/${repoName}. Error: ${errorMessage}`
             };
         }
     },
