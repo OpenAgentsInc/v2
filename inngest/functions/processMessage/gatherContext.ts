@@ -1,5 +1,4 @@
 import { ToolName } from "@/tools"
-import { ProcessMessageData } from "./"
 
 interface GatherContextProps {
   content: string
@@ -12,7 +11,7 @@ export async function gatherContext({ content, threadId, userId }: GatherContext
 
   // Truncate/summarize as needed
 
-  // Select tools
+  // Select tools. Hardcoding fine for now
 
   return {
     messages: [],
