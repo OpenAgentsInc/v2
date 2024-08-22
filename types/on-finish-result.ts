@@ -1,5 +1,4 @@
 import { CompletionTokenUsage } from "./token-usage"
-import { ToolCall } from "./tool-call"
 import { ToolResult } from "./tool-result"
 
 export interface OnFinishResult {
