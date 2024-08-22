@@ -31,40 +31,54 @@ export async function createOrUpdateAssistantMessage({
   userId,
   isPartial
 }: SaveAssistantMessageProps) {
+  console.log('createOrUpdateAssistantMessage called with:', { content, finishReason, modelId, usage, threadId, toolCalls, toolResults, userId, isPartial });
+
   if (debounceTimer) {
+    console.log('Clearing existing debounce timer');
     clearTimeout(debounceTimer);
   }
 
-  debounceTimer = setTimeout(async () => {
-    const messageData = {
-      clerk_user_id: userId,
-      completion_tokens: usage?.completion_tokens,
-      content,
-      finish_reason: finishReason,
-      model_id: modelId,
-      prompt_tokens: usage?.prompt_tokens,
-      role: 'assistant',
-      tool_calls: toolCalls,
-      tool_results: toolResults,
-      thread_id: threadId as Id<"threads">,
-      status: isPartial ? 'partial' : 'complete',
-    };
+  return new Promise<void>((resolve) => {
+    console.log('Setting up new debounce timer');
+    debounceTimer = setTimeout(async () => {
+      console.log('Debounce timer fired, preparing messageData');
+      const messageData = {
+        clerk_user_id: userId,
+        completion_tokens: usage?.completion_tokens,
+        content,
+        finish_reason: finishReason,
+        model_id: modelId,
+        prompt_tokens: usage?.prompt_tokens,
+        role: 'assistant',
+        tool_calls: toolCalls,
+        tool_results: toolResults,
+        thread_id: threadId as Id<"threads">,
+        status: isPartial ? 'partial' : 'complete',
+      };
+      console.log('messageData prepared:', messageData);
 
-    if (messageId) {
-      await convex.mutation(api.messages.updateChatMessage.updateChatMessage, {
-        id: messageId,
-        ...messageData,
-      });
-    } else {
-      const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
-      messageId = result?._id as Id<"messages">;
-    }
-  }, 500); // Debounce for 500ms (0.5 seconds)
+      try {
+        if (messageId) {
+          console.log('Updating existing message with ID:', messageId);
+          await convex.mutation(api.messages.updateChatMessage.updateChatMessage, {
+            id: messageId,
+            ...messageData,
+          });
+          console.log('Message updated successfully');
+        } else {
+          console.log('Creating new message');
+          const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
+          console.log('New message created, result:', result);
+          messageId = result._id as Id<"messages">;
+          console.log('New messageId set:', messageId);
+        }
+      } catch (error) {
+        console.error('Error in createOrUpdateAssistantMessage:', error);
+      }
 
-  // If it's the final message, wait for the debounce to complete
-  if (!isPartial) {
-    await new Promise(resolve => setTimeout(resolve, 500));
-  }
+      resolve();
+    }, 500); // Debounce for 500ms (0.5 seconds)
+  });
 }
 
 export async function saveAssistantMessage({
@@ -77,7 +91,9 @@ export async function saveAssistantMessage({
   toolResults,
   userId
 }: Omit<SaveAssistantMessageProps, 'isPartial'>) {
-  return await createOrUpdateAssistantMessage({
+  console.log('saveAssistantMessage called with:', { content, finishReason, modelId, usage, threadId, toolCalls, toolResults, userId });
+  
+  await createOrUpdateAssistantMessage({
     content,
     finishReason,
     modelId,
@@ -88,4 +104,6 @@ export async function saveAssistantMessage({
     userId,
     isPartial: false
   });
+
+  console.log('saveAssistantMessage completed');
 }
