@@ -25,7 +25,7 @@ export const listReposTool = (context: ToolContext): CoreTool<typeof params, Res
   parameters: params,
   execute: async ({ perPage, sort, direction }: Params): Promise<Result> => {
     console.log("Attempting to execute listRepos")
-    if (!context.user || !context.githubToken) {
+    if (!context.githubToken) {
       return {
         success: false,
         error: "Missing user information or GitHub token",
