@@ -40,6 +40,8 @@ export const processMessage = inngest.createFunction(
       return await saveAssistantMessage({
         content: response.text,
         finishReason: response.finishReason,
+        toolCalls: response.toolCalls,
+        toolResults: response.toolResults,
         modelId, threadId,
         usage: {
           completion_tokens: response.usage.completionTokens,

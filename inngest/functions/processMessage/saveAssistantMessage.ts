@@ -8,13 +8,15 @@ interface SaveAssistantMessageProps {
   finishReason: string
   modelId: string
   threadId: string
+  toolCalls: any
+  toolResults: any
   usage: CompletionUsage
   userId: string
 }
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function saveAssistantMessage({ content, finishReason, modelId, usage, threadId, userId }: SaveAssistantMessageProps) {
+export async function saveAssistantMessage({ content, finishReason, modelId, usage, threadId, toolCalls, toolResults, userId }: SaveAssistantMessageProps) {
   return await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
     clerk_user_id: userId,
     completion_tokens: usage.completion_tokens,
@@ -23,6 +25,8 @@ export async function saveAssistantMessage({ content, finishReason, modelId, usa
     model_id: modelId,
     prompt_tokens: usage.completion_tokens,
     role: 'assistant',
+    tool_calls: toolCalls,
+    tool_results: toolResults,
     thread_id: threadId as Id<"threads">,
   });
 }

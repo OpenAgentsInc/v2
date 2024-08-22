@@ -1,5 +1,5 @@
-import { defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export const messages = defineTable({
   thread_id: v.id("threads"),
@@ -8,6 +8,8 @@ export const messages = defineTable({
   content: v.string(),
   created_at: v.string(),
   tool_invocations: v.optional(v.any()),
+  tool_results: v.optional(v.any()),
+  tool_calls: v.optional(v.any()),
   finish_reason: v.optional(v.string()),
   total_tokens: v.optional(v.number()),
   prompt_tokens: v.optional(v.number()),

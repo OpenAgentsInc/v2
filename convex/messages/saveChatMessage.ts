@@ -1,5 +1,5 @@
-import { mutation } from "../_generated/server";
-import { v } from "convex/values";
+import { v } from "convex/values"
+import { mutation } from "../_generated/server"
 
 export const saveChatMessage = mutation({
   args: {
@@ -8,6 +8,8 @@ export const saveChatMessage = mutation({
     role: v.string(),
     content: v.string(),
     tool_invocations: v.optional(v.any()),
+    tool_calls: v.optional(v.any()),
+    tool_results: v.optional(v.any()),
     finish_reason: v.optional(v.string()),
     total_tokens: v.optional(v.number()),
     prompt_tokens: v.optional(v.number()),
