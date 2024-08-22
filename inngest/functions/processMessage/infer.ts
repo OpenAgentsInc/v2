@@ -3,6 +3,7 @@ import { Logger } from "inngest/middleware/logger"
 import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
 import { OnChunkResult, OnFinishResult, Repo } from "@/types"
+import { createOrUpdateAssistantMessage } from "./saveAssistantMessage"
 
 interface InferProps {
   githubToken?: string
@@ -11,23 +12,32 @@ interface InferProps {
   modelId: string
   repo: Repo | null
   tools: ToolName[]
+  threadId: string
+  userId: string
 }
 
-export async function infer({ githubToken, logger, messages, modelId, repo, tools: bodyTools }: InferProps) {
+export async function infer({ githubToken, logger, messages, modelId, repo, tools: bodyTools, threadId, userId }: InferProps) {
   logger.info("Test.")
   const toolContext = await getToolContext({ githubToken, modelId, repo });
   const tools = getTools(toolContext, bodyTools);
-  const { textStream, text, finishReason, usage } = await streamText({
+  const { textStream, finishReason, usage } = await streamText({
     messages,
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
     tools,
-    onChunk: (chunk: OnChunkResult) => {
-      // Console log each chunk
+    onChunk: async (chunk: OnChunkResult) => {
       logger.info("Chunk received:", chunk);
+      await createOrUpdateAssistantMessage({
+        content: chunk.chunk.type === 'text-delta' ? chunk.chunk.textDelta : '',
+        modelId,
+        threadId,
+        userId,
+        toolCalls: chunk.chunk.type === 'tool-call' ? chunk.chunk : undefined,
+        toolResults: chunk.chunk.type === 'tool-result' ? chunk.chunk : undefined,
+        isPartial: true,
+      });
     },
     onFinish: (result: OnFinishResult) => {
-      // Console log the finish reason
       logger.info("Finish reason:", result);
     }
   });
@@ -38,9 +48,19 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     fullResponse += chunk;
   }
 
-  // logger.info("Text is:", text);
   logger.info("Full response is:", fullResponse);
   logger.info("Usage is:", usage);
+
+  // Save the final message
+  await createOrUpdateAssistantMessage({
+    content: fullResponse,
+    modelId,
+    threadId,
+    userId,
+    usage,
+    finishReason,
+    isPartial: false,
+  });
 
   return {
     result: fullResponse,
