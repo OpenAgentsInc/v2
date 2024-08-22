@@ -1,6 +1,5 @@
 export interface Repo {
-    owner: string
-    name: string
-    branch: string
+  owner: string
+  name: string
+  branch: string
 }
-

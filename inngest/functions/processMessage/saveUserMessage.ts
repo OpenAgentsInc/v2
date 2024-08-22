@@ -1,14 +1,20 @@
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function saveUserMessage(threadId: string, userId: string, content: string) {
+interface SaveUserMessageProps {
+  content: string
+  threadId: string
+  userId: string
+}
+
+export async function saveUserMessage({ content, threadId, userId }: SaveUserMessageProps) {
   return await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
-    thread_id: threadId as any, // Type assertion to avoid the error
     clerk_user_id: userId,
     content: content,
     role: 'user',
-    model_id: 'default', // You might want to make this configurable
+    thread_id: threadId as Id<"threads">,
   });
 }

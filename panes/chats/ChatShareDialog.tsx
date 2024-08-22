@@ -4,11 +4,11 @@ import * as React from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,
-  DialogTitle
+    Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader,
+    DialogTitle
 } from "@/components/ui/dialog"
 import { IconSpinner } from "@/components/ui/icons"
-import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard"
+import { useCopyToClipboard } from "@/hooks"
 import { DialogProps } from "@radix-ui/react-dialog"
 
 interface ChatShareDialogProps extends DialogProps {

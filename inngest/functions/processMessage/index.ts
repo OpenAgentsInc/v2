@@ -1,29 +1,54 @@
-import { inngest } from "@/inngest/client";
-import { saveUserMessage } from "./saveUserMessage";
-import { processContent } from "./processContent";
-import { saveProcessedMessage } from "./saveProcessedMessage";
+import { inngest } from "@/inngest/client"
+import { Repo } from "@/types"
+import { gatherContext } from "./gatherContext"
+import { infer } from "./infer"
+import { saveAssistantMessage } from "./saveAssistantMessage"
+import { saveUserMessage } from "./saveUserMessage"
+
+export interface ProcessMessageData {
+  content: string
+  modelId: string
+  repo: Repo | null
+  threadId: string
+  userId: string
+}
 
 export const processMessage = inngest.createFunction(
   { id: "process-message", name: "Process Message" },
-  { event: "chat/message.sent" },
+  { event: "chat/process.message" },
   async ({ event, step }) => {
-    const { chatId, content, userId } = event.data;
+    const { content, modelId, repo, threadId, userId } = event.data as ProcessMessageData; // must confirm this can take a Repo
 
-    // Step 1: Save user message
-    const userMessage = await step.run("Save User Message", async () => {
-      return await saveUserMessage(chatId, userId, content);
+    // Save user message to Convex database
+    await step.run("Save User Message", async () => {
+      return await saveUserMessage({ content, threadId, userId });
     });
 
-    // Step 2: Process content
-    const processedContent = await step.run("Process Content", async () => {
-      return await processContent(content);
+    // Collect relevant message history and tools
+    const { messages, tools } = await step.run("Gather Context", async () => {
+      return await gatherContext({ content, threadId, userId })
     });
 
-    // Step 3: Save processed message
+    // Send message, context, and tools to LLM
+    const response = await step.run("LLM Inference", async () => {
+      return await infer({ messages, modelId, repo, tools })
+    });
+
+    // Save processed message
     const assistantMessage = await step.run("Save Processed Message", async () => {
-      return await saveProcessedMessage(chatId, processedContent, "assistant");
+      return await saveAssistantMessage({
+        content: response.text,
+        finishReason: response.finishReason,
+        modelId, threadId,
+        usage: {
+          completion_tokens: response.usage.completionTokens,
+          prompt_tokens: response.usage.promptTokens,
+          total_tokens: response.usage.totalTokens
+        },
+        userId
+      });
     });
 
-    return { userMessage, assistantMessage };
+    return { assistantMessage };
   }
 );
