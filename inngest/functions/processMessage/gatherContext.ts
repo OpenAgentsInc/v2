@@ -1,7 +1,13 @@
 import { ToolName } from "@/tools"
 import { ProcessMessageData } from "./"
 
-export async function gatherContext({ content, threadId, userId }: Omit<ProcessMessageData, "modelId">) {
+interface GatherContextProps {
+  content: string
+  threadId: string
+  userId: string
+}
+
+export async function gatherContext({ content, threadId, userId }: GatherContextProps) {
   // Gather the thread's message history
 
   // Truncate/summarize as needed

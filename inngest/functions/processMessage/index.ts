@@ -1,4 +1,5 @@
 import { inngest } from "@/inngest/client"
+import { Repo } from "@/types"
 import { gatherContext } from "./gatherContext"
 import { infer } from "./infer"
 import { saveAssistantMessage } from "./saveAssistantMessage"
@@ -7,6 +8,7 @@ import { saveUserMessage } from "./saveUserMessage"
 export interface ProcessMessageData {
   content: string
   modelId: string
+  repo: Repo | null
   threadId: string
   userId: string
 }
@@ -15,7 +17,7 @@ export const processMessage = inngest.createFunction(
   { id: "process-message", name: "Process Message" },
   { event: "chat/process.message" },
   async ({ event, step }) => {
-    const { content, modelId, threadId, userId } = event.data as ProcessMessageData;
+    const { content, modelId, repo, threadId, userId } = event.data as ProcessMessageData;
 
     // Save user message to Convex database
     await step.run("Save User Message", async () => {
@@ -29,7 +31,7 @@ export const processMessage = inngest.createFunction(
 
     // Send message, context, and tools to LLM
     const { response } = await step.run("LLM Inference", async () => {
-      return await infer({ messages, modelId, tools })
+      return await infer({ messages, modelId, repo, tools })
     });
 
     // Save processed message

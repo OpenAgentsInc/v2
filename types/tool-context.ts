@@ -1,6 +1,8 @@
+import { Repo } from "./repo"
+
 export interface ToolContext {
   user: any // User | null;
-  // repo: any //Repo | null;
+  repo: Repo | null;
   gitHubToken: string | undefined;
   firecrawlToken: string | undefined;
   greptileToken: string | undefined;
