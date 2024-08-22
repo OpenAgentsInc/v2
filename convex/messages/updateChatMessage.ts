@@ -16,6 +16,8 @@ export const updateChatMessage = mutation({
     model_id: v.optional(v.string()),
     cost_in_cents: v.optional(v.number()),
     status: v.optional(v.string()),
+    role: v.optional(v.string()),
+    thread_id: v.optional(v.id("threads")),
   },
   async handler(ctx, args) {
     const { id, ...updateFields } = args;
@@ -25,7 +27,7 @@ export const updateChatMessage = mutation({
       throw new Error(`Message with id ${id} not found`);
     }
 
-    const updatedMessage = await ctx.db.patch(id, updateFields);
+    await ctx.db.patch(id, updateFields);
 
     return await ctx.db.get(id);
   },
