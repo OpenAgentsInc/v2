@@ -2,7 +2,7 @@ import { streamText } from "ai"
 import { Logger } from "inngest/middleware/logger"
 import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
-import { OnFinishResult, Repo } from "@/types"
+import { OnChunkResult, OnFinishResult, Repo } from "@/types"
 
 interface InferProps {
   githubToken?: string
@@ -22,7 +22,7 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
     tools,
-    onChunk: (chunk) => {
+    onChunk: (chunk: OnChunkResult) => {
       // Console log each chunk
       logger.info("Chunk received:", chunk);
     },
