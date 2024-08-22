@@ -20,6 +20,7 @@ import type * as messages_getChatById from "../messages/getChatById.js";
 import type * as messages_getLastMessage from "../messages/getLastMessage.js";
 import type * as messages_index from "../messages/index.js";
 import type * as messages_saveChatMessage from "../messages/saveChatMessage.js";
+import type * as messages_updateChatMessage from "../messages/updateChatMessage.js";
 import type * as schema_documents from "../schema/documents.js";
 import type * as schema_emails from "../schema/emails.js";
 import type * as schema_messages from "../schema/messages.js";
@@ -66,6 +67,7 @@ declare const fullApi: ApiFromModules<{
   "messages/getLastMessage": typeof messages_getLastMessage;
   "messages/index": typeof messages_index;
   "messages/saveChatMessage": typeof messages_saveChatMessage;
+  "messages/updateChatMessage": typeof messages_updateChatMessage;
   "schema/documents": typeof schema_documents;
   "schema/emails": typeof schema_emails;
   "schema/messages": typeof schema_messages;
