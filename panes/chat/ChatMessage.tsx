@@ -4,7 +4,7 @@ import remarkMath from "remark-math"
 import { CodeBlock } from "@/components/ui/codeblock"
 import { IconOpenAgents, IconUser } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
-import { Message } from "@/types"
+import { Message, ToolInvocation } from "@/types"
 import { ChatMessageActions } from "./ChatMessageActions"
 import { MemoizedReactMarkdown } from "./Markdown"
 import { ToolResult } from "./ToolResult"
@@ -78,7 +78,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             state={invocation.state}
           />
         ))}
-        {message.tool_invocations && message.tool_invocations.map(invocation => (
+        {message.tool_invocations && message.tool_invocations.map((invocation: ToolInvocation) => (
           <ToolResult
             key={invocation.toolCallId}
             toolName={invocation.toolName}
