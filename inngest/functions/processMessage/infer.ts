@@ -25,17 +25,37 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
     tools,
-    onChunk: async (chunk: OnChunkResult) => {
-      logger.info("Chunk received:", chunk);
-      await createOrUpdateAssistantMessage({
-        content: chunk.chunk.type === 'text-delta' ? chunk.chunk.textDelta : '',
-        modelId,
-        threadId,
-        userId,
-        toolCalls: chunk.chunk.type === 'tool-call' ? chunk.chunk : undefined,
-        toolResults: chunk.chunk.type === 'tool-result' ? chunk.chunk : undefined,
-        isPartial: true,
-      });
+    onChunk: async (event: { chunk: OnChunkResult['chunk'] }) => {
+      logger.info("Chunk received:", event);
+      const chunk = event.chunk;
+
+      if (chunk.type === 'text-delta') {
+        await createOrUpdateAssistantMessage({
+          content: chunk.textDelta,
+          modelId,
+          threadId,
+          userId,
+          isPartial: true,
+        });
+      } else if (chunk.type === 'tool-call') {
+        await createOrUpdateAssistantMessage({
+          content: '',
+          modelId,
+          threadId,
+          userId,
+          toolCalls: chunk,
+          isPartial: true,
+        });
+      } else if (chunk.type === 'tool-result') {
+        await createOrUpdateAssistantMessage({
+          content: '',
+          modelId,
+          threadId,
+          userId,
+          toolResults: chunk,
+          isPartial: true,
+        });
+      }
     },
     onFinish: (result: OnFinishResult) => {
       logger.info("Finish reason:", result);
