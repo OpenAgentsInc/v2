@@ -30,13 +30,22 @@ export const processMessage = inngest.createFunction(
     });
 
     // Send message, context, and tools to LLM
-    const { response } = await step.run("LLM Inference", async () => {
+    const response = await step.run("LLM Inference", async () => {
       return await infer({ messages, modelId, repo, tools })
     });
 
     // Save processed message
     const assistantMessage = await step.run("Save Processed Message", async () => {
-      return await saveAssistantMessage({ content: response, modelId, threadId, userId }); // Add usage
+      return await saveAssistantMessage({
+        content: response.text,
+        modelId, threadId,
+        usage: {
+          completion_tokens: response.usage.completionTokens,
+          prompt_tokens: response.usage.promptTokens,
+          total_tokens: response.usage.totalTokens
+        },
+        userId
+      });
     });
 
     return { assistantMessage };

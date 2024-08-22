@@ -19,7 +19,5 @@ export async function infer({ messages, modelId, repo, tools: bodyTools }: Infer
     system: getSystemPrompt(toolContext),
     tools
   });
-  return {
-    response: result.text
-  }
+  return result
 }
