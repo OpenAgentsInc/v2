@@ -16,6 +16,7 @@ export const saveChatMessage = mutation({
     completion_tokens: v.optional(v.number()),
     model_id: v.optional(v.string()),
     cost_in_cents: v.optional(v.number()),
+    status: v.optional(v.string()),
   },
   async handler(ctx, args) {
     const newMessage = await ctx.db.insert("messages", {
