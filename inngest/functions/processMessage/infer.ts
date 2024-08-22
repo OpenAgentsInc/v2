@@ -17,7 +17,6 @@ interface InferProps {
 }
 
 export async function infer({ githubToken, logger, messages, modelId, repo, tools: bodyTools, threadId, userId }: InferProps) {
-  logger.info("Test.")
   const toolContext = await getToolContext({ githubToken, modelId, repo });
   const tools = getTools(toolContext, bodyTools);
   const { textStream, finishReason, usage } = await streamText({
@@ -64,8 +63,14 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     fullResponse += chunk;
   }
 
-  logger.info("Full response is:", fullResponse);
-  logger.info("Usage is:", usage);
+  // logger.info("Full response is:", fullResponse);
+  // logger.info("Usage is:", usage);
+  const doneUsage = await usage;
+  const realUsage = {
+    completion_tokens: doneUsage.completionTokens,
+    prompt_tokens: doneUsage.promptTokens,
+    total_tokens: doneUsage.totalTokens,
+  }
 
   // Save the final message
   await createOrUpdateAssistantMessage({
@@ -73,8 +78,8 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     modelId,
     threadId,
     userId,
-    usage,
-    finishReason,
+    usage: realUsage,
+    finishReason: await finishReason,
     isPartial: false,
   });
 
