@@ -42,10 +42,11 @@ export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
 interface ToolContextBody {
   repo: Repo | null
   modelId: string;
+  repoUrl?: string; // Add optional repoUrl parameter
 }
 
 export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
-  const { repo, modelId } = body;
+  const { repo, modelId, repoUrl } = body;
   const user = await currentUser();
   const gitHubToken = user ? await getGitHubToken(user) : undefined;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
@@ -72,8 +73,20 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
       throw new Error(`Unsupported model provider: ${modelObj.provider}`);
   }
 
+  // Parse repoUrl if provided
+  let parsedRepo = repo;
+  if (repoUrl) {
+    const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)(?:\/tree\/([^/]+))?/);
+    if (match) {
+      const [, owner, name, branch = 'main'] = match;
+      parsedRepo = { owner, name, branch };
+    } else {
+      throw new Error("Invalid repository URL");
+    }
+  }
+
   return {
-    repo,
+    repo: parsedRepo,
     user: user as User | null,
     gitHubToken,
     firecrawlToken,
