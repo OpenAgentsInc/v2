@@ -27,7 +27,7 @@ const allTools = {
   search_codebase: searchCodebaseTool
 } as const;
 
-type ToolName = keyof typeof allTools;
+export type ToolName = keyof typeof allTools;
 
 export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
   const tools: Partial<Record<ToolName, ReturnType<typeof allTools[ToolName]>>> = {};

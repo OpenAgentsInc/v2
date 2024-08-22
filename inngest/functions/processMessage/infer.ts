@@ -1,11 +1,11 @@
 import { generateText } from "ai"
-import { getToolContext, getTools } from "@/tools"
+import { getToolContext, getTools, ToolName } from "@/tools"
 import { anthropic } from "@ai-sdk/anthropic"
 
 interface InferProps {
   messages: any[]
   modelId: string
-  tools: any[]
+  tools: ToolName[]
 }
 
 export async function infer({ messages, modelId, tools: bodyTools }: InferProps) {

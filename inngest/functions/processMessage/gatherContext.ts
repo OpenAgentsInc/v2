@@ -1,3 +1,4 @@
+import { ToolName } from "@/tools"
 import { ProcessMessageData } from "./"
 
 export async function gatherContext({ content, threadId, userId }: Omit<ProcessMessageData, "modelId">) {
@@ -9,6 +10,11 @@ export async function gatherContext({ content, threadId, userId }: Omit<ProcessM
 
   return {
     messages: [],
-    tools: []
+    tools: [
+      "view_file",
+      "view_hierarchy",
+      "create_file",
+      "rewrite_file"
+    ] as ToolName[]
   }
 }
