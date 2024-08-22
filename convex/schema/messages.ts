@@ -17,7 +17,7 @@ export const messages = defineTable({
   model_id: v.optional(v.string()),
   cost_in_cents: v.optional(v.number()),
   original_id: v.optional(v.number()),
-  status: v.string(),
+  status: v.optional(v.string()),
 })
   .index('by_thread_id', ['thread_id'])
   .index('by_clerk_user_id', ['clerk_user_id']);
