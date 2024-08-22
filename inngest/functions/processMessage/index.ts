@@ -17,7 +17,7 @@ export const processMessage = inngest.createFunction(
   { id: "process-message", name: "Process Message" },
   { event: "chat/process.message" },
   async ({ event, step }) => {
-    const { content, modelId, repo, threadId, userId } = event.data as ProcessMessageData;
+    const { content, modelId, repo, threadId, userId } = event.data as ProcessMessageData; // must confirm this can take a Repo
 
     // Save user message to Convex database
     await step.run("Save User Message", async () => {
