@@ -18,7 +18,7 @@ export function useChat({ threadId }: UseChatProps) {
   const messages = useQuery(
     api.messages.fetchThreadMessages.fetchThreadMessages, 
     { thread_id: threadId as Id<"threads"> },
-    { subscribe: true }
+    { initialData: [] }
   );
 
   const sendMessage = useCallback(async (text: string) => {
@@ -26,18 +26,15 @@ export function useChat({ threadId }: UseChatProps) {
     const res = await libSendMessage({ modelId: model.id, repo, text, threadId })
     console.log("libSendMessage response", res)
     setIsLoading(false)
-  }, [threadId, setIsLoading, model.id, repo])
+  }, [threadId, model.id, repo])
 
   const allMessages = useMemo(() => {
     if (!messages) return []
     
-    const completeMessages = messages.filter(m => m.status !== 'partial')
-    const partialMessage = messages.find(m => m.status === 'partial')
-    
-    return [
-      ...completeMessages,
-      ...(partialMessage ? [partialMessage] : [])
-    ]
+    return messages.map(message => ({
+      ...message,
+      content: message.content || '',
+    }))
   }, [messages])
 
   return {
