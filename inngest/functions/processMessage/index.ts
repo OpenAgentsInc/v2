@@ -38,6 +38,7 @@ export const processMessage = inngest.createFunction(
     const assistantMessage = await step.run("Save Processed Message", async () => {
       return await saveAssistantMessage({
         content: response.text,
+        finishReason: response.finishReason,
         modelId, threadId,
         usage: {
           completion_tokens: response.usage.completionTokens,
