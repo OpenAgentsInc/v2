@@ -33,7 +33,7 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
     try {
       const items = await githubListContents({
         path,
-        token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '',
+        token: context.githubToken ?? process.env.GITHUB_TOKEN ?? '',
         repoOwner: context.repo.owner,
         repoName: context.repo.name,
         branch: context.repo.branch

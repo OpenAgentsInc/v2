@@ -26,14 +26,16 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
         success: false,
         error: "Missing repository or user information",
         summary: "Failed to view file due to missing context",
-        details: "The tool context is missing required repository or user information."
+        details: "The tool context is missing required repository or user information.",
+        repo: context.repo,
+        user: context.user
       };
     }
 
     try {
       const content = await githubReadFile({
         path,
-        token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '', // TODO
+        token: context.githubToken ?? process.env.GITHUB_TOKEN ?? '', // TODO
         repoOwner: context.repo.owner,
         repoName: context.repo.name,
         branch: context.repo.branch

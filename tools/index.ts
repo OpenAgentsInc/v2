@@ -40,14 +40,13 @@ export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
 };
 
 interface ToolContextBody {
-  repo: Repo | null
+  githubToken?: string
   modelId: string;
+  repo: Repo | null
 }
 
 export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
-  const { repo, modelId } = body;
-  const user = await currentUser();
-  const gitHubToken = user ? await getGitHubToken(user) : undefined;
+  const { githubToken, modelId, repo } = body;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
   const greptileToken = process.env.GREPTILE_API_KEY;
 
@@ -74,8 +73,7 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
 
   return {
     repo,
-    user: user as User | null,
-    gitHubToken,
+    githubToken,
     firecrawlToken,
     greptileToken,
     model
