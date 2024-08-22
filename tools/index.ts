@@ -71,6 +71,18 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
       throw new Error(`Unsupported model provider: ${modelObj.provider}`);
   }
 
+  // Parse repoUrl if provided
+  let parsedRepo = repo;
+  if (repoUrl) {
+    const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)(?:\/tree\/([^/]+))?/);
+    if (match) {
+      const [, owner, name, branch = 'main'] = match;
+      parsedRepo = { owner, name, branch };
+    } else {
+      throw new Error("Invalid repository URL");
+    }
+  }
+
   return {
     repo,
     githubToken,
