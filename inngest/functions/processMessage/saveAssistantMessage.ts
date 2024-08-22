@@ -83,7 +83,7 @@ export async function createOrUpdateAssistantMessage({
       }
 
       resolve();
-    }, 500); // Debounce for 500ms (0.5 seconds)
+    }, 200);
   });
 }
 
@@ -98,7 +98,7 @@ export async function saveAssistantMessage({
   userId
 }: Omit<SaveAssistantMessageProps, 'isPartial'>) {
   console.log('saveAssistantMessage called with:', { content, finishReason, modelId, usage, threadId, toolCalls, toolResults, userId });
-  
+
   await createOrUpdateAssistantMessage({
     content,
     finishReason,
