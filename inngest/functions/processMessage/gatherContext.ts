@@ -21,12 +21,6 @@ export async function gatherContext({ content, threadId, userId }: GatherContext
     content: message.content
   }))
 
-  // Add the new user message
-  formattedMessages.push({
-    role: "user",
-    content
-  })
-
   // Truncate/summarize as needed
   // For now, we'll just take the last 10 messages if there are more than 10
   const truncatedMessages = formattedMessages.slice(-10)
