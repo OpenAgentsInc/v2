@@ -21,7 +21,7 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
   description: "View file/folder hierarchy at path (one level deep)",
   parameters: params,
   execute: async ({ path }: Params): Promise<Result> => {
-    if (!context.repo || !context.user) {
+    if (!context.repo || !context.githubToken) {
       return {
         success: false,
         error: "Missing repository or user information",
@@ -33,7 +33,7 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
     try {
       const items = await githubListContents({
         path,
-        token: context.githubToken ?? process.env.GITHUB_TOKEN ?? '',
+        token: context.githubToken,
         repoOwner: context.repo.owner,
         repoName: context.repo.name,
         branch: context.repo.branch

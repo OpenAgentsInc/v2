@@ -21,21 +21,19 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
   description: "View file contents at path",
   parameters: params,
   execute: async ({ path }: Params): Promise<Result> => {
-    if (!context.repo || !context.user) {
+    if (!context.repo || !context.githubToken) {
       return {
         success: false,
         error: "Missing repository or user information",
         summary: "Failed to view file due to missing context",
         details: "The tool context is missing required repository or user information.",
-        repo: context.repo,
-        user: context.user
       };
     }
 
     try {
       const content = await githubReadFile({
         path,
-        token: context.githubToken ?? process.env.GITHUB_TOKEN ?? '', // TODO
+        token: context.githubToken,
         repoOwner: context.repo.owner,
         repoName: context.repo.name,
         branch: context.repo.branch
