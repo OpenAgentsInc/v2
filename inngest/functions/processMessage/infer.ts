@@ -14,6 +14,7 @@ export async function infer({ messages, modelId, repo, tools: bodyTools }: Infer
   const toolContext = await getToolContext({ modelId, repo });
   const tools = getTools(toolContext, bodyTools);
   const result = await generateText({
+    maxToolRoundtrips: 50, // todo: make this a passed-in prop
     messages,
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
