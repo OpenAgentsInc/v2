@@ -69,8 +69,12 @@ export async function createOrUpdateAssistantMessage({
           console.log('Creating new message');
           const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
           console.log('New message created, result:', result);
-          messageId = result._id as Id<"messages">;
-          console.log('New messageId set:', messageId);
+          if (result && result._id) {
+            messageId = result._id as Id<"messages">;
+            console.log('New messageId set:', messageId);
+          } else {
+            console.error('Failed to create new message: result or result._id is null');
+          }
         }
       } catch (error) {
         console.error('Error in createOrUpdateAssistantMessage:', error);
