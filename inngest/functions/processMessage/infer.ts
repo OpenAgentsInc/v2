@@ -2,7 +2,7 @@ import { streamText } from "ai"
 import { Logger } from "inngest/middleware/logger"
 import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
-import { OnChunkResult, OnFinishResult, Repo } from "@/types"
+import { OnFinishResult, Repo } from "@/types"
 import { createOrUpdateAssistantMessage } from "./saveAssistantMessage"
 
 interface InferProps {
@@ -25,36 +25,51 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
     tools,
-    onChunk: async (event: { chunk: OnChunkResult['chunk'] }) => {
+    onChunk: async (event: { 
+      chunk: { 
+        type: "text-delta"; 
+        textDelta: string; 
+      } | { 
+        type: "tool-call-streaming-start"; 
+        toolCallId: string; 
+        toolName: string; 
+      } | { 
+        type: "tool-call-delta"; 
+        toolCallId: string; 
+        toolName: string; 
+        argsTextDelta: string; 
+      } | { 
+        type: "tool-call"; 
+        toolCallId: string; 
+        toolName: string; 
+        args: Record<string, any>; 
+      }
+    }) => {
       logger.info("Chunk received:", event);
       const chunk = event.chunk;
 
-      if (chunk.type === 'text-delta') {
-        await createOrUpdateAssistantMessage({
-          content: chunk.textDelta,
-          modelId,
-          threadId,
-          userId,
-          isPartial: true,
-        });
-      } else if (chunk.type === 'tool-call') {
-        await createOrUpdateAssistantMessage({
-          content: '',
-          modelId,
-          threadId,
-          userId,
-          toolCalls: chunk,
-          isPartial: true,
-        });
-      } else if (chunk.type === 'tool-result') {
-        await createOrUpdateAssistantMessage({
-          content: '',
-          modelId,
-          threadId,
-          userId,
-          toolResults: chunk,
-          isPartial: true,
-        });
+      switch (chunk.type) {
+        case 'text-delta':
+          await createOrUpdateAssistantMessage({
+            content: chunk.textDelta,
+            modelId,
+            threadId,
+            userId,
+            isPartial: true,
+          });
+          break;
+        case 'tool-call-streaming-start':
+        case 'tool-call-delta':
+        case 'tool-call':
+          await createOrUpdateAssistantMessage({
+            content: '',
+            modelId,
+            threadId,
+            userId,
+            toolCalls: chunk,
+            isPartial: true,
+          });
+          break;
       }
     },
     onFinish: (result: OnFinishResult) => {
