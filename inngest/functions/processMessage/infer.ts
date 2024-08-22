@@ -2,7 +2,7 @@ import { streamText } from "ai"
 import { Logger } from "inngest/middleware/logger"
 import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
-import { Repo } from "@/types"
+import { OnFinishResult, Repo } from "@/types"
 
 interface InferProps {
   githubToken?: string
@@ -26,9 +26,9 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
       // Console log each chunk
       logger.info("Chunk received:", chunk);
     },
-    onFinish: (reason) => {
+    onFinish: (result: OnFinishResult) => {
       // Console log the finish reason
-      logger.info("Finish reason:", reason);
+      logger.info("Finish reason:", result);
     }
   });
 
@@ -38,7 +38,7 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     fullResponse += chunk;
   }
 
-  logger.info("Text is:", text);
+  // logger.info("Text is:", text);
   logger.info("Full response is:", fullResponse);
   logger.info("Usage is:", usage);
 

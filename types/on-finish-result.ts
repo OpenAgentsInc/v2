@@ -10,7 +10,7 @@ export interface OnFinishResult {
   // The full text that has been generated.
   text: string
   // The tool calls that have been executed.
-  toolCalls: ToolCall<any, any>[]
+  toolCalls?: any //ToolCall<any, any>[]
   // The tool results that have been generated.
-  toolResults: ToolResult<any, any, any>[]
+  toolResults?: ToolResult<any, any, any>[]
 }
