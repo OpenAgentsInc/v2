@@ -2,7 +2,7 @@ import { streamText } from "ai"
 import { Logger } from "inngest/middleware/logger"
 import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
-import { OnFinishResult, Repo } from "@/types"
+import { OnChunkResult, OnFinishResult, Repo } from "@/types"
 import { createOrUpdateAssistantMessage } from "./saveAssistantMessage"
 
 interface InferProps {
@@ -25,26 +25,7 @@ export async function infer({ githubToken, logger, messages, modelId, repo, tool
     model: toolContext.model,
     system: getSystemPrompt(toolContext),
     tools,
-    onChunk: async (event: { 
-      chunk: { 
-        type: "text-delta"; 
-        textDelta: string; 
-      } | { 
-        type: "tool-call-streaming-start"; 
-        toolCallId: string; 
-        toolName: string; 
-      } | { 
-        type: "tool-call-delta"; 
-        toolCallId: string; 
-        toolName: string; 
-        argsTextDelta: string; 
-      } | { 
-        type: "tool-call"; 
-        toolCallId: string; 
-        toolName: string; 
-        args: Record<string, any>; 
-      }
-    }) => {
+    onChunk: async (event: OnChunkResult) => {
       logger.info("Chunk received:", event);
       const chunk = event.chunk;
 
