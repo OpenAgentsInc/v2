@@ -3,18 +3,20 @@
 import { inngest } from "@/inngest/client"
 
 interface TriggerInngestEventProps {
+  content: string
+  modelId: string
   threadId: string
   userId: string
-  content: string
 }
 
-export async function triggerInngestEvent({ threadId, userId, content }: TriggerInngestEventProps) {
+export async function triggerInngestEvent({ content, modelId, threadId, userId }: TriggerInngestEventProps) {
   await inngest.send({
     name: "chat/process.message",
     data: {
+      content,
+      modelId,
       threadId,
       userId,
-      content,
     }
   })
 }
