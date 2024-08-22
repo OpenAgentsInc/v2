@@ -5,11 +5,11 @@ import { Id } from "@/convex/_generated/dataModel"
 
 interface SaveAssistantMessageProps {
   content: string
-  finishReason: string
+  finishReason?: string
   modelId: string
   threadId: string
-  toolCalls: any
-  toolResults: any
+  toolCalls?: any
+  toolResults?: any
   usage: CompletionUsage
   userId: string
 }

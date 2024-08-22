@@ -17,7 +17,7 @@ export interface ProcessMessageData {
 export const processMessage = inngest.createFunction(
   { id: "process-message", name: "Process Message" },
   { event: "chat/process.message" },
-  async ({ event, step }) => {
+  async ({ event, step, logger }) => {
     const { content, githubToken, modelId, repo, threadId, userId } = event.data as ProcessMessageData; // must confirm this can take a Repo
 
     // Save user message to Convex database
@@ -32,16 +32,16 @@ export const processMessage = inngest.createFunction(
 
     // Send message, context, and tools to LLM
     const response = await step.run("LLM Inference", async () => {
-      return await infer({ githubToken, messages, modelId, repo, tools })
+      return await infer({ githubToken, logger, messages, modelId, repo, tools })
     });
 
     // Save processed message
     const assistantMessage = await step.run("Save Processed Message", async () => {
       return await saveAssistantMessage({
-        content: response.text,
-        finishReason: response.finishReason,
-        toolCalls: response.toolCalls,
-        toolResults: response.toolResults,
+        content: response.result,
+        // finishReason: response.finishReason,
+        // toolCalls: response.toolCalls,
+        // toolResults: response.toolResults,
         modelId, threadId,
         usage: {
           completion_tokens: response.usage.completionTokens,
