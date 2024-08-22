@@ -6,7 +6,7 @@ import { saveUserMessage } from "./saveUserMessage"
 
 export interface ProcessMessageData {
   content: string
-  modelId?: string
+  modelId: string
   threadId: string
   userId: string
 }
@@ -29,12 +29,12 @@ export const processMessage = inngest.createFunction(
 
     // Send message, context, and tools to LLM
     const { response } = await step.run("LLM Inference", async () => {
-      return await infer({ messages, tools })
+      return await infer({ messages, modelId, tools })
     });
 
     // Save processed message
     const assistantMessage = await step.run("Save Processed Message", async () => {
-      return await saveAssistantMessage({ content: response, modelId, threadId, userId });
+      return await saveAssistantMessage({ content: response, modelId, threadId, userId }); // Add usage
     });
 
     return { assistantMessage };

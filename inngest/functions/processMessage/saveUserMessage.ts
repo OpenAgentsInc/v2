@@ -5,7 +5,7 @@ import { ProcessMessageData } from "./"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function saveUserMessage({ content, threadId, userId }: ProcessMessageData) {
+export async function saveUserMessage({ content, threadId, userId }: Omit<ProcessMessageData, "modelId">) {
   return await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
     clerk_user_id: userId,
     content: content,
