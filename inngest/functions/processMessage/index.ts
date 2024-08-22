@@ -1,17 +1,17 @@
-import { inngest } from "@/inngest/client";
-import { saveUserMessage } from "./saveUserMessage";
-import { processContent } from "./processContent";
-import { saveProcessedMessage } from "./saveProcessedMessage";
+import { inngest } from "@/inngest/client"
+import { processContent } from "./processContent"
+import { saveProcessedMessage } from "./saveProcessedMessage"
+import { saveUserMessage } from "./saveUserMessage"
 
 export const processMessage = inngest.createFunction(
   { id: "process-message", name: "Process Message" },
-  { event: "chat/message.sent" },
+  { event: "chat/process.message" },
   async ({ event, step }) => {
-    const { chatId, content, userId } = event.data;
+    const { threadId, content, userId } = event.data;
 
     // Step 1: Save user message
     const userMessage = await step.run("Save User Message", async () => {
-      return await saveUserMessage(chatId, userId, content);
+      return await saveUserMessage(threadId, userId, content);
     });
 
     // Step 2: Process content
@@ -21,7 +21,7 @@ export const processMessage = inngest.createFunction(
 
     // Step 3: Save processed message
     const assistantMessage = await step.run("Save Processed Message", async () => {
-      return await saveProcessedMessage(chatId, processedContent, "assistant");
+      return await saveProcessedMessage(userId, threadId, processedContent, "assistant");
     });
 
     return { userMessage, assistantMessage };
