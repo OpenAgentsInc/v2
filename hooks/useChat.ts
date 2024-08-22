@@ -17,8 +17,7 @@ export function useChat({ threadId }: UseChatProps) {
   
   const messages = useQuery(
     api.messages.fetchThreadMessages.fetchThreadMessages, 
-    { thread_id: threadId as Id<"threads"> },
-    { initialData: [] }
+    { thread_id: threadId as Id<"threads"> }
   );
 
   const sendMessage = useCallback(async (text: string) => {
