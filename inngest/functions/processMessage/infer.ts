@@ -1,4 +1,5 @@
 import { generateText } from "ai"
+import { getSystemPrompt } from "@/lib/systemPrompt"
 import { getToolContext, getTools, ToolName } from "@/tools"
 import { Repo } from "@/types"
 
@@ -15,7 +16,7 @@ export async function infer({ messages, modelId, repo, tools: bodyTools }: Infer
   const result = await generateText({
     messages,
     model: toolContext.model,
-    system: "You are a helpful assistant.",
+    system: getSystemPrompt(toolContext),
     tools
   });
   return {
