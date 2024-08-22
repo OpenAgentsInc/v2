@@ -56,7 +56,8 @@ export async function createOrUpdateAssistantMessage({
         ...messageData,
       });
     } else {
-      messageId = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
+      const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
+      messageId = result._id as Id<"messages">;
     }
   }, 500); // Debounce for 500ms (0.5 seconds)
 
