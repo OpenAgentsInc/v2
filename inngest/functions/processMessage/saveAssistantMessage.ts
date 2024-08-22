@@ -43,11 +43,10 @@ export async function createOrUpdateAssistantMessage({
     debounceTimer = setTimeout(async () => {
       console.log('Debounce timer fired, preparing messageData');
       const messageData = {
-        clerk_user_id: userId,
-        completion_tokens: usage?.completion_tokens,
         content,
         finish_reason: finishReason,
         model_id: modelId,
+        completion_tokens: usage?.completion_tokens,
         prompt_tokens: usage?.prompt_tokens,
         role: 'assistant',
         tool_calls: toolCalls,
@@ -67,7 +66,10 @@ export async function createOrUpdateAssistantMessage({
           console.log('Message updated successfully');
         } else {
           console.log('Creating new message');
-          const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, messageData);
+          const result = await convex.mutation(api.messages.saveChatMessage.saveChatMessage, {
+            ...messageData,
+            clerk_user_id: userId,
+          });
           console.log('New message created, result:', result);
           if (result && result._id) {
             messageId = result._id as Id<"messages">;
