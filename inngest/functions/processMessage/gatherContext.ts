@@ -1,17 +1,19 @@
 import { ToolName } from "@/tools"
-import { ConvexClient } from "convex/browser"
+import { ConvexHttpClient } from "convex/browser"
 import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 interface GatherContextProps {
   content: string
   threadId: string
   userId: string
-  convex: ConvexClient
 }
 
-export async function gatherContext({ content, threadId, userId, convex }: GatherContextProps) {
+export async function gatherContext({ content, threadId, userId }: GatherContextProps) {
   // Gather the thread's message history
-  const messages = await convex.query(api.threads.getThreadMessages, { threadId })
+  const messages = await convex.query(api.threads.getThreadMessages, { threadId: threadId as Id<"threads"> })
 
   // Convert Convex messages to the format expected by the LLM
   const formattedMessages = messages.map(message => ({
