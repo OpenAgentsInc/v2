@@ -7,14 +7,16 @@ import { InputSettings } from "./InputSettings";
 interface InputBarProps {
   onSubmit: (content: string) => void;
   isLoading: boolean;
+  onStop: () => void;
 }
 
 const MAX_CONTENT_LENGTH = 9000;
 
-export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
+export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit, onStop }) => {
   const [input, setInput] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -74,14 +76,22 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit }) => {
                 {isLoading ? (
                   <button
                     type="button"
-                    disabled
-                    className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-black text-white cursor-not-allowed"
-                    aria-label="Loading"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    onClick={onStop}
+                    className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-black text-white cursor-pointer"
+                    aria-label={isHovered ? "Stop" : "Loading"}
                   >
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    {isHovered ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm-16,160H64V64H192Z"></path>
+                      </svg>
+                    ) : (
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
                   </button>
                 ) : (
                   <button
