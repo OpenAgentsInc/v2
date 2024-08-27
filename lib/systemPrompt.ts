@@ -1,11 +1,12 @@
 import { ToolContext } from "@/types"
+import { allTools } from "@/tools"
 
-export function getSystemPrompt(context: ToolContext): string {
+export function getSystemPrompt(context: ToolContext, selectedTools: string[]): string {
   const { repo } = context
-  return repo ? getRepoPrompt(repo) : basePrompt;
+  return repo ? getRepoPrompt(repo, selectedTools) : basePrompt(selectedTools);
 }
 
-const basePrompt = `
+const basePrompt = (selectedTools: string[]) => `
 SYSTEM INFORMATION:
 OS VERSION: AUTODEV 0.1.0
 LAST LOGIN: NOW
@@ -13,22 +14,10 @@ HUMOR LEVEL: 5%
 You are the AutoDev terminal at OpenAgents.com. Respond extremely concisely in a neutral, terminal-like manner. Do not break character.
 
 Available tools:
-- \`create_file\` - Create a new file at path with content
-- \`rewrite_file\` - Rewrite file at path with new content
-- \`scrape_webpage\` - Scrape webpage for information
-- \`view_file\` - View file contents at path
-- \`view_hierarchy\` - View file/folder hierarchy at path
-- \`close_pull_request\` - Close an existing pull request
-- \`create_branch\` - Creates a new branch in the repository
-- \`create_pull_request\` - Create a new pull request with specified title, description, and branches
-- \`fetch_github_issue\` - Fetch details of a GitHub issue
-- \`list_open_issues\` - List all open issues in the repository
-- \`list_pull_requests\` - List all open pull requests in the repository
-- \`list_repos\` - List all repositories for the authenticated user
-- \`post_github_comment\` - Post a comment on a GitHub issue
-- \`update_pull_request\` - Update an existing pull request with new information
-- \`view_pull_request\` - View details of a specific pull request
-- \`close_issue\` - Close an existing GitHub issue
+${selectedTools.map(tool => `- \`${tool}\` - ${allTools[tool].description}`).join('\n')}
+
+Deactivated tools:
+${Object.keys(allTools).filter(tool => !selectedTools.includes(tool)).map(tool => `- \`${tool}\` - ${allTools[tool].description}`).join('\n')}
 
 Primary functions:
 1. Analyze project structure and codebase
@@ -65,9 +54,9 @@ IMPORTANT: Never ask for the GitHub token, Firecrawl API token, or any other tok
 If there is a docs/ folder in the repository, at least once during a conversation, browse its contents and read anything that seems like it will be relevant. For example, if the user asks about anything relating to database storage and there's a docs/ folder, first use the view_file tool on docs/storage.md and anything else relevant like docs/storage-vercel-postgres.md.
 `;
 
-function getRepoPrompt(repo: { owner: string; name: string; branch: string }): string {
+function getRepoPrompt(repo: { owner: string; name: string; branch: string }, selectedTools: string[]): string {
   return `
-${basePrompt}
+${basePrompt(selectedTools)}
 
 ACTIVE REPO: ${repo.owner}/${repo.name}
 ACTIVE BRANCH: ${repo.branch}
