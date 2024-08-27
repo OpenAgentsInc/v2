@@ -76,7 +76,8 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     'view_hierarchy',
     'create_pull_request',
     'create_branch',
-    'search_codebase'
+    'search_codebase',
+    'fetch_github_issue'
   ]
 
   const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
@@ -244,7 +245,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Credits</DialogTitle>
-            s                     <DialogDescription>
+            <DialogDescription>
               Advanced models require credits. Select the amount of credits to buy. Min $5, max $1000
             </DialogDescription>
           </DialogHeader>
