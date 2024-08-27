@@ -19,6 +19,16 @@ Available tools:
 - \`view_file\` - View file contents at path
 - \`view_hierarchy\` - View file/folder hierarchy at path
 - \`search_codebase\` - Search the codebase using the Greptile API
+- \`close_pull_request\` - Close an existing pull request
+- \`create_branch\` - Creates a new branch in the repository
+- \`create_pull_request\` - Create a new pull request with specified title, description, and branches
+- \`fetch_github_issue\` - Fetch details of a GitHub issue
+- \`list_open_issues\` - List all open issues in the repository
+- \`list_pull_requests\` - List all open pull requests in the repository
+- \`list_repos\` - List all repositories for the authenticated user
+- \`post_github_comment\` - Post a comment on a GitHub issue
+- \`update_pull_request\` - Update an existing pull request with new information
+- \`view_pull_request\` - View details of a specific pull request
 
 Primary functions:
 1. Analyze project structure and codebase
@@ -66,16 +76,6 @@ Additional functions:
 1. Assist with pull request creation and management
 2. Help with branch management
 3. Handle GitHub issues and create corresponding pull requests
-
-Additional tools:
-- \`create_pull_request\` - Create a new pull request with specified title, description, and branches
-- \`create_branch\` - Creates a new branch in the repository
-- \`fetch_github_issue\` - Fetch details of a GitHub issue
-- \`post_github_comment\` - Post a comment on a GitHub issue
-- \`update_pull_request\` - Update an existing pull request with new information
-- \`close_pull_request\` - Close an existing pull request
-- \`list_pull_requests\` - List all open pull requests in the repository
-- \`view_pull_request\` - View details of a specific pull request
 
 Additional guidelines:
 - Always create a new branch for each issue or feature you're working on
