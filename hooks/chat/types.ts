@@ -14,3 +14,11 @@ export interface Thread {
   _creationTime: number;
   shareToken?: string;
 }
+
+export interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  createdAt: number;
+  tool_invocations?: any; // Consider creating a more specific type
+}
