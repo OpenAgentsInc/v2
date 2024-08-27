@@ -11,7 +11,6 @@ import { createPullRequestTool } from "./create-pull-request"
 import { listReposTool } from "./list-repos"
 import { rewriteFileTool } from "./rewrite-file"
 import { scrapeWebpageTool } from "./scrape-webpage"
-import { searchCodebaseTool } from "./search-codebase"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { fetchGitHubIssueTool } from "./fetch-github-issue"
@@ -25,7 +24,6 @@ const allTools = {
   view_hierarchy: viewHierarchyTool,
   create_pull_request: createPullRequestTool,
   create_branch: createBranchTool,
-  search_codebase: searchCodebaseTool,
   fetch_github_issue: fetchGitHubIssueTool
 } as const;
 
@@ -58,7 +56,6 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
   const user = await currentUser();
   const gitHubToken = user ? await getGitHubToken(user) : undefined;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
-  const greptileToken = process.env.GREPTILE_API_KEY;
 
   // Find the full model object based on the provided model ID
   const modelObj = models.find((m: Model) => m.id === modelId);
@@ -86,7 +83,6 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     user: user as User | null,
     gitHubToken,
     firecrawlToken,
-    greptileToken,
     model
   };
 };
