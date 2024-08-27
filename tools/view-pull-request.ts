@@ -1,55 +1,88 @@
-import { Octokit } from '@octokit/rest'
-import { z } from 'zod'
-import { ToolDefinition } from './tool'
+import { z } from 'zod';
+import { tool, CoreTool } from 'ai';
+import { Octokit } from '@octokit/rest';
+import { ToolContext } from '@/types';
 
-const schema = z.object({
-  pull_number: z.number(),
-})
+const params = z.object({
+    pull_number: z.number().describe('The number of the pull request to view'),
+});
 
-export const viewPullRequest: ToolDefinition<typeof schema> = {
-  name: 'view_pull_request',
-  description: 'View details of a specific pull request, including comments, commits, and diffs',
-  schema,
-  func: async ({ pull_number }, { gitHubToken }) => {
-    const octokit = new Octokit({ auth: gitHubToken })
+type Params = z.infer<typeof params>;
 
-    try {
-      const { data: pr } = await octokit.pulls.get({
-        owner: 'openagentsinc',
-        repo: 'v2',
-        pull_number,
-      })
+type Result = {
+    success: boolean;
+    content: string;
+    summary: string;
+    details: string;
+};
 
-      const { data: comments } = await octokit.pulls.listComments({
-        owner: 'openagentsinc',
-        repo: 'v2',
-        pull_number,
-      })
+export const viewPullRequestTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
+    description: 'View details of a specific pull request',
+    parameters: params,
+    execute: async ({ pull_number }: Params): Promise<Result> => {
+        if (!context.repo || !context.gitHubToken) {
+            return {
+                success: false,
+                content: 'Missing repository information or GitHub token',
+                summary: 'Failed to view pull request due to missing context',
+                details: 'The tool context is missing required repository information or GitHub token.'
+            };
+        }
 
-      const { data: commits } = await octokit.pulls.listCommits({
-        owner: 'openagentsinc',
-        repo: 'v2',
-        pull_number,
-      })
+        const octokit = new Octokit({ auth: context.gitHubToken });
 
-      const { data: files } = await octokit.pulls.listFiles({
-        owner: 'openagentsinc',
-        repo: 'v2',
-        pull_number,
-      })
+        try {
+            const { data: pr } = await octokit.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                pull_number,
+            });
 
-      return {
-        success: true,
-        pr,
-        comments,
-        commits,
-        files,
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: `Failed to fetch pull request details: ${error.message}`,
-      }
-    }
-  },
-}
+            const { data: comments } = await octokit.pulls.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                pull_number,
+            });
+
+            const { data: commits } = await octokit.pulls.listCommits({
+                owner: context.repo.owner,
+                repo: context.repo.name,
+                pull_number,
+            });
+
+            const content = `
+Pull Request #${pr.number}
+Title: ${pr.title}
+State: ${pr.state}
+Created by: ${pr.user.login}
+Created at: ${pr.created_at}
+Updated at: ${pr.updated_at}
+
+Description:
+${pr.body}
+
+Comments:
+${comments.map(comment => `- ${comment.user.login}: ${comment.body}`).join('\n')}
+
+Commits:
+${commits.map(commit => `- ${commit.sha.substring(0, 7)}: ${commit.commit.message}`).join('\n')}
+            `.trim();
+
+            return {
+                success: true,
+                content,
+                summary: `Viewed pull request #${pull_number}`,
+                details: `Successfully retrieved details for pull request #${pull_number} in ${context.repo.owner}/${context.repo.name}`,
+            };
+        } catch (error) {
+            console.error('Error viewing pull request:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            return {
+                success: false,
+                content: 'Failed to view pull request.',
+                summary: 'Error viewing pull request',
+                details: `Error: ${errorMessage}`,
+            };
+        }
+    },
+});
