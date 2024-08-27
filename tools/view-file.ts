@@ -5,6 +5,9 @@ import { ToolContext } from '@/types';
 
 const params = z.object({
     path: z.string().describe("The path of the file to view"),
+    owner: z.string().optional().describe("The owner of the repository"),
+    repo: z.string().optional().describe("The name of the repository"),
+    branch: z.string().optional().describe("The branch to view the file from"),
 });
 
 type Params = z.infer<typeof params>;
@@ -20,7 +23,7 @@ type Result = {
 export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     description: "View file contents at path",
     parameters: params,
-    execute: async ({ path }: Params): Promise<Result> => {
+    execute: async ({ path, owner, repo, branch }: Params): Promise<Result> => {
         if (!context.repo || !context.user) {
             return {
                 success: false,
@@ -30,20 +33,24 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
             };
         }
 
+        const repoOwner = owner || context.repo.owner;
+        const repoName = repo || context.repo.name;
+        const repoBranch = branch || context.repo.branch || 'main';
+
         try {
             const content = await githubReadFile({
                 path,
                 token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '', // TODO
-                repoOwner: context.repo.owner,
-                repoName: context.repo.name,
-                branch: context.repo.branch
+                repoOwner,
+                repoName,
+                branch: repoBranch
             });
 
             return {
                 success: true,
                 content: content,
-                summary: `Viewed ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `File contents of ${path} on branch ${context.repo.branch || 'main'} have been retrieved:\n\n${content}`
+                summary: `Viewed ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}`,
+                details: `File contents of ${path} in ${repoOwner}/${repoName} on branch ${repoBranch} have been retrieved:\n\n${content}`
             };
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : String(error);
@@ -51,8 +58,8 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
             return {
                 success: false,
                 error: errorMessage,
-                summary: `Failed to view ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `Failed to retrieve file contents at ${path} on branch ${context.repo.branch || 'main'}. Error: ${errorMessage}`
+                summary: `Failed to view ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}`,
+                details: `Failed to retrieve file contents at ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}. Error: ${errorMessage}`
             };
         }
     },

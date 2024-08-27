@@ -5,6 +5,9 @@ import { ToolContext } from '@/types';
 
 const params = z.object({
     path: z.string().describe("The path to view the hierarchy"),
+    owner: z.string().optional().describe("The owner of the repository"),
+    repo: z.string().optional().describe("The name of the repository"),
+    branch: z.string().optional().describe("The branch to view the hierarchy from"),
 });
 
 type Params = z.infer<typeof params>;
@@ -20,7 +23,7 @@ type Result = {
 export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     description: "View file/folder hierarchy at path (one level deep)",
     parameters: params,
-    execute: async ({ path }: Params): Promise<Result> => {
+    execute: async ({ path, owner, repo, branch }: Params): Promise<Result> => {
         if (!context.repo || !context.user) {
             return {
                 success: false,
@@ -30,13 +33,17 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
             };
         }
 
+        const repoOwner = owner || context.repo.owner;
+        const repoName = repo || context.repo.name;
+        const repoBranch = branch || context.repo.branch || 'main';
+
         try {
             const items = await githubListContents({
                 path,
                 token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '',
-                repoOwner: context.repo.owner,
-                repoName: context.repo.name,
-                branch: context.repo.branch
+                repoOwner,
+                repoName,
+                branch: repoBranch
             });
 
             const result = items.map((item: string) => `- ${item}`).join('\n');
@@ -44,8 +51,8 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
             return {
                 success: true,
                 contents: result,
-                summary: `Viewed hierarchy at ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `Project structure at ${path} on branch ${context.repo.branch || 'main'} (one level deep):\n${result}`
+                summary: `Viewed hierarchy at ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}`,
+                details: `Project structure at ${path} in ${repoOwner}/${repoName} on branch ${repoBranch} (one level deep):\n${result}`
             };
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : String(error);
@@ -53,8 +60,8 @@ export const viewHierarchyTool = (context: ToolContext): CoreTool<typeof params,
             return {
                 success: false,
                 error: errorMessage,
-                summary: `Failed to view hierarchy at ${path} on branch ${context.repo.branch || 'main'}`,
-                details: `Failed to retrieve project structure at ${path} on branch ${context.repo.branch || 'main'}. Error: ${errorMessage}`
+                summary: `Failed to view hierarchy at ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}`,
+                details: `Failed to retrieve project structure at ${path} in ${repoOwner}/${repoName} on branch ${repoBranch}. Error: ${errorMessage}`
             };
         }
     },

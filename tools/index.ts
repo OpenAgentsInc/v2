@@ -11,9 +11,13 @@ import { createPullRequestTool } from "./create-pull-request"
 import { listReposTool } from "./list-repos"
 import { rewriteFileTool } from "./rewrite-file"
 import { scrapeWebpageTool } from "./scrape-webpage"
-import { searchCodebaseTool } from "./search-codebase"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
+import { fetchGitHubIssueTool } from "./fetch-github-issue"
+import { postGitHubCommentTool } from "./post-github-comment"
+import { updatePullRequest } from "./update-pull-request"
+import { closePullRequest } from "./close-pull-request"
+import { listPullRequestsTool } from "./list-pull-requests"
 
 const allTools = {
   create_file: createFileTool,
@@ -24,7 +28,11 @@ const allTools = {
   view_hierarchy: viewHierarchyTool,
   create_pull_request: createPullRequestTool,
   create_branch: createBranchTool,
-  search_codebase: searchCodebaseTool
+  fetch_github_issue: fetchGitHubIssueTool,
+  post_github_comment: postGitHubCommentTool,
+  update_pull_request: updatePullRequest,
+  close_pull_request: closePullRequest,
+  list_pull_requests: listPullRequestsTool
 } as const;
 
 type ToolName = keyof typeof allTools;
@@ -56,7 +64,6 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
   const user = await currentUser();
   const gitHubToken = user ? await getGitHubToken(user) : undefined;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
-  const greptileToken = process.env.GREPTILE_API_KEY;
 
   // Find the full model object based on the provided model ID
   const modelObj = models.find((m: Model) => m.id === modelId);
@@ -84,7 +91,6 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
     user: user as User | null,
     gitHubToken,
     firecrawlToken,
-    greptileToken,
     model
   };
 };
