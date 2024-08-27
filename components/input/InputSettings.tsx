@@ -76,7 +76,6 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     'view_hierarchy',
     'create_pull_request',
     'create_branch',
-    'search_codebase',
     'fetch_github_issue'
   ]
 
