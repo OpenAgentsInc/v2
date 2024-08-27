@@ -15,6 +15,9 @@ import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { fetchGitHubIssueTool } from "./fetch-github-issue"
 import { postGitHubCommentTool } from "./post-github-comment"
+import { updatePullRequest } from "./update-pull-request"
+import { closePullRequest } from "./close-pull-request"
+import { listPullRequestsTool } from "./list-pull-requests"
 
 const allTools = {
   create_file: createFileTool,
@@ -26,7 +29,10 @@ const allTools = {
   create_pull_request: createPullRequestTool,
   create_branch: createBranchTool,
   fetch_github_issue: fetchGitHubIssueTool,
-  post_github_comment: postGitHubCommentTool
+  post_github_comment: postGitHubCommentTool,
+  update_pull_request: updatePullRequest,
+  close_pull_request: closePullRequest,
+  list_pull_requests: listPullRequestsTool
 } as const;
 
 type ToolName = keyof typeof allTools;
