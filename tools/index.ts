@@ -18,7 +18,7 @@ import { scrapeWebpageTool } from "./scrape-webpage"
 import { updatePullRequestTool } from "./update-pull-request"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
-import { viewPullRequest } from "./view-pull-request"
+import { viewPullRequestTool } from "./view-pull-request"
 
 const allTools = {
   create_file: createFileTool,
@@ -34,7 +34,7 @@ const allTools = {
   update_pull_request: updatePullRequestTool,
   close_pull_request: closePullRequestTool,
   list_pull_requests: listPullRequestsTool,
-  view_pull_request: viewPullRequest
+  view_pull_request: viewPullRequestTool
 } as const;
 
 type ToolName = keyof typeof allTools;
