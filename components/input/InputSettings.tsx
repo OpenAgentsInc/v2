@@ -23,6 +23,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
   const setModel = useModelStore((state) => state.setModel)
   const tools = useToolStore((state) => state.tools)
   const setTools = useToolStore((state) => state.setTools)
+  const getSelectedTools = useToolStore((state) => state.getSelectedTools)
   const balance = useBalanceStore((state) => state.balance)
   const { user, isLoaded, isSignedIn } = useUser()
   const [isGitHubConnected, setIsGitHubConnected] = useState(false)
@@ -60,10 +61,11 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
 
   const handleToolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target
+    const selectedTools = getSelectedTools()
     if (checked) {
-      setTools([...tools, name])
+      setTools([...selectedTools, name])
     } else {
-      setTools(tools.filter((tool) => tool !== name))
+      setTools(selectedTools.filter((tool) => tool !== name))
     }
   }
 
@@ -151,7 +153,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
             <Popover.Trigger asChild>
               <button className={buttonClasses}>
                 <Wrench className="mr-1" size={14} />
-                {tools.length}
+                {getSelectedTools().length}
               </button>
             </Popover.Trigger>
             <Popover.Portal>
@@ -167,7 +169,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
                         type="checkbox"
                         id={tool}
                         name={tool}
-                        checked={tools.includes(tool)}
+                        checked={getSelectedTools().includes(tool)}
                         onChange={handleToolChange}
                         className="mr-2"
                       />

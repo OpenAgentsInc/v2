@@ -22,32 +22,32 @@ import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { viewPullRequestTool } from "./view-pull-request"
 
-const allTools = {
-  create_file: createFileTool,
-  list_repos: listReposTool,
-  rewrite_file: rewriteFileTool,
-  scrape_webpage: scrapeWebpageTool,
-  view_file: viewFileTool,
-  view_hierarchy: viewHierarchyTool,
-  create_pull_request: createPullRequestTool,
-  create_branch: createBranchTool,
-  fetch_github_issue: fetchGitHubIssueTool,
-  post_github_comment: postGitHubCommentTool,
-  update_pull_request: updatePullRequestTool,
-  close_pull_request: closePullRequestTool,
-  list_pull_requests: listPullRequestsTool,
-  view_pull_request: viewPullRequestTool,
-  list_open_issues: listOpenIssuesTool,
-  close_issue: closeIssueTool
+export const allTools = {
+  create_file: { tool: createFileTool, description: "Create a new file at path with content" },
+  list_repos: { tool: listReposTool, description: "List all repositories for the authenticated user" },
+  rewrite_file: { tool: rewriteFileTool, description: "Rewrite file at path with new content" },
+  scrape_webpage: { tool: scrapeWebpageTool, description: "Scrape webpage for information" },
+  view_file: { tool: viewFileTool, description: "View file contents at path" },
+  view_hierarchy: { tool: viewHierarchyTool, description: "View file/folder hierarchy at path" },
+  create_pull_request: { tool: createPullRequestTool, description: "Create a new pull request with specified title, description, and branches" },
+  create_branch: { tool: createBranchTool, description: "Creates a new branch in the repository" },
+  fetch_github_issue: { tool: fetchGitHubIssueTool, description: "Fetch details of a GitHub issue" },
+  post_github_comment: { tool: postGitHubCommentTool, description: "Post a comment on a GitHub issue" },
+  update_pull_request: { tool: updatePullRequestTool, description: "Update an existing pull request with new information" },
+  close_pull_request: { tool: closePullRequestTool, description: "Close an existing pull request" },
+  list_pull_requests: { tool: listPullRequestsTool, description: "List all open pull requests in the repository" },
+  view_pull_request: { tool: viewPullRequestTool, description: "View details of a specific pull request" },
+  list_open_issues: { tool: listOpenIssuesTool, description: "List all open issues in the repository" },
+  close_issue: { tool: closeIssueTool, description: "Close an existing GitHub issue" }
 } as const;
 
 type ToolName = keyof typeof allTools;
 
 export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
-  const tools: Partial<Record<ToolName, ReturnType<typeof allTools[ToolName]>>> = {};
+  const tools: Partial<Record<ToolName, ReturnType<typeof allTools[ToolName]["tool"]>>> = {};
   toolNames.forEach(toolName => {
     if (allTools[toolName]) {
-      tools[toolName] = allTools[toolName](context);
+      tools[toolName] = allTools[toolName].tool(context);
     }
   });
   return tools;
