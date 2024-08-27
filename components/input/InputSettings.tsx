@@ -79,7 +79,8 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     'fetch_github_issue',
     'update_pull_request',
     'close_pull_request',
-    'list_pull_requests'
+    'list_pull_requests',
+    'view_pull_request'
   ]
 
   const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
