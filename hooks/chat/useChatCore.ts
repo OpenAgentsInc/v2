@@ -57,6 +57,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             content: message.content,
             role: message.role,
             model_id: currentModelRef.current || model.id,
+            tool_invocations: message.tool_invocations, // Add this line to include tool invocations
           })
 
           if (options && options.usage) {
