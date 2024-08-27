@@ -19,6 +19,7 @@ import { updatePullRequestTool } from "./update-pull-request"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { viewPullRequestTool } from "./view-pull-request"
+import { listOpenIssuesTool } from "./list-open-issues"
 
 const allTools = {
   create_file: createFileTool,
@@ -34,7 +35,8 @@ const allTools = {
   update_pull_request: updatePullRequestTool,
   close_pull_request: closePullRequestTool,
   list_pull_requests: listPullRequestsTool,
-  view_pull_request: viewPullRequestTool
+  view_pull_request: viewPullRequestTool,
+  list_open_issues: listOpenIssuesTool
 } as const;
 
 type ToolName = keyof typeof allTools;
