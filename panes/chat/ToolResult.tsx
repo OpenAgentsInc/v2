@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Loader2, GitCompare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { FileViewer } from './FileViewer';
+import { CheckCircle2, GitCompare, Loader2 } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
+import { FileViewer } from "./FileViewer"
 
 interface ToolResultProps {
   toolName: string;
@@ -17,6 +17,14 @@ const truncateLines = (str: string, maxLines: number) => {
 };
 
 const prettyPrintJson = (obj: any): string => {
+  if (typeof obj === 'string') {
+    try {
+      obj = JSON.parse(obj);
+    } catch (e) {
+      // If it's not valid JSON, just return the string
+      return obj;
+    }
+  }
   const prettyJson = JSON.stringify(obj, (key, value) => {
     if (key === 'token') return '[REDACTED]';
     if (typeof value === 'string' && value.length > 50) {
@@ -28,6 +36,13 @@ const prettyPrintJson = (obj: any): string => {
 };
 
 const getToolParams = (toolName: string, args: any): string => {
+  if (typeof args === 'string') {
+    try {
+      args = JSON.parse(args);
+    } catch (e) {
+      return args;
+    }
+  }
   const filteredArgs = Object.entries(args).filter(([key]) => !['token', 'repoContext', 'content', 'path'].includes(key));
   return filteredArgs.map(([key, value]) => `${key}: ${typeof value === 'string' ? value : '[complex value]'}`).join(', ');
 };
@@ -42,12 +57,6 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     setCurrentResult(result);
   }, [state, result]);
 
-  const filteredArgs = { ...args };
-  delete filteredArgs.token;
-  delete filteredArgs.repoContext;
-  delete filteredArgs.content;
-  delete filteredArgs.path;
-
   const renderResult = () => {
     if (currentState === 'result' && currentResult) {
       if (typeof currentResult === 'object' && currentResult !== null) {
@@ -60,7 +69,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     if (currentState === 'call') {
       return `Calling ${toolName}...`;
     }
-    return prettyPrintJson(filteredArgs);
+    return prettyPrintJson(args);
   };
 
   const renderStateIcon = () => {
@@ -83,7 +92,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
       <div className={cn("bg-background text-foreground rounded border border-border overflow-hidden")}>
         <div className="flex justify-between items-center p-2 bg-secondary border-b border-border">
           <span className="font-bold">{toolName}</span>
-          <span className="text-xs">{args.path}</span>
+          <span className="text-xs">{typeof args === 'object' ? args.path : ''}</span>
         </div>
         <div className="p-2 pt-1 relative">
           <div className="absolute top-2 right-2">
@@ -96,7 +105,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
             <>
               <FileViewer
                 content={showOldContent ? currentResult.oldContent : currentResult.newContent}
-                filename={args.path}
+                filename={typeof args === 'object' ? args.path : ''}
               />
               <div className="mt-2 flex space-x-4">
                 <button onClick={handleViewContents} className="flex items-center text-foreground hover:bg-secondary px-3 py-1 rounded border border-border transition-colors duration-200">

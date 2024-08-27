@@ -78,6 +78,15 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             state={invocation.state}
           />
         ))}
+        {message.tool_invocations && message.tool_invocations.map(invocation => (
+          <ToolResult
+            key={invocation.toolCallId}
+            toolName={invocation.toolName}
+            args={invocation.args}
+            result={invocation.state === 'result' ? invocation.result : undefined}
+            state={invocation.state}
+          />
+        ))}
         <ChatMessageActions message={message} />
       </div>
     </div>

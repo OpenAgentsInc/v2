@@ -13,6 +13,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: Request) {
   const body = await req.json();
+  console.log("request body:", JSON.stringify(body, null, 2));
   const threadId = body.threadId as Id<"threads">;
 
   if (!threadId) {
@@ -42,7 +43,9 @@ export async function POST(req: Request) {
     }
   }
 
+  console.log("BEFORE CONVERSION:", JSON.stringify(body.messages, null, 2));
   const messages = convertToCoreMessages(body.messages);
+  console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
   console.log("Converting messages to core messages");
   const result = await streamText({
     messages,

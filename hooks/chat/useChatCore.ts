@@ -2,7 +2,6 @@ import { Message as VercelMessage, useChat as useVercelChat } from "ai/react"
 import { useAction, useMutation, useQuery } from "convex/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { useDebounce } from "use-debounce"
 import { createNewMessage } from "@/panes/chat/chatUtils"
 import { useBalanceStore } from "@/store/balance"
 import { useModelStore } from "@/store/models"
@@ -59,7 +58,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             role: message.role,
             model_id: currentModelRef.current || model.id,
             tool_invocations: message.toolInvocations as ToolInvocation[],
-            // tool_invocations: message.tool_invocations as ToolInvocation[],
           })
 
           if (options && options.usage) {
@@ -106,7 +104,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     },
   })
 
-  // const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
   const debouncedMessages = vercelChatProps.messages
 
   useEffect(() => {
@@ -116,7 +113,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
         title: 'New Chat',
         messages: fetchMessages.map((message: any) => ({
           ...message,
-          tool_invocations: message.tool_invocations ? message.tool_invocations.map((invocation: ToolInvocation) => ({
+          toolInvocations: message.tool_invocations ? message.tool_invocations.map((invocation: ToolInvocation) => ({
             ...invocation,
             args: typeof invocation.args === 'string' ? JSON.parse(invocation.args) : invocation.args,
             result: invocation.state === 'result' ? (typeof invocation.result === 'string' ? JSON.parse(invocation.result) : invocation.result) : undefined,
@@ -126,6 +123,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
         userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
       }
+      console.log('Rehydrated thread:', thread);
       setThreadData(thread)
       setThread(threadId, thread)
     }
