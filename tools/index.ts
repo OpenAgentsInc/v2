@@ -14,6 +14,7 @@ import { scrapeWebpageTool } from "./scrape-webpage"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { fetchGitHubIssueTool } from "./fetch-github-issue"
+import { postGitHubCommentTool } from "./post-github-comment"
 
 const allTools = {
   create_file: createFileTool,
@@ -24,7 +25,8 @@ const allTools = {
   view_hierarchy: viewHierarchyTool,
   create_pull_request: createPullRequestTool,
   create_branch: createBranchTool,
-  fetch_github_issue: fetchGitHubIssueTool
+  fetch_github_issue: fetchGitHubIssueTool,
+  post_github_comment: postGitHubCommentTool
 } as const;
 
 type ToolName = keyof typeof allTools;
