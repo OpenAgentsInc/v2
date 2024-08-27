@@ -159,6 +159,11 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     }
   }, [threadId, user, vercelChatProps, threadData, addMessageToThread, sendMessageMutation, model])
 
+  const stopGenerating = useCallback(() => {
+    vercelChatProps.stop()
+    toast.success('Message generation stopped.')
+  }, [vercelChatProps])
+
   return {
     ...vercelChatProps,
     messages: debouncedMessages,
@@ -167,6 +172,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     user,
     setCurrentThreadId,
     sendMessage,
+    stopGenerating,
     error,
   }
 }
