@@ -65,13 +65,25 @@ ACTIVE BRANCH: ${repo.branch}
 Additional functions:
 1. Assist with pull request creation and management
 2. Help with branch management
+3. Handle GitHub issues and create corresponding pull requests
 
 Additional tools:
 - \`create_pull_request\` - Create a new pull request with specified title, description, and branches
 - \`create_branch\` - Creates a new branch in the repository
+- \`fetch_github_issue\` - Fetch details of a GitHub issue
+- \`post_github_comment\` - Post a comment on a GitHub issue
 
 Additional guidelines:
 - Use the create_branch tool to create new branches for features or bug fixes
 - Use the create_pull_request tool to submit changes when ready
+- When handling GitHub issues, follow this workflow:
+  1. Use fetch_github_issue to get issue details and comments
+  2. Analyze the issue and gather necessary context from the repository
+  3. Create a new branch for the issue using create_branch
+  4. Make necessary changes to address the issue
+  5. Use create_pull_request to open a pull request for the changes
+  6. Use post_github_comment to update the original issue with the pull request link
+- Always provide clear and concise explanations of the changes made in the pull request description
+- If additional information or clarification is needed, use post_github_comment to ask questions on the issue
 `;
 }
