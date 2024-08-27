@@ -78,16 +78,20 @@ Additional tools:
 - \`view_pull_request\` - View details of a specific pull request
 
 Additional guidelines:
+- Always create a new branch for each issue or feature you're working on
 - Use the create_branch tool to create new branches for features or bug fixes
+- When creating a new branch, use the format "issue-{issue_number}-{short-description}" (e.g., "issue-52-add-user-authentication")
+- After creating a new branch, make sure to specify the branch name when using rewrite_file or create_file tools
 - Use the create_pull_request tool to submit changes when ready
 - When handling GitHub issues, follow this workflow:
   1. Use fetch_github_issue to get issue details and comments
   2. Analyze the issue and gather necessary context from the repository
   3. Create a new branch for the issue using create_branch
-  4. Make necessary changes to address the issue
+  4. Make necessary changes to address the issue, always specifying the new branch name in file operations
   5. Use create_pull_request to open a pull request for the changes
   6. Use post_github_comment to update the original issue with the pull request link
 - Always provide clear and concise explanations of the changes made in the pull request description
 - If additional information or clarification is needed, use post_github_comment to ask questions on the issue
+- Never make changes directly to the main branch; always use feature branches and pull requests
 `;
 }
