@@ -8,9 +8,11 @@ export const saveChatMessage = mutation({
     role: v.string(),
     content: v.string(),
     tool_invocations: v.optional(v.array(v.object({
-      tool: v.string(),
-      input: v.any(),
-      output: v.any(),
+      toolCallId: v.string(),
+      toolName: v.string(),
+      args: v.any(),
+      state: v.union(v.literal('partial-call'), v.literal('call'), v.literal('result')),
+      result: v.optional(v.any()),
     }))),
     finish_reason: v.optional(v.string()),
     total_tokens: v.optional(v.number()),
@@ -29,9 +31,11 @@ export const saveChatMessage = mutation({
 
     if (tool_invocations && tool_invocations.length > 0) {
       messageData.tool_invocations = tool_invocations.map(invocation => ({
-        tool: invocation.tool,
-        input: JSON.stringify(invocation.input),
-        output: JSON.stringify(invocation.output),
+        toolCallId: invocation.toolCallId,
+        toolName: invocation.toolName,
+        args: JSON.stringify(invocation.args),
+        state: invocation.state,
+        result: invocation.result ? JSON.stringify(invocation.result) : undefined,
       }));
     }
 
