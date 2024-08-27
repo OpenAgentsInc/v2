@@ -109,7 +109,7 @@ export const Pane: React.FC<PaneProps> = ({
   titleBarButtons,
   dismissable = true
 }) => {
-  const [bounds, setBounds] = useState({ right: 0, bottom: 0 })
+  const [bounds, setBounds] = useState({ left: 0, top: 0, right: 0, bottom: 0 })
   const updatePanePosition = usePaneStore(state => state.updatePanePosition)
   const updatePaneSize = usePaneStore(state => state.updatePaneSize)
   const removePane = usePaneStore(state => state.removePane)
@@ -125,9 +125,12 @@ export const Pane: React.FC<PaneProps> = ({
 
   useEffect(() => {
     const updateBounds = () => {
+      const handleSize = 50 // Size of the handle that remains on screen
       setBounds({
-        right: window.innerWidth - size.width,
-        bottom: window.innerHeight - size.height,
+        left: -size.width + handleSize,
+        top: -size.height + handleSize,
+        right: window.innerWidth - handleSize,
+        bottom: window.innerHeight - handleSize,
       })
     }
 
@@ -141,12 +144,7 @@ export const Pane: React.FC<PaneProps> = ({
     updatePanePosition(id, ox, oy)
   }, {
     from: () => [position.x, position.y],
-    bounds: {
-      left: 0,
-      top: 0,
-      right: bounds.right,
-      bottom: bounds.bottom,
-    },
+    bounds: bounds,
   })
 
   const handleClose = (e: React.MouseEvent) => {
