@@ -9,6 +9,7 @@ import { useModelStore } from "@/store/models"
 import { useRepoStore } from "@/store/repo"
 import { useToolStore } from "@/store/tools"
 import { Chat as Thread, Message } from "@/types"
+import { ToolInvocation } from "@/types/tool-invocation"
 import { useUser } from "@clerk/nextjs"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
@@ -57,7 +58,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             content: message.content,
             role: message.role,
             model_id: currentModelRef.current || model.id,
-            tool_invocations: message.tool_invocations,
+            tool_invocations: message.tool_invocations as ToolInvocation[],
           })
 
           if (options && options.usage) {
@@ -114,10 +115,10 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
         title: 'New Chat',
         messages: fetchMessages.map((message: any) => ({
           ...message,
-          tool_invocations: message.tool_invocations ? message.tool_invocations.map((invocation: any) => ({
+          tool_invocations: message.tool_invocations ? message.tool_invocations.map((invocation: ToolInvocation) => ({
             ...invocation,
-            input: JSON.parse(invocation.input),
-            output: JSON.parse(invocation.output),
+            args: typeof invocation.args === 'string' ? JSON.parse(invocation.args) : invocation.args,
+            result: invocation.state === 'result' ? (typeof invocation.result === 'string' ? JSON.parse(invocation.result) : invocation.result) : undefined,
           })) : undefined,
         })) as Message[],
         createdAt: threadData.createdAt || new Date(),
