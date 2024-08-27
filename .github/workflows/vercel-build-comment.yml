@@ -18,6 +18,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 300
           check_interval: 10
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Comment PR on failure
         if: failure()
@@ -25,9 +27,17 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: 'The Vercel build for this PR has failed. Please check the Vercel deployment logs for more information.'
-            })
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            try {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: 'The Vercel build for this PR has failed. Please check the Vercel deployment logs for more information.'
+              });
+            } catch (error) {
+              console.error('Error posting comment:', error);
+              core.setFailed(`Failed to post comment: ${error.message}`);
+            }
