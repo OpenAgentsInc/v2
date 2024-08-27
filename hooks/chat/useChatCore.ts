@@ -168,5 +168,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     setCurrentThreadId,
     sendMessage,
     error,
+    stop: vercelChatProps.stop,
   }
 }
