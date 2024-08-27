@@ -5,19 +5,19 @@ import { bedrock } from "@ai-sdk/amazon-bedrock"
 import { anthropic } from "@ai-sdk/anthropic"
 import { openai } from "@ai-sdk/openai"
 import { currentUser, User } from "@clerk/nextjs/server"
+import { closePullRequestTool } from "./close-pull-request"
 import { createBranchTool } from "./create-branch"
 import { createFileTool } from "./create-file"
 import { createPullRequestTool } from "./create-pull-request"
+import { fetchGitHubIssueTool } from "./fetch-github-issue"
+import { listPullRequestsTool } from "./list-pull-requests"
 import { listReposTool } from "./list-repos"
+import { postGitHubCommentTool } from "./post-github-comment"
 import { rewriteFileTool } from "./rewrite-file"
 import { scrapeWebpageTool } from "./scrape-webpage"
+import { updatePullRequestTool } from "./update-pull-request"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
-import { fetchGitHubIssueTool } from "./fetch-github-issue"
-import { postGitHubCommentTool } from "./post-github-comment"
-import { updatePullRequest } from "./update-pull-request"
-import { closePullRequest } from "./close-pull-request"
-import { listPullRequestsTool } from "./list-pull-requests"
 
 const allTools = {
   create_file: createFileTool,
@@ -30,8 +30,8 @@ const allTools = {
   create_branch: createBranchTool,
   fetch_github_issue: fetchGitHubIssueTool,
   post_github_comment: postGitHubCommentTool,
-  update_pull_request: updatePullRequest,
-  close_pull_request: closePullRequest,
+  update_pull_request: updatePullRequestTool,
+  close_pull_request: closePullRequestTool,
   list_pull_requests: listPullRequestsTool
 } as const;
 

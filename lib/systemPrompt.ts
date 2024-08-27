@@ -72,6 +72,9 @@ Additional tools:
 - \`create_branch\` - Creates a new branch in the repository
 - \`fetch_github_issue\` - Fetch details of a GitHub issue
 - \`post_github_comment\` - Post a comment on a GitHub issue
+- \`update_pull_request\` - Update an existing pull request with new information
+- \`close_pull_request\` - Close an existing pull request
+- \`list_pull_requests\` - List all open pull requests in the repository
 
 Additional guidelines:
 - Use the create_branch tool to create new branches for features or bug fixes
