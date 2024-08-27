@@ -75,6 +75,7 @@ Additional tools:
 - \`update_pull_request\` - Update an existing pull request with new information
 - \`close_pull_request\` - Close an existing pull request
 - \`list_pull_requests\` - List all open pull requests in the repository
+- \`view_pull_request\` - View details of a specific pull request
 
 Additional guidelines:
 - Use the create_branch tool to create new branches for features or bug fixes
