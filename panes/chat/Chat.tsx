@@ -15,6 +15,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
     messages,
     sendMessage,
     isLoading,
+    stopGenerating
   } = useChat({ propsId: threadId })
   const chatContainerRef = useChatScroll(messages);
 
@@ -25,7 +26,7 @@ export const Chat = ({ threadId, className }: ChatProps) => {
       </div>
       <div className="flex-shrink-0 w-full">
         <div className="sticky bottom-0 w-full">
-          <InputBar onSubmit={sendMessage} isLoading={isLoading} />
+          <InputBar onSubmit={sendMessage} isLoading={isLoading} onStop={stopGenerating} />
         </div>
       </div>
     </div>
