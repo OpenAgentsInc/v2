@@ -6,6 +6,7 @@ import { ToolContext } from '@/types';
 const params = z.object({
     path: z.string().describe('The path where the new file should be created'),
     content: z.string().describe('The content of the new file'),
+    branch: z.string().optional().describe('The branch to create the file on. If not provided, the default branch from the context will be used.'),
 });
 
 type Params = z.infer<typeof params>;
@@ -20,7 +21,7 @@ type Result = {
 export const createFileTool = (context: ToolContext): CoreTool<typeof params, Result> => tool({
     description: 'Creates a new file at the given path with the provided content',
     parameters: params,
-    execute: async ({ path, content }: Params): Promise<Result> => {
+    execute: async ({ path, content, branch: paramBranch }: Params): Promise<Result> => {
         if (!context.repo || !context.gitHubToken) {
             return {
                 success: false,
@@ -31,7 +32,7 @@ export const createFileTool = (context: ToolContext): CoreTool<typeof params, Re
         }
 
         const octokit = new Octokit({ auth: context.gitHubToken });
-        const branch = context.repo.branch || 'main';
+        const branch = paramBranch || context.repo.branch || 'main';
         console.log(`Creating file on branch: ${branch}`);
 
         try {
