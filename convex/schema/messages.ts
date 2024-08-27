@@ -1,8 +1,8 @@
-import { defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export const messages = defineTable({
-  thread_id: v.id("threads"),
+  thread_id: v.optional(v.id("threads")),
   clerk_user_id: v.string(),
   role: v.string(),
   content: v.string(),
