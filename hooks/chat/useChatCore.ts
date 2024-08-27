@@ -57,7 +57,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             content: message.content,
             role: message.role,
             model_id: currentModelRef.current || model.id,
-            tool_invocations: message.tool_invocations, // Add this line to include tool invocations
+            tool_invocations: message.tool_invocations,
           })
 
           if (options && options.usage) {
@@ -112,7 +112,14 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       const thread: Thread = {
         id: threadId,
         title: 'New Chat',
-        messages: fetchMessages as Message[],
+        messages: fetchMessages.map((message: any) => ({
+          ...message,
+          tool_invocations: message.tool_invocations ? message.tool_invocations.map((invocation: any) => ({
+            ...invocation,
+            input: JSON.parse(invocation.input),
+            output: JSON.parse(invocation.output),
+          })) : undefined,
+        })) as Message[],
         createdAt: threadData.createdAt || new Date(),
         userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
