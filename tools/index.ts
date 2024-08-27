@@ -17,7 +17,7 @@ import { fetchGitHubIssueTool } from "./fetch-github-issue"
 import { postGitHubCommentTool } from "./post-github-comment"
 import { updatePullRequest } from "./update-pull-request"
 import { closePullRequest } from "./close-pull-request"
-import { listPullRequests } from "./list-pull-requests"
+import { listPullRequestsTool } from "./list-pull-requests"
 
 const allTools = {
   create_file: createFileTool,
@@ -32,7 +32,7 @@ const allTools = {
   post_github_comment: postGitHubCommentTool,
   update_pull_request: updatePullRequest,
   close_pull_request: closePullRequest,
-  list_pull_requests: listPullRequests
+  list_pull_requests: listPullRequestsTool
 } as const;
 
 type ToolName = keyof typeof allTools;
