@@ -2,13 +2,13 @@ import { Message as VercelMessage, useChat as useVercelChat } from "ai/react"
 import { useAction, useMutation, useQuery } from "convex/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { useDebounce } from "use-debounce"
 import { createNewMessage } from "@/panes/chat/chatUtils"
 import { useBalanceStore } from "@/store/balance"
 import { useModelStore } from "@/store/models"
 import { useRepoStore } from "@/store/repo"
 import { useToolStore } from "@/store/tools"
 import { Chat as Thread, Message } from "@/types"
+import { ToolInvocation } from "@/types/tool-invocation"
 import { useUser } from "@clerk/nextjs"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
@@ -57,6 +57,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
             content: message.content,
             role: message.role,
             model_id: currentModelRef.current || model.id,
+            tool_invocations: message.toolInvocations as ToolInvocation[],
           })
 
           if (options && options.usage) {
@@ -103,7 +104,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
     },
   })
 
-  // const [debouncedMessages] = useDebounce(vercelChatProps.messages, 25, { maxWait: 25 })
   const debouncedMessages = vercelChatProps.messages
 
   useEffect(() => {
@@ -111,11 +111,19 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       const thread: Thread = {
         id: threadId,
         title: 'New Chat',
-        messages: fetchMessages as Message[],
+        messages: fetchMessages.map((message: any) => ({
+          ...message,
+          toolInvocations: message.tool_invocations ? message.tool_invocations.map((invocation: ToolInvocation) => ({
+            ...invocation,
+            args: typeof invocation.args === 'string' ? JSON.parse(invocation.args) : invocation.args,
+            result: invocation.state === 'result' ? (typeof invocation.result === 'string' ? JSON.parse(invocation.result) : invocation.result) : undefined,
+          })) : undefined,
+        })) as Message[],
         createdAt: threadData.createdAt || new Date(),
         userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
       }
+      console.log('Rehydrated thread:', thread);
       setThreadData(thread)
       setThread(threadId, thread)
     }

@@ -11,6 +11,7 @@ const ChangelogPane: React.FC = () => {
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added new GitHub tools for issues & pull requests</li>
             <li className="text-sm text-foreground/80">Added stop button during chat stream (hover over loadspinner)</li>
+            <li className="text-sm text-foreground/80">Fixed issue of tool calls not showing on refresh, breaking chats (new chats only)</li>
           </ul>
         </ScrollArea>
       </CardContent>
