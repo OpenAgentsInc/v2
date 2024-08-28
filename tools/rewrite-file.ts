@@ -108,18 +108,54 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
 });
 
 function generateCommitMessage(path: string, oldContent: string, newContent: string): string {
-  const fileExtension = path.split('.').pop()?.toLowerCase();
+  const fileName = path.split('/').pop() || path;
+  const fileExtension = fileName.split('.').pop()?.toLowerCase();
   const isCode = ['js', 'ts', 'jsx', 'tsx', 'py', 'rb', 'java', 'c', 'cpp', 'go', 'rs'].includes(fileExtension || '');
 
+  const oldLines = oldContent.split('\n');
+  const newLines = newContent.split('\n');
+  const addedLines = newLines.length - oldLines.length;
+
+  let description = '';
+
   if (isCode) {
-    const addedLines = newContent.split('\n').length - oldContent.split('\n').length;
-    const action = addedLines > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(addedLines)} lines in ${path.split('/').pop()}`;
+    const functionsAdded = (newContent.match(/function\s+\w+/g) || []).length - (oldContent.match(/function\s+\w+/g) || []).length;
+    const classesAdded = (newContent.match(/class\s+\w+/g) || []).length - (oldContent.match(/class\s+\w+/g) || []).length;
+
+    if (functionsAdded > 0) {
+      description += `Add ${functionsAdded} function${functionsAdded > 1 ? 's' : ''}. `;
+    } else if (functionsAdded < 0) {
+      description += `Remove ${Math.abs(functionsAdded)} function${Math.abs(functionsAdded) > 1 ? 's' : ''}. `;
+    }
+
+    if (classesAdded > 0) {
+      description += `Add ${classesAdded} class${classesAdded > 1 ? 'es' : ''}. `;
+    } else if (classesAdded < 0) {
+      description += `Remove ${Math.abs(classesAdded)} class${Math.abs(classesAdded) > 1 ? 'es' : ''}. `;
+    }
+
+    if (addedLines > 0) {
+      description += `Add ${addedLines} line${addedLines > 1 ? 's' : ''} of code. `;
+    } else if (addedLines < 0) {
+      description += `Remove ${Math.abs(addedLines)} line${Math.abs(addedLines) > 1 ? 's' : ''} of code. `;
+    }
   } else {
     const oldWords = oldContent.split(/\s+/).length;
     const newWords = newContent.split(/\s+/).length;
     const diffWords = newWords - oldWords;
-    const action = diffWords > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(diffWords)} words in ${path.split('/').pop()}`;
+
+    if (diffWords > 0) {
+      description += `Add ${diffWords} word${diffWords > 1 ? 's' : ''}. `;
+    } else if (diffWords < 0) {
+      description += `Remove ${Math.abs(diffWords)} word${Math.abs(diffWords) > 1 ? 's' : ''}. `;
+    }
+  }
+
+  description = description.trim();
+
+  if (description) {
+    return `Update ${fileName}: ${description}`;
+  } else {
+    return `Update ${fileName} with minor changes`;
   }
 }
