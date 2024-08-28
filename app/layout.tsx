@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
+import { HUDControls } from "@/components/ui/HUDControls"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://openagents.com"),
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body
         className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
       >
+        <HUDControls />
         {children}
       </body>
     </html>
