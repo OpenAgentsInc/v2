@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { usePaneStore } from '@/store/pane';
+import { Button } from '@/components/ui/button';
+import { IconRefresh } from '@/components/ui/icons';
 
 const ResetHUDButton: React.FC = () => {
   const resetHUDState = usePaneStore((state) => state.resetHUDState);
@@ -11,12 +13,15 @@ const ResetHUDButton: React.FC = () => {
   };
 
   return (
-    <button
+    <Button
       onClick={handleReset}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      variant="outline"
+      size="icon"
+      className="fixed bottom-4 left-4 z-50"
     >
-      Reset HUD
-    </button>
+      <IconRefresh className="h-4 w-4" />
+      <span className="sr-only">Reset HUD</span>
+    </Button>
   );
 };
 
