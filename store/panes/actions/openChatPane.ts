@@ -7,11 +7,11 @@ import { handleChatPanePosition } from "../utils/handleChatPanePosition"
 
 const PANE_OFFSET = 45 // Offset for new panes when tiling, matching the value in hud.ts
 
-// Define default chat pane dimensions
-const DEFAULT_CHAT_PANE_WIDTH = 800;
-const DEFAULT_CHAT_PANE_HEIGHT = window.innerHeight * 0.9;
-
 export function openChatPane(set: SetFunction, newPane: PaneInput, isCommandKeyHeld: boolean = false) {
+  // Define default chat pane dimensions
+  const DEFAULT_CHAT_PANE_WIDTH = 800;
+  const DEFAULT_CHAT_PANE_HEIGHT = window.innerHeight * 0.9;
+
   return set((state: PaneStore) => {
     if (!newPane.id) {
       console.error('Invalid thread ID provided for chat pane');
