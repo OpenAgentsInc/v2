@@ -16,6 +16,11 @@ function ensureValidMessageOrder(messages: any[]) {
   let lastRole = null;
 
   for (const message of messages) {
+    if (!message || typeof message !== 'object') {
+      console.error('Invalid message:', message);
+      continue;
+    }
+
     if (message.role === 'tool') {
       // Always include tool messages
       validatedMessages.push(message);
@@ -26,9 +31,9 @@ function ensureValidMessageOrder(messages: any[]) {
     } else if (message.role === lastRole) {
       // Combine consecutive messages with the same role
       const lastMessage = validatedMessages[validatedMessages.length - 1];
-      if (typeof lastMessage.content === 'string' && typeof message.content === 'string') {
+      if (lastMessage && typeof lastMessage.content === 'string' && typeof message.content === 'string') {
         lastMessage.content += '\n' + message.content;
-      } else if (Array.isArray(lastMessage.content) && Array.isArray(message.content)) {
+      } else if (lastMessage && Array.isArray(lastMessage.content) && Array.isArray(message.content)) {
         lastMessage.content = lastMessage.content.concat(message.content);
       } else {
         validatedMessages.push(message);
@@ -44,12 +49,12 @@ function ensureValidMessageOrder(messages: any[]) {
   }
 
   // Ensure the conversation ends with a user message
-  if (validatedMessages[validatedMessages.length - 1].role !== 'user') {
+  if (validatedMessages.length === 0 || validatedMessages[validatedMessages.length - 1].role !== 'user') {
     validatedMessages.push({ role: 'user', content: 'Continue' });
   }
 
   // Ensure the conversation starts with a user message
-  if (validatedMessages[0].role !== 'user') {
+  if (validatedMessages.length === 0 || validatedMessages[0].role !== 'user') {
     validatedMessages.unshift({ role: 'user', content: 'Start the conversation' });
   }
 
@@ -57,48 +62,53 @@ function ensureValidMessageOrder(messages: any[]) {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  console.log("request body:", JSON.stringify(body, null, 2));
-  const threadId = body.threadId as Id<"threads">;
+  try {
+    const body = await req.json();
+    console.log("request body:", JSON.stringify(body, null, 2));
+    const threadId = body.threadId as Id<"threads">;
 
-  if (!threadId) {
-    console.error("Invalid threadId");
-    return new Response('Invalid threadId', { status: 400 });
-  }
-
-  const toolContext = await getToolContext(body);
-  const tools = getTools(toolContext, body.tools);
-  const { userId } = auth();
-  if (!userId) {
-    console.error("Unauthorized: No userId found");
-    return new Response('Unauthorized', { status: 401 });
-  }
-
-  // Check user balance is > 0, but skip for GPT-4o Mini
-  if (toolContext.model.modelId !== 'gpt-4o-mini') {
-    try {
-      const userBalance = await convex.query(api.users.getUserBalance.getUserBalance, { clerk_user_id: userId });
-      if (userBalance <= 0) {
-        console.error("Insufficient credits for user:", userId);
-        return new Response('Insufficient credits', { status: 403 });
-      }
-    } catch (error) {
-      console.error('Error checking user balance:', error);
-      return new Response('Error checking user balance', { status: 500 });
+    if (!threadId) {
+      console.error("Invalid threadId");
+      return new Response('Invalid threadId', { status: 400 });
     }
+
+    const toolContext = await getToolContext(body);
+    const tools = getTools(toolContext, body.tools);
+    const { userId } = auth();
+    if (!userId) {
+      console.error("Unauthorized: No userId found");
+      return new Response('Unauthorized', { status: 401 });
+    }
+
+    // Check user balance is > 0, but skip for GPT-4o Mini
+    if (toolContext.model.modelId !== 'gpt-4o-mini') {
+      try {
+        const userBalance = await convex.query(api.users.getUserBalance.getUserBalance, { clerk_user_id: userId });
+        if (userBalance <= 0) {
+          console.error("Insufficient credits for user:", userId);
+          return new Response('Insufficient credits', { status: 403 });
+        }
+      } catch (error) {
+        console.error('Error checking user balance:', error);
+        return new Response('Error checking user balance', { status: 500 });
+      }
+    }
+
+    console.log("BEFORE CONVERSION:", JSON.stringify(body.messages, null, 2));
+    const validatedMessages = ensureValidMessageOrder(body.messages);
+    const messages = convertToCoreMessages(validatedMessages);
+    console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
+    console.log("Converting messages to core messages");
+    const result = await streamText({
+      messages,
+      model: toolContext.model,
+      system: getSystemPrompt(toolContext),
+      tools,
+    });
+
+    return result.toAIStreamResponse();
+  } catch (error) {
+    console.error('Error in POST function:', error);
+    return new Response('Internal Server Error', { status: 500 });
   }
-
-  console.log("BEFORE CONVERSION:", JSON.stringify(body.messages, null, 2));
-  const validatedMessages = ensureValidMessageOrder(body.messages);
-  const messages = convertToCoreMessages(validatedMessages);
-  console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
-  console.log("Converting messages to core messages");
-  const result = await streamText({
-    messages,
-    model: toolContext.model,
-    system: getSystemPrompt(toolContext),
-    tools,
-  });
-
-  return result.toAIStreamResponse();
 }
