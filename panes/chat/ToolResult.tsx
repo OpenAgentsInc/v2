@@ -59,25 +59,24 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
 
   const renderResult = () => {
     if (currentState === 'result' && currentResult) {
-      if (typeof currentResult === 'object' && currentResult !== null) {
-        if ('summary' in currentResult) {
-          return currentResult.summary;
+      let resultToRender = currentResult;
+
+      // Handle rehydrated data structure
+      if (typeof currentResult === 'object' && 'result' in currentResult) {
+        resultToRender = currentResult.result;
+      }
+
+      if (typeof resultToRender === 'object' && resultToRender !== null) {
+        if ('summary' in resultToRender) {
+          return resultToRender.summary;
         }
-        if ('content' in currentResult) {
-          return currentResult.content;
-        }
-        // Handle rehydrated data structure
-        if ('result' in currentResult) {
-          const resultObj = typeof currentResult.result === 'string' ? JSON.parse(currentResult.result) : currentResult.result;
-          if ('summary' in resultObj) {
-            return resultObj.summary;
-          }
-          if ('content' in resultObj) {
-            return resultObj.content;
-          }
+        if ('content' in resultToRender) {
+          return resultToRender.content;
         }
       }
-      return prettyPrintJson(currentResult);
+
+      // If no summary or content, return the stringified result
+      return typeof resultToRender === 'string' ? resultToRender : JSON.stringify(resultToRender);
     }
     if (currentState === 'call') {
       return `Calling ${toolName}...`;
