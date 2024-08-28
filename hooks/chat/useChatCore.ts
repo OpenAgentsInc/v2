@@ -135,6 +135,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       return
     }
 
+    // Remove the message combination logic
     const newMessage = createNewMessage(threadId, user.id, content)
     addMessageToThread(threadId, newMessage)
 
