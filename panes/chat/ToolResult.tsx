@@ -16,25 +16,6 @@ const truncateLines = (str: string, maxLines: number) => {
   return lines.slice(0, maxLines).join('\n') + '\n...';
 };
 
-const prettyPrintJson = (obj: any): string => {
-  if (typeof obj === 'string') {
-    try {
-      obj = JSON.parse(obj);
-    } catch (e) {
-      // If it's not valid JSON, just return the string
-      return obj;
-    }
-  }
-  const prettyJson = JSON.stringify(obj, (key, value) => {
-    if (key === 'token') return '[REDACTED]';
-    if (typeof value === 'string' && value.length > 50) {
-      return value.substring(0, 47) + '...';
-    }
-    return value;
-  }, 2);
-  return truncateLines(prettyJson, 5);
-};
-
 const getToolParams = (toolName: string, args: any): string => {
   if (typeof args === 'string') {
     try {
@@ -75,8 +56,18 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         }
       }
 
-      // If no summary or content, return the stringified result
-      return typeof resultToRender === 'string' ? resultToRender : JSON.stringify(resultToRender);
+      // If it's a string, return it directly
+      if (typeof resultToRender === 'string') {
+        return resultToRender;
+      }
+
+      // If it's an object, only return the 'summary' field if it exists
+      if (typeof resultToRender === 'object' && resultToRender !== null && 'summary' in resultToRender) {
+        return resultToRender.summary;
+      }
+
+      // Otherwise, return an empty string to prevent displaying unnecessary information
+      return '';
     }
     if (currentState === 'call') {
       return `Calling ${toolName}...`;
