@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"
 import { CodeBlock } from "@/components/ui/codeblock"
@@ -14,6 +14,20 @@ export interface ChatMessageProps {
 }
 
 export function ChatMessage({ message, ...props }: ChatMessageProps) {
+  const renderedToolInvocations = useMemo(() => {
+    const renderedSet = new Set<string>();
+    const toolInvocations = [...(message.toolInvocations || []), ...(message.tool_invocations || [])];
+    
+    return toolInvocations.filter(invocation => {
+      const key = `${invocation.toolName}-${JSON.stringify(invocation.args)}`;
+      if (!renderedSet.has(key)) {
+        renderedSet.add(key);
+        return true;
+      }
+      return false;
+    });
+  }, [message.toolInvocations, message.tool_invocations]);
+
   return (
     <div
       className={cn('group relative mb-4 flex items-start')}
@@ -69,16 +83,7 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
             {message.content}
           </MemoizedReactMarkdown>
         )}
-        {message.toolInvocations && message.toolInvocations.map(invocation => (
-          <ToolResult
-            key={invocation.toolCallId}
-            toolName={invocation.toolName}
-            args={invocation.args}
-            result={invocation.state === 'result' ? invocation.result : undefined}
-            state={invocation.state}
-          />
-        ))}
-        {message.tool_invocations && message.tool_invocations.map(invocation => (
+        {renderedToolInvocations.map(invocation => (
           <ToolResult
             key={invocation.toolCallId}
             toolName={invocation.toolName}
