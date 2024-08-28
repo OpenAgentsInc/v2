@@ -58,12 +58,15 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         if ('content' in resultToRender) {
           return resultToRender.content;
         }
-        // If it's an object without summary or content, return an empty string
-        return '';
+        if ('details' in resultToRender) {
+          return resultToRender.details;
+        }
+        // If it's an object without summary, content, or details, stringify it
+        return JSON.stringify(resultToRender, null, 2);
       }
 
-      // If it's neither a string nor an object, return an empty string
-      return '';
+      // If it's neither a string nor an object, stringify it
+      return JSON.stringify(resultToRender, null, 2);
     }
     if (currentState === 'call') {
       return `Calling ${toolName}...`;
