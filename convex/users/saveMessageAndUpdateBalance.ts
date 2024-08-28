@@ -24,6 +24,11 @@ export const saveMessageAndUpdateBalance = mutation({
 
     const cost_in_cents = calculateMessageCost(model, usage);
 
+    if (typeof cost_in_cents !== 'number' || isNaN(cost_in_cents)) {
+      console.error(`Invalid cost calculated: ${cost_in_cents}`);
+      throw new Error('Invalid cost calculated');
+    }
+
     // Save the message to the database
     // This is a placeholder - you need to implement the actual message saving logic
     // const messageId = await ctx.db.insert('messages', { /* message data */ });
@@ -39,7 +44,14 @@ export const saveMessageAndUpdateBalance = mutation({
       throw new Error('User not found');
     }
 
-    const newBalance = user.credits - cost_in_cents;
+    const currentCredits = typeof user.credits === 'number' ? user.credits : 0;
+    const newBalance = Math.max(0, currentCredits - cost_in_cents);
+
+    if (isNaN(newBalance)) {
+      console.error(`Invalid new balance calculated: ${newBalance}`);
+      throw new Error('Invalid new balance calculated');
+    }
+
     await ctx.db.patch(user._id, { credits: newBalance });
 
     return { cost_in_cents, newBalance };

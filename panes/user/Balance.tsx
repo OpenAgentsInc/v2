@@ -20,13 +20,19 @@ export const Balance = () => {
 
   useEffect(() => {
     if (balance !== undefined) {
-      setBalance(balance);
-      setLoading(false);
+      if (typeof balance === 'number' && !isNaN(balance)) {
+        setBalance(balance);
+        setLoading(false);
+        setError(null);
+      } else {
+        setError("Invalid balance received");
+        setLoading(false);
+      }
     }
   }, [balance, setBalance]);
 
   const balanceInCents = useBalanceStore(state => state.balance);
-  const balanceInDollars = Math.floor(balanceInCents) / 100;
+  const balanceInDollars = typeof balanceInCents === 'number' && !isNaN(balanceInCents) ? Math.floor(balanceInCents) / 100 : 0;
   const formattedBalance = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -43,7 +49,9 @@ export const Balance = () => {
       <DialogTrigger asChild>
         <div className="opacity-75 mt-1 mb-2 px-3 py-1 bg-black border border-white rounded-full flex items-center space-x-2 cursor-pointer hover:opacity-100 transition-opacity">
           <span className="text-xs font-semibold text-gray-300">Credits</span>
-          <span className="text-sm font-bold text-white">{loading ? 'Loading...' : formattedBalance}</span>
+          <span className="text-sm font-bold text-white">
+            {loading ? 'Loading...' : error ? 'Error' : formattedBalance}
+          </span>
         </div>
       </DialogTrigger>
       <DialogContent className="z-[10000]">
