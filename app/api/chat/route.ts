@@ -102,12 +102,27 @@ export async function POST(req: Request) {
   const messages = convertToCoreMessages(validMessages);
   console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
   console.log("Converting messages to core messages");
-  const result = await streamText({
-    messages,
-    model: toolContext.model,
-    system: getSystemPrompt(toolContext),
-    tools,
-  });
 
-  return result.toAIStreamResponse();
+  try {
+    const result = await streamText({
+      messages,
+      model: toolContext.model,
+      system: getSystemPrompt(toolContext),
+      tools,
+      keepLastMessageOnError: true,
+      sendExtraMessageFields: true,
+      experimental_prepareRequestBody: (options) => {
+        // Ensure the last message is from the user
+        if (options.messages.length > 0 && options.messages[options.messages.length - 1].role !== 'user') {
+          options.messages.push({ role: 'user', content: 'Continue' });
+        }
+        return options;
+      },
+    });
+
+    return result.toAIStreamResponse();
+  } catch (error) {
+    console.error("Error in chat stream:", error);
+    return new Response('Error in chat stream', { status: 500 });
+  }
 }
