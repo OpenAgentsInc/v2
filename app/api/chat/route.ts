@@ -19,6 +19,10 @@ function ensureValidMessageOrder(messages: any[]) {
     if (message.role === 'tool') {
       // Always include tool messages
       validatedMessages.push(message);
+      // After a tool message, we need an assistant message
+      if (lastRole !== 'assistant') {
+        validatedMessages.push({ role: 'assistant', content: 'Continuing the conversation based on the tool result.' });
+      }
     } else if (message.role === lastRole) {
       // Combine consecutive messages with the same role
       const lastMessage = validatedMessages[validatedMessages.length - 1];
@@ -30,14 +34,23 @@ function ensureValidMessageOrder(messages: any[]) {
         validatedMessages.push(message);
       }
     } else {
+      if (message.role === 'user' && lastRole === 'user') {
+        // If we have consecutive user messages, add an assistant message in between
+        validatedMessages.push({ role: 'assistant', content: 'I understand. Please continue.' });
+      }
       validatedMessages.push(message);
-      lastRole = message.role;
     }
+    lastRole = message.role;
   }
 
   // Ensure the conversation ends with a user message
   if (validatedMessages[validatedMessages.length - 1].role !== 'user') {
     validatedMessages.push({ role: 'user', content: 'Continue' });
+  }
+
+  // Ensure the conversation starts with a user message
+  if (validatedMessages[0].role !== 'user') {
+    validatedMessages.unshift({ role: 'user', content: 'Start the conversation' });
   }
 
   return validatedMessages;
