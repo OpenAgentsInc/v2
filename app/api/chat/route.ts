@@ -11,6 +11,35 @@ export const maxDuration = 60;
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+// New function to ensure messages are in the correct order
+function ensureValidMessageOrder(messages: any[]) {
+  const validMessages = [];
+  let lastRole = null;
+
+  for (const message of messages) {
+    if (message.role === 'user' || message.role === 'assistant') {
+      if (message.role !== lastRole) {
+        validMessages.push(message);
+        lastRole = message.role;
+      } else if (message.role === 'user') {
+        // If we have consecutive user messages, combine them
+        const lastMessage = validMessages[validMessages.length - 1];
+        lastMessage.content += "\n\n" + message.content;
+      }
+    } else if (message.role === 'tool') {
+      // Always include tool messages
+      validMessages.push(message);
+    }
+  }
+
+  // Ensure the conversation ends with a user message
+  if (lastRole === 'assistant') {
+    validMessages.pop();
+  }
+
+  return validMessages;
+}
+
 export async function POST(req: Request) {
   const body = await req.json();
   console.log("request body:", JSON.stringify(body, null, 2));
@@ -44,7 +73,8 @@ export async function POST(req: Request) {
   }
 
   console.log("BEFORE CONVERSION:", JSON.stringify(body.messages, null, 2));
-  const messages = convertToCoreMessages(body.messages);
+  const validMessages = ensureValidMessageOrder(body.messages);
+  const messages = convertToCoreMessages(validMessages);
   console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
   console.log("Converting messages to core messages");
   const result = await streamText({
@@ -53,35 +83,6 @@ export async function POST(req: Request) {
     system: getSystemPrompt(toolContext),
     tools,
   });
-
-  // console.log("Stream text result:", JSON.stringify(result, null, 2));
-
-  // // Save message and update user balance
-  // try {
-  //   const usage = {
-  //     promptTokens: result.usage?.promptTokens || 0,
-  //     completionTokens: result.usage?.completionTokens || 0,
-  //     totalTokens: result.usage?.totalTokens || 0,
-  //   };
-  //   console.log("Usage:", JSON.stringify(usage));
-
-  //   console.log("Calling saveMessageAndUpdateBalance with:", JSON.stringify({
-  //     clerk_user_id: userId,
-  //     model_id: toolContext.model,
-  //     usage,
-  //   }));
-
-  //   const { cost_in_cents, newBalance } = await convex.mutation(api.users.saveMessageAndUpdateBalance, {
-  //     clerk_user_id: userId,
-  //     model_id: toolContext.model,
-  //     usage,
-  //   });
-
-  //   console.log(`Message cost: ${cost_in_cents} cents. New balance: ${newBalance}`);
-  // } catch (error) {
-  //   console.error('Error saving message and updating user balance:', error);
-  //   // console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-  // }
 
   return result.toAIStreamResponse();
 }
