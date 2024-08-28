@@ -47,10 +47,20 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
 
       console.log('Initial resultToRender:', resultToRender);
 
-      // Handle rehydrated data structure
+      // Handle rehydrated data structure (stringified JSON)
+      if (typeof resultToRender === 'string') {
+        try {
+          resultToRender = JSON.parse(resultToRender);
+          console.log('Parsed stringified result:', resultToRender);
+        } catch (e) {
+          console.log('Failed to parse stringified result, using as-is');
+        }
+      }
+
+      // Handle nested result structure
       if (typeof resultToRender === 'object' && 'result' in resultToRender) {
         resultToRender = resultToRender.result;
-        console.log('After handling rehydrated data:', resultToRender);
+        console.log('After handling nested result:', resultToRender);
       }
 
       if (typeof resultToRender === 'string') {
