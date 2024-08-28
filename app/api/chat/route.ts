@@ -28,6 +28,16 @@ function ensureValidMessageOrder(messages: any[]) {
       if (lastRole !== 'assistant') {
         validatedMessages.push({ role: 'assistant', content: 'Continuing the conversation based on the tool result.' });
       }
+    } else if (message.role === 'assistant' && message.toolInvocations) {
+      // Handle assistant messages with tool invocations
+      validatedMessages.push(message);
+      // Add a tool message for each tool invocation
+      message.toolInvocations.forEach((invocation: any) => {
+        validatedMessages.push({
+          role: 'tool',
+          content: [{ type: 'tool-result', ...invocation }]
+        });
+      });
     } else if (message.role === lastRole) {
       // Combine consecutive messages with the same role
       const lastMessage = validatedMessages[validatedMessages.length - 1];
@@ -64,7 +74,7 @@ function ensureValidMessageOrder(messages: any[]) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("request body:", JSON.stringify(body, null, 2));
+    console.log("Request body:", JSON.stringify(body, null, 2));
     const threadId = body.threadId as Id<"threads">;
 
     if (!threadId) {
@@ -96,9 +106,10 @@ export async function POST(req: Request) {
 
     console.log("BEFORE CONVERSION:", JSON.stringify(body.messages, null, 2));
     const validatedMessages = ensureValidMessageOrder(body.messages);
+    console.log("AFTER VALIDATION:", JSON.stringify(validatedMessages, null, 2));
     const messages = convertToCoreMessages(validatedMessages);
     console.log("AFTER CONVERSION:", JSON.stringify(messages, null, 2));
-    console.log("Converting messages to core messages");
+    
     const result = await streamText({
       messages,
       model: toolContext.model,
