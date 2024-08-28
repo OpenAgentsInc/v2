@@ -11,13 +11,23 @@ export const maxDuration = 60;
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-// New function to ensure messages are in the correct order
+// Updated function to ensure messages are in the correct order
 function ensureValidMessageOrder(messages: any[]) {
   const validMessages = [];
   let lastRole = null;
+  let pendingToolCall = null;
 
   for (const message of messages) {
     if (message.role === 'user' || message.role === 'assistant') {
+      if (pendingToolCall) {
+        // If there's a pending tool call, add a dummy result
+        validMessages.push({
+          role: 'tool',
+          content: [{ type: 'tool-result', result: { success: false, content: 'Tool call interrupted' } }]
+        });
+        pendingToolCall = null;
+      }
+
       if (message.role !== lastRole) {
         validMessages.push(message);
         lastRole = message.role;
@@ -26,15 +36,30 @@ function ensureValidMessageOrder(messages: any[]) {
         const lastMessage = validMessages[validMessages.length - 1];
         lastMessage.content += "\n\n" + message.content;
       }
-    } else if (message.role === 'tool') {
-      // Always include tool messages
+    } else if (message.role === 'assistant' && message.toolInvocations) {
+      // Handle tool calls
       validMessages.push(message);
+      pendingToolCall = message;
+      lastRole = 'assistant';
+    } else if (message.role === 'tool') {
+      // Add tool result and clear pending tool call
+      validMessages.push(message);
+      pendingToolCall = null;
+      lastRole = 'tool';
     }
   }
 
+  // If there's still a pending tool call at the end, add a dummy result
+  if (pendingToolCall) {
+    validMessages.push({
+      role: 'tool',
+      content: [{ type: 'tool-result', result: { success: false, content: 'Tool call interrupted' } }]
+    });
+  }
+
   // Ensure the conversation ends with a user message
-  if (lastRole === 'assistant') {
-    validMessages.pop();
+  if (lastRole !== 'user') {
+    validMessages.push({ role: 'user', content: 'Continue' });
   }
 
   return validMessages;
