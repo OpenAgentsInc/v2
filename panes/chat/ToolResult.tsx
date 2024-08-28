@@ -32,10 +32,12 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
   const [currentState, setCurrentState] = useState(state);
   const [currentResult, setCurrentResult] = useState(result);
   const [showOldContent, setShowOldContent] = useState(false);
+  const [processedResult, setProcessedResult] = useState<string | null>(null);
 
   useEffect(() => {
     setCurrentState(state);
     setCurrentResult(result);
+    setProcessedResult(null); // Reset processed result when result changes
     console.log('ToolResult useEffect - state:', state, 'result:', result);
   }, [state, result]);
 
@@ -43,6 +45,11 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     console.log('renderResult - currentState:', currentState, 'currentResult:', currentResult);
     
     if (currentState === 'result' && currentResult) {
+      if (processedResult !== null) {
+        console.log('Returning cached processed result');
+        return processedResult;
+      }
+
       let resultToRender = currentResult;
 
       console.log('Initial resultToRender:', resultToRender);
@@ -63,31 +70,33 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         console.log('After handling nested result:', resultToRender);
       }
 
-      if (typeof resultToRender === 'string') {
-        console.log('Returning string result:', resultToRender);
-        return resultToRender;
-      }
+      let finalResult: string;
 
-      if (typeof resultToRender === 'object' && resultToRender !== null) {
+      if (typeof resultToRender === 'string') {
+        console.log('Using string result:', resultToRender);
+        finalResult = resultToRender;
+      } else if (typeof resultToRender === 'object' && resultToRender !== null) {
         console.log('Handling object result');
         if ('summary' in resultToRender) {
-          console.log('Returning summary:', resultToRender.summary);
-          return resultToRender.summary;
+          console.log('Using summary:', resultToRender.summary);
+          finalResult = resultToRender.summary;
+        } else if ('content' in resultToRender) {
+          console.log('Using content:', resultToRender.content);
+          finalResult = resultToRender.content;
+        } else if ('details' in resultToRender) {
+          console.log('Using details:', resultToRender.details);
+          finalResult = resultToRender.details;
+        } else {
+          console.log('Stringifying object:', resultToRender);
+          finalResult = JSON.stringify(resultToRender, null, 2);
         }
-        if ('content' in resultToRender) {
-          console.log('Returning content:', resultToRender.content);
-          return resultToRender.content;
-        }
-        if ('details' in resultToRender) {
-          console.log('Returning details:', resultToRender.details);
-          return resultToRender.details;
-        }
-        console.log('Stringifying object:', resultToRender);
-        return JSON.stringify(resultToRender, null, 2);
+      } else {
+        console.log('Fallback: stringifying result:', resultToRender);
+        finalResult = JSON.stringify(resultToRender, null, 2);
       }
 
-      console.log('Fallback: stringifying result:', resultToRender);
-      return JSON.stringify(resultToRender, null, 2);
+      setProcessedResult(finalResult);
+      return finalResult;
     }
     if (currentState === 'call') {
       console.log('Returning call state message');
