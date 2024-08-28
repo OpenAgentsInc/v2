@@ -5,33 +5,35 @@ import { calculatePanePosition } from "./panes"
 import * as actions from "./panes/actions"
 import { PaneStore } from "./types"
 
+const initialPanes = [
+  {
+    id: '0',
+    type: 'chats',
+    title: 'Chats',
+    x: 90,
+    y: 170,
+    width: 260,
+    height: 450,
+    isOpen: true,
+    dismissable: false,
+  },
+  {
+    id: '1',
+    type: 'changelog',
+    title: 'Changelog',
+    x: 390,
+    y: 170,
+    width: 360,
+    height: 350,
+    isOpen: true,
+    dismissable: true,
+  },
+]
+
 export const usePaneStore = create<PaneStore>()(
   persist(
     (set) => ({
-      panes: [
-        {
-          id: '0',
-          type: 'chats',
-          title: 'Chats',
-          x: 90,
-          y: 170,
-          width: 260,
-          height: 450,
-          isOpen: true,
-          dismissable: false,
-        },
-        {
-          id: '1',
-          type: 'changelog',
-          title: 'Changelog',
-          x: 390,
-          y: 170,  // Positioned below the Chats pane
-          width: 360,
-          height: 350,  // Smaller height
-          isOpen: true,
-          dismissable: true,
-        },
-      ],
+      panes: initialPanes,
       isChatOpen: true,
       lastPanePosition: null,
       addPane: (newPane: PaneInput, shouldTile = false) => actions.addPane(set, newPane, shouldTile),
@@ -46,6 +48,7 @@ export const usePaneStore = create<PaneStore>()(
       openChatPane: (newPane: PaneInput, isCommandKeyHeld: boolean = false) => actions.openChatPane(set, newPane, isCommandKeyHeld),
       bringPaneToFront: (id: string) => actions.bringPaneToFront(set, id),
       setActivePane: (id: string) => actions.setActivePane(set, id),
+      resetHUDState: () => set({ panes: initialPanes, lastPanePosition: null }),
     }),
     {
       name: 'openagents-hud-storage-1293761231233x344a',
