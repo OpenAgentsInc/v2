@@ -123,7 +123,6 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
         userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
       }
-      console.log('Rehydrated thread:', thread);
       setThreadData(thread)
       setThread(threadId, thread)
     }
