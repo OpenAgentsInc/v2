@@ -1,5 +1,5 @@
 import { CheckCircle2, GitCompare, Loader2 } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { FileViewer } from "./FileViewer"
 
@@ -33,11 +33,13 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
   const [currentResult, setCurrentResult] = useState(result);
   const [showOldContent, setShowOldContent] = useState(false);
   const [processedResult, setProcessedResult] = useState<string | null>(null);
+  const resultRef = useRef<string | null>(null);
 
   useEffect(() => {
     setCurrentState(state);
     setCurrentResult(result);
-    setProcessedResult(null); // Reset processed result when result changes
+    setProcessedResult(null);
+    resultRef.current = null;
     console.log('ToolResult useEffect - state:', state, 'result:', result);
   }, [state, result]);
 
@@ -45,9 +47,9 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
     console.log('renderResult - currentState:', currentState, 'currentResult:', currentResult);
     
     if (currentState === 'result' && currentResult) {
-      if (processedResult !== null) {
-        console.log('Returning cached processed result');
-        return processedResult;
+      if (resultRef.current !== null) {
+        console.log('Returning cached result');
+        return resultRef.current;
       }
 
       let resultToRender = currentResult;
@@ -95,7 +97,7 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         finalResult = JSON.stringify(resultToRender, null, 2);
       }
 
-      setProcessedResult(finalResult);
+      resultRef.current = finalResult;
       return finalResult;
     }
     if (currentState === 'call') {
