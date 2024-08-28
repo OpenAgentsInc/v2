@@ -12,6 +12,8 @@ const ChangelogPane: React.FC = () => {
             <li className="text-sm text-foreground/80">Added new GitHub tools for issues & pull requests</li>
             <li className="text-sm text-foreground/80">Added stop button during chat stream (hover over loadspinner)</li>
             <li className="text-sm text-foreground/80">Fixed issue of tool calls not showing on refresh, breaking chats (new chats only)</li>
+            <li className="text-sm text-foreground/80">Added button to reset HUD panes to default</li>
+            <li className="text-sm text-foreground/80">Nicer commit messages when editing files</li>
           </ul>
         </ScrollArea>
       </CardContent>
