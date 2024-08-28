@@ -108,18 +108,50 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
 });
 
 function generateCommitMessage(path: string, oldContent: string, newContent: string): string {
-  const fileExtension = path.split('.').pop()?.toLowerCase();
-  const isCode = ['js', 'ts', 'jsx', 'tsx', 'py', 'rb', 'java', 'c', 'cpp', 'go', 'rs'].includes(fileExtension || '');
-
-  if (isCode) {
-    const addedLines = newContent.split('\n').length - oldContent.split('\n').length;
-    const action = addedLines > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(addedLines)} lines in ${path.split('/').pop()}`;
-  } else {
-    const oldWords = oldContent.split(/\s+/).length;
-    const newWords = newContent.split(/\s+/).length;
-    const diffWords = newWords - oldWords;
-    const action = diffWords > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(diffWords)} words in ${path.split('/').pop()}`;
+  const fileName = path.split('/').pop() || path;
+  const oldLines = oldContent.split('\n');
+  const newLines = newContent.split('\n');
+  
+  const addedLines = newLines.filter(line => !oldLines.includes(line)).length;
+  const removedLines = oldLines.filter(line => !newLines.includes(line)).length;
+  
+  let changes = [];
+  if (addedLines > 0) changes.push(`added ${addedLines} line${addedLines > 1 ? 's' : ''}`);
+  if (removedLines > 0) changes.push(`removed ${removedLines} line${removedLines > 1 ? 's' : ''}`);
+  
+  const changesDescription = changes.join(' and ');
+  
+  let commitMessage = `Update ${fileName}: ${changesDescription}`;
+  
+  // Analyze the changes to provide more context
+  if (oldContent !== newContent) {
+    if (oldContent.length === 0 && newContent.length > 0) {
+      commitMessage += ". Created new file with initial content";
+    } else if (oldContent.length > 0 && newContent.length === 0) {
+      commitMessage += ". Removed all content from file";
+    } else {
+      const oldWords = oldContent.split(/\s+/);
+      const newWords = newContent.split(/\s+/);
+      const addedWords = newWords.filter(word => !oldWords.includes(word));
+      const removedWords = oldWords.filter(word => !newWords.includes(word));
+      
+      if (addedWords.length > 0 || removedWords.length > 0) {
+        commitMessage += ". Modified content";
+        if (addedWords.length > 0) {
+          commitMessage += `, added key terms: ${addedWords.slice(0, 3).join(', ')}`;
+        }
+        if (removedWords.length > 0) {
+          commitMessage += `, removed key terms: ${removedWords.slice(0, 3).join(', ')}`;
+        }
+      }
+    }
   }
+  
+  // Ensure the commit message is not longer than 50 words
+  const words = commitMessage.split(' ');
+  if (words.length > 50) {
+    commitMessage = words.slice(0, 47).join(' ') + '...';
+  }
+  
+  return commitMessage;
 }
