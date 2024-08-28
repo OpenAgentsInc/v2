@@ -39,6 +39,13 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit, onStop 
     }
   }, [input, onSubmit, isLoading]);
 
+  const handleStop = useCallback(() => {
+    onStop();
+    // Reset the input state
+    setInput("");
+    setErrorMessage(null);
+  }, [onStop]);
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -78,7 +85,7 @@ export const InputBar: React.FC<InputBarProps> = ({ isLoading, onSubmit, onStop 
                     type="button"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
-                    onClick={onStop}
+                    onClick={handleStop}
                     className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-black text-white cursor-pointer"
                     aria-label={isHovered ? "Stop" : "Loading"}
                   >
