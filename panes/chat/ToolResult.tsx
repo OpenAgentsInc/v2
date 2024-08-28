@@ -36,41 +36,54 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
   useEffect(() => {
     setCurrentState(state);
     setCurrentResult(result);
+    console.log('ToolResult useEffect - state:', state, 'result:', result);
   }, [state, result]);
 
   const renderResult = () => {
+    console.log('renderResult - currentState:', currentState, 'currentResult:', currentResult);
+    
     if (currentState === 'result' && currentResult) {
       let resultToRender = currentResult;
+
+      console.log('Initial resultToRender:', resultToRender);
 
       // Handle rehydrated data structure
       if (typeof resultToRender === 'object' && 'result' in resultToRender) {
         resultToRender = resultToRender.result;
+        console.log('After handling rehydrated data:', resultToRender);
       }
 
       if (typeof resultToRender === 'string') {
+        console.log('Returning string result:', resultToRender);
         return resultToRender;
       }
 
       if (typeof resultToRender === 'object' && resultToRender !== null) {
+        console.log('Handling object result');
         if ('summary' in resultToRender) {
+          console.log('Returning summary:', resultToRender.summary);
           return resultToRender.summary;
         }
         if ('content' in resultToRender) {
+          console.log('Returning content:', resultToRender.content);
           return resultToRender.content;
         }
         if ('details' in resultToRender) {
+          console.log('Returning details:', resultToRender.details);
           return resultToRender.details;
         }
-        // If it's an object without summary, content, or details, stringify it
+        console.log('Stringifying object:', resultToRender);
         return JSON.stringify(resultToRender, null, 2);
       }
 
-      // If it's neither a string nor an object, stringify it
+      console.log('Fallback: stringifying result:', resultToRender);
       return JSON.stringify(resultToRender, null, 2);
     }
     if (currentState === 'call') {
+      console.log('Returning call state message');
       return `Calling ${toolName}...`;
     }
+    console.log('Returning empty string');
     return '';
   };
 
@@ -88,6 +101,8 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
   const handleViewContents = () => {
     setShowOldContent(!showOldContent);
   };
+
+  console.log('ToolResult render - toolName:', toolName, 'args:', args, 'state:', currentState);
 
   return (
     <div className="my-2 px-4 text-sm text-foreground">
