@@ -27,7 +27,7 @@ export const usePaneStore = create<PaneStore>()(
           x: 390,
           y: 170,  // Positioned below the Chats pane
           width: 360,
-          height: 450,  // Smaller height
+          height: 350,  // Smaller height
           isOpen: true,
           dismissable: true,
         },
@@ -48,7 +48,7 @@ export const usePaneStore = create<PaneStore>()(
       setActivePane: (id: string) => actions.setActivePane(set, id),
     }),
     {
-      name: 'openagents-hud-storage-1293761231233x344',
+      name: 'openagents-hud-storage-1293761231233x344a',
       partialize: (state) => ({ panes: state.panes, lastPanePosition: state.lastPanePosition }),
     }
   )
