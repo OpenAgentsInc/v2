@@ -37,10 +37,19 @@ export const viewFileTool = (context: ToolContext): CoreTool<typeof params, Resu
             };
         }
 
+        if (!context.gitHubToken) {
+            return {
+                success: false,
+                error: "Missing GitHub token",
+                summary: "Failed to view file due to missing GitHub token",
+                details: "The GitHub token is missing. Please ensure it is provided in the context."
+            };
+        }
+
         try {
             const content = await githubReadFile({
                 path,
-                token: context.gitHubToken ?? process.env.GITHUB_TOKEN ?? '',
+                token: context.gitHubToken,
                 repoOwner,
                 repoName,
                 branch: repoBranch
