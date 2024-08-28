@@ -43,11 +43,11 @@ export async function POST(req: Request) {
   }
 
   const messages = convertToCoreMessages(body.messages);
-  console.log("Converting messages to core messages");
+  console.log('tools:', tools)
   const result = await streamText({
     messages,
     model: toolContext.model,
-    system: getSystemPrompt(toolContext),
+    system: getSystemPrompt(toolContext, Object.keys(tools)),
     tools,
   });
 
