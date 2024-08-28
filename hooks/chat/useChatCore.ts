@@ -111,14 +111,43 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       const thread: Thread = {
         id: threadId,
         title: 'New Chat',
-        messages: fetchMessages.map((message: any) => ({
-          ...message,
-          toolInvocations: message.tool_invocations ? message.tool_invocations.map((invocation: ToolInvocation) => ({
-            ...invocation,
-            args: typeof invocation.args === 'string' ? JSON.parse(invocation.args) : invocation.args,
-            result: invocation.state === 'result' ? (typeof invocation.result === 'string' ? JSON.parse(invocation.result) : invocation.result) : undefined,
-          })) : undefined,
-        })) as Message[],
+        messages: fetchMessages.map((message: any) => {
+          const toolInvocations = message.tool_invocations
+            ? message.tool_invocations.map((invocation: ToolInvocation) => {
+                let args = invocation.args;
+                let result = invocation.result;
+
+                // Parse args if it's a string
+                if (typeof args === 'string') {
+                  try {
+                    args = JSON.parse(args);
+                  } catch (e) {
+                    console.error('Error parsing args:', e);
+                  }
+                }
+
+                // Parse result if it's a string and state is 'result'
+                if (invocation.state === 'result' && typeof result === 'string') {
+                  try {
+                    result = JSON.parse(result);
+                  } catch (e) {
+                    console.error('Error parsing result:', e);
+                  }
+                }
+
+                return {
+                  ...invocation,
+                  args,
+                  result: invocation.state === 'result' ? result : undefined,
+                };
+              })
+            : undefined;
+
+          return {
+            ...message,
+            toolInvocations,
+          };
+        }) as Message[],
         createdAt: threadData.createdAt || new Date(),
         userId: user?.id as Id<"users"> || '' as Id<"users">,
         path: ''
