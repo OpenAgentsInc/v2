@@ -2,6 +2,8 @@ import { CoreTool, tool } from "ai"
 import { z } from "zod"
 import { ToolContext } from "@/types"
 import { Octokit } from "@octokit/rest"
+import { openai } from '@ai-sdk/openai'
+import { generateText } from 'ai'
 
 const params = z.object({
   path: z.string().describe('The path of the file to rewrite'),
@@ -66,7 +68,7 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
 
       if ('sha' in currentFile && 'content' in currentFile) {
         const currentContent = Buffer.from(currentFile.content, 'base64').toString('utf-8');
-        const commitMessage = generateCommitMessage(path, currentContent, content);
+        const commitMessage = await generateCommitMessage(path, currentContent, content);
 
         // Update the file
         const { data } = await octokit.repos.createOrUpdateFileContents({
@@ -107,51 +109,39 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
   },
 });
 
-function generateCommitMessage(path: string, oldContent: string, newContent: string): string {
+async function generateCommitMessage(path: string, oldContent: string, newContent: string): Promise<string> {
   const fileName = path.split('/').pop() || path;
-  const oldLines = oldContent.split('\n');
-  const newLines = newContent.split('\n');
-  
-  const addedLines = newLines.filter(line => !oldLines.includes(line)).length;
-  const removedLines = oldLines.filter(line => !newLines.includes(line)).length;
-  
-  let changes = [];
-  if (addedLines > 0) changes.push(`added ${addedLines} line${addedLines > 1 ? 's' : ''}`);
-  if (removedLines > 0) changes.push(`removed ${removedLines} line${removedLines > 1 ? 's' : ''}`);
-  
-  const changesDescription = changes.join(' and ');
-  
-  let commitMessage = `Update ${fileName}: ${changesDescription}`;
-  
-  // Analyze the changes to provide more context
-  if (oldContent !== newContent) {
-    if (oldContent.length === 0 && newContent.length > 0) {
-      commitMessage += ". Created new file with initial content";
-    } else if (oldContent.length > 0 && newContent.length === 0) {
-      commitMessage += ". Removed all content from file";
-    } else {
-      const oldWords = oldContent.split(/\s+/);
-      const newWords = newContent.split(/\s+/);
-      const addedWords = newWords.filter(word => !oldWords.includes(word));
-      const removedWords = oldWords.filter(word => !newWords.includes(word));
-      
-      if (addedWords.length > 0 || removedWords.length > 0) {
-        commitMessage += ". Modified content";
-        if (addedWords.length > 0) {
-          commitMessage += `, added key terms: ${addedWords.slice(0, 3).join(', ')}`;
-        }
-        if (removedWords.length > 0) {
-          commitMessage += `, removed key terms: ${removedWords.slice(0, 3).join(', ')}`;
-        }
-      }
+  const prompt = `
+    Generate a concise commit message (max 50 words) for the following file change:
+    
+    File: ${fileName}
+    
+    Old content:
+    ${oldContent.slice(0, 500)}...
+    
+    New content:
+    ${newContent.slice(0, 500)}...
+    
+    Focus on describing the main changes and their purpose. Start with an action verb.
+  `;
+
+  try {
+    const { text } = await generateText({
+      model: openai('gpt-4-turbo'),
+      prompt,
+      maxTokens: 100,
+      temperature: 0.7,
+    });
+
+    // Ensure the commit message is not longer than 50 words
+    const words = text.split(' ');
+    if (words.length > 50) {
+      return words.slice(0, 47).join(' ') + '...';
     }
+
+    return text.trim();
+  } catch (error) {
+    console.error('Error generating commit message:', error);
+    return `Update ${fileName}`;
   }
-  
-  // Ensure the commit message is not longer than 50 words
-  const words = commitMessage.split(' ');
-  if (words.length > 50) {
-    commitMessage = words.slice(0, 47).join(' ') + '...';
-  }
-  
-  return commitMessage;
 }
