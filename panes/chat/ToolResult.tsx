@@ -43,8 +43,12 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
       let resultToRender = currentResult;
 
       // Handle rehydrated data structure
-      if (typeof currentResult === 'object' && 'result' in currentResult) {
-        resultToRender = currentResult.result;
+      if (typeof resultToRender === 'object' && 'result' in resultToRender) {
+        resultToRender = resultToRender.result;
+      }
+
+      if (typeof resultToRender === 'string') {
+        return resultToRender;
       }
 
       if (typeof resultToRender === 'object' && resultToRender !== null) {
@@ -54,19 +58,11 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         if ('content' in resultToRender) {
           return resultToRender.content;
         }
+        // If it's an object without summary or content, return an empty string
+        return '';
       }
 
-      // If it's a string, return it directly
-      if (typeof resultToRender === 'string') {
-        return resultToRender;
-      }
-
-      // If it's an object, only return the 'summary' field if it exists
-      if (typeof resultToRender === 'object' && resultToRender !== null && 'summary' in resultToRender) {
-        return resultToRender.summary;
-      }
-
-      // Otherwise, return an empty string to prevent displaying unnecessary information
+      // If it's neither a string nor an object, return an empty string
       return '';
     }
     if (currentState === 'call') {
