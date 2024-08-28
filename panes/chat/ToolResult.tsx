@@ -68,7 +68,13 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         }
         // Handle rehydrated data structure
         if ('result' in currentResult) {
-          return prettyPrintJson(currentResult.result);
+          const resultObj = typeof currentResult.result === 'string' ? JSON.parse(currentResult.result) : currentResult.result;
+          if ('summary' in resultObj) {
+            return resultObj.summary;
+          }
+          if ('content' in resultObj) {
+            return resultObj.content;
+          }
         }
       }
       return prettyPrintJson(currentResult);
