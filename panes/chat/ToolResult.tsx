@@ -63,13 +63,16 @@ export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, 
         if ('summary' in currentResult) {
           return currentResult.summary;
         }
+        if ('content' in currentResult) {
+          return currentResult.content;
+        }
       }
       return prettyPrintJson(currentResult);
     }
     if (currentState === 'call') {
       return `Calling ${toolName}...`;
     }
-    return prettyPrintJson(args);
+    return '';
   };
 
   const renderStateIcon = () => {
