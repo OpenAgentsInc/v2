@@ -135,20 +135,8 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       return
     }
 
-    let combinedContent = content
-    let lastMessage = threadData.messages[threadData.messages.length - 1]
-
-    // If the last message is from the user, combine it with the new message
-    if (lastMessage && lastMessage.role === 'user') {
-      combinedContent = `${lastMessage.content}\n\n${content}`
-      // Remove the last message from the thread
-      setThreadData(prevData => ({
-        ...prevData,
-        messages: prevData.messages.slice(0, -1)
-      }))
-    }
-
-    const newMessage = createNewMessage(threadId, user.id, combinedContent)
+    // Remove the message combination logic
+    const newMessage = createNewMessage(threadId, user.id, content)
     addMessageToThread(threadId, newMessage)
 
     try {
@@ -156,7 +144,7 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
       await sendMessageMutation({
         thread_id: threadId,
         clerk_user_id: user.id,
-        content: combinedContent,
+        content: content,
         role: 'user',
         model_id: model.id,
       })
