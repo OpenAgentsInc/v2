@@ -2,6 +2,8 @@ import { CoreTool, tool } from "ai"
 import { z } from "zod"
 import { ToolContext } from "@/types"
 import { Octokit } from "@octokit/rest"
+import { openai } from '@ai-sdk/openai'
+import { generateText } from 'ai'
 
 const params = z.object({
   path: z.string().describe('The path of the file to rewrite'),
@@ -66,7 +68,7 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
 
       if ('sha' in currentFile && 'content' in currentFile) {
         const currentContent = Buffer.from(currentFile.content, 'base64').toString('utf-8');
-        const commitMessage = generateCommitMessage(path, currentContent, content);
+        const commitMessage = await generateCommitMessage(path, currentContent, content);
 
         // Update the file
         const { data } = await octokit.repos.createOrUpdateFileContents({
@@ -107,19 +109,39 @@ export const rewriteFileTool = (context: ToolContext): CoreTool<typeof params, R
   },
 });
 
-function generateCommitMessage(path: string, oldContent: string, newContent: string): string {
-  const fileExtension = path.split('.').pop()?.toLowerCase();
-  const isCode = ['js', 'ts', 'jsx', 'tsx', 'py', 'rb', 'java', 'c', 'cpp', 'go', 'rs'].includes(fileExtension || '');
+async function generateCommitMessage(path: string, oldContent: string, newContent: string): Promise<string> {
+  const fileName = path.split('/').pop() || path;
+  const prompt = `
+    Generate a concise commit message (max 50 words) for the following file change:
+    
+    File: ${fileName}
+    
+    Old content:
+    ${oldContent.slice(0, 500)}...
+    
+    New content:
+    ${newContent.slice(0, 500)}...
+    
+    Focus on describing the main changes and their purpose. Start with an action verb.
+  `;
 
-  if (isCode) {
-    const addedLines = newContent.split('\n').length - oldContent.split('\n').length;
-    const action = addedLines > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(addedLines)} lines in ${path.split('/').pop()}`;
-  } else {
-    const oldWords = oldContent.split(/\s+/).length;
-    const newWords = newContent.split(/\s+/).length;
-    const diffWords = newWords - oldWords;
-    const action = diffWords > 0 ? 'Add' : 'Remove';
-    return `${action} ${Math.abs(diffWords)} words in ${path.split('/').pop()}`;
+  try {
+    const { text } = await generateText({
+      model: openai('gpt-4-turbo'),
+      prompt,
+      maxTokens: 100,
+      temperature: 0.7,
+    });
+
+    // Ensure the commit message is not longer than 50 words
+    const words = text.split(' ');
+    if (words.length > 50) {
+      return words.slice(0, 47).join(' ') + '...';
+    }
+
+    return text.trim();
+  } catch (error) {
+    console.error('Error generating commit message:', error);
+    return `Update ${fileName}`;
   }
 }
