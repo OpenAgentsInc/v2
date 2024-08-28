@@ -44,7 +44,21 @@ const getToolParams = (toolName: string, args: any): string => {
     }
   }
   const filteredArgs = Object.entries(args).filter(([key]) => !['token', 'repoContext', 'content', 'path'].includes(key));
-  return filteredArgs.map(([key, value]) => `${key}: ${typeof value === 'string' ? value : '[complex value]'}`).join(', ');
+  return filteredArgs.map(([key, value]) => {
+    if (typeof value === 'string') {
+      return `${key}: ${value}`;
+    } else if (typeof value === 'number' || typeof value === 'boolean') {
+      return `${key}: ${value}`;
+    } else if (value === null) {
+      return `${key}: null`;
+    } else if (Array.isArray(value)) {
+      return `${key}: [Array]`;
+    } else if (typeof value === 'object') {
+      return `${key}: {Object}`;
+    } else {
+      return `${key}: ${typeof value}`;
+    }
+  }).join(', ');
 };
 
 export const ToolResult: React.FC<ToolResultProps> = ({ toolName, args, result, state }) => {
