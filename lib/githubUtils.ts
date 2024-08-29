@@ -102,17 +102,15 @@ export async function githubDeleteFile(args: {
     committerEmail = "noreply@github.com"
   } = args;
 
-  // Include the branch in the URL when fetching the file data
-  const getFileUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}?ref=${branch}`;
+  // Include the branch in the URL for both GET and DELETE requests
+  const fileUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
   // First, get the current file to retrieve its SHA
-  const fileData = await githubApiRequest(getFileUrl, token);
+  const fileData = await githubApiRequest(`${fileUrl}?ref=${branch}`, token);
 
   if (!fileData.sha) {
     throw new Error(`File not found: ${path} in branch ${branch}`);
   }
-
-  const deleteUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
   // Prepare the request body
   const body = {
@@ -126,5 +124,5 @@ export async function githubDeleteFile(args: {
   };
 
   // Send DELETE request
-  await githubApiRequest(deleteUrl, token, 'DELETE', body);
+  await githubApiRequest(fileUrl, token, 'DELETE', body);
 }
