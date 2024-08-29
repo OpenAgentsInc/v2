@@ -7,6 +7,10 @@ const ChangelogPane: React.FC = () => {
     <Card className="w-full h-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <CardContent>
         <ScrollArea className="py-4 h-[calc(100%-2rem)] pr-4">
+          <h2 className="mb-2 font-semibold">Aug 29</h2>
+          <ul className="space-y-2 list-disc list-inside">
+            <li className="text-sm text-foreground/80">Added tool to create GitHub issue</li>
+          </ul>
           <h2 className="mb-2 font-semibold">Aug 27</h2>
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added new GitHub tools for issues & pull requests</li>
