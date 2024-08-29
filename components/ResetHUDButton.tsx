@@ -5,20 +5,12 @@ import { usePaneStore } from '@/store/pane';
 import { Button } from '@/components/ui/button';
 import { IconRefresh } from '@/components/ui/icons';
 
-interface ResetHUDButtonProps {
-  isSignedIn: boolean;
-}
-
-const ResetHUDButton: React.FC<ResetHUDButtonProps> = ({ isSignedIn }) => {
+const ResetHUDButton: React.FC = () => {
   const resetHUDState = usePaneStore((state) => state.resetHUDState);
 
   const handleReset = () => {
     resetHUDState();
   };
-
-  if (!isSignedIn) {
-    return null;
-  }
 
   return (
     <Button
