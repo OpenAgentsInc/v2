@@ -24,7 +24,7 @@ const initialPanes = [
     x: 390,
     y: 170,
     width: 360,
-    height: 350,
+    height: 450,
     isOpen: true,
     dismissable: true,
   },

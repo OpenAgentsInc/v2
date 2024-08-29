@@ -14,7 +14,7 @@ const ChangelogPane: React.FC = () => {
             <li className="text-sm text-foreground/80">Reordered tools, removed list-repo tool</li>
             <li className="text-sm text-foreground/80">Will warn instead of fail if a needed tool is unchecked</li>
           </ul>
-          <h2 className="my-2 font-semibold">Aug 27</h2>
+          <h2 className="mt-4 my-2 font-semibold">Aug 27</h2>
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added new GitHub tools for issues & pull requests</li>
             <li className="text-sm text-foreground/80">Added stop button during chat stream (hover over loadspinner)</li>
