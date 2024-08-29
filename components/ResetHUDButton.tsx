@@ -4,11 +4,13 @@ import React from 'react';
 import { usePaneStore } from '@/store/pane';
 import { Button } from '@/components/ui/button';
 import { IconRefresh } from '@/components/ui/icons';
-import { useAuth } from '@clerk/nextjs';
 
-const ResetHUDButton: React.FC = () => {
+interface ResetHUDButtonProps {
+  isSignedIn: boolean;
+}
+
+const ResetHUDButton: React.FC<ResetHUDButtonProps> = ({ isSignedIn }) => {
   const resetHUDState = usePaneStore((state) => state.resetHUDState);
-  const { isSignedIn } = useAuth();
 
   const handleReset = () => {
     resetHUDState();
