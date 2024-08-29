@@ -12,6 +12,7 @@ const ChangelogPane: React.FC = () => {
             <li className="text-sm text-foreground/80">Added tool to create GitHub issue</li>
             <li className="text-sm text-foreground/80">Added tool to delete file</li>
             <li className="text-sm text-foreground/80">Reordered tools, removed list-repo tool</li>
+            <li className="text-sm text-foreground/80">Will warn instead of fail if a needed tool is unchecked</li>
           </ul>
           <h2 className="my-2 font-semibold">Aug 27</h2>
           <ul className="space-y-2 list-disc list-inside">

@@ -1,11 +1,14 @@
 import { z } from "zod"
 
-async function githubApiRequest(url: string, token: string): Promise<any> {
+async function githubApiRequest(url: string, token: string, method: string = 'GET', body?: any): Promise<any> {
   const response = await fetch(url, {
+    method,
     headers: {
       Authorization: `token ${token}`,
       Accept: 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json',
     },
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!response.ok) {
@@ -76,4 +79,20 @@ export async function githubListContents(args: { path: string, token: string, re
   return data.map((item: any) => item.name);
 }
 
-// ... (rest of the file remains unchanged)
+export async function githubDeleteFile(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string, message?: string }): Promise<void> {
+  const { path, token, repoOwner, repoName, branch, message } = args;
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+
+  // First, get the current file to retrieve its SHA
+  const fileData = await githubApiRequest(url, token);
+
+  // Prepare the request body
+  const body = {
+    message: message || `Delete ${path}`,
+    sha: fileData.sha,
+    branch: branch || 'main',
+  };
+
+  // Send DELETE request
+  await githubApiRequest(url, token, 'DELETE', body);
+}
