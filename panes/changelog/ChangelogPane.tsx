@@ -11,7 +11,7 @@ const ChangelogPane: React.FC = () => {
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added tool to create GitHub issue</li>
           </ul>
-          <h2 className="mb-2 font-semibold">Aug 27</h2>
+          <h2 className="my-2 font-semibold">Aug 27</h2>
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added new GitHub tools for issues & pull requests</li>
             <li className="text-sm text-foreground/80">Added stop button during chat stream (hover over loadspinner)</li>
