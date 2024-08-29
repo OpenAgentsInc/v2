@@ -87,7 +87,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     'open_issue',
     'close_issue',
     'post_github_comment',
-    'list_repos',
+    // 'list_repos',
   ]
 
   const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"

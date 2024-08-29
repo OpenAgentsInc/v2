@@ -10,10 +10,12 @@ import { closePullRequestTool } from "./close-pull-request"
 import { createBranchTool } from "./create-branch"
 import { createFileTool } from "./create-file"
 import { createPullRequestTool } from "./create-pull-request"
+import { deleteFileTool } from "./delete-file"
 import { fetchGitHubIssueTool } from "./fetch-github-issue"
 import { listOpenIssuesTool } from "./list-open-issues"
 import { listPullRequestsTool } from "./list-pull-requests"
-import { listReposTool } from "./list-repos"
+import { openIssueTool } from "./open-issue"
+// import { listReposTool } from "./list-repos"
 import { postGitHubCommentTool } from "./post-github-comment"
 import { rewriteFileTool } from "./rewrite-file"
 import { scrapeWebpageTool } from "./scrape-webpage"
@@ -21,12 +23,10 @@ import { updatePullRequestTool } from "./update-pull-request"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { viewPullRequestTool } from "./view-pull-request"
-import { openIssueTool } from "./open-issue"
-import { deleteFileTool } from "./delete-file"
 
 export const allTools = {
   create_file: { tool: createFileTool, description: "Create a new file at path with content" },
-  list_repos: { tool: listReposTool, description: "List all repositories for the authenticated user" },
+  // list_repos: { tool: listReposTool, description: "List all repositories for the authenticated user" },
   rewrite_file: { tool: rewriteFileTool, description: "Rewrite file at path with new content" },
   scrape_webpage: { tool: scrapeWebpageTool, description: "Scrape webpage for information" },
   view_file: { tool: viewFileTool, description: "View file contents at path" },

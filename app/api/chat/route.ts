@@ -43,7 +43,6 @@ export async function POST(req: Request) {
   }
 
   const messages = convertToCoreMessages(body.messages);
-  console.log('tools:', tools)
   const result = await streamText({
     messages,
     model: toolContext.model,

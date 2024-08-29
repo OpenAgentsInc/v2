@@ -4,6 +4,7 @@ import { ToolContext } from "@/types"
 export function getSystemPrompt(context: ToolContext, selectedTools: string[]): string {
   const { repo } = context
   const prompt = repo ? getRepoPrompt(repo, selectedTools) : basePrompt(selectedTools);
+  console.log("Prompt:", prompt);
   return prompt
 }
 
