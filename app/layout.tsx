@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
-import { siteConfig } from "./siteConfig"
 import ResetHUDButton from "@/components/ResetHUDButton"
+import { jetbrainsMono } from "@/lib/fonts"
+import { siteConfig } from "./siteConfig"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://openagents.com"),
@@ -39,9 +39,6 @@ export default function RootLayout({
       <body
         className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
       >
-        <div className="fixed top-4 right-4 z-50">
-          <ResetHUDButton />
-        </div>
         {children}
       </body>
     </html>

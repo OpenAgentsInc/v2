@@ -1,4 +1,4 @@
-import { Pane, PaneInput } from '@/types/pane'
+import { Pane, PaneInput } from "@/types/pane"
 
 export type PaneStore = {
   panes: Pane[]
@@ -16,4 +16,5 @@ export type PaneStore = {
   openChatPane: (pane: PaneInput, isCommandKeyHeld: boolean) => void
   bringPaneToFront: (id: string) => void
   setActivePane: (id: string) => void
+  resetHUDState: any
 }
