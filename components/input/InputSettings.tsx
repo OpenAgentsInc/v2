@@ -84,6 +84,7 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
     'list_pull_requests',
     'view_pull_request',
     'list_open_issues',
+    'open_issue',
     'close_issue',
     'post_github_comment'
   ]
