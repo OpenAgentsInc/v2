@@ -4,15 +4,17 @@ async function githubApiRequest(url: string, token: string, method: string = 'GE
   const response = await fetch(url, {
     method,
     headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
       'Content-Type': 'application/json',
     },
     body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub API request failed: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}\n${errorText}`);
   }
 
   return response.json();
@@ -79,20 +81,50 @@ export async function githubListContents(args: { path: string, token: string, re
   return data.map((item: any) => item.name);
 }
 
-export async function githubDeleteFile(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string, message?: string }): Promise<void> {
-  const { path, token, repoOwner, repoName, branch, message } = args;
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+export async function githubDeleteFile(args: {
+  path: string,
+  token: string,
+  repoOwner: string,
+  repoName: string,
+  branch?: string,
+  message?: string,
+  committerName?: string,
+  committerEmail?: string
+}): Promise<void> {
+  const {
+    path,
+    token,
+    repoOwner,
+    repoName,
+    branch = 'main',
+    message,
+    committerName = "GitHub API",
+    committerEmail = "noreply@github.com"
+  } = args;
+
+  // Include the branch in the URL when fetching the file data
+  const getFileUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}?ref=${branch}`;
 
   // First, get the current file to retrieve its SHA
-  const fileData = await githubApiRequest(url, token);
+  const fileData = await githubApiRequest(getFileUrl, token);
+
+  if (!fileData.sha) {
+    throw new Error(`File not found: ${path} in branch ${branch}`);
+  }
+
+  const deleteUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
 
   // Prepare the request body
   const body = {
     message: message || `Delete ${path}`,
+    committer: {
+      name: committerName,
+      email: committerEmail
+    },
     sha: fileData.sha,
-    branch: branch || 'main',
+    branch: branch,
   };
 
   // Send DELETE request
-  await githubApiRequest(url, token, 'DELETE', body);
+  await githubApiRequest(deleteUrl, token, 'DELETE', body);
 }
