@@ -1,10 +1,10 @@
 "use client";
 
 import React from 'react';
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, ClerkProvider } from "@clerk/nextjs";
 import ResetHUDButton from "./ResetHUDButton";
 
-const ClientResetHUDButton: React.FC = () => {
+const AuthenticatedResetHUDButton: React.FC = () => {
   const { isSignedIn } = useAuth();
   
   if (!isSignedIn) {
@@ -12,6 +12,14 @@ const ClientResetHUDButton: React.FC = () => {
   }
 
   return <ResetHUDButton />;
+};
+
+const ClientResetHUDButton: React.FC = () => {
+  return (
+    <ClerkProvider>
+      <AuthenticatedResetHUDButton />
+    </ClerkProvider>
+  );
 };
 
 export default ClientResetHUDButton;
