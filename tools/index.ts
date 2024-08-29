@@ -21,6 +21,7 @@ import { updatePullRequestTool } from "./update-pull-request"
 import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { viewPullRequestTool } from "./view-pull-request"
+import { openIssueTool } from "./open-issue"
 
 export const allTools = {
   create_file: { tool: createFileTool, description: "Create a new file at path with content" },
@@ -38,7 +39,8 @@ export const allTools = {
   list_pull_requests: { tool: listPullRequestsTool, description: "List all open pull requests in the repository" },
   view_pull_request: { tool: viewPullRequestTool, description: "View details of a specific pull request" },
   list_open_issues: { tool: listOpenIssuesTool, description: "List all open issues in the repository" },
-  close_issue: { tool: closeIssueTool, description: "Close an existing GitHub issue" }
+  close_issue: { tool: closeIssueTool, description: "Close an existing GitHub issue" },
+  open_issue: { tool: openIssueTool, description: "Open a new GitHub issue" }
 } as const;
 
 type ToolName = keyof typeof allTools;
