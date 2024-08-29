@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
-import { ClerkProvider } from "@clerk/nextjs"
 import ClientResetHUDButton from "@/components/ClientResetHUDButton"
 
 export const metadata: Metadata = {
@@ -36,17 +35,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning className="dark">
-        <body
-          className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
-        >
-          <div className="fixed top-4 right-4 z-50">
-            <ClientResetHUDButton />
-          </div>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body
+        className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
+      >
+        <div className="fixed top-4 right-4 z-50">
+          <ClientResetHUDButton />
+        </div>
+        {children}
+      </body>
+    </html>
   )
 }
