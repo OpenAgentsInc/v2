@@ -58,7 +58,7 @@ export const Balance = () => {
         <DialogHeader>
           <DialogTitle>Add Credits</DialogTitle>
           <DialogDescription>
-            Advanced models require credits. Select the amount of credits to buy. Min $5, max $1000
+            Advanced models require credits. Select the amount of credits to buy. Min $5, max $2000
           </DialogDescription>
         </DialogHeader>
         <AddCreditsForm uiMode="hosted" clerkUserId={userId} />
