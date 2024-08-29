@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
-import ResetHUDButton from "@/components/ResetHUDButton"
-import { ClerkProvider, useAuth } from "@clerk/nextjs"
+import { ClerkProvider } from "@clerk/nextjs"
+import ClientResetHUDButton from "@/components/ClientResetHUDButton"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://openagents.com"),
@@ -30,11 +30,6 @@ export const metadata: Metadata = {
   },
 }
 
-function AuthenticatedResetHUDButton() {
-  const { isSignedIn } = useAuth()
-  return <ResetHUDButton isSignedIn={isSignedIn || false} />
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,7 +42,7 @@ export default function RootLayout({
           className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
         >
           <div className="fixed top-4 right-4 z-50">
-            <AuthenticatedResetHUDButton />
+            <ClientResetHUDButton />
           </div>
           {children}
         </body>
