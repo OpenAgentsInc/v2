@@ -3,6 +3,7 @@ import { jetbrainsMono } from '@/lib/fonts'
 import "./globals.css"
 import { siteConfig } from "./siteConfig"
 import ResetHUDButton from "@/components/ResetHUDButton"
+import { ClerkProvider, useAuth } from "@clerk/nextjs"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://openagents.com"),
@@ -29,21 +30,28 @@ export const metadata: Metadata = {
   },
 }
 
+function AuthenticatedResetHUDButton() {
+  const { isSignedIn } = useAuth()
+  return <ResetHUDButton isSignedIn={isSignedIn || false} />
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body
-        className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
-      >
-        <div className="fixed top-4 right-4 z-50">
-          <ResetHUDButton />
-        </div>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning className="dark">
+        <body
+          className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
+        >
+          <div className="fixed top-4 right-4 z-50">
+            <AuthenticatedResetHUDButton />
+          </div>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
