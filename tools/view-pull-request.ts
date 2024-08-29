@@ -32,13 +32,13 @@ export const viewPullRequestTool = (context: ToolContext): CoreTool<typeof param
     const octokit = new Octokit({ auth: context.gitHubToken });
 
     try {
-      const { data: pr } = await octokit.pulls.get({
+      const { data: pr } = await octokit.issues.listComments({
         owner: context.repo.owner,
         repo: context.repo.name,
-        pull_number,
+        issue_number: pull_number,
       });
 
-      const { data: comments } = await octokit.pulls.listReviewComments({
+      const { data: comments } = await octokit.pulls.({
         owner: context.repo.owner,
         repo: context.repo.name,
         pull_number,
