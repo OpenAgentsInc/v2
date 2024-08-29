@@ -70,23 +70,24 @@ export function InputSettings({ className, ...props }: React.ComponentProps<'div
   }
 
   const ourtools = [
-    'create_file',
-    'list_repos',
-    'rewrite_file',
     'scrape_webpage',
     'view_file',
     'view_hierarchy',
-    'create_pull_request',
+    'create_file',
+    'rewrite_file',
+    'delete_file',
     'create_branch',
-    'fetch_github_issue',
+    'create_pull_request',
     'update_pull_request',
     'close_pull_request',
     'list_pull_requests',
     'view_pull_request',
+    'fetch_github_issue',
     'list_open_issues',
     'open_issue',
     'close_issue',
-    'post_github_comment'
+    'post_github_comment',
+    'list_repos',
   ]
 
   const buttonClasses = "opacity-75 bg-background text-foreground hover:bg-accent/60 hover:text-accent-foreground rounded px-2 py-1 flex items-center space-x-1 focus:outline-none focus:ring-0 transition-colors duration-200"
