@@ -22,6 +22,7 @@ import { viewFileTool } from "./view-file"
 import { viewHierarchyTool } from "./view-hierarchy"
 import { viewPullRequestTool } from "./view-pull-request"
 import { openIssueTool } from "./open-issue"
+import { deleteFileTool } from "./delete-file"
 
 export const allTools = {
   create_file: { tool: createFileTool, description: "Create a new file at path with content" },
@@ -40,7 +41,8 @@ export const allTools = {
   view_pull_request: { tool: viewPullRequestTool, description: "View details of a specific pull request" },
   list_open_issues: { tool: listOpenIssuesTool, description: "List all open issues in the repository" },
   close_issue: { tool: closeIssueTool, description: "Close an existing GitHub issue" },
-  open_issue: { tool: openIssueTool, description: "Open a new GitHub issue" }
+  open_issue: { tool: openIssueTool, description: "Open a new GitHub issue" },
+  delete_file: { tool: deleteFileTool, description: "Delete file at path" }
 } as const;
 
 type ToolName = keyof typeof allTools;
