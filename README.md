@@ -1,3 +1,5 @@
+([Open-sourced August 29th.](https://x.com/OpenAgentsInc/status/1829308058679365748) Any horrific bugs please DM us!)
+
 # OpenAgents.com
 
 OpenAgents is 'your all-in-one AI productivity dashboard', available at openagents.com.
