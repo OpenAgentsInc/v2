@@ -47,7 +47,7 @@ export async function POST(req: Request) {
             console.log(`Amount total: ${amountTotal}, User ID: ${userId}`)
 
             if (amountTotal && userId) {
-              const creditsToAdd = Math.floor(amountTotal / 100) // Convert cents to dollars/credits
+              const creditsToAdd = Math.floor(amountTotal) // Remove division by 100, as amount is already in cents
               console.log(`Attempting to add ${creditsToAdd} credits to user ${userId}`)
               try {
                 await convex.mutation(api.users.updateUserCredits.updateUserCredits, { clerk_user_id: userId, credits: creditsToAdd })
