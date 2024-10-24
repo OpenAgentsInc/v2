@@ -37,13 +37,22 @@ export function useChat({ propsId, onTitleUpdate }: { propsId?: Id<"threads">, o
 
   const model = useModelStore((state) => state.model)
   const repo = useRepoStore((state) => state.repo)
+  const githubToken = useRepoStore((state) => state.githubToken)
   const tools = useToolStore((state) => state.tools)
   const setBalance = useBalanceStore((state) => state.setBalance)
 
   const vercelChatProps = useVercelChat({
     id: threadId?.toString(),
     initialMessages: threadData.messages as VercelMessage[],
-    body: { model: model.id, tools, threadId, repoOwner: repo?.owner, repoName: repo?.name, repoBranch: repo?.branch },
+    body: { 
+      model: model.id, 
+      tools, 
+      threadId, 
+      repoOwner: repo?.owner, 
+      repoName: repo?.name, 
+      repoBranch: repo?.branch,
+      githubToken: githubToken // Add the GitHub token to the body
+    },
     maxToolRoundtrips: 20,
     onFinish: async (message, options) => {
       if (threadId && user) {
