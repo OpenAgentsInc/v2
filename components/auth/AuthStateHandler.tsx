@@ -16,7 +16,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
         try {
           const result = await createOrGetUser({
             clerk_user_id: user.id,
-            email: user.emailAddresses[0].emailAddress,
+            email: user.emailAddresses[0].emailAddress ?? "noemail-" + user.id + "@openagents.com",
             image: user.imageUrl,
             // name: user.fullName,
             // username: user.username
@@ -26,6 +26,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error('Error creating/getting user:', error)
           toast.error('Failed to initialize user data. Please try refreshing the page.')
+          // so reset the user
         }
       }
     }
