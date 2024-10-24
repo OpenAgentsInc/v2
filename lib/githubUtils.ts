@@ -28,7 +28,6 @@ const githubListUserReposArgsSchema = z.object({
 });
 
 export async function githubListUserRepos(args: z.infer<typeof githubListUserReposArgsSchema>): Promise<any[]> {
-  console.log("are we here")
   const { token, perPage, sort, direction } = githubListUserReposArgsSchema.parse(args);
   const params = new URLSearchParams();
 

@@ -1,10 +1,10 @@
-import { getGitHubToken } from "@/lib/github/isGitHubUser"
 import { models } from "@/lib/models"
 import { Model, Repo, ToolContext } from "@/types"
 import { bedrock } from "@ai-sdk/amazon-bedrock"
 import { anthropic } from "@ai-sdk/anthropic"
 import { openai } from "@ai-sdk/openai"
 import { currentUser, User } from "@clerk/nextjs/server"
+import { getGitHubToken } from "@/lib/github/isGitHubUser"
 import { closeIssueTool } from "./close-issue"
 import { closePullRequestTool } from "./close-pull-request"
 import { createBranchTool } from "./create-branch"
@@ -15,7 +15,6 @@ import { fetchGitHubIssueTool } from "./fetch-github-issue"
 import { listOpenIssuesTool } from "./list-open-issues"
 import { listPullRequestsTool } from "./list-pull-requests"
 import { openIssueTool } from "./open-issue"
-// import { listReposTool } from "./list-repos"
 import { postGitHubCommentTool } from "./post-github-comment"
 import { rewriteFileTool } from "./rewrite-file"
 import { scrapeWebpageTool } from "./scrape-webpage"
@@ -26,7 +25,6 @@ import { viewPullRequestTool } from "./view-pull-request"
 
 export const allTools = {
   create_file: { tool: createFileTool, description: "Create a new file at path with content" },
-  // list_repos: { tool: listReposTool, description: "List all repositories for the authenticated user" },
   rewrite_file: { tool: rewriteFileTool, description: "Rewrite file at path with new content" },
   scrape_webpage: { tool: scrapeWebpageTool, description: "Scrape webpage for information" },
   view_file: { tool: viewFileTool, description: "View file contents at path" },
@@ -47,11 +45,14 @@ export const allTools = {
 
 type ToolName = keyof typeof allTools;
 
-export const getTools = (context: ToolContext, toolNames: ToolName[]) => {
+export const getTools = (context: ToolContext, toolNames: ToolName[], githubToken?: string) => {
   const tools: Partial<Record<ToolName, ReturnType<typeof allTools[ToolName]["tool"]>>> = {};
   toolNames.forEach(toolName => {
     if (allTools[toolName]) {
-      tools[toolName] = allTools[toolName].tool(context);
+      tools[toolName] = allTools[toolName].tool({
+        ...context,
+        gitHubToken: githubToken || context.gitHubToken
+      });
     }
   });
   return tools;
@@ -61,18 +62,18 @@ interface ToolContextBody {
   repoOwner: string;
   repoName: string;
   repoBranch: string;
-  model: string; // Change this to expect just the model ID
+  model: string;
+  githubToken?: string;
 }
 
 export const getToolContext = async (body: ToolContextBody): Promise<ToolContext> => {
-  const { repoOwner, repoName, repoBranch, model: modelId } = body;
+  const { repoOwner, repoName, repoBranch, model: modelId, githubToken } = body;
   const repo: Repo = {
     owner: repoOwner,
     name: repoName,
     branch: repoBranch
   };
   const user = await currentUser();
-  const gitHubToken = user ? await getGitHubToken(user) : undefined;
   const firecrawlToken = process.env.FIRECRAWL_API_KEY;
 
   // Find the full model object based on the provided model ID
@@ -96,10 +97,16 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
       throw new Error(`Unsupported model provider: ${modelObj.provider}`);
   }
 
+  // Use the manually set token if available, otherwise fall back to the Clerk user's token
+  let finalGitHubToken = githubToken;
+  if (!finalGitHubToken && user) {
+    finalGitHubToken = await getGitHubToken(user);
+  }
+
   return {
     repo,
     user: user as User | null,
-    gitHubToken,
+    gitHubToken: finalGitHubToken,
     firecrawlToken,
     model
   };

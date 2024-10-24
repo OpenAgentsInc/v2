@@ -14,6 +14,7 @@ const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 export async function POST(req: Request) {
   const body = await req.json();
   const threadId = body.threadId as Id<"threads">;
+  const githubToken = body.githubToken as string | undefined;
 
   if (!threadId) {
     console.error("Invalid threadId");
@@ -21,7 +22,10 @@ export async function POST(req: Request) {
   }
 
   const toolContext = await getToolContext(body);
-  const tools = getTools(toolContext, body.tools);
+  
+  // Pass the GitHub token to getTools
+  const tools = getTools(toolContext, body.tools, githubToken);
+  
   const { userId } = auth();
   if (!userId) {
     console.error("Unauthorized: No userId found");
