@@ -3,10 +3,11 @@ import { Loader2 } from "lucide-react" // Import the Loader2 icon from lucide-re
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { api } from "@/convex/_generated/api"
-import { useUser } from "@clerk/nextjs"
+import { useClerk, useUser } from "@clerk/nextjs"
 
 export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser()
+  const { signOut } = useClerk()
   const [isHandled, setIsHandled] = useState(false)
   const createOrGetUser = useMutation(api.users.createOrGetUser.createOrGetUser)
 
@@ -16,9 +17,14 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
 
         let email
         if (!user.emailAddresses || user.emailAddresses.length === 0) {
-          console.error('User has no email addresses:', user)
-          toast.error('Failed to initialize user data. Please try refreshing the page.')
+          console.log('User has no email addresses:', user)
+          // toast.error('Failed to initialize user data. Please try refreshing the page.')
           email = "noemail-" + user.id + "@openagents.com"
+
+          // so reset the user
+          setIsHandled(true)
+
+
           return
         } else {
           email = user.emailAddresses[0].emailAddress
@@ -37,6 +43,7 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error('Error creating/getting user:', error)
           toast.error('Failed to initialize user data. Please try refreshing the page.')
+          signOut({ redirectUrl: '/' })
           // so reset the user
         }
       }
