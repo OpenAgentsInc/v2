@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { useRepoStore } from "@/store/repo"
 
 async function githubApiRequest(url: string, token: string, method: string = 'GET', body?: any): Promise<any> {
   const response = await fetch(url, {
@@ -22,13 +21,14 @@ async function githubApiRequest(url: string, token: string, method: string = 'GE
 }
 
 const githubListUserReposArgsSchema = z.object({
+  token: z.string(),
   perPage: z.number().optional(),
   sort: z.enum(['created', 'updated', 'pushed', 'full_name']).optional(),
   direction: z.enum(['asc', 'desc']).optional(),
 });
 
 export async function githubListUserRepos(args: z.infer<typeof githubListUserReposArgsSchema>): Promise<any[]> {
-  const { perPage, sort, direction } = githubListUserReposArgsSchema.parse(args);
+  const { token, perPage, sort, direction } = githubListUserReposArgsSchema.parse(args);
   const params = new URLSearchParams();
 
   if (perPage !== undefined) params.append('per_page', perPage.toString());
@@ -36,11 +36,6 @@ export async function githubListUserRepos(args: z.infer<typeof githubListUserRep
   if (direction !== undefined) params.append('direction', direction);
 
   const url = `https://api.github.com/user/repos?${params.toString()}`;
-
-  const token = useRepoStore.getState().githubToken;
-  if (!token) {
-    throw new Error("GitHub token not set. Please set your GitHub token first.");
-  }
 
   const data = await githubApiRequest(url, token);
 
@@ -59,14 +54,9 @@ export async function githubListUserRepos(args: z.infer<typeof githubListUserRep
   }));
 }
 
-export async function githubReadFile(args: { path: string, repoOwner: string, repoName: string, branch?: string }): Promise<string> {
-  const { path, repoOwner, repoName, branch } = args;
+export async function githubReadFile(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string> {
+  const { path, token, repoOwner, repoName, branch } = args;
   const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}${branch ? `?ref=${branch}` : ''}`;
-
-  const token = useRepoStore.getState().githubToken;
-  if (!token) {
-    throw new Error("GitHub token not set. Please set your GitHub token first.");
-  }
 
   const data = await githubApiRequest(url, token);
 
@@ -77,14 +67,9 @@ export async function githubReadFile(args: { path: string, repoOwner: string, re
   return Buffer.from(data.content, 'base64').toString('utf-8');
 }
 
-export async function githubListContents(args: { path: string, repoOwner: string, repoName: string, branch?: string }): Promise<string[]> {
-  const { path, repoOwner, repoName, branch } = args;
+export async function githubListContents(args: { path: string, token: string, repoOwner: string, repoName: string, branch?: string }): Promise<string[]> {
+  const { path, token, repoOwner, repoName, branch } = args;
   const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}${branch ? `?ref=${branch}` : ''}`;
-
-  const token = useRepoStore.getState().githubToken;
-  if (!token) {
-    throw new Error("GitHub token not set. Please set your GitHub token first.");
-  }
 
   const data = await githubApiRequest(url, token);
 
@@ -97,6 +82,7 @@ export async function githubListContents(args: { path: string, repoOwner: string
 
 export async function githubDeleteFile(args: {
   path: string,
+  token: string,
   repoOwner: string,
   repoName: string,
   branch?: string,
@@ -106,6 +92,7 @@ export async function githubDeleteFile(args: {
 }): Promise<void> {
   const {
     path,
+    token,
     repoOwner,
     repoName,
     branch = 'main',
@@ -113,11 +100,6 @@ export async function githubDeleteFile(args: {
     committerName = "GitHub API",
     committerEmail = "noreply@github.com"
   } = args;
-
-  const token = useRepoStore.getState().githubToken;
-  if (!token) {
-    throw new Error("GitHub token not set. Please set your GitHub token first.");
-  }
 
   // Include the branch in the URL for both GET and DELETE requests
   const fileUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
