@@ -11,7 +11,7 @@ export const GitHubTokenDialog: React.FC = () => {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="fixed bottom-4 left-20 z-50">
-          <Github className="h-4 w-4" />
+          <Github className="size-4" />
           <span className="sr-only">Set GitHub Token</span>
         </Button>
       </DialogTrigger>
@@ -19,7 +19,7 @@ export const GitHubTokenDialog: React.FC = () => {
         <DialogHeader>
           <DialogTitle>Set GitHub Token</DialogTitle>
           <DialogDescription>
-            If you have a GitHub account connected, we'll use your GitHub token from that. You can also manually specify one here.
+            If you have a GitHub account connected, we&apos;ll use your GitHub token from that. You can also manually specify one here.
           </DialogDescription>
         </DialogHeader>
         <GitHubTokenInput />
