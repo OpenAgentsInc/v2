@@ -2,6 +2,8 @@
 
 import React, { useState } from "react"
 import { useRepoStore } from "../store/repo"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export function GitHubTokenInput() {
   const [token, setToken] = useState('');
@@ -15,19 +17,16 @@ export function GitHubTokenInput() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
-      <input
+      <Input
         type="text"
         value={token}
         onChange={(e) => setToken(e.target.value)}
         placeholder="Enter your GitHub token"
-        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full"
       />
-      <button
-        type="submit"
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
+      <Button type="submit" className="w-full">
         Set GitHub Token
-      </button>
+      </Button>
     </form>
   );
 }
