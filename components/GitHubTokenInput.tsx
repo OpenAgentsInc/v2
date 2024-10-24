@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { useRepoStore } from '../store/repo';
+"use client"
+
+import React, { useState } from "react"
+import { useRepoStore } from "../store/repo"
 
 export function GitHubTokenInput() {
   const [token, setToken] = useState('');
