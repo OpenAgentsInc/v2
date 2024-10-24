@@ -4,6 +4,7 @@ import { bedrock } from "@ai-sdk/amazon-bedrock"
 import { anthropic } from "@ai-sdk/anthropic"
 import { openai } from "@ai-sdk/openai"
 import { currentUser, User } from "@clerk/nextjs/server"
+import { getGitHubToken } from "@/lib/github/isGitHubUser"
 import { closeIssueTool } from "./close-issue"
 import { closePullRequestTool } from "./close-pull-request"
 import { createBranchTool } from "./create-branch"
@@ -96,10 +97,16 @@ export const getToolContext = async (body: ToolContextBody): Promise<ToolContext
       throw new Error(`Unsupported model provider: ${modelObj.provider}`);
   }
 
+  // Use the manually set token if available, otherwise fall back to the Clerk user's token
+  let finalGitHubToken = githubToken;
+  if (!finalGitHubToken && user) {
+    finalGitHubToken = await getGitHubToken(user);
+  }
+
   return {
     repo,
     user: user as User | null,
-    gitHubToken: githubToken,
+    gitHubToken: finalGitHubToken,
     firecrawlToken,
     model
   };
