@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import ResetHUDButton from "@/components/ResetHUDButton"
-import { GitHubTokenInput } from "@/components/GitHubTokenInput"
 import { jetbrainsMono } from "@/lib/fonts"
 import { siteConfig } from "./siteConfig"
 
@@ -40,9 +39,6 @@ export default function RootLayout({
       <body
         className={`${jetbrainsMono.variable} min-h-screen scroll-auto antialiased selection:bg-white selection:text-black dark:bg-black font-mono`}
       >
-        <div className="fixed top-4 right-4 z-50">
-          <GitHubTokenInput />
-        </div>
         {children}
       </body>
     </html>
