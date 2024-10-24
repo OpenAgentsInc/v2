@@ -13,10 +13,21 @@ export function AuthStateHandler({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleUserCreation = async () => {
       if (isLoaded && user && !isHandled) {
+
+        let email
+        if (!user.emailAddresses || user.emailAddresses.length === 0) {
+          console.error('User has no email addresses:', user)
+          toast.error('Failed to initialize user data. Please try refreshing the page.')
+          email = "noemail-" + user.id + "@openagents.com"
+          return
+        } else {
+          email = user.emailAddresses[0].emailAddress
+        }
+
         try {
           const result = await createOrGetUser({
             clerk_user_id: user.id,
-            email: user.emailAddresses[0].emailAddress ?? "noemail-" + user.id + "@openagents.com",
+            email,
             image: user.imageUrl,
             // name: user.fullName,
             // username: user.username
