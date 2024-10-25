@@ -15,7 +15,7 @@
     "migrate:prod": "NODE_ENV=production npx tsx scripts/migrate_vercel_to_convex.ts"
   },
   "dependencies": {
-    "@ai-sdk/amazon-bedrock": "^0.0.13",
+    "@ai-sdk/amazon-bedrock": "0.0.30",
     "@ai-sdk/anthropic": "^0.0.35",
     "@ai-sdk/openai": "^0.0.34",
     "@ai-sdk/provider-utils": "^1.0.9",
