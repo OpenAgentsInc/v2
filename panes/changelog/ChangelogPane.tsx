@@ -7,6 +7,10 @@ const ChangelogPane: React.FC = () => {
     <Card className="w-full h-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <CardContent>
         <ScrollArea className="py-4 h-[calc(100%-2rem)] pr-4">
+          <h2 className="mb-2 font-semibold">Oct 25</h2>
+          <ul className="space-y-2 list-disc list-inside">
+            <li className="text-sm text-foreground/80">Added Claude 3.5 Sonnet v2</li>
+          </ul>
           <h2 className="mb-2 font-semibold">Oct 24</h2>
           <ul className="space-y-2 list-disc list-inside">
             <li className="text-sm text-foreground/80">Added ability to manually specify GitHub token</li>

@@ -20,7 +20,7 @@ export const models: Model[] = [
     providerCentsPerMillionOutputTokens: 1500
   },
   {
-    name: 'Claude 3.5 Sonnet',
+    name: 'Claude 3.5 Sonnet (v2)',
     id: USE_ANTHROPIC ? 'claude-3-5-sonnet-20240620' : 'anthropic.claude-3-5-sonnet-20241022-v2:0', // 'anthropic.claude-3-5-sonnet-20240620-v1:0',
     provider: USE_ANTHROPIC ? 'anthropic' : 'bedrock',
     providerCentsPerMillionInputTokens: 300,
